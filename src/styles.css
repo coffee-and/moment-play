@@ -1,0 +1,268 @@
+:root {
+  font-family: Arial, sans-serif;
+  color: #111;
+  background: #f5f5f5;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.app-header {
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.app-header p {
+  margin: 4px 0 0;
+  color: #555;
+}
+
+.minigame-hub {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.minigame-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  min-height: 124px;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.minigame-card:hover:not(:disabled),
+.minigame-card.is-active {
+  border-color: #111;
+}
+
+.minigame-card:disabled {
+  color: #777;
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.minigame-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.minigame-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.minigame-card__body strong {
+  font-size: 1rem;
+}
+
+.minigame-card__body span:last-child {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.minigame-card__meta,
+.minigame-card__status {
+  color: #666;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.minigame-card__status {
+  grid-column: 1 / -1;
+  align-self: end;
+}
+
+.game-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.button {
+  padding: 8px 12px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+.button--secondary {
+  border-color: #ccc;
+  background: #fff;
+  color: #111;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.game-stage {
+  position: relative;
+}
+
+.game-stage.is-focus-mode {
+  position: fixed;
+  inset: 16px;
+  z-index: 10;
+  overflow: auto;
+  padding: 16px;
+  background: #fff;
+}
+
+.game-stage__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.game-stage__copy h2,
+.game-stage__copy p {
+  margin: 0;
+}
+
+.game-stage__copy p {
+  margin-top: 4px;
+  color: #555;
+}
+
+.game-stage__title-row,
+.game-stage__actions,
+.game-stage-modal__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.game-stage-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.game-stage-modal {
+  max-width: 420px;
+  padding: 18px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.game-guide-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.game-guide-modal {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 20;
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  transform: translate(-50%, -50%);
+}
+
+.editorial-label {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #666;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.omok-game__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .game-stage__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
