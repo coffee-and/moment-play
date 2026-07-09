@@ -21,6 +21,7 @@ export function GameStage({
   description,
   eyebrow,
   fullscreenEnabled = false,
+  sidebar,
   title,
 }) {
   const rootRef = useRef(null);
@@ -83,7 +84,8 @@ export function GameStage({
   return (
     <section ref={rootRef} className={joinClassNames(['game-stage', isExpanded ? 'is-expanded' : '', isFocusMode ? 'is-focus-mode' : '', className])} aria-label={ariaLabel ?? title}>
       <div className="game-stage__inner">
-        <header className="game-stage__header">
+        <aside className="card game-stage__side">
+          <span className="board-motif" aria-hidden="true" />
           <div className="game-stage__copy">
             {eyebrow ? <EditorialLabel variant="section">{eyebrow}</EditorialLabel> : null}
             <div className="game-stage__title-row">
@@ -100,8 +102,11 @@ export function GameStage({
               </Button>
             ) : null}
           </div>
-        </header>
-        <div className="game-stage__content">{children}</div>
+          {sidebar ? <div className="game-stage__sidebar">{sidebar}</div> : null}
+        </aside>
+        <main className="card game-stage__play">
+          <div className="game-stage__content">{children}</div>
+        </main>
       </div>
       {isGuideOpen ? <GameGuideModal guide={guide} onClose={() => setIsGuideOpen(false)} /> : null}
     </section>

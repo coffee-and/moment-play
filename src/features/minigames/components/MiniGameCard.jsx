@@ -1,9 +1,9 @@
 import { MINIGAME_STATUS } from "../data/minigameCatalog.js";
 
 const STATUS_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "Available",
-  [MINIGAME_STATUS.COMING_SOON]: "Coming soon",
-  [MINIGAME_STATUS.IN_PROGRESS]: "In progress",
+  [MINIGAME_STATUS.AVAILABLE]: "Play",
+  [MINIGAME_STATUS.COMING_SOON]: "Soon",
+  [MINIGAME_STATUS.IN_PROGRESS]: "UI ready",
 };
 
 function joinClassNames(values) {
@@ -17,18 +17,24 @@ export function MiniGameCard({ game, isActive, onSelect }) {
   return (
     <button
       type="button"
-      className={joinClassNames(["minigame-card", isActive ? "is-active" : "", canOpen ? "" : "is-disabled"])}
+      className={joinClassNames(["minigame-card", "gcard", isActive ? "is-active" : "", canOpen ? "open" : "soon"])}
       disabled={!canOpen}
       onClick={() => onSelect(game.id)}
       aria-pressed={canOpen ? isActive : undefined}
     >
-      <span className="minigame-card__icon" aria-hidden="true">{game.icon}</span>
-      <span className="minigame-card__body">
-        <span className="minigame-card__meta">{game.category}</span>
-        <strong>{game.title}</strong>
-        <span>{game.description}</span>
+      <span className="gc-top">
+        <span className="gc-num">{game.icon}</span>
+        <span className={joinClassNames(["badge", game.category === "Online" ? "online" : ""])}>{game.category}</span>
       </span>
-      <span className="minigame-card__status">{statusLabel}</span>
+      <span className="minigame-card__body">
+        <span className="gc-en">{game.path.replace("/minigames/", "")}</span>
+        <strong className="gc-name">{game.title}</strong>
+        <span className="gc-desc">{game.description}</span>
+      </span>
+      <span className="gc-bot">
+        <span className="badge">{game.status === MINIGAME_STATUS.IN_PROGRESS ? "Next logic" : game.status === MINIGAME_STATUS.AVAILABLE ? "Solo" : "Soon"}</span>
+        <span className="gc-play">{statusLabel}<span className="arw" aria-hidden="true" /></span>
+      </span>
     </button>
   );
 }
