@@ -1521,6 +1521,56 @@ a {
   word-break: break-all;
 }
 
+.omok-game__notice {
+  width: 100%;
+  margin: 0;
+  border-radius: var(--r3);
+  padding: 10px 12px;
+  background: var(--field);
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.omok-game__notice.is-error {
+  color: var(--coral2);
+}
+
+.omok-game__invite {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+}
+
+.omok-game__invite-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.omok-game__room-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.omok-game__room-slot {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--r2);
+  padding: 13px 16px;
+  background: var(--field);
+}
+
+.omok-game__waiting-actions {
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .omok-game__settings {
   display: flex;
   flex-wrap: wrap;
@@ -1651,7 +1701,13 @@ a {
   .ggrid,
   .steps,
   .omok-game__menu-grid,
+  .omok-game__room-slots,
   .sudoku-game__level-list {
+    grid-template-columns: 1fr;
+  }
+
+  .omok-game__invite-row,
+  .omok-game__waiting-actions {
     grid-template-columns: 1fr;
   }
 
