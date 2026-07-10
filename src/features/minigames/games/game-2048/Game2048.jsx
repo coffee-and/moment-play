@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import "./game-2048.css";
 import {
   BOARD_SIZE,
   FINAL_TARGET_TILE,
@@ -366,7 +367,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <h3 id="game-2048-complete-title">{FINAL_TARGET_TILE} {GAME_2048_COPY.completed.title}</h3>
               <p>{GAME_2048_COPY.completed.description}</p>
               <p>{GAME_2048_COPY.completed.detail}</p>
-              <div className="game-2048__modal-actions game-stage-modal__actions">
+              <div className="game-stage-modal__actions">
                 <Button ref={completedContinueButtonRef} type="button" onClick={continueEndless}>{GAME_2048_COPY.completed.continueButton}</Button>
                 <Button type="button" variant="secondary" onClick={startNewGame}>{GAME_2048_COPY.completed.newGameButton}</Button>
               </div>
@@ -385,7 +386,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-reset-title">
               <h3 id="game-2048-reset-title">{GAME_2048_COPY.reset.title}</h3>
               <p>{GAME_2048_COPY.reset.description}</p>
-              <div className="game-2048__modal-actions game-stage-modal__actions">
+              <div className="game-stage-modal__actions">
                 <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{GAME_2048_COPY.reset.continueButton}</Button>
                 <Button type="button" onClick={startNewGame}>{GAME_2048_COPY.reset.newGameButton}</Button>
               </div>

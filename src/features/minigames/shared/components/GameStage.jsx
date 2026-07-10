@@ -95,12 +95,14 @@ export function GameStage({
             {description ? <p>{description}</p> : null}
           </div>
           <div className="game-stage__actions">
-            {actions}
-            {fullscreenEnabled ? (
-              <Button ref={expandButtonRef} className="game-stage__expand" variant="secondary" type="button" onClick={handleToggleExpanded} aria-expanded={isExpanded} aria-label={isExpanded ? 'Exit fullscreen' : 'Expand game'}>
-                {isExpanded ? 'Exit fullscreen' : 'Expand'}
-              </Button>
-            ) : null}
+            <div className="game-stage__action-slot game-stage__action-slot--primary">{actions}</div>
+            <div className="game-stage__action-slot game-stage__action-slot--expand">
+              {fullscreenEnabled ? (
+                <Button ref={expandButtonRef} className="game-stage__expand" variant="secondary" type="button" onClick={handleToggleExpanded} aria-expanded={isExpanded} aria-label={isExpanded ? 'Exit fullscreen' : 'Expand game'}>
+                  {isExpanded ? 'Exit fullscreen' : 'Expand'}
+                </Button>
+              ) : null}
+            </div>
           </div>
           {sidebar ? <div className="game-stage__sidebar">{sidebar}</div> : null}
         </aside>

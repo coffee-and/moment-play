@@ -4,6 +4,7 @@ import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { createMemoryRound, evaluateMemoryChoice, shouldUpdateMemoryBest } from "./memoryOrder.logic.js";
+import "./memory-game.css";
 
 export const MEMORY_BEST_ROUND_KEY = "eunContents.memoryOrderGame.bestRound";
 const KEY = MEMORY_BEST_ROUND_KEY;
@@ -458,7 +459,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
                   );
                 })}
               </div>
-              <span className="memory-game__sr-feedback" aria-live="polite">{correctAnnouncement}</span>
+              <span className="visually-hidden" aria-live="polite">{correctAnnouncement}</span>
             </GameItemPanel>
           </div>
         )}

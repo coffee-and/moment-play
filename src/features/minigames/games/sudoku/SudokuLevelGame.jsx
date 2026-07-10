@@ -197,7 +197,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <p>{completedCopy.description}</p>
               <strong>{formatTime(elapsedSeconds)}</strong>
               <p>{SUDOKU_COPY.completed.bestTime}</p>
-              <div className="game-2048__modal-actions game-stage-modal__actions">
+              <div className="game-stage-modal__actions">
                 <Button ref={completedButtonRef} type="button" onClick={continueAfterComplete}>{completedCopy.button}</Button>
                 <Button type="button" variant="secondary" onClick={returnToLevelSelect}>{SUDOKU_COPY.actions.chooseLevel}</Button>
               </div>
@@ -207,7 +207,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
             <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-reset-title">
               <h3 id="sudoku-game-reset-title">{SUDOKU_COPY.reset.title}</h3>
               <p>{SUDOKU_COPY.reset.description}</p>
-              <div className="game-2048__modal-actions game-stage-modal__actions">
+              <div className="game-stage-modal__actions">
                 <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{SUDOKU_COPY.actions.keepPlaying}</Button>
                 <Button type="button" onClick={confirmNewGame}>{SUDOKU_COPY.reset.confirm}</Button>
               </div>
