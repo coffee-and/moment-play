@@ -1,6 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
-import { DEFAULT_MINIGAME_ID, getMinigameById, MINIGAME_CATALOG, MINIGAME_STATUS } from "../data/minigameCatalog.js";
+import { GameDetailSection } from "../components/GameDetailSection.jsx";
+import { DEFAULT_MINIGAME_ID, getMinigameById, MINIGAME_CATALOG } from "../data/minigameCatalog.js";
+import { getGamePersonalRecord } from "../data/personalRecords.js";
 
 function getInitialGame() {
   return getMinigameById(DEFAULT_MINIGAME_ID) ?? MINIGAME_CATALOG[0];
@@ -9,7 +11,6 @@ function getInitialGame() {
 export function MiniGamesPage() {
   const [activeGameId, setActiveGameId] = useState(DEFAULT_MINIGAME_ID);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [theme, setTheme] = useState("dark");
   const playSectionRef = useRef(null);
 
   const activeGame = useMemo(() => getMinigameById(activeGameId) ?? getInitialGame(), [activeGameId]);
@@ -18,7 +19,6 @@ export function MiniGamesPage() {
     if (activeFilter === "All") return MINIGAME_CATALOG;
     return MINIGAME_CATALOG.filter((game) => game.category === activeFilter);
   }, [activeFilter]);
-  const ActiveGameComponent = activeGame?.component;
 
   function selectGame(gameId) {
     setActiveGameId(gameId);
@@ -32,21 +32,7 @@ export function MiniGamesPage() {
   }
 
   return (
-    <div className={`moment-app pal-${theme}`}>
-      <div className="wrap minigames-page">
-      <header className="card nav reveal">
-        <a className="brand" href="#top" aria-label="Moment Play home"><span className="bd" aria-hidden="true" />moment<b>PLAY</b></a>
-        <nav className="nav-links" aria-label="Moment Play navigation">
-          <a className="nav-link on" href="#games">Games</a>
-          <a className="nav-link" href="#omok">Omok</a>
-          <a className="nav-link" href="#play">Play</a>
-          <a className="nav-link" href="#future">Updates</a>
-        </nav>
-        <button className="mode-btn" type="button" onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}>
-          {theme === "dark" ? "Light" : "Dark"}
-        </button>
-      </header>
-
+    <div className="wrap minigames-page">
       <section className="hero" id="top" aria-labelledby="moment-play-title">
         <div className="card h-main reveal d1">
           <span className="board-motif" aria-hidden="true" />
@@ -146,19 +132,18 @@ export function MiniGamesPage() {
       <section className="game-card" id="play" ref={playSectionRef} aria-labelledby="active-game-title">
         <div className="sec-head game-card__head">
           <span className="sec-title" id="active-game-title">{activeGame?.title ?? "Game"}</span>
-          <span className="sec-sub">{activeGame?.status === MINIGAME_STATUS.IN_PROGRESS ? "UI first" : "Now playing"}</span>
+          <span className="sec-sub">Selected game</span>
         </div>
-        {ActiveGameComponent ? <ActiveGameComponent game={activeGame} /> : null}
+        <GameDetailSection game={activeGame} personalRecord={getGamePersonalRecord(activeGame?.id)} />
       </section>
 
       <footer className="card footer" id="future">
         <a className="brand" href="#top"><span className="bd" aria-hidden="true" />moment<b>PLAY</b></a>
         <div className="foot-links">
-          <a href="#games">Games</a><a href="#omok">Omok</a><a href="#play">Play</a><a href="#future">Updates</a>
+          <a href="#games">Games</a><a href="#omok">Omok</a><a href="#play">Selected Game</a><a href="#future">Updates</a>
         </div>
         <div className="foot-copy">© 2026 momentPLAY · UI prepared for account, records, matching, and future service integration.</div>
       </footer>
-      </div>
     </div>
   );
 }

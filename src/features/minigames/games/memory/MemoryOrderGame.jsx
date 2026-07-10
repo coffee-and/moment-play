@@ -5,7 +5,8 @@ import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { createMemoryRound, evaluateMemoryChoice, shouldUpdateMemoryBest } from "./memoryOrder.logic.js";
 
-const KEY = "eunContents.memoryOrderGame.bestRound";
+export const MEMORY_BEST_ROUND_KEY = "eunContents.memoryOrderGame.bestRound";
+const KEY = MEMORY_BEST_ROUND_KEY;
 const COUNTDOWN_LABELS = ["3", "2", "1", "START!"];
 const COUNTDOWN_STEP_MS = 1000;
 const ROUND_TRANSITION_MS = 900;

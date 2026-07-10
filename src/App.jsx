@@ -1,7 +1,7 @@
-import { MiniGamesPage } from "./features/minigames/pages/MiniGamesPage.jsx";
+import { AppRoutes } from "./routes/AppRoutes.jsx";
 
 function App() {
-  return <MiniGamesPage />;
+  return <AppRoutes />;
 }
 
 export default App;

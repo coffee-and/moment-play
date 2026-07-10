@@ -1919,3 +1919,75 @@ a {
     opacity: 1;
   }
 }
+
+/* Home page game detail section (GameDetailSection) */
+.game-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.game-detail__title {
+  margin: 8px 0 6px;
+  color: var(--onbg);
+  font-size: clamp(20px, 2.6vw, 26px);
+}
+
+.game-detail__desc {
+  color: var(--onbg2);
+}
+
+.game-detail__howto {
+  color: var(--onbg2);
+  font-size: 13px;
+}
+
+.game-detail__status {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--coral2);
+  font-family: var(--lat);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.game-detail__section-title {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--onbg2);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+/* Shared empty / coming-soon / not-found panel (StatusPanel) */
+.status-panel {
+  padding: var(--gap);
+  text-align: center;
+}
+
+.status-panel__title {
+  display: block;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.status-panel__description {
+  margin-top: 6px;
+  color: var(--ink2);
+  font-size: 13px;
+}
+
+.status-panel__action {
+  margin-top: var(--gap);
+}
+
+/* Gameplay page (MinigamePlayPage) back-link header */
+.play-page__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.play-page__back {
+  flex: none;
+}

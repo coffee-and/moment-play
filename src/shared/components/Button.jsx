@@ -5,6 +5,7 @@ function joinClassNames(values) {
 }
 
 export const Button = forwardRef(function Button({
+  as: Component = 'button',
   children,
   className = '',
   fullWidth = false,
@@ -13,10 +14,13 @@ export const Button = forwardRef(function Button({
   variant = 'primary',
   ...props
 }, ref) {
+  // `type` only applies to a real <button>; non-button elements (e.g. router Link) don't accept it.
+  const typeProp = Component === 'button' ? { type } : {};
+
   return (
-    <button
+    <Component
       ref={ref}
-      type={type}
+      {...typeProp}
       className={joinClassNames([
         'button',
         `button--${variant}`,
@@ -27,6 +31,6 @@ export const Button = forwardRef(function Button({
       {...props}
     >
       {children}
-    </button>
+    </Component>
   );
 });
