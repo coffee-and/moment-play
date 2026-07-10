@@ -26,9 +26,9 @@ async function getCurrentUserId(client = getSupabaseClient()) {
   return session.user.id;
 }
 
-async function getProfileByUserId(userId, client = getSupabaseClient()) {
+export async function getProfileByUserId(userId, client = getSupabaseClient()) {
   const { data, error } = await client
-    .from("omok_profiles")
+    .from("profiles")
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
@@ -42,7 +42,7 @@ async function getOrCreateProfileNickname(userId, client = getSupabaseClient()) 
   if (profile?.nickname) return profile.nickname;
 
   const fallbackNickname = getFallbackOnlineNickname(userId);
-  const { error } = await client.from("omok_profiles").insert({
+  const { error } = await client.from("profiles").insert({
     user_id: userId,
     nickname: fallbackNickname,
   });
@@ -51,7 +51,7 @@ async function getOrCreateProfileNickname(userId, client = getSupabaseClient()) 
   return fallbackNickname;
 }
 
-export async function getCurrentOmokProfileState(client = getSupabaseClient()) {
+export async function getCurrentProfileState(client = getSupabaseClient()) {
   const userId = await getCurrentUserId(client);
   const profile = await getProfileByUserId(userId, client);
   const nickname = profile?.nickname ?? null;
@@ -64,13 +64,13 @@ export async function getCurrentOmokProfileState(client = getSupabaseClient()) {
   };
 }
 
-export async function saveCurrentOmokProfileNickname(nickname, client = getSupabaseClient()) {
+export async function saveCurrentProfileNickname(nickname, client = getSupabaseClient()) {
   const validation = validateOnlineNickname(nickname);
   if (!validation.valid) throw new Error(validation.message);
 
   const userId = await getCurrentUserId(client);
   const normalizedNickname = normalizeOnlineNickname(validation.value);
-  const { error } = await client.from("omok_profiles").upsert(
+  const { error } = await client.from("profiles").upsert(
     {
       user_id: userId,
       nickname: normalizedNickname,
@@ -256,8 +256,8 @@ export async function acceptOmokOnlineRematch(roomId, client = getSupabaseClient
 
 export const omokOnlineRoomGateway = {
   isConfigured: isSupabaseConfigured,
-  getCurrentProfileState: getCurrentOmokProfileState,
-  saveCurrentProfileNickname: saveCurrentOmokProfileNickname,
+  getCurrentProfileState,
+  saveCurrentProfileNickname,
   createRoom: createOmokOnlineRoom,
   joinRoom: joinOmokOnlineRoom,
   refreshRoom: getOmokOnlineRoomSnapshot,

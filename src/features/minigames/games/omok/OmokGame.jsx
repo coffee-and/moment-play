@@ -26,6 +26,15 @@ import {
   ONLINE_ROOM_LOAD_STATUS,
   ONLINE_ROOM_STATUS,
 } from "./online/omokOnline.constants.js";
+import {
+  GUEST_FALLBACK_NICKNAME,
+  getNicknamePrefillForOnlineSetup,
+  getResolvedLocalPlayerTwoNickname,
+  resolveSharedNickname,
+  saveLocalPlayerTwo,
+  saveLocalSharedNickname,
+  saveSharedNickname,
+} from "./online/sharedNickname.js";
 import { createOmokMatchConfig, isSamePosition, pointToPercent, positionKey } from "./omok.utils.js";
 
 const DEFAULT_GAME_META = {
@@ -127,7 +136,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   const navigate = useNavigate();
   const [view, setView] = useState(VIEW.LOBBY);
   const [dialog, setDialog] = useState(null);
-  const [nickname, setNickname] = useState("guest");
+  const [sharedNickname, setSharedNickname] = useState(GUEST_FALLBACK_NICKNAME);
+  const [localPlayerTwoNickname, setLocalPlayerTwoNickname] = useState(getResolvedLocalPlayerTwoNickname);
   const [onlineNickname, setOnlineNickname] = useState("");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [activeMatch, setActiveMatch] = useState(() => createOmokMatchConfig(MATCH_TYPE.LOCAL, DEFAULT_SETTINGS));
@@ -198,11 +208,23 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   const onlineBusy = online.actionStatus !== ONLINE_ACTION_STATUS.IDLE;
 
   useEffect(() => {
+    let cancelled = false;
+
+    resolveSharedNickname().then((resolved) => {
+      if (!cancelled) setSharedNickname(resolved);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (online.needsNicknameSetup) {
       setDialog(DIALOG.NICKNAME);
-      setOnlineNickname(nickname);
+      setOnlineNickname(getNicknamePrefillForOnlineSetup());
     }
-  }, [nickname, online.needsNicknameSetup]);
+  }, [online.needsNicknameSetup]);
 
   function openDialog(nextDialog) {
     setDialog(nextDialog);
@@ -271,11 +293,13 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     }
 
     if (activeMatch.matchType === MATCH_TYPE.LOCAL) {
-      return stone === STONE.BLACK ? `${nickname || "Player"} (흑)` : "Player 2 (백)";
+      return stone === STONE.BLACK
+        ? `${sharedNickname || "Player"} (흑)`
+        : `${localPlayerTwoNickname || "Player 2"} (백)`;
     }
 
     return stone === activeMatch.playerStone
-      ? `${nickname || "Player"} (${getStoneLabel(stone)})`
+      ? `${sharedNickname || "Player"} (${getStoneLabel(stone)})`
       : `Computer (${getStoneLabel(stone)})`;
   }
 
@@ -310,6 +334,13 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   }
 
   function saveOnlineNickname() {
+    try {
+      const normalized = saveLocalSharedNickname(onlineNickname);
+      setSharedNickname(normalized);
+    } catch {
+      // Validation errors surface via online.saveNicknameAndResume's own error state below.
+    }
+
     online.saveNicknameAndResume(onlineNickname);
   }
 
@@ -343,11 +374,33 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
           className="txt"
           id="omok-nickname"
           type="text"
-          value={nickname}
+          value={sharedNickname}
           maxLength="12"
-          onChange={(event) => setNickname(event.target.value)}
+          onChange={(event) => setSharedNickname(event.target.value)}
+          onBlur={() => {
+            saveSharedNickname(sharedNickname).then(setSharedNickname).catch(() => {});
+          }}
         />
         <p className="game-stage__side-note">로그인 전에는 대국에서 사용할 이름만 이 화면에서 입력합니다.</p>
+      </div>
+      <div>
+        <label className="f-label" htmlFor="omok-local-player-two-nickname">Player 2 (local only)</label>
+        <input
+          className="txt"
+          id="omok-local-player-two-nickname"
+          type="text"
+          value={localPlayerTwoNickname}
+          maxLength="12"
+          onChange={(event) => setLocalPlayerTwoNickname(event.target.value)}
+          onBlur={() => {
+            try {
+              setLocalPlayerTwoNickname(saveLocalPlayerTwo(localPlayerTwoNickname));
+            } catch {
+              // keep the current in-progress text; ignore invalid intermediate values
+            }
+          }}
+        />
+        <p className="game-stage__side-note">같은 화면에서 2인 대국할 때만 사용하는 이름입니다.</p>
       </div>
       <div className="stat-row">
         <div className="stat"><div className="l">Board</div><div className="v">{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>

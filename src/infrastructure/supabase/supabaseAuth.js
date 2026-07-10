@@ -1,5 +1,17 @@
 import { getSupabaseClient } from "./supabaseClient.js";
 
+// Read-only session check. Never creates a session — safe to call from local/computer
+// match code paths that must not trigger an anonymous Supabase sign-in.
+export async function getExistingSession(client = getSupabaseClient()) {
+  const {
+    data: { session },
+    error,
+  } = await client.auth.getSession();
+
+  if (error) throw error;
+  return session ?? null;
+}
+
 export async function ensureAnonymousSession(client = getSupabaseClient()) {
   const {
     data: { session },

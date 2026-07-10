@@ -1,8 +1,9 @@
 -- Omok online friend rooms for moment-play.
 
-create table public.omok_profiles (
+create table public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   nickname text not null check (char_length(nickname) between 2 and 12),
+  last_active_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -15,6 +16,7 @@ create table public.omok_rooms (
   status text not null default 'waiting' check (status in ('waiting', 'playing')),
   current_round integer not null default 1 check (current_round >= 1),
   round_requested_by uuid null references auth.users(id) on delete set null,
+  last_activity_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -82,8 +84,8 @@ begin
 end;
 $$;
 
-create trigger omok_profiles_set_updated_at
-before update on public.omok_profiles
+create trigger profiles_set_updated_at
+before update on public.profiles
 for each row
 execute function public.omok_set_updated_at();
 
@@ -92,6 +94,22 @@ before update on public.omok_rooms
 for each row
 execute function public.omok_set_updated_at();
 
+create or replace function public.profiles_touch_last_active()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  new.last_active_at = now();
+  return new;
+end;
+$$;
+
+create trigger profiles_touch_last_active_trigger
+before update on public.profiles
+for each row
+execute function public.profiles_touch_last_active();
+
 create or replace function public.omok_handle_new_auth_user()
 returns trigger
 language plpgsql
@@ -99,7 +117,7 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.omok_profiles (user_id, nickname)
+  insert into public.profiles (user_id, nickname)
   values (new.id, 'Guest-' || left(new.id::text, 6))
   on conflict (user_id) do nothing;
 
@@ -127,18 +145,42 @@ as $$
   );
 $$;
 
-alter table public.omok_profiles enable row level security;
+create or replace function public.omok_room_players_touch_activity()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.omok_rooms
+  set last_activity_at = now()
+  where id = new.room_id;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = new.user_id;
+
+  return new;
+end;
+$$;
+
+create trigger omok_room_players_touch_activity_trigger
+after update on public.omok_room_players
+for each row
+execute function public.omok_room_players_touch_activity();
+
+alter table public.profiles enable row level security;
 alter table public.omok_rooms enable row level security;
 alter table public.omok_room_players enable row level security;
 alter table public.omok_room_moves enable row level security;
 
-revoke all on table public.omok_profiles from anon, authenticated;
+revoke all on table public.profiles from anon, authenticated;
 revoke all on table public.omok_rooms from anon, authenticated;
 revoke all on table public.omok_room_players from anon, authenticated;
 revoke all on table public.omok_room_moves from anon, authenticated;
 
-grant select, insert on table public.omok_profiles to authenticated;
-grant update (nickname, updated_at) on table public.omok_profiles to authenticated;
+grant select, insert on table public.profiles to authenticated;
+grant update (nickname, updated_at) on table public.profiles to authenticated;
 
 grant select on table public.omok_rooms to authenticated;
 
@@ -150,20 +192,20 @@ grant select on table public.omok_room_moves to authenticated;
 
 grant execute on function public.omok_is_room_member(uuid) to authenticated;
 
-create policy omok_profiles_select_own
-on public.omok_profiles
+create policy profiles_select_own
+on public.profiles
 for select
 to authenticated
 using (user_id = auth.uid());
 
-create policy omok_profiles_insert_own
-on public.omok_profiles
+create policy profiles_insert_own
+on public.profiles
 for insert
 to authenticated
 with check (user_id = auth.uid());
 
-create policy omok_profiles_update_own
-on public.omok_profiles
+create policy profiles_update_own
+on public.profiles
 for update
 to authenticated
 using (user_id = auth.uid())
@@ -334,12 +376,16 @@ as $$
 declare
   profile_nickname text;
 begin
-  insert into public.omok_profiles (user_id, nickname)
+  insert into public.profiles (user_id, nickname)
   values (target_user_id, 'Guest-' || left(target_user_id::text, 6))
   on conflict (user_id) do nothing;
 
+  update public.profiles
+  set last_active_at = now()
+  where user_id = target_user_id;
+
   select nickname into profile_nickname
-  from public.omok_profiles
+  from public.profiles
   where user_id = target_user_id;
 
   return profile_nickname;
@@ -460,6 +506,10 @@ begin
     true,
     true
   );
+
+  update public.omok_rooms
+  set last_activity_at = now()
+  where id = p_room_id;
 end;
 $$;
 
@@ -504,8 +554,13 @@ begin
   update public.omok_rooms
   set status = 'playing',
       current_round = 1,
-      round_requested_by = null
+      round_requested_by = null,
+      last_activity_at = now()
   where id = p_room_id;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = current_user_id;
 end;
 $$;
 
@@ -606,6 +661,14 @@ begin
     p_col_index,
     p_stone
   );
+
+  update public.omok_rooms
+  set last_activity_at = now()
+  where id = p_room_id;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = current_user_id;
 end;
 $$;
 
@@ -651,8 +714,13 @@ begin
   end if;
 
   update public.omok_rooms
-  set round_requested_by = current_user_id
+  set round_requested_by = current_user_id,
+      last_activity_at = now()
   where id = p_room_id;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = current_user_id;
 end;
 $$;
 
@@ -664,9 +732,14 @@ set search_path = public
 as $$
 begin
   update public.omok_rooms
-  set round_requested_by = null
+  set round_requested_by = null,
+      last_activity_at = now()
   where id = p_room_id
     and round_requested_by = auth.uid();
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = auth.uid();
 end;
 $$;
 
@@ -712,10 +785,15 @@ begin
 
   update public.omok_rooms
   set current_round = current_round + 1,
-      round_requested_by = null
+      round_requested_by = null,
+      last_activity_at = now()
   where id = p_room_id
     and current_round = target_room.current_round
     and round_requested_by = target_room.round_requested_by;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = current_user_id;
 end;
 $$;
 
@@ -728,6 +806,14 @@ as $$
 begin
   delete from public.omok_room_players
   where room_id = p_room_id and user_id = auth.uid();
+
+  update public.omok_rooms
+  set last_activity_at = now()
+  where id = p_room_id;
+
+  update public.profiles
+  set last_active_at = now()
+  where user_id = auth.uid();
 end;
 $$;
 
