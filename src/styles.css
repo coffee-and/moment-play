@@ -1095,7 +1095,8 @@ a {
 
 .game-2048__modal-eyebrow,
 .sudoku-game__modal-eyebrow,
-.memory-game__state-kicker {
+.memory-game__state-kicker,
+.omok-game__modal-eyebrow {
   margin-bottom: 8px;
   color: var(--ink2);
   font-family: var(--lat);
@@ -1304,9 +1305,14 @@ a {
   transition: border-color 0.25s, transform 0.25s;
 }
 
-.omok-game__menu-option:hover {
+.omok-game__menu-option:hover:not(:disabled) {
   border-color: var(--ink);
   transform: translateY(-3px);
+}
+
+.omok-game__menu-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .omok-game__menu-title {
@@ -1326,7 +1332,7 @@ a {
 }
 
 .omok-game__board-wrap {
-  width: 100%;
+  width: min(100%, 540px);
   max-width: 540px;
 }
 
@@ -1369,7 +1375,7 @@ a {
 }
 
 .omok-game__star,
-.omok-game__stone {
+.omok-game__intersection {
   position: absolute;
   border-radius: 50%;
   transform: translate(-50%, -50%);
@@ -1381,9 +1387,49 @@ a {
   background: color-mix(in oklab, var(--ink) 60%, transparent);
 }
 
-.omok-game__stone {
-  width: 5.6%;
+.omok-game__intersection {
+  z-index: 1;
+  width: clamp(20px, 7%, 38px);
   aspect-ratio: 1;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.omok-game__intersection:disabled {
+  cursor: default;
+}
+
+.omok-game__intersection:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 3px;
+}
+
+.omok-game__intersection.is-forbidden::before {
+  content: "";
+  position: absolute;
+  inset: 31%;
+  border: 1.5px dashed var(--coral2);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--coral) 18%, transparent);
+}
+
+.omok-game__intersection.is-rejected::before {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  border: 1.5px solid var(--coral2);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--coral) 18%, transparent);
+  border-style: solid;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--coral) 18%, transparent);
+}
+
+.omok-game__stone {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
 }
 
 .omok-game__stone.is-black {
@@ -1401,6 +1447,15 @@ a {
   inset: 32%;
   border-radius: 50%;
   background: var(--coral);
+}
+
+.omok-game__stone.is-winning::before {
+  content: "";
+  position: absolute;
+  inset: -17%;
+  border: 2px solid var(--coral2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--card) 65%, transparent);
 }
 
 .omok-game__turns {
@@ -1472,6 +1527,62 @@ a {
   justify-content: center;
   gap: 7px;
   margin: 16px 0 4px;
+}
+
+.omok-game__settings--toggles {
+  align-items: stretch;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.omok-game__settings--toggles label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: var(--r3);
+  padding: 10px 12px;
+  background: var(--field);
+  color: var(--ink2);
+  font-size: 12px;
+  text-align: left;
+}
+
+.omok-game__settings--toggles input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--coral);
+}
+
+.omok-game__setting-chip {
+  min-height: 38px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r3);
+  padding: 9px 12px;
+  background: var(--field);
+  color: var(--ink2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.omok-game__setting-chip:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.omok-game__setting-chip.is-selected {
+  border-color: var(--coral);
+  color: var(--ink);
+}
+
+.omok-game__setting-chip:disabled,
+.omok-game__settings--toggles input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .visually-hidden {
