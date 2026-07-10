@@ -23,6 +23,8 @@ const PHASE = {
   FAILED: "failed",
 };
 
+export const MEMORY_TIMER_PHASE = PHASE;
+
 const FAILURE_REASON = {
   WRONG: "wrong",
   TIMEOUT: "timeout",
@@ -64,6 +66,10 @@ function saveBest(round) {
 
 function formatTimer(milliseconds) {
   return Math.max(0, milliseconds / 1000).toFixed(2);
+}
+
+export function isMemoryTimerUrgent(phase, remainingMs) {
+  return (phase === PHASE.PREVIEW || phase === PHASE.PLAYING) && remainingMs > 0 && remainingMs <= 3000;
 }
 
 function focusElement(element) {
@@ -144,8 +150,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const isStageCovered = phase === PHASE.COUNTDOWN || phase === PHASE.PAUSED || phase === PHASE.FAILED;
   const shouldShowTimer = phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
   const timerText = formatTimer(remainingMs);
-  const isTimerCritical = remainingMs > 0 && remainingMs <= 3000;
-  const isTimerWarning = remainingMs > 0 && remainingMs <= 5000;
+  const isTimerUrgent = isMemoryTimerUrgent(phase, remainingMs);
   const sequenceDensity = data.count <= 4 ? "comfortable" : data.count <= 7 ? "compact" : "dense";
 
   phaseRef.current = phase;
@@ -431,7 +436,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
         ) : (
           <div className="memory-game__play-shell" data-memory-count={data.count} data-phase={phase}>
             <div className="memory-game__timer-row">
-              {shouldShowTimer ? <div className={`memory-game__clock${isTimerWarning ? " is-warning" : ""}${isTimerCritical ? " is-critical" : ""}`} aria-label={`남은 시간 ${timerText}초`}><span className="memory-game__clock-body"><StopwatchIcon /><span>{timerText}</span></span></div> : null}
+              {shouldShowTimer ? <div className={`memory-game__clock${isTimerUrgent ? " is-urgent" : ""}`} aria-label={`남은 시간 ${timerText}초`}><span className="memory-game__clock-body"><StopwatchIcon /><span>{timerText}</span></span></div> : null}
             </div>
             <GameItemPanel title={`${round} ROUND`} variant="problem" className="memory-game__problem-panel" ariaLabel={`${round}라운드 기억할 순서`}>
               <div className="memory-sequence" data-count={data.count} data-density={sequenceDensity} aria-label="기억해야 할 이모지 순서">

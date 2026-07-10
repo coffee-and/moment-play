@@ -36,8 +36,31 @@
   height: 18px;
 }
 
-.memory-game__clock.is-warning {
+.memory-game__clock.is-urgent {
   color: var(--coral2);
+  font-weight: 800;
+  animation: memory-timer-urgent-shake 0.5s ease-in-out infinite;
+}
+
+@keyframes memory-timer-urgent-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-1px);
+  }
+
+  75% {
+    transform: translateX(1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-game__clock.is-urgent {
+    animation: none;
+  }
 }
 
 .memory-game__problem-panel,
