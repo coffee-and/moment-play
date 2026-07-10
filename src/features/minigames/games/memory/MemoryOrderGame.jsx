@@ -405,9 +405,20 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const resultTitle = didBreakRecordThisAttempt ? "최고기록 갱신!" : "GAME OVER";
   const isTimeoutFailure = failureReason === FAILURE_REASON.TIMEOUT;
   const gameActions = canPause ? <Button ref={pauseButtonRef} className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>일시정지</Button> : null;
+  const sidebar = (
+    <>
+      <div className="stat-row">
+        <div className="stat"><div className="l">Round</div><div className="v">{round}</div></div>
+        <div className="stat"><div className="l">Time</div><div className="v">{timerText}<small>s</small></div></div>
+        <div className="stat"><div className="l">Step</div><div className="v">{step}<small> / {data.count}</small></div></div>
+        <div className="stat"><div className="l">Best</div><div className="v">{best || "-"}<small>R</small></div></div>
+      </div>
+      <p className="game-stage__side-note">라운드 생성, 타이머, 정답 판정은 기존 로직을 그대로 사용합니다.</p>
+    </>
+  );
 
   return (
-    <GameStage className="memory-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} fullscreenEnabled ariaLabel={game.title}>
+    <GameStage className="memory-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} fullscreenEnabled ariaLabel={game.title}>
       <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === PHASE.IDLE ? (
           <section className="memory-game__idle" aria-labelledby="memory-game-start-title">

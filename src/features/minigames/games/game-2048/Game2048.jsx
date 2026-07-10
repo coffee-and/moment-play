@@ -294,8 +294,20 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     </Button>
   ) : null;
 
+  const sidebar = (
+    <>
+      <div className="stat-row">
+        <div className="stat"><div className="l">Round</div><div className="v">{phase === GAME_2048_PHASE.ENDLESS ? "∞" : round}</div></div>
+        <div className="stat"><div className="l">Target</div><div className="v">{phase === GAME_2048_PHASE.ENDLESS ? "End" : formatNumber(currentTarget)}</div></div>
+        <div className="stat"><div className="l">Score</div><div className="v">{formatNumber(score)}</div></div>
+        <div className="stat"><div className="l">Best</div><div className="v">{formatNumber(bestScore)}</div></div>
+      </div>
+      <p className="game-stage__side-note">방향키, 스와이프, 버튼 입력을 모두 같은 이동 처리로 연결합니다.</p>
+    </>
+  );
+
   return (
-    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} fullscreenEnabled ariaLabel="2048 게임">
+    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} fullscreenEnabled ariaLabel="2048 게임">
       <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === GAME_2048_PHASE.IDLE ? (
           <GameStageModal className="game-2048__modal game-2048__start-modal" role="region" aria-labelledby="game-2048-start-title">
@@ -326,6 +338,12 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
                   </div>
                 );
               })}
+            </div>
+            <div className="game-2048__dpad" role="group" aria-label="2048 이동 버튼">
+              <button className="game-2048__dpad-button is-up" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.UP)} disabled={!canMoveBoard} aria-label="위로 이동">↑</button>
+              <button className="game-2048__dpad-button is-left" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.LEFT)} disabled={!canMoveBoard} aria-label="왼쪽으로 이동">←</button>
+              <button className="game-2048__dpad-button is-down" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.DOWN)} disabled={!canMoveBoard} aria-label="아래로 이동">↓</button>
+              <button className="game-2048__dpad-button is-right" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.RIGHT)} disabled={!canMoveBoard} aria-label="오른쪽으로 이동">→</button>
             </div>
             <p className="game-2048__hint"><span>{GAME_2048_COPY.guidance.gameOverRule}</span><span>{GAME_2048_COPY.guidance.move} 빈칸 {emptyCellCount}칸 · 최대 타일 {formatNumber(maxTile)}</span></p>
           </>

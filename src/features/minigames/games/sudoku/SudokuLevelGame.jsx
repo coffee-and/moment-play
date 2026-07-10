@@ -99,6 +99,17 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const statusText = SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
   const bestTimeText = levelRecords.bestTimeSeconds === null ? SUDOKU_COPY.meta.emptyBestTime : formatTime(levelRecords.bestTimeSeconds);
   const gameActions = phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>;
+  const sidebar = (
+    <>
+      <div className="stat-row">
+        <div className="stat"><div className="l">Level</div><div className="v"><small>{activeLevelLabel}</small></div></div>
+        <div className="stat"><div className="l">Time</div><div className="v">{formatTime(elapsedSeconds)}</div></div>
+        <div className="stat"><div className="l">Clear</div><div className="v">{levelRecords.completedCount}</div></div>
+        <div className="stat"><div className="l">Best</div><div className="v">{bestTimeText}</div></div>
+      </div>
+      <p className="game-stage__side-note">{activeLevelLabel} · {statusText}</p>
+    </>
+  );
 
   phaseRef.current = phase;
   selectedIndexRef.current = selectedIndex;
@@ -134,7 +145,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty"]); }
 
   return (
-    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} fullscreenEnabled ariaLabel={game.title}>
+    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} fullscreenEnabled ariaLabel={game.title}>
       <div ref={stageContentRef} className="sudoku-game__stage" aria-hidden={isStageCovered ? "true" : undefined} onKeyDown={handleGameKeyDown}>
         {phase === SUDOKU_PHASE.IDLE ? (
           <GameStageModal className="sudoku-game__modal sudoku-game__start" role="region" aria-labelledby="sudoku-game-start-title">
