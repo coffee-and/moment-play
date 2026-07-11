@@ -8,10 +8,13 @@ export function GameGuideIconButton({ label, onClick }) {
 
 export function GameGuideModal({ guide, onClose }) {
   return (
-    <div className="game-guide-modal" role="dialog" aria-modal="true">
-      <h3>Game guide</h3>
-      <p>{guide?.description ?? 'No guide is available yet.'}</p>
-      <button type="button" onClick={onClose}>Close</button>
-    </div>
+    <GameStageOverlay state="guide" closeOnBackdrop closeOnEscape onClose={onClose}>
+      <GameStageModal className="game-guide-modal" role="dialog" aria-modal="true" aria-labelledby="game-guide-title">
+        <h3 id="game-guide-title">Game guide</h3>
+        <p>{guide?.description ?? 'No guide is available yet.'}</p>
+        <button type="button" onClick={onClose}>Close</button>
+      </GameStageModal>
+    </GameStageOverlay>
   );
 }
+import { GameStageModal, GameStageOverlay } from './GameStageOverlay.jsx';
