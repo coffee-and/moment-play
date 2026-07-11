@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { Children, isValidElement, useEffect, useRef, useState } from 'react';
 import { Button } from '../../../../shared/components/Button.jsx';
 import { EditorialLabel } from '../../../../shared/components/editorial/EditorialLabel.jsx';
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
+import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -13,8 +14,15 @@ function focusElement(element) {
   element.focus({ preventScroll: true });
 }
 
+function getInlineActionCount(actions) {
+  if (!isValidElement(actions)) return 0;
+  const classNames = String(actions.props.className ?? '').split(/\s+/);
+  if (!classNames.includes('game-stage__inline-actions')) return 0;
+  return Children.toArray(actions.props.children).length;
+}
+
 export function GameStage({
-  actionLayout = 'split',
+  actionLayout,
   actions,
   ariaLabel,
   children,
@@ -33,6 +41,7 @@ export function GameStage({
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const isExpanded = isFullscreen || isFocusMode;
   const guide = useGameGuide();
+  const resolvedActionLayout = actionLayout ?? (getInlineActionCount(actions) > 1 ? 'stacked' : 'split');
 
   useEffect(() => {
     function handleFullscreenChange() {
@@ -95,7 +104,7 @@ export function GameStage({
             </div>
             {description ? <p>{description}</p> : null}
           </div>
-          <div className={joinClassNames(['game-stage__actions', `game-stage__actions--${actionLayout}`])} data-layout={actionLayout}>
+          <div className={joinClassNames(['game-stage__actions', `game-stage__actions--${resolvedActionLayout}`])} data-layout={resolvedActionLayout}>
             <div className="game-stage__action-slot game-stage__action-slot--primary">{actions}</div>
             <div className="game-stage__action-slot game-stage__action-slot--expand">
               {fullscreenEnabled ? (
