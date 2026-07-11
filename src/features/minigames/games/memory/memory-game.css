@@ -89,6 +89,7 @@
 
 .memory-game__selection-panel {
   min-height: clamp(150px, 17vw, 190px);
+  container: memory-selection / inline-size;
 }
 
 .memory-game__play-shell[data-phase="cleared"] .memory-game__problem-panel .game-item-panel__content::before {
@@ -162,11 +163,11 @@
 .memory-card-grid {
   display: grid;
   width: 100%;
-  max-width: 690px;
-  grid-template-columns: repeat(8, 74px);
+  max-width: 100%;
+  grid-template-columns: repeat(8, minmax(60px, 74px));
   justify-content: center;
   justify-items: center;
-  gap: 14px;
+  gap: 12px;
   margin: 0 auto;
 }
 
@@ -250,6 +251,12 @@
   flex-direction: column;
   gap: 6px;
   margin: 12px 0;
+}
+
+@container memory-selection (max-width: 660px) {
+  .memory-card-grid {
+    grid-template-columns: repeat(4, 74px);
+  }
 }
 
 @media (max-width: 620px) {
