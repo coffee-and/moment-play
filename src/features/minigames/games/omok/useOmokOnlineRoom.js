@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { omokOnlineRoomGateway } from "../../../../infrastructure/supabase/omokOnlineRoomGateway.js";
 import { getForbiddenPositions, validateMove, positionKey } from "./domain/index.js";
-import { OMOK_MODE, STONE } from "./omok.constants.js";
+import { FORBIDDEN_REASON_LABEL, OMOK_MODE, STONE } from "./omok.constants.js";
 import {
   deriveOmokStateFromMoves,
   getOnlinePlayerStone,
@@ -85,10 +85,17 @@ export function useOmokOnlineRoom({
     derivedGame.turn === playerStone,
   );
 
+  const isStandardRoom = state.room?.gameMode === OMOK_MODE.STANDARD;
+  const effectiveShowForbiddenPositions = Boolean(
+    isStandardRoom && state.room?.allowForbiddenPositions && currentPlayer?.showForbiddenPositions,
+  );
+  const effectiveExplainForbiddenReasons = Boolean(
+    isStandardRoom && state.room?.allowForbiddenReasons && currentPlayer?.explainForbiddenReasons,
+  );
+
   const forbiddenPositionKeys = useMemo(() => {
     if (
-      !currentPlayer?.showForbiddenPositions ||
-      state.room?.gameMode !== OMOK_MODE.STANDARD ||
+      !effectiveShowForbiddenPositions ||
       derivedGame.turn !== STONE.BLACK ||
       derivedGame.winner ||
       derivedGame.draw
@@ -97,9 +104,10 @@ export function useOmokOnlineRoom({
     }
 
     return new Set(getForbiddenPositions(derivedGame.board).map(positionKey));
-  }, [currentPlayer?.showForbiddenPositions, derivedGame.board, derivedGame.draw, derivedGame.turn, derivedGame.winner, state.room?.gameMode]);
+  }, [derivedGame.board, derivedGame.draw, derivedGame.turn, derivedGame.winner, effectiveShowForbiddenPositions]);
 
   const applySnapshot = useCallback((snapshot) => {
+    if (!snapshot?.room || !Array.isArray(snapshot.moves)) return;
     setState((previous) => {
       if (previous.room?.id && previous.room.id !== snapshot.room.id) return previous;
       return {
@@ -340,6 +348,18 @@ export function useOmokOnlineRoom({
     [gateway, runAction, state.room],
   );
 
+  const updateRoomSettings = useCallback(
+    (roomSettings) => {
+      if (!state.room) return null;
+      return runAction(
+        ONLINE_ACTION_STATUS.UPDATING_READY,
+        () => gateway.updateRoomSettings(state.room.id, roomSettings),
+        "방 설정을 저장하지 못했습니다.",
+      );
+    },
+    [gateway, runAction, state.room],
+  );
+
   const startRoom = useCallback(() => {
     if (!state.room) return null;
     return runAction(
@@ -355,9 +375,12 @@ export function useOmokOnlineRoom({
 
       const validation = validateMove(derivedGame.board, position, playerStone, state.room.gameMode);
       if (!validation.valid) {
+        const reasonLabel = effectiveExplainForbiddenReasons ? FORBIDDEN_REASON_LABEL[validation.reason] : null;
         setState((previous) => ({
           ...previous,
-          errorMessage: validation.reason === "occupied" ? "이미 돌이 놓인 자리입니다." : "둘 수 없는 자리입니다.",
+          errorMessage: validation.reason === "occupied"
+            ? "이미 돌이 놓인 자리입니다."
+            : reasonLabel ?? "둘 수 없는 자리입니다.",
         }));
         return false;
       }
@@ -376,7 +399,7 @@ export function useOmokOnlineRoom({
 
       return Boolean(snapshot);
     },
-    [canSubmitMove, derivedGame.board, derivedGame.moveCount, gateway, playerStone, runAction, state.room],
+    [canSubmitMove, derivedGame.board, derivedGame.moveCount, effectiveExplainForbiddenReasons, gateway, playerStone, runAction, state.room],
   );
 
   const requestRematch = useCallback(() => {
@@ -498,6 +521,8 @@ export function useOmokOnlineRoom({
     canSubmitMove,
     currentPlayer,
     derivedGame,
+    effectiveExplainForbiddenReasons,
+    effectiveShowForbiddenPositions,
     forbiddenPositionKeys,
     isOnlineReady,
     opponent,
@@ -508,6 +533,7 @@ export function useOmokOnlineRoom({
     leaveRoom,
     setReady,
     setGuidePreferences,
+    updateRoomSettings,
     startRoom,
     submitMove,
     requestRematch,

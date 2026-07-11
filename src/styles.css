@@ -1635,6 +1635,91 @@ a {
   opacity: 0.55;
 }
 
+.omok-game__rule-panel {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  background: var(--field);
+}
+
+.omok-game__rule-panel-header,
+.omok-game__rule-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.omok-game__rule-info-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--ink2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.omok-game__rule-info-button:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.omok-game__rule-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.omok-game__rule-info-list {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.omok-game__rule-info-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+.omok-game__rule-info-list dt {
+  color: var(--ink2);
+  font-weight: 600;
+}
+
+.omok-game__rule-info-list dd {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+  text-align: right;
+}
+
+.omok-game__player-guide-row {
+  display: grid;
+  gap: 6px;
+}
+
+.omok-game__player-guide-role {
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .visually-hidden {
   position: absolute;
   overflow: hidden;
@@ -1709,6 +1794,16 @@ a {
   .omok-game__invite-row,
   .omok-game__waiting-actions {
     grid-template-columns: 1fr;
+  }
+
+  .omok-game__rule-info-list div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .omok-game__rule-info-list dd {
+    text-align: left;
   }
 
   .h-cta .btn,

@@ -68,6 +68,8 @@ export function mapOmokRoomRow(roomRow, playerRows = []) {
     hostUserId: roomRow.host_user_id,
     title: roomRow.title,
     gameMode: roomRow.game_mode,
+    allowForbiddenPositions: Boolean(roomRow.allow_forbidden_positions),
+    allowForbiddenReasons: Boolean(roomRow.allow_forbidden_reasons),
     status: roomRow.status,
     currentRound: roomRow.current_round,
     roundRequestedBy: roomRow.round_requested_by,

@@ -13,6 +13,8 @@ const roomId = "11111111-1111-4111-8111-111111111111";
 
 function createRoom(overrides = {}) {
   return {
+    allowForbiddenPositions: true,
+    allowForbiddenReasons: true,
     currentRound: 1,
     gameMode: OMOK_MODE.STANDARD,
     hostUserId: "host",
@@ -54,6 +56,7 @@ function createGateway(overrides = {}) {
       moves: [{ id: "move-0", moveNumber: 0, position: { row: 7, col: 7 }, roundNumber: 1, stone: STONE.BLACK }],
       room: createRoom({ players: fullPlayers(true), status: "playing" }),
     })),
+    updateRoomSettings: vi.fn(async () => ({ moves: [], room: baseRoom })),
     ...overrides,
   };
 }
@@ -387,5 +390,124 @@ describe("useOmokOnlineRoom", () => {
     expect(navigateToLobby).toHaveBeenCalledTimes(1);
     expect(hook.current.room).toBeNull();
     hook.unmount();
+  });
+
+  it("gates effective guide permissions by the room-level allow settings", async () => {
+    const gateway = createGateway({
+      createRoom: vi.fn(async () => ({
+        inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+        moves: [],
+        room: createRoom({ allowForbiddenPositions: false, allowForbiddenReasons: true }),
+        userId: "host",
+      })),
+    });
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: false, allowForbiddenReasons: true } });
+    });
+
+    expect(hook.current.effectiveShowForbiddenPositions).toBe(false);
+    expect(hook.current.effectiveExplainForbiddenReasons).toBe(true);
+    hook.unmount();
+  });
+
+  it("disables every effective guide permission in Free mode even when allowed and enabled", async () => {
+    const gateway = createGateway({
+      createRoom: vi.fn(async () => ({
+        inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+        moves: [],
+        room: createRoom({ allowForbiddenPositions: true, allowForbiddenReasons: true, gameMode: OMOK_MODE.FREE }),
+        userId: "host",
+      })),
+    });
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.FREE, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: true, allowForbiddenReasons: true } });
+    });
+
+    expect(hook.current.effectiveShowForbiddenPositions).toBe(false);
+    expect(hook.current.effectiveExplainForbiddenReasons).toBe(false);
+    hook.unmount();
+  });
+
+  it("calls the room-settings RPC gateway with the submitted shared values", async () => {
+    const gateway = createGateway();
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: true, allowForbiddenReasons: true } });
+    });
+    await act(async () => {
+      await hook.current.updateRoomSettings({ allowForbiddenPositions: false, allowForbiddenReasons: true, gameMode: OMOK_MODE.STANDARD });
+    });
+
+    expect(gateway.updateRoomSettings).toHaveBeenCalledWith(roomId, { allowForbiddenPositions: false, allowForbiddenReasons: true, gameMode: OMOK_MODE.STANDARD });
+    hook.unmount();
+  });
+
+  it("calls the per-player guide-preference RPC gateway with the submitted values", async () => {
+    const gateway = createGateway();
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: true, allowForbiddenReasons: true } });
+    });
+    await act(async () => {
+      await hook.current.setGuidePreferences({ explainForbiddenReasons: false, showForbiddenPositions: true });
+    });
+
+    expect(gateway.setGuidePreferences).toHaveBeenCalledWith(roomId, { explainForbiddenReasons: false, showForbiddenPositions: true });
+    hook.unmount();
+  });
+
+  it("labels a rejected forbidden move only when the effective explain permission is enabled", async () => {
+    const doubleThreeMoves = [
+      { id: "m0", moveNumber: 0, position: { row: 7, col: 6 }, roundNumber: 1, stone: STONE.BLACK },
+      { id: "m1", moveNumber: 1, position: { row: 0, col: 0 }, roundNumber: 1, stone: STONE.WHITE },
+      { id: "m2", moveNumber: 2, position: { row: 7, col: 8 }, roundNumber: 1, stone: STONE.BLACK },
+      { id: "m3", moveNumber: 3, position: { row: 0, col: 1 }, roundNumber: 1, stone: STONE.WHITE },
+      { id: "m4", moveNumber: 4, position: { row: 6, col: 7 }, roundNumber: 1, stone: STONE.BLACK },
+      { id: "m5", moveNumber: 5, position: { row: 0, col: 2 }, roundNumber: 1, stone: STONE.WHITE },
+      { id: "m6", moveNumber: 6, position: { row: 8, col: 7 }, roundNumber: 1, stone: STONE.BLACK },
+      { id: "m7", moveNumber: 7, position: { row: 0, col: 3 }, roundNumber: 1, stone: STONE.WHITE },
+    ];
+
+    const gatewayReasonHidden = createGateway({
+      createRoom: vi.fn(async () => ({
+        inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+        moves: doubleThreeMoves,
+        room: createRoom({ allowForbiddenReasons: false, players: fullPlayers(true), status: "playing" }),
+        userId: "host",
+      })),
+    });
+    const hookHidden = renderUseOmokOnlineRoom({ gateway: gatewayReasonHidden });
+    await act(async () => {
+      await hookHidden.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: true, allowForbiddenReasons: false } });
+    });
+    await act(async () => {
+      expect(await hookHidden.current.submitMove({ row: 7, col: 7 })).toBe(false);
+    });
+    expect(hookHidden.current.errorMessage).toBe("둘 수 없는 자리입니다.");
+    hookHidden.unmount();
+
+    const gatewayReasonShown = createGateway({
+      createRoom: vi.fn(async () => ({
+        inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+        moves: doubleThreeMoves,
+        room: createRoom({ allowForbiddenReasons: true, players: fullPlayers(true), status: "playing" }),
+        userId: "host",
+      })),
+    });
+    const hookShown = renderUseOmokOnlineRoom({ gateway: gatewayReasonShown });
+    await act(async () => {
+      await hookShown.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true }, roomGuideSettings: { allowForbiddenPositions: true, allowForbiddenReasons: true } });
+    });
+    await act(async () => {
+      expect(await hookShown.current.submitMove({ row: 7, col: 7 })).toBe(false);
+    });
+    expect(hookShown.current.errorMessage).toBe("쌍삼 자리입니다.");
+    hookShown.unmount();
   });
 });

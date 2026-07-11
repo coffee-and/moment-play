@@ -129,11 +129,13 @@ export async function getOmokOnlineRoomSnapshot(roomId, client = getSupabaseClie
   return { room, moves };
 }
 
-export async function createOmokOnlineRoom({ gameMode, guideSettings }, client = getSupabaseClient()) {
+export async function createOmokOnlineRoom({ gameMode, guideSettings, roomGuideSettings }, client = getSupabaseClient()) {
   const userId = await getCurrentUserId(client);
   await getOrCreateProfileNickname(userId, client);
 
   const { data: roomId, error } = await client.rpc("omok_create_room", {
+    p_allow_forbidden_positions: Boolean(roomGuideSettings.allowForbiddenPositions),
+    p_allow_forbidden_reasons: Boolean(roomGuideSettings.allowForbiddenReasons),
     p_explain_forbidden_reasons: Boolean(guideSettings.explainForbiddenReasons),
     p_game_mode: gameMode,
     p_show_forbidden_positions: Boolean(guideSettings.showForbiddenPositions),
@@ -190,17 +192,25 @@ export async function setOmokOnlineReady(roomId, ready, client = getSupabaseClie
 }
 
 export async function setOmokOnlineGuidePreferences(roomId, guideSettings, client = getSupabaseClient()) {
-  const userId = await getCurrentUserId(client);
-  const { error } = await client
-    .from("omok_room_players")
-    .update({
-      explain_forbidden_reasons: Boolean(guideSettings.explainForbiddenReasons),
-      show_forbidden_positions: Boolean(guideSettings.showForbiddenPositions),
-    })
-    .eq("room_id", roomId)
-    .eq("user_id", userId);
+  const { error } = await client.rpc("omok_update_player_guide_preferences", {
+    p_explain_forbidden_reasons: Boolean(guideSettings.explainForbiddenReasons),
+    p_room_id: roomId,
+    p_show_forbidden_positions: Boolean(guideSettings.showForbiddenPositions),
+  });
 
   throwIfSupabaseError(error, "안내 설정을 저장하지 못했습니다.");
+  return getOmokOnlineRoomSnapshot(roomId, client);
+}
+
+export async function updateOmokOnlineRoomSettings(roomId, roomSettings, client = getSupabaseClient()) {
+  const { error } = await client.rpc("omok_update_room_settings", {
+    p_allow_forbidden_positions: Boolean(roomSettings.allowForbiddenPositions),
+    p_allow_forbidden_reasons: Boolean(roomSettings.allowForbiddenReasons),
+    p_game_mode: roomSettings.gameMode,
+    p_room_id: roomId,
+  });
+
+  throwIfSupabaseError(error, "방 설정을 저장하지 못했습니다.");
   return getOmokOnlineRoomSnapshot(roomId, client);
 }
 
@@ -264,6 +274,7 @@ export const omokOnlineRoomGateway = {
   leaveRoom: leaveOmokOnlineRoom,
   setReady: setOmokOnlineReady,
   setGuidePreferences: setOmokOnlineGuidePreferences,
+  updateRoomSettings: updateOmokOnlineRoomSettings,
   startRoom: startOmokOnlineRoom,
   submitMove: submitOmokOnlineMove,
   requestRematch: requestOmokOnlineRematch,

@@ -6,6 +6,7 @@ import {
   getOnlinePlayerStone,
   isFallbackOnlineNickname,
   isValidOnlineRoomId,
+  mapOmokRoomRow,
   normalizeOnlineNickname,
   validateOnlineNickname,
 } from "./online/omokOnline.utils.js";
@@ -120,5 +121,24 @@ describe("online room mapping helpers", () => {
 
     expect(getOnlinePlayerStone(room, "host")).toBe(STONE.BLACK);
     expect(getOnlinePlayerStone(room, "guest")).toBe(STONE.WHITE);
+  });
+
+  it("maps room-level guide permission columns to camelCase booleans", () => {
+    const room = mapOmokRoomRow({
+      allow_forbidden_positions: false,
+      allow_forbidden_reasons: true,
+      created_at: "2026-01-01T00:00:00.000Z",
+      current_round: 1,
+      game_mode: OMOK_MODE.STANDARD,
+      host_user_id: "host",
+      id: roomId,
+      round_requested_by: null,
+      status: "waiting",
+      title: "Host님의 방",
+      updated_at: "2026-01-01T00:00:00.000Z",
+    });
+
+    expect(room.allowForbiddenPositions).toBe(false);
+    expect(room.allowForbiddenReasons).toBe(true);
   });
 });

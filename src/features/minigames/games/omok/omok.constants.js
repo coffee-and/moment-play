@@ -76,3 +76,16 @@ export const FORBIDDEN_REASON_LABEL = Object.freeze({
   [FORBIDDEN_REASON.DOUBLE_FOUR]: "쌍사 자리입니다.",
   [FORBIDDEN_REASON.OVERLINE]: "장목 자리입니다.",
 });
+
+export const OMOK_RULE_DETAILS = Object.freeze({
+  [OMOK_MODE.STANDARD]: [
+    "흑이 먼저 시작",
+    "흑은 3-3, 4-4, 장목 금지",
+    "흑은 정확히 5목일 때 승리",
+    "백은 5목 이상이면 승리",
+  ],
+  [OMOK_MODE.FREE]: [
+    "흑과 백 모두 금수 없음",
+    "흑과 백 모두 5목 이상이면 승리",
+  ],
+});
