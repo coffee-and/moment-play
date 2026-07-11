@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
@@ -116,6 +117,7 @@ function CorrectBurst() {
 }
 
 export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
+  const navigate = useNavigate();
   const initialData = useMemo(() => createMemoryRound(1, MEMORY_SYMBOLS), []);
   const [round, setRound] = useState(1);
   const [data, setData] = useState(initialData);
@@ -128,6 +130,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [correctFeedback, setCorrectFeedback] = useState(null);
   const [correctAnnouncement, setCorrectAnnouncement] = useState("");
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const activeTimerRef = useRef(null);
   const roundTransitionTimerRef = useRef(null);
@@ -147,7 +150,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const retryButtonRef = useRef(null);
 
   const canPause = phase === PHASE.COUNTDOWN || phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
-  const isStageCovered = phase === PHASE.COUNTDOWN || phase === PHASE.PAUSED || phase === PHASE.FAILED;
+  const isStageCovered = phase === PHASE.COUNTDOWN || phase === PHASE.PAUSED || phase === PHASE.FAILED || isExitConfirmOpen;
   const shouldShowTimer = phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
   const timerText = formatTimer(remainingMs);
   const isTimerUrgent = isMemoryTimerUrgent(phase, remainingMs);
@@ -170,7 +173,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     if (phase === PHASE.FAILED) focusElement(retryButtonRef.current);
   }, [phase]);
 
-  useEffect(() => () => clearGameTimers(), []);
+  useEffect(() => () => clearGameTimers({ updateFeedback: false }), []);
 
   function clearActiveTimer({ preserve = false } = {}) {
     const timer = activeTimerRef.current;
@@ -190,19 +193,21 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     roundTransitionTimerRef.current = null;
   }
 
-  function clearCorrectFeedback() {
+  function clearCorrectFeedback({ updateState = true } = {}) {
     if (feedbackTimerRef.current) {
       window.clearTimeout(feedbackTimerRef.current);
       feedbackTimerRef.current = null;
     }
-    setCorrectFeedback(null);
-    setCorrectAnnouncement("");
+    if (updateState) {
+      setCorrectFeedback(null);
+      setCorrectAnnouncement("");
+    }
   }
 
-  function clearGameTimers() {
+  function clearGameTimers({ updateFeedback = true } = {}) {
     clearActiveTimer();
     clearRoundTransitionTimer();
-    clearCorrectFeedback();
+    clearCorrectFeedback({ updateState: updateFeedback });
   }
 
   function runTimer(kind, durationMs) {
@@ -317,6 +322,26 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setCountdownIndex(0);
     countdownIndexRef.current = 0;
     setRemainingMs(nextData.selectionSeconds * 1000);
+    setIsExitConfirmOpen(false);
+  }
+
+  function requestExit() {
+    if (phaseRef.current === PHASE.FAILED) {
+      clearGameTimers();
+      navigate("/");
+      return;
+    }
+    setIsExitConfirmOpen(true);
+  }
+
+  function cancelExit() {
+    setIsExitConfirmOpen(false);
+  }
+
+  function confirmExit() {
+    clearGameTimers();
+    setIsExitConfirmOpen(false);
+    navigate("/");
   }
 
   function startGame() {
@@ -470,23 +495,34 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
         )}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="memory-game__overlay-layer" state={phase}>
-          {phase === PHASE.COUNTDOWN ? (
+        <GameStageOverlay className="memory-game__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : phase}>
+          {isExitConfirmOpen ? (
+            <GameStageModal className="memory-game__state-view" role="dialog" aria-modal="true" aria-labelledby="memory-game-exit-title">
+              <h3 className="memory-game__state-title" id="memory-game-exit-title">게임을 나갈까요?</h3>
+              <p>현재 라운드 진행은 저장되지 않아요.</p>
+              <div className="memory-game__state-actions game-stage-modal__actions">
+                <Button type="button" onClick={cancelExit}>계속하기</Button>
+                <Button type="button" variant="secondary" onClick={confirmExit}>게임 나가기</Button>
+              </div>
+            </GameStageModal>
+          ) : null}
+          {phase === PHASE.COUNTDOWN && !isExitConfirmOpen ? (
             <GameStageModal className="memory-game__state-view" data-state="countdown" role="status" aria-live="assertive">
               <p className="memory-game__state-kicker" aria-label={`현재 ${round}라운드`}>— {round} ROUND —</p>
               <p className="memory-game__state-title memory-game__state-title--countdown">{COUNTDOWN_LABELS[countdownIndex]}</p>
             </GameStageModal>
           ) : null}
-          {phase === PHASE.PAUSED ? (
+          {phase === PHASE.PAUSED && !isExitConfirmOpen ? (
             <GameStageModal className="memory-game__state-view" data-state="paused" role="dialog" aria-modal="true" aria-labelledby="memory-game-pause-title">
               <h3 className="memory-game__state-title" id="memory-game-pause-title">일시정지</h3>
               <div className="memory-game__state-actions game-stage-modal__actions">
                 <Button ref={resumeButtonRef} className="memory-game__state-button" type="button" onClick={resumeGame}>계속하기</Button>
                 <Button className="memory-game__state-button" variant="secondary" type="button" onClick={resetToIdle}>처음부터 다시 시작</Button>
+                <Button className="memory-game__state-button" variant="secondary" type="button" onClick={requestExit}>게임 나가기</Button>
               </div>
             </GameStageModal>
           ) : null}
-          {phase === PHASE.FAILED ? (
+          {phase === PHASE.FAILED && !isExitConfirmOpen ? (
             <GameStageModal className="memory-game__state-view" data-state="failed" role="dialog" aria-modal="true" aria-labelledby="memory-game-result-title">
               <h3 className="memory-game__state-title memory-game__state-title--failed" id="memory-game-result-title">{resultTitle}</h3>
               <div className="memory-game__state-details">
@@ -496,6 +532,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               <div className="memory-game__state-actions game-stage-modal__actions">
                 <Button ref={retryButtonRef} className="memory-game__state-button" type="button" onClick={retryRound}>재도전</Button>
                 <Button className="memory-game__state-button" variant="secondary" type="button" onClick={resetToIdle}>처음부터 다시 시작</Button>
+                <Button className="memory-game__state-button" variant="secondary" type="button" onClick={requestExit}>게임 나가기</Button>
               </div>
             </GameStageModal>
           ) : null}
