@@ -1,8 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
+}
+
+function addActionCount(child) {
+  if (!isValidElement(child)) return child;
+  const classNames = String(child.props.className ?? '').split(/\s+/);
+  if (!classNames.includes('game-stage-modal__actions')) return child;
+  return cloneElement(child, {
+    'data-action-count': Children.toArray(child.props.children).length,
+  });
 }
 
 export function GameStageOverlay({
@@ -57,7 +67,7 @@ export function GameStageOverlay({
 export function GameStageModal({ children, className = '', style, ...props }) {
   return (
     <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
-      {children}
+      {Children.map(children, addActionCount)}
     </div>
   );
 }
