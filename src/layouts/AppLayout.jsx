@@ -21,9 +21,8 @@ export function AppLayout() {
           {isHome ? (
             <nav className="nav-links" aria-label="Moment Play navigation">
               <a className="nav-link on" href="#games">Games</a>
-              <a className="nav-link" href="#omok">Omok</a>
-              <a className="nav-link" href="#play">Selected Game</a>
-              <a className="nav-link" href="#future">Updates</a>
+              <a className="nav-link" href="#featured">Featured</a>
+              <a className="nav-link" href="#about">About</a>
             </nav>
           ) : null}
           <button
