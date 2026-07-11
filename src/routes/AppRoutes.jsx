@@ -9,6 +9,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<MiniGamesPage />} />
+        <Route path="/minigames/:gameId/room/:roomId" element={<MinigamePlayPage />} />
         <Route path="/minigames/:gameId" element={<MinigamePlayPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

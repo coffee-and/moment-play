@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -64,12 +65,14 @@ function getCellAriaLabel({ conflictIndexes, index, puzzle, selected, value }) {
 function getCompletedCopy(level) { const nextLevel = getNextLevel(level); if (nextLevel) { const nextLevelLabel = getLevelLabel(nextLevel); return { title: formatCopy(SUDOKU_COPY.completed.nextLevelTitle, { level: nextLevelLabel }), description: SUDOKU_COPY.completed.nextLevelDescription, button: formatCopy(SUDOKU_COPY.completed.nextLevelButton, { level: nextLevelLabel }), nextLevel }; } return { title: SUDOKU_COPY.completed.retryAdvancedTitle, description: SUDOKU_COPY.completed.retryAdvancedDescription, button: SUDOKU_COPY.completed.retryAdvancedButton, nextLevel: SUDOKU_LEVEL.ADVANCED }; }
 
 export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
+  const navigate = useNavigate();
   const [activePuzzle, setActivePuzzle] = useState(DEFAULT_SUDOKU_PUZZLE);
   const [userValues, setUserValues] = useState(() => createEmptyUserValues());
   const [phase, setPhase] = useState(SUDOKU_PHASE.IDLE);
   const [selectedIndex, setSelectedIndex] = useState(() => getInitialSelectedIndex(DEFAULT_SUDOKU_PUZZLE.puzzle));
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [records, setRecords] = useState(() => readRecords());
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const phaseRef = useRef(phase);
   const selectedIndexRef = useRef(selectedIndex);
@@ -95,10 +98,10 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
     return { row: new Set(getRowIndexes(selectedIndex)), column: new Set(getColumnIndexes(selectedIndex)), box: new Set(getBoxIndexes(selectedIndex)) };
   }, [selectedIndex]);
   const canEditSelected = phase === SUDOKU_PHASE.PLAYING && selectedIndex !== null && !isGivenCell(activePuzzle.puzzle, selectedIndex);
-  const isStageCovered = phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM;
+  const isStageCovered = phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen;
   const statusText = SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
   const bestTimeText = levelRecords.bestTimeSeconds === null ? SUDOKU_COPY.meta.emptyBestTime : formatTime(levelRecords.bestTimeSeconds);
-  const gameActions = phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>;
+  const gameActions = <div className="game-stage__inline-actions">{phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>}<Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button></div>;
   const sidebar = (
     <>
       <div className="stat-row">
@@ -120,12 +123,12 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   useEffect(() => { if (!stageContentRef.current) return; stageContentRef.current.inert = isStageCovered; }, [isStageCovered]);
   useEffect(() => { if (phase === SUDOKU_PHASE.IDLE) startButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.RESET_CONFIRM) resetCancelButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.COMPLETED) completedButtonRef.current?.focus({ preventScroll: true }); }, [phase]);
   useEffect(() => {
-    if (phase !== SUDOKU_PHASE.PLAYING && phase !== SUDOKU_PHASE.RESET_CONFIRM) return undefined;
+    if (isExitConfirmOpen || (phase !== SUDOKU_PHASE.PLAYING && phase !== SUDOKU_PHASE.RESET_CONFIRM)) return undefined;
     function updateElapsedSeconds() { setElapsedSeconds(getCurrentElapsedSeconds()); }
     updateElapsedSeconds();
     const intervalId = window.setInterval(updateElapsedSeconds, 1000);
     return () => window.clearInterval(intervalId);
-  }, [phase]);
+  }, [isExitConfirmOpen, phase]);
 
   function focusCell(index) { window.requestAnimationFrame(() => { cellRefs.current[index]?.focus({ preventScroll: true }); }); }
   function getCurrentElapsedSeconds() { if (!startedAtRef.current) return elapsedSecondsRef.current; return Math.max(0, Math.floor((performance.now() - startedAtRef.current) / 1000)); }
@@ -135,6 +138,9 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
   function confirmNewGame() { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
   function returnToLevelSelect() { const puzzle = activePuzzleRef.current; startedAtRef.current = null; setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(getInitialSelectedIndex(puzzle.puzzle)); setPhase(SUDOKU_PHASE.IDLE); }
+  function requestExit() { if (phaseRef.current === SUDOKU_PHASE.IDLE || phaseRef.current === SUDOKU_PHASE.COMPLETED) { navigate("/"); return; } const currentElapsed = getCurrentElapsedSeconds(); elapsedSecondsRef.current = currentElapsed; setElapsedSeconds(currentElapsed); startedAtRef.current = null; setIsExitConfirmOpen(true); }
+  function cancelExit() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
+  function confirmExit() { startedAtRef.current = null; navigate("/"); }
   function continueAfterComplete() { startLevel(completedCopy.nextLevel); }
   function completeGame() { const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: currentLevelRecord.bestTimeSeconds === null || finalTimeSeconds < currentLevelRecord.bestTimeSeconds ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: currentRecords.bestTimeSeconds === null || finalTimeSeconds < currentRecords.bestTimeSeconds ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); }
   function updateSelectedValue(value) { if (!canEditSelected) return; const index = selectedIndexRef.current; const nextUserValues = [...userValues]; nextUserValues[index] = value; const nextBoard = createBoard(activePuzzle.puzzle, nextUserValues); setUserValues(nextUserValues); if (isBoardComplete(nextBoard, activePuzzle.solution)) completeGame(); }
@@ -189,8 +195,15 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
         )}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="sudoku-game__overlay-layer" state={phase}>
-          {phase === SUDOKU_PHASE.COMPLETED ? (
+        <GameStageOverlay className="sudoku-game__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : phase}>
+          {isExitConfirmOpen ? (
+            <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-exit-title">
+              <h3 id="sudoku-game-exit-title">게임을 나갈까요?</h3>
+              <p>현재 퍼즐 진행은 저장되지 않아요.</p>
+              <div className="game-stage-modal__actions"><Button type="button" onClick={cancelExit}>계속하기</Button><Button type="button" variant="secondary" onClick={confirmExit}>게임 나가기</Button></div>
+            </GameStageModal>
+          ) : null}
+          {phase === SUDOKU_PHASE.COMPLETED && !isExitConfirmOpen ? (
             <GameStageModal className="sudoku-game__modal sudoku-game__modal--complete" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-complete-title">
               <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.completed.eyebrow}</p>
               <h3 id="sudoku-game-complete-title">{completedCopy.title}</h3>
@@ -203,7 +216,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               </div>
             </GameStageModal>
           ) : null}
-          {phase === SUDOKU_PHASE.RESET_CONFIRM ? (
+          {phase === SUDOKU_PHASE.RESET_CONFIRM && !isExitConfirmOpen ? (
             <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-reset-title">
               <h3 id="sudoku-game-reset-title">{SUDOKU_COPY.reset.title}</h3>
               <p>{SUDOKU_COPY.reset.description}</p>

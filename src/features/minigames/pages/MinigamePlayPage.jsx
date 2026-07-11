@@ -5,7 +5,7 @@ import { MINIGAME_STATUS, getMinigameById } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
 
 export function MinigamePlayPage() {
-  const { gameId } = useParams();
+  const { gameId, roomId } = useParams();
   const game = getMinigameById(gameId);
   const ActiveGameComponent = game ? getMinigameComponent(game.id) : null;
 
@@ -47,9 +47,8 @@ export function MinigamePlayPage() {
     <div className="wrap minigame-play-page">
       <div className="sec-head play-page__head">
         <Link className="nav-link play-page__back" to="/">← 게임 목록으로</Link>
-        <span className="sec-title">{game.title}</span>
       </div>
-      <ActiveGameComponent game={game} />
+      <ActiveGameComponent game={game} roomId={roomId ?? null} />
     </div>
   );
 }

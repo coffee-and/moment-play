@@ -15,6 +15,7 @@ export const OMOK_MODE = Object.freeze({
 export const MATCH_TYPE = Object.freeze({
   LOCAL: "local",
   COMPUTER: "computer",
+  ONLINE: "online",
 });
 
 export const COMPUTER_DIFFICULTY = Object.freeze({
@@ -55,6 +56,7 @@ export const OMOK_MODE_LABEL = Object.freeze({
 export const MATCH_TYPE_LABEL = Object.freeze({
   [MATCH_TYPE.LOCAL]: "Local match",
   [MATCH_TYPE.COMPUTER]: "Computer match",
+  [MATCH_TYPE.ONLINE]: "Online room",
 });
 
 export const COMPUTER_DIFFICULTY_LABEL = Object.freeze({
@@ -73,4 +75,17 @@ export const FORBIDDEN_REASON_LABEL = Object.freeze({
   [FORBIDDEN_REASON.DOUBLE_THREE]: "쌍삼 자리입니다.",
   [FORBIDDEN_REASON.DOUBLE_FOUR]: "쌍사 자리입니다.",
   [FORBIDDEN_REASON.OVERLINE]: "장목 자리입니다.",
+});
+
+export const OMOK_RULE_DETAILS = Object.freeze({
+  [OMOK_MODE.STANDARD]: [
+    "흑이 먼저 시작",
+    "흑은 3-3, 4-4, 장목 금지",
+    "흑은 정확히 5목일 때 승리",
+    "백은 5목 이상이면 승리",
+  ],
+  [OMOK_MODE.FREE]: [
+    "흑과 백 모두 금수 없음",
+    "흑과 백 모두 5목 이상이면 승리",
+  ],
 });

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -88,12 +89,14 @@ function getNextTargetLabel(targetIndex) {
 }
 
 export function Game2048({ game = DEFAULT_GAME_META }) {
+  const navigate = useNavigate();
   const [board, setBoard] = useState(() => createEmptyBoard());
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(() => getBestScore());
   const [targetIndex, setTargetIndex] = useState(0);
   const [phase, setPhase] = useState(GAME_2048_PHASE.IDLE);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const boardRef = useRef(board);
   const scoreRef = useRef(score);
@@ -114,9 +117,9 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const maxTile = useMemo(() => getMaxTile(board), [board]);
   const emptyCellCount = useMemo(() => getEmptyCellCount(board), [board]);
   const phaseStatus = getPhaseStatus(phase, round, currentTarget);
-  const canMoveBoard = (phase === GAME_2048_PHASE.PLAYING || phase === GAME_2048_PHASE.ENDLESS) && !isResetConfirmOpen;
+  const canMoveBoard = (phase === GAME_2048_PHASE.PLAYING || phase === GAME_2048_PHASE.ENDLESS) && !isResetConfirmOpen && !isExitConfirmOpen;
   const hasStarted = phase !== GAME_2048_PHASE.IDLE;
-  const isStageCovered = isResetConfirmOpen || phase === GAME_2048_PHASE.MILESTONE_CLEAR || phase === GAME_2048_PHASE.COMPLETED || phase === GAME_2048_PHASE.GAME_OVER;
+  const isStageCovered = isResetConfirmOpen || isExitConfirmOpen || phase === GAME_2048_PHASE.MILESTONE_CLEAR || phase === GAME_2048_PHASE.COMPLETED || phase === GAME_2048_PHASE.GAME_OVER;
 
   boardRef.current = board;
   scoreRef.current = score;
@@ -261,6 +264,20 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     pointerStartRef.current = null;
   }
 
+  function requestExit() {
+    pointerStartRef.current = null;
+    if (phaseRef.current === GAME_2048_PHASE.IDLE || phaseRef.current === GAME_2048_PHASE.GAME_OVER || phaseRef.current === GAME_2048_PHASE.COMPLETED) {
+      navigate("/");
+      return;
+    }
+    setIsExitConfirmOpen(true);
+  }
+
+  function confirmExit() {
+    pointerStartRef.current = null;
+    navigate("/");
+  }
+
   function continueToNextTarget() {
     const nextIndex = targetIndexRef.current + 1;
     setTargetIndex(nextIndex);
@@ -289,11 +306,12 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     focusBoard();
   }
 
-  const gameActions = hasStarted ? (
-    <Button type="button" variant="secondary" onClick={requestNewGame}>
-      {GAME_2048_COPY.reset.newGameButton}
-    </Button>
-  ) : null;
+  const gameActions = (
+    <div className="game-stage__inline-actions">
+      {hasStarted ? <Button type="button" variant="secondary" onClick={requestNewGame}>{GAME_2048_COPY.reset.newGameButton}</Button> : null}
+      <Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button>
+    </div>
+  );
 
   const sidebar = (
     <>
@@ -351,8 +369,18 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
         )}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="game-2048__overlay-layer" state={isResetConfirmOpen ? "reset-confirm" : phase}>
-          {phase === GAME_2048_PHASE.MILESTONE_CLEAR && !isResetConfirmOpen ? (
+        <GameStageOverlay className="game-2048__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : isResetConfirmOpen ? "reset-confirm" : phase}>
+          {isExitConfirmOpen ? (
+            <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-exit-title">
+              <h3 id="game-2048-exit-title">게임을 나갈까요?</h3>
+              <p>현재 게임 진행은 저장되지 않아요.</p>
+              <div className="game-stage-modal__actions">
+                <Button type="button" onClick={() => setIsExitConfirmOpen(false)}>계속하기</Button>
+                <Button type="button" variant="secondary" onClick={confirmExit}>게임 나가기</Button>
+              </div>
+            </GameStageModal>
+          ) : null}
+          {phase === GAME_2048_PHASE.MILESTONE_CLEAR && !isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-milestone-title">
               <p className="game-2048__modal-eyebrow">ROUND {round} CLEAR</p>
               <h3 id="game-2048-milestone-title">{formatNumber(currentTarget)} 타일을 완성했어요.</h3>
@@ -361,7 +389,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <Button ref={milestoneButtonRef} type="button" onClick={continueToNextTarget}>{GAME_2048_COPY.milestone.nextButtonLabel} {formatNumber(getNextTargetLabel(targetIndex))}</Button>
             </GameStageModal>
           ) : null}
-          {phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen ? (
+          {phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal game-2048__modal--complete" role="dialog" aria-modal="true" aria-labelledby="game-2048-complete-title">
               <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.completed.eyebrow}</p>
               <h3 id="game-2048-complete-title">{FINAL_TARGET_TILE} {GAME_2048_COPY.completed.title}</h3>
@@ -373,7 +401,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               </div>
             </GameStageModal>
           ) : null}
-          {phase === GAME_2048_PHASE.GAME_OVER && !isResetConfirmOpen ? (
+          {phase === GAME_2048_PHASE.GAME_OVER && !isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-game-over-title">
               <h3 id="game-2048-game-over-title">{GAME_2048_COPY.gameOver.title}</h3>
               <p>{GAME_2048_COPY.gameOver.scoreLabel}</p>
@@ -382,7 +410,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <Button ref={gameOverButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
             </GameStageModal>
           ) : null}
-          {isResetConfirmOpen ? (
+          {isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-reset-title">
               <h3 id="game-2048-reset-title">{GAME_2048_COPY.reset.title}</h3>
               <p>{GAME_2048_COPY.reset.description}</p>

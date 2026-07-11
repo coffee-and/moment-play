@@ -811,7 +811,7 @@ a {
 }
 
 .game-stage__inner {
-  --stage-card-min-height: clamp(460px, 52vh, 620px);
+  --stage-card-min-height: clamp(380px, 44vh, 520px);
   display: grid;
   grid-template-columns: 330px minmax(0, 1fr);
   gap: var(--gap);
@@ -862,19 +862,22 @@ a {
 
 .game-stage__play {
   position: relative;
+  display: flex;
   min-width: 0;
   min-height: var(--stage-card-min-height);
   padding: clamp(18px, 2.4vw, 30px);
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
 }
 
 .game-stage__content {
   display: flex;
+  flex: 1;
   width: 100%;
   min-height: 100%;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 14px;
 }
 
@@ -897,30 +900,31 @@ a {
 }
 
 .game-guide-modal {
-  position: fixed;
-  z-index: 40;
-  top: 50%;
-  left: 50%;
   width: min(400px, calc(100vw - 32px));
-  border-radius: var(--r);
-  padding: 28px;
-  background: var(--card);
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
-  color: var(--ink);
-  transform: translate(-50%, -50%);
+}
+
+.game-stage__inline-actions {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.minigames-page__featured {
+  grid-template-columns: 1fr;
 }
 
 .game-stage-overlay {
-  position: absolute;
-  inset: -2px;
-  z-index: 10;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  border-radius: var(--r);
   background: color-mix(in oklab, oklch(0.13 0.008 40) 68%, transparent);
   backdrop-filter: blur(6px);
+  overflow-y: auto;
 }
 
 .game-stage-modal {
@@ -931,7 +935,8 @@ a {
   flex-direction: column;
   justify-content: center;
   gap: var(--gap);
-  overflow: hidden;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
   border: none;
   border-radius: var(--r);
   padding: 32px 28px;
@@ -1521,6 +1526,56 @@ a {
   word-break: break-all;
 }
 
+.omok-game__notice {
+  width: 100%;
+  margin: 0;
+  border-radius: var(--r3);
+  padding: 10px 12px;
+  background: var(--field);
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.omok-game__notice.is-error {
+  color: var(--coral2);
+}
+
+.omok-game__invite {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+}
+
+.omok-game__invite-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.omok-game__room-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.omok-game__room-slot {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--r2);
+  padding: 13px 16px;
+  background: var(--field);
+}
+
+.omok-game__waiting-actions {
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .omok-game__settings {
   display: flex;
   flex-wrap: wrap;
@@ -1585,6 +1640,91 @@ a {
   opacity: 0.55;
 }
 
+.omok-game__rule-panel {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  background: var(--field);
+}
+
+.omok-game__rule-panel-header,
+.omok-game__rule-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.omok-game__rule-info-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--ink2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.omok-game__rule-info-button:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.omok-game__rule-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.omok-game__rule-info-list {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.omok-game__rule-info-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+.omok-game__rule-info-list dt {
+  color: var(--ink2);
+  font-weight: 600;
+}
+
+.omok-game__rule-info-list dd {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+  text-align: right;
+}
+
+.omok-game__player-guide-row {
+  display: grid;
+  gap: 6px;
+}
+
+.omok-game__player-guide-role {
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .visually-hidden {
   position: absolute;
   overflow: hidden;
@@ -1631,7 +1771,7 @@ a {
   }
 
   .game-stage__inner {
-    --stage-card-min-height: clamp(320px, 46vh, 420px);
+    --stage-card-min-height: clamp(300px, 38vh, 400px);
   }
 
   .h-visual {
@@ -1651,8 +1791,24 @@ a {
   .ggrid,
   .steps,
   .omok-game__menu-grid,
+  .omok-game__room-slots,
   .sudoku-game__level-list {
     grid-template-columns: 1fr;
+  }
+
+  .omok-game__invite-row,
+  .omok-game__waiting-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .omok-game__rule-info-list div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .omok-game__rule-info-list dd {
+    text-align: left;
   }
 
   .h-cta .btn,

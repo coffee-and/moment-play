@@ -3,7 +3,7 @@
   width: 100%;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .memory-game__timer-row {
@@ -57,30 +57,43 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .memory-game__clock.is-urgent {
-    animation: none;
-  }
-}
-
 .memory-game__problem-panel,
 .memory-game__selection-panel {
+  display: flex;
   width: min(720px, 100%);
+  flex-direction: column;
+  padding: 18px 20px;
+}
+
+.memory-game__problem-panel .game-item-panel__title-row,
+.memory-game__selection-panel .game-item-panel__title-row {
+  margin-bottom: 12px;
+}
+
+.memory-game__problem-panel .game-item-panel__content,
+.memory-game__selection-panel .game-item-panel__content {
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
 }
 
 .memory-game__problem-panel {
-  min-height: clamp(200px, 24vw, 260px);
+  min-height: clamp(150px, 18vw, 200px);
 }
 
 .memory-game__selection-panel {
-  min-height: clamp(180px, 20vw, 220px);
+  min-height: clamp(150px, 17vw, 190px);
+  container: memory-selection / inline-size;
 }
 
 .memory-sequence {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
-  justify-items: center;
-  gap: 14px;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto;
 }
 
 .memory-sequence__item {
@@ -139,10 +152,11 @@
 .memory-card-grid {
   display: grid;
   width: 100%;
-  max-width: 720px;
-  grid-template-columns: repeat(8, 1fr);
+  max-width: 100%;
+  grid-template-columns: repeat(8, minmax(60px, 74px));
+  justify-content: center;
   justify-items: center;
-  gap: 14px;
+  gap: 12px;
   margin: 0 auto;
 }
 
@@ -210,7 +224,6 @@
   }
 }
 
-.memory-game__feedback,
 .memory-game__state-title {
   color: var(--ink);
   font-family: var(--lat);
@@ -228,6 +241,87 @@
   margin: 12px 0;
 }
 
+.memory-game__overlay-layer[data-state="turn-ready"],
+.memory-game__overlay-layer[data-state="cleared"] {
+  background: color-mix(in oklab, oklch(0.13 0.008 40) 52%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.memory-game__transition-view {
+  min-height: 0;
+  width: min(360px, 100%);
+  gap: 8px;
+  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  border-radius: calc(var(--r) - 4px);
+  padding: 26px 28px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--card) 94%, var(--coral) 6%);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
+}
+
+.memory-game__transition-view--turn {
+  animation: memory-turn-ready-in 0.22s ease-out both;
+}
+
+.memory-game__transition-view--clear {
+  background: color-mix(in oklab, var(--card) 86%, var(--coral) 14%);
+  animation: memory-round-clear-in 0.28s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+}
+
+.memory-game__transition-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--lat);
+  font-size: clamp(30px, 6vw, 46px);
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.memory-game__transition-copy {
+  margin: 2px 0 0;
+  color: var(--ink2);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@keyframes memory-turn-ready-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes memory-round-clear-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  65% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@container memory-selection (max-width: 670px) {
+  .memory-card-grid {
+    grid-template-columns: repeat(4, 74px);
+  }
+}
+
 @media (max-width: 620px) {
   .memory-card {
     width: 64px;
@@ -236,7 +330,30 @@
   }
 
   .memory-card-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 64px);
     gap: 11px;
+  }
+
+  .memory-sequence__item {
+    min-width: 52px;
+  }
+
+  .memory-game__transition-view {
+    width: min(320px, 100%);
+    padding: 24px 20px;
+  }
+
+  .memory-game__transition-title {
+    font-size: clamp(28px, 10vw, 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-game__clock.is-urgent,
+  .memory-sequence__display,
+  .memory-card__success-ring,
+  .memory-game__transition-view--turn,
+  .memory-game__transition-view--clear {
+    animation: none;
   }
 }
