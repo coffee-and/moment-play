@@ -24,4 +24,20 @@ describe("GameStage", () => {
     expect(host.querySelector('[aria-label="Expand game"]')).not.toBeNull();
     act(() => root.unmount());
   });
+
+  it("uses the stacked action layout for inline groups with multiple actions", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const actions = (
+      <div className="game-stage__inline-actions">
+        <button type="button">New game</button>
+        <button type="button">Exit game</button>
+      </div>
+    );
+
+    act(() => root.render(<GameStage title="Test game" actions={actions} fullscreenEnabled><div>Body</div></GameStage>));
+    expect(host.querySelector(".game-stage__actions").dataset.layout).toBe("stacked");
+    act(() => root.unmount());
+  });
 });
