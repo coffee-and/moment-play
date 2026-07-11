@@ -582,6 +582,7 @@ declare
   target_room public.omok_rooms%rowtype;
   player_role text;
   expected_stone text;
+  expected_turn_stone text;
   current_move_count integer;
   player_count integer;
 begin
@@ -619,7 +620,12 @@ begin
     raise exception '내 돌 차례가 아닙니다.';
   end if;
 
-  if p_stone <> case when mod(p_move_number, 2) = 0 then 'black' else 'white' end then
+  expected_turn_stone := case
+    when mod(p_move_number, 2) = 0 then 'black'
+    else 'white'
+  end;
+
+  if p_stone <> expected_turn_stone then
     raise exception '착수 순서가 올바르지 않습니다.';
   end if;
 
