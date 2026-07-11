@@ -215,6 +215,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   const activeDraw = isOnlinePlaying ? onlineGame.draw : draw;
   const activeForbiddenPositionKeys = isOnlinePlaying ? online.forbiddenPositionKeys : forbiddenPositionKeys;
   const activeMatchType = isOnlineContext ? MATCH_TYPE.ONLINE : activeMatch.matchType;
+  const isGameScreenVisible = isOnlinePlaying || screen === SCREEN.GAME_START || screen === SCREEN.PLAYING;
   const activeGameMode = online.room?.gameMode ?? activeMatch.gameMode;
   const currentGuideSettings = {
     explainForbiddenReasons: online.currentPlayer?.explainForbiddenReasons ?? settings.explainForbiddenReasons,
@@ -473,9 +474,18 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       </div>
       <div className="stat-row">
         <div className="stat"><div className="l">Board</div><div className="v">{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>
-        <div className="stat"><div className="l">Mode</div><div className="v"><small>{MATCH_TYPE_LABEL[activeMatchType]}</small></div></div>
-        <div className="stat"><div className="l">Turn</div><div className="v"><small>{getStoneLabel(activeTurn)}</small></div></div>
-        <div className="stat"><div className="l">Moves</div><div className="v">{activeMoveCount}</div></div>
+        <div className="stat"><div className="l">Mode</div><div className="v"><small>{isGameScreenVisible ? MATCH_TYPE_LABEL[activeMatchType] : isOnlineContext ? "Online waiting" : "선택 전"}</small></div></div>
+        {isGameScreenVisible ? (
+          <>
+            <div className="stat"><div className="l">Turn</div><div className="v"><small>{getStoneLabel(activeTurn)}</small></div></div>
+            <div className="stat"><div className="l">Moves</div><div className="v">{activeMoveCount}</div></div>
+          </>
+        ) : (
+          <>
+            <div className="stat"><div className="l">Rule</div><div className="v"><small>{OMOK_MODE_LABEL[activeGameMode]}</small></div></div>
+            <div className="stat"><div className="l">Guide</div><div className="v"><small>{compactRuleSummaryText.includes("사용 중") ? "사용 중" : "사용 안 함"}</small></div></div>
+          </>
+        )}
       </div>
       {isOnlineContext && online.room ? (
         <div className="game-stage__actions">

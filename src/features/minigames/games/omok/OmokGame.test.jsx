@@ -149,6 +149,9 @@ describe("OmokGame top-level menu", () => {
     expect(view.container.textContent).not.toContain("로컬 2인");
     expect(view.container.textContent).not.toContain("공개방");
     expect(view.container.textContent).not.toContain("방 목록");
+    expect(view.container.textContent).toContain("선택 전");
+    expect(view.container.textContent).not.toContain("Computer match");
+    expect(view.container.textContent).not.toContain("Moves0");
 
     view.unmount();
   });
