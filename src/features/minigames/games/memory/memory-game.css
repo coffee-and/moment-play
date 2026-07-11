@@ -253,7 +253,7 @@
   margin: 12px 0;
 }
 
-@container memory-selection (max-width: 660px) {
+@container memory-selection (max-width: 670px) {
   .memory-card-grid {
     grid-template-columns: repeat(4, 74px);
   }
