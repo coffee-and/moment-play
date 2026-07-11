@@ -14,6 +14,7 @@ function focusElement(element) {
 }
 
 export function GameStage({
+  actionLayout = 'split',
   actions,
   ariaLabel,
   children,
@@ -94,7 +95,7 @@ export function GameStage({
             </div>
             {description ? <p>{description}</p> : null}
           </div>
-          <div className="game-stage__actions">
+          <div className={joinClassNames(['game-stage__actions', `game-stage__actions--${actionLayout}`])} data-layout={actionLayout}>
             <div className="game-stage__action-slot game-stage__action-slot--primary">{actions}</div>
             <div className="game-stage__action-slot game-stage__action-slot--expand">
               {fullscreenEnabled ? (
