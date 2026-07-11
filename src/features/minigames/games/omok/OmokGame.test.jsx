@@ -116,7 +116,8 @@ function getMenuOptionButtons(container) {
 }
 
 function findButtonByText(container, text) {
-  return Array.from(container.querySelectorAll("button")).find((button) => button.textContent.includes(text)) ?? null;
+  void container;
+  return Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes(text)) ?? null;
 }
 
 describe("OmokGame top-level menu", () => {
@@ -157,18 +158,22 @@ describe("OmokGame top-level menu", () => {
     const [quickMatchButton] = getMenuOptionButtons(view.container);
 
     expect(quickMatchButton.disabled).toBe(true);
-    expect(quickMatchButton.textContent).toContain("Soon");
+    expect(quickMatchButton.textContent).toContain("준비 중");
 
     view.unmount();
   });
 
-  it("starting a computer match never touches the online gateway", async () => {
+  it("shows computer setup before the board and starts only after confirmation", async () => {
     const view = renderOmokGame();
     const computerButton = findButtonByText(view.container, "컴퓨터 대전");
 
     await view.click(computerButton);
 
+    expect(view.container.textContent).toContain("컴퓨터 대전 설정");
+    expect(view.container.querySelector(".omok-game__board")).toBeNull();
+    await view.click(findButtonByText(view.container, "게임 시작"));
     expect(view.container.querySelector(".omok-game__board")).not.toBeNull();
+    expect(document.body.textContent).toContain("대국을 시작합니다");
     expect(mockGateway.createRoom).not.toHaveBeenCalled();
     expect(mockGateway.joinRoom).not.toHaveBeenCalled();
     expect(mockGateway.getCurrentProfileState).not.toHaveBeenCalled();
@@ -205,15 +210,16 @@ describe("OmokGame settings menu", () => {
     }));
 
     const view = renderOmokGame();
-    await view.click(findButtonByText(view.container, "게임 설정"));
+    await view.click(findButtonByText(view.container, "친구 초대"));
 
     const allowPositionsToggle = Array.from(view.container.querySelectorAll("label")).find((label) => label.textContent.includes("금수 위치 보기 허용"))?.querySelector("input");
     await act(async () => {
       allowPositionsToggle.click();
       await flushMicrotasks();
     });
-    await view.click(findButtonByText(view.container, "확인"));
-    await view.click(findButtonByText(view.container, "친구 초대"));
+    expect(view.container.querySelector(".omok-game__board")).toBeNull();
+    expect(view.container.textContent).not.toContain("Easy");
+    await view.click(findButtonByText(view.container, "방 만들기"));
 
     expect(mockGateway.createRoom).toHaveBeenCalledTimes(1);
     const payload = mockGateway.createRoom.mock.calls[0][0];
@@ -242,16 +248,18 @@ describe("OmokGame active-game leave confirmation (computer match)", () => {
   it("confirms before returning to the menu once a move has been made, and cancelling preserves the game", async () => {
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "컴퓨터 대전"));
+    await view.click(findButtonByText(view.container, "게임 시작"));
+    await view.click(findButtonByText(view.container, "시작"));
 
     const centerIntersection = view.container.querySelectorAll(".omok-game__intersection")[7 * 15 + 7];
     await view.click(centerIntersection);
     expect(view.container.querySelector(".omok-game__stone")).not.toBeNull();
 
     await view.click(findButtonByText(view.container, "메뉴"));
-    expect(view.container.textContent).toContain("게임 중 메뉴로 나갈까요?");
+    expect(document.body.textContent).toContain("게임 중 메뉴로 나갈까요?");
 
     await view.click(findButtonByText(view.container, "계속 두기"));
-    expect(view.container.textContent).not.toContain("게임 중 메뉴로 나갈까요?");
+    expect(document.body.textContent).not.toContain("게임 중 메뉴로 나갈까요?");
     expect(view.container.querySelector(".omok-game__stone")).not.toBeNull();
 
     await view.click(findButtonByText(view.container, "메뉴"));
@@ -265,18 +273,42 @@ describe("OmokGame active-game leave confirmation (computer match)", () => {
   it("shows only 한 판 더 and 방 나가기 on the result modal after resigning", async () => {
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "컴퓨터 대전"));
+    await view.click(findButtonByText(view.container, "게임 시작"));
+    await view.click(findButtonByText(view.container, "시작"));
 
     await view.click(findButtonByText(view.container, "기권"));
     await view.click(findButtonByText(view.container, "기권하기"));
 
     const resultActions = view.container.querySelector(".omok-game-modal, .game-stage-modal");
-    expect(view.container.textContent).toContain("한 판 더");
+    expect(document.body.textContent).toContain("한 판 더");
     expect(findButtonByText(view.container, "한 판 더")).not.toBeNull();
     expect(findButtonByText(view.container, "방 나가기")).not.toBeNull();
-    expect(view.container.textContent).not.toContain("재대결 요청");
-    expect(view.container.textContent).not.toContain("요청 취소");
+    expect(document.body.textContent).not.toContain("재대결 요청");
+    expect(document.body.textContent).not.toContain("요청 취소");
     void resultActions;
 
+    view.unmount();
+  });
+
+  it("does not start the computer timer before the start modal is completed", async () => {
+    const view = renderOmokGame();
+    await view.click(findButtonByText(view.container, "컴퓨터 대전"));
+    await view.click(findButtonByText(view.container, "White · Second"));
+    await view.click(findButtonByText(view.container, "게임 시작"));
+
+    expect(view.container.querySelectorAll(".omok-game__stone")).toHaveLength(0);
+    await act(async () => {
+      vi.runOnlyPendingTimers();
+      await flushMicrotasks();
+    });
+    expect(view.container.querySelectorAll(".omok-game__stone")).toHaveLength(0);
+
+    await view.click(findButtonByText(view.container, "시작"));
+    await act(async () => {
+      vi.runOnlyPendingTimers();
+      await flushMicrotasks();
+    });
+    expect(view.container.querySelectorAll(".omok-game__stone")).toHaveLength(1);
     view.unmount();
   });
 });
@@ -305,12 +337,14 @@ describe("OmokGame online waiting room", () => {
 
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "친구 초대"));
+    expect(view.container.querySelector(".omok-game__board")).toBeNull();
+    await view.click(findButtonByText(view.container, "방 만들기"));
 
     expect(view.container.textContent).toContain("공유 방 규칙");
     expect(view.container.querySelectorAll(".omok-game__setting-chip").length).toBeGreaterThan(0);
     await view.click(view.container.querySelector('.omok-game__rule-panel [aria-label="규칙 자세히 보기"]'));
-    expect(view.container.textContent).toContain("방장 금수 안내");
-    expect(view.container.textContent).toContain("참가자 금수 안내");
+    expect(document.body.textContent).toContain("방장 금수 안내");
+    expect(document.body.textContent).toContain("참가자 금수 안내");
     await view.click(findButtonByText(view.container, "확인"));
 
     view.unmount();
@@ -359,14 +393,21 @@ describe("OmokGame active online game", () => {
 
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "친구 초대"));
+    await view.click(findButtonByText(view.container, "방 만들기"));
+    expect(view.container.querySelector(".omok-game__board")).not.toBeNull();
+    const firstIntersection = view.container.querySelector(".omok-game__intersection");
+    expect(firstIntersection.disabled).toBe(true);
+    await view.click(firstIntersection);
+    expect(mockGateway.submitMove).not.toHaveBeenCalled();
+    await view.click(findButtonByText(view.container, "시작"));
 
     const leaveButton = findButtonByText(view.container, "나가기");
     await view.click(leaveButton);
-    expect(view.container.textContent).toContain("게임 중 방을 나갈까요?");
+    expect(document.body.textContent).toContain("게임 중 방을 나갈까요?");
     expect(mockGateway.leaveRoom).not.toHaveBeenCalled();
 
     await view.click(findButtonByText(view.container, "계속 두기"));
-    expect(view.container.textContent).not.toContain("게임 중 방을 나갈까요?");
+    expect(document.body.textContent).not.toContain("게임 중 방을 나갈까요?");
 
     await view.click(findButtonByText(view.container, "나가기"));
     await view.click(findButtonByText(view.container, "방 나가기"));
@@ -385,9 +426,11 @@ describe("OmokGame active online game", () => {
 
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "친구 초대"));
+    await view.click(findButtonByText(view.container, "방 만들기"));
+    await view.click(findButtonByText(view.container, "시작"));
 
-    expect(view.container.textContent).not.toContain("재대결 요청");
-    expect(view.container.textContent).not.toContain("수락");
+    expect(document.body.textContent).not.toContain("재대결 요청");
+    expect(document.body.textContent).not.toContain("수락");
 
     const rematchButton = findButtonByText(view.container, "한 판 더");
     expect(rematchButton).not.toBeNull();
@@ -400,7 +443,7 @@ describe("OmokGame active online game", () => {
     await view.click(rematchButton);
 
     expect(mockGateway.requestRematch).toHaveBeenCalledTimes(1);
-    expect(view.container.textContent).toContain("상대 응답을 기다리는 중입니다.");
+    expect(document.body.textContent).toContain("상대 응답을 기다리는 중입니다.");
     expect(findButtonByText(view.container, "한 판 더").disabled).toBe(true);
 
     view.unmount();
@@ -416,10 +459,12 @@ describe("OmokGame active online game", () => {
 
     const view = renderOmokGame();
     await view.click(findButtonByText(view.container, "친구 초대"));
+    await view.click(findButtonByText(view.container, "방 만들기"));
+    await view.click(findButtonByText(view.container, "시작"));
     await view.click(findButtonByText(view.container, "방 나가기"));
 
-    expect(view.container.textContent).toContain("방을 나갈까요?");
-    expect(view.container.textContent).not.toContain("기권하면");
+    expect(document.body.textContent).toContain("방을 나갈까요?");
+    expect(document.body.textContent).not.toContain("기권하면");
     expect(mockGateway.leaveRoom).not.toHaveBeenCalled();
 
     await view.click(findButtonByText(view.container, "방 나가기"));
