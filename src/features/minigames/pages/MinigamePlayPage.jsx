@@ -47,7 +47,6 @@ export function MinigamePlayPage() {
     <div className="wrap minigame-play-page">
       <div className="sec-head play-page__head">
         <Link className="nav-link play-page__back" to="/">← 게임 목록으로</Link>
-        <span className="sec-title">{game.title}</span>
       </div>
       <ActiveGameComponent game={game} roomId={roomId ?? null} />
     </div>
