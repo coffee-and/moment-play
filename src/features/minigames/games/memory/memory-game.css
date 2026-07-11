@@ -65,7 +65,9 @@
 
 .memory-game__problem-panel,
 .memory-game__selection-panel {
+  display: flex;
   width: min(720px, 100%);
+  flex-direction: column;
   padding: 18px 20px;
 }
 
@@ -74,12 +76,24 @@
   margin-bottom: 12px;
 }
 
+.memory-game__problem-panel .game-item-panel__content,
+.memory-game__selection-panel .game-item-panel__content {
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
+}
+
 .memory-game__problem-panel {
   min-height: clamp(150px, 18vw, 200px);
 }
 
 .memory-game__selection-panel {
   min-height: clamp(150px, 17vw, 190px);
+}
+
+.memory-game__play-shell[data-phase="cleared"] .memory-game__problem-panel .game-item-panel__content::before {
+  content: "";
+  flex: 0 0 52px;
 }
 
 .memory-sequence {
