@@ -48,4 +48,22 @@ describe("GameStageOverlay", () => {
     expect(onClose).toHaveBeenCalledTimes(2);
     unmount();
   });
+
+  it("annotates modal action groups with their rendered action count", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    act(() => root.render(
+      <GameStageModal>
+        <div className="game-stage-modal__actions">
+          <button type="button">Primary</button>
+          <button type="button">Secondary</button>
+          <button type="button">Exit</button>
+        </div>
+      </GameStageModal>,
+    ));
+
+    expect(host.querySelector(".game-stage-modal__actions").dataset.actionCount).toBe("3");
+    act(() => root.unmount());
+  });
 });
