@@ -1,5 +1,6 @@
 import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { MoonMark, SunMark } from '../../../../shared/components/decoration/CelestialMark.jsx';
 import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
@@ -27,13 +28,17 @@ function ModalSkyDecoration() {
   return (
     <div className="game-stage-modal__sky" aria-hidden="true">
       <div className="game-stage-modal__sky-day">
-        <span className="game-stage-modal__sky-sun" style={{ top: '10%', right: '14%', width: 24, height: 24 }} />
+        <span className="game-stage-modal__sky-sun" style={{ top: '10%', right: '14%', width: 24, height: 24 }}>
+          <svg viewBox="0 0 32 32">
+            <SunMark />
+          </svg>
+        </span>
         <span className="game-stage-modal__sky-cloud" style={{ top: '18%', left: '10%', width: 66 }} />
       </div>
       <div className="game-stage-modal__sky-night">
         <span className="game-stage-modal__sky-moon" style={{ top: '12%', right: '14%', width: 24, height: 24 }}>
           <svg viewBox="0 0 32 32">
-            <path d="M23.5 19.2A9.5 9.5 0 1 1 12.8 4a7.5 7.5 0 0 0 10.7 15.2Z" fill="currentColor" />
+            <MoonMark />
           </svg>
         </span>
         <svg

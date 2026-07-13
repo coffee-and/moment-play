@@ -70,6 +70,16 @@
   --modal-border: color-mix(in oklab, var(--accent) 18%, transparent);
   --modal-shadow: 0 14px 30px -22px color-mix(in oklab, var(--accent) 30%, transparent);
 
+  /* Modal secondary action (Cancel/Back/Close/etc.) - the primary action
+     already reuses var(--accent)/var(--on-accent) via .button with no
+     modal-specific override needed, and the disabled state already reuses
+     the shared .button:disabled treatment - only the secondary action
+     needs its own tokens, since a plain var(--surface) background reads as
+     nearly invisible against the modal's own near-white surface (day). */
+  --modal-action-secondary-bg: color-mix(in oklab, var(--accent) 14%, #ffffff);
+  --modal-action-secondary-border: color-mix(in oklab, var(--accent) 50%, transparent);
+  --modal-action-secondary-text: var(--accent-2);
+
   font-family: var(--font);
   line-height: 1.5;
   color: var(--text);
@@ -109,6 +119,12 @@
   --modal-surface: linear-gradient(160deg, var(--night-1), var(--night-2));
   --modal-border: rgba(255, 255, 255, 0.08);
   --modal-shadow: 0 22px 48px -22px rgba(0, 0, 0, 0.6), 0 0 32px -12px color-mix(in oklab, var(--accent) 45%, transparent);
+
+  /* Reused as-is from the pre-existing dark-only override - only the light
+     theme values above are new. */
+  --modal-action-secondary-bg: rgba(255, 255, 255, 0.1);
+  --modal-action-secondary-border: rgba(255, 255, 255, 0.2);
+  --modal-action-secondary-text: #ffffff;
 }
 
 * {
@@ -1267,20 +1283,21 @@ a {
     -20px 6px 0 -6px var(--decoration-cloud);
 }
 
-.game-stage-modal__sky-sun {
+.game-stage-modal__sky-sun,
+.game-stage-modal__sky-moon {
   position: absolute;
-  border-radius: 50%;
-  background: var(--decoration-sun);
   opacity: var(--modal-decoration-opacity);
-  filter: blur(1px);
+}
+
+.game-stage-modal__sky-sun {
+  color: var(--decoration-sun);
 }
 
 .game-stage-modal__sky-moon {
-  position: absolute;
   color: var(--decoration-moon);
-  opacity: var(--modal-decoration-opacity);
 }
 
+.game-stage-modal__sky-sun svg,
 .game-stage-modal__sky-moon svg {
   display: block;
   width: 100%;
@@ -1328,15 +1345,11 @@ a {
   }
 }
 
-/* Light-theme modal surface is pale, so the default .button--secondary/
-   .btn-ghost styles (var(--surface)/var(--line)/var(--text)) already read
-   correctly there. This override is only needed against the dark navy
-   modal surface. */
-[data-theme="dark"] .game-stage-modal .button--secondary,
-[data-theme="dark"] .game-stage-modal .btn-ghost {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+.game-stage-modal .button--secondary,
+.game-stage-modal .btn-ghost {
+  border-color: var(--modal-action-secondary-border);
+  background: var(--modal-action-secondary-bg);
+  color: var(--modal-action-secondary-text);
   box-shadow: none;
 }
 
