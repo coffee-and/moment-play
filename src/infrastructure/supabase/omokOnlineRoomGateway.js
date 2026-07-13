@@ -1,5 +1,6 @@
 import { ensureAnonymousSession } from "./supabaseAuth.js";
 import { getSupabaseClient, isSupabaseConfigured } from "./supabaseClient.js";
+import { ONLINE_NICKNAME_SAVE_FAILED_MESSAGE } from "../../features/minigames/games/omok/online/omokOnline.constants.js";
 import {
   createOmokInviteUrl,
   getFallbackOnlineNickname,
@@ -70,16 +71,27 @@ export async function saveCurrentProfileNickname(nickname, client = getSupabaseC
 
   const userId = await getCurrentUserId(client);
   const normalizedNickname = normalizeOnlineNickname(validation.value);
-  const { error } = await client.from("profiles").upsert(
-    {
-      user_id: userId,
+
+  // A plain update, not an upsert: the omok_handle_new_auth_user trigger
+  // (see supabase/migrations) already inserts a profiles row for every new
+  // auth.users row, anonymous or not, so there is always an existing row to
+  // update here. Upsert's ON CONFLICT DO UPDATE previously also tried to set
+  // user_id (it re-sets every column in the payload, including the conflict
+  // key), which the table's column-scoped UPDATE grant
+  // (nickname, updated_at only) does not permit - failing with "permission
+  // denied for table profiles" even though the RLS policy itself was fine.
+  const { error } = await client
+    .from("profiles")
+    .update({
       nickname: normalizedNickname,
       updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
+    })
+    .eq("user_id", userId);
 
-  throwIfSupabaseError(error, "닉네임을 저장하지 못했습니다.");
+  if (error) {
+    if (import.meta.env.DEV) console.error("saveCurrentProfileNickname failed:", error);
+    throw new Error(ONLINE_NICKNAME_SAVE_FAILED_MESSAGE);
+  }
 
   return {
     userId,
