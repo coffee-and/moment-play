@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
+import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
+import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import "./game-2048.css";
@@ -90,6 +93,7 @@ function getNextTargetLabel(targetIndex) {
 
 export function Game2048({ game = DEFAULT_GAME_META }) {
   const navigate = useNavigate();
+  const rankingSubmission = useGameResultSubmission();
   const [board, setBoard] = useState(() => createEmptyBoard());
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(() => getBestScore());
@@ -165,6 +169,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   }
 
   function startNewGame() {
+    rankingSubmission.startAttempt();
     const nextBoard = createInitialBoard();
     setBoard(nextBoard);
     setScore(0);
@@ -208,6 +213,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     if (phaseRef.current !== GAME_2048_PHASE.ENDLESS && hasReachedTarget(nextBoard, TARGET_TILES[targetIndexRef.current])) {
       if (targetIndexRef.current === TARGET_TILES.length - 1) {
         setPhase(GAME_2048_PHASE.COMPLETED);
+        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
         return;
       }
       setPhase(GAME_2048_PHASE.MILESTONE_CLEAR);
@@ -216,6 +222,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
     if (!hasAvailableMove(nextBoard)) {
       setPhase(GAME_2048_PHASE.GAME_OVER);
+      void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
     }
   }
 
@@ -225,6 +232,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     if (!result.changed) {
       if (!hasAvailableMove(boardRef.current)) {
         setPhase(GAME_2048_PHASE.GAME_OVER);
+        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
       }
       return;
     }
@@ -284,6 +292,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     if (hasReachedTarget(boardRef.current, TARGET_TILES[nextIndex])) {
       if (nextIndex === TARGET_TILES.length - 1) {
         setPhase(GAME_2048_PHASE.COMPLETED);
+        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
         return;
       }
       setPhase(GAME_2048_PHASE.MILESTONE_CLEAR);
@@ -291,6 +300,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     }
     if (!hasAvailableMove(boardRef.current)) {
       setPhase(GAME_2048_PHASE.GAME_OVER);
+      void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
       return;
     }
     setPhase(GAME_2048_PHASE.PLAYING);
@@ -302,6 +312,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
       setPhase(GAME_2048_PHASE.GAME_OVER);
       return;
     }
+    rankingSubmission.startAttempt();
     setPhase(GAME_2048_PHASE.ENDLESS);
     focusBoard();
   }
@@ -395,6 +406,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <h3 id="game-2048-complete-title">{FINAL_TARGET_TILE} {GAME_2048_COPY.completed.title}</h3>
               <p>{GAME_2048_COPY.completed.description}</p>
               <p>{GAME_2048_COPY.completed.detail}</p>
+              <ResultSubmissionStatus submission={rankingSubmission} />
               <div className="game-stage-modal__actions">
                 <Button ref={completedContinueButtonRef} type="button" onClick={continueEndless}>{GAME_2048_COPY.completed.continueButton}</Button>
                 <Button type="button" variant="secondary" onClick={startNewGame}>{GAME_2048_COPY.completed.newGameButton}</Button>
@@ -407,6 +419,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <p>{GAME_2048_COPY.gameOver.scoreLabel}</p>
               <strong>{formatNumber(score)}</strong>
               <p>{GAME_2048_COPY.gameOver.maxTileLabel} {formatNumber(maxTile)}</p>
+              <ResultSubmissionStatus submission={rankingSubmission} />
               <Button ref={gameOverButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
             </GameStageModal>
           ) : null}

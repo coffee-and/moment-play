@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
+import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
+import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -120,6 +123,7 @@ function CorrectBurst() {
 
 export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const navigate = useNavigate();
+  const rankingSubmission = useGameResultSubmission();
   const initialData = useMemo(() => createMemoryRound(1, MEMORY_SYMBOLS), []);
   const [round, setRound] = useState(1);
   const [data, setData] = useState(initialData);
@@ -377,10 +381,12 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
 
   function startGame() {
     if (phaseRef.current !== PHASE.IDLE) return;
+    rankingSubmission.startAttempt();
     startRound(1);
   }
 
   function retryRound() {
+    rankingSubmission.startAttempt();
     startRound(roundRef.current);
   }
 
@@ -393,6 +399,10 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setFailureReason(reason);
     setPhase(PHASE.FAILED);
     phaseRef.current = PHASE.FAILED;
+    void rankingSubmission.submitResult({
+      gameKey: RANKING_GAME.MEMORY,
+      scoreValue: Math.max(0, roundRef.current - 1),
+    });
   }
 
   function completeRound() {
@@ -736,6 +746,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
                 <p>{round}라운드 실패</p>
                 {isTimeoutFailure ? <p>시간 초과</p> : null}
               </div>
+              <ResultSubmissionStatus submission={rankingSubmission} />
               <div className="memory-game__state-actions game-stage-modal__actions">
                 <Button
                   ref={retryButtonRef}
