@@ -54,7 +54,7 @@
 
 .sky-decoration__star--sparkle {
   color: var(--star);
-  animation: sky-decoration-twinkle 3.2s ease-in-out infinite;
+  animation: sky-decoration-twinkle var(--decoration-anim-duration) ease-in-out infinite;
 }
 
 .sky-decoration__star--dot {

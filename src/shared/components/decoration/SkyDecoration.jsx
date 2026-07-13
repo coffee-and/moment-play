@@ -15,24 +15,31 @@ const CLOUDS = [
   { top: "72%", left: "70%", width: 100, scale: 0.75 },
 ];
 
-// 4-point sparkle stars: position/size/opacity vary slightly per star.
+// Sparkle star sizes read from the shared --star-size-* tokens (styles.css)
+// so SkyDecoration and the modal's sky decoration stay in sync from one
+// place. A small mix of levels keeps the night sky varied without looking
+// noisy: a couple of larger "anchor" stars, one medium, a couple small.
+const SPARKLE_SIZE = { sm: "var(--star-size-sm)", md: "var(--star-size-md)", lg: "var(--star-size-lg)" };
+const DOT_SIZE = { sm: "var(--dot-size-sm)", md: "var(--dot-size-md)", lg: "var(--dot-size-lg)" };
+
+// 4-point sparkle stars: position/level/opacity vary per star.
 const SPARKLE_STARS = [
-  { top: "10%", left: "16%", size: 20, opacity: 0.85, delay: "0s" },
-  { top: "18%", left: "78%", size: 14, opacity: 0.7, delay: "0.6s" },
-  { top: "34%", left: "48%", size: 12, opacity: 0.55, delay: "1.1s" },
-  { top: "52%", left: "88%", size: 16, opacity: 0.75, delay: "0.3s" },
-  { top: "68%", left: "10%", size: 13, opacity: 0.6, delay: "0.9s" },
+  { top: "10%", left: "16%", level: "lg", opacity: 0.92, delay: "0s" },
+  { top: "18%", left: "78%", level: "md", opacity: 0.78, delay: "0.6s" },
+  { top: "34%", left: "48%", level: "sm", opacity: 0.6, delay: "1.1s" },
+  { top: "52%", left: "88%", level: "lg", opacity: 0.85, delay: "0.3s" },
+  { top: "68%", left: "10%", level: "sm", opacity: 0.65, delay: "0.9s" },
 ];
 
-// Small circular dot stars, layered in alongside the sparkles.
+// Circular dot stars, layered in alongside the sparkles. Fewer, larger dots
+// than before - a handful of barely-visible pinpricks read as noise rather
+// than stars.
 const DOT_STARS = [
-  { top: "6%", left: "40%", size: 3, opacity: 0.6 },
-  { top: "14%", left: "58%", size: 2, opacity: 0.45 },
-  { top: "24%", left: "24%", size: 3, opacity: 0.7 },
-  { top: "40%", left: "70%", size: 2, opacity: 0.5 },
-  { top: "60%", left: "42%", size: 3, opacity: 0.55 },
-  { top: "78%", left: "84%", size: 2, opacity: 0.4 },
-  { top: "84%", left: "30%", size: 3, opacity: 0.6 },
+  { top: "6%", left: "40%", level: "md", opacity: 0.7 },
+  { top: "14%", left: "58%", level: "sm", opacity: 0.55 },
+  { top: "24%", left: "24%", level: "lg", opacity: 0.8 },
+  { top: "60%", left: "42%", level: "sm", opacity: 0.6 },
+  { top: "84%", left: "30%", level: "md", opacity: 0.65 },
 ];
 
 function Cloud({ top, left, width, scale }) {
@@ -44,7 +51,8 @@ function Cloud({ top, left, width, scale }) {
   );
 }
 
-function SparkleStar({ top, left, size, opacity, delay }) {
+function SparkleStar({ top, left, level, opacity, delay }) {
+  const size = SPARKLE_SIZE[level];
   return (
     <svg
       className="sky-decoration__star sky-decoration__star--sparkle"
@@ -57,7 +65,8 @@ function SparkleStar({ top, left, size, opacity, delay }) {
   );
 }
 
-function DotStar({ top, left, size, opacity }) {
+function DotStar({ top, left, level, opacity }) {
+  const size = DOT_SIZE[level];
   return (
     <span
       className="sky-decoration__star sky-decoration__star--dot"

@@ -38,14 +38,14 @@ function ModalSkyDecoration() {
         </span>
         <svg
           className="game-stage-modal__sky-star game-stage-modal__sky-star--sparkle"
-          style={{ top: '16%', left: '18%', width: 14, height: 14 }}
+          style={{ top: '16%', left: '18%', width: 'var(--star-size-sm)', height: 'var(--star-size-sm)' }}
           viewBox="0 0 24 24"
           fill="currentColor"
         >
           <path d="M12 1.5c.9 5.8 3.4 8.3 9 9-5.6.7-8.1 3.2-9 9-.9-5.8-3.4-8.3-9-9 5.6-.7 8.1-3.2 9-9Z" />
         </svg>
-        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '32%', left: '76%', width: 3, height: 3 }} />
-        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '62%', left: '12%', width: 2, height: 2 }} />
+        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '32%', left: '76%', width: 'var(--dot-size-sm)', height: 'var(--dot-size-sm)' }} />
+        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '62%', left: '12%', width: 'var(--dot-size-md)', height: 'var(--dot-size-md)' }} />
       </div>
     </div>
   );
