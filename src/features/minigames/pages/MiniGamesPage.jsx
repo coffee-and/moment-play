@@ -1,9 +1,19 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../shared/auth/AuthContext.jsx";
+import { AUTH_LABELS, getAccountLabel, LOGIN_PATH, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
 import { Brand } from "../../../shared/components/Brand.jsx";
-import { AUTH_LABELS, LOGIN_PATH } from "../../../shared/auth/authConstants.js";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG } from "../data/minigameCatalog.js";
+
+function FooterAccountItem() {
+  const { status, user } = useAuth();
+
+  if (status === "loading") return <span aria-label={AUTH_LABELS.loading} />;
+  if (status === "anonymous") return <Link to={SIGNUP_PATH}>{AUTH_LABELS.createAccount}</Link>;
+  if (status === "authenticated") return <span>{getAccountLabel(user)}</span>;
+  return <Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link>;
+}
 
 export function MiniGamesPage() {
   const navigate = useNavigate();
@@ -57,7 +67,7 @@ export function MiniGamesPage() {
 
       <footer className="card footer">
         <Brand />
-        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link></div>
+        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><FooterAccountItem /></div>
         <div className="foot-copy">© 2026 momentPLAY · 짧은 순간을 위한 미니게임.</div>
       </footer>
     </div>
