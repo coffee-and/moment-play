@@ -15,6 +15,42 @@ function addActionCount(child) {
   });
 }
 
+// Theme-aware ambient decoration shared by every game's result/status modal
+// (clouds + a small sun accent by day, stars + a small crescent moon by
+// night). Both layers are always in the DOM; CSS toggles which one is
+// visible for the active [data-theme] (same approach as SkyDecoration.jsx),
+// so this stays a plain, context-free markup fragment - no theme lookup
+// needed here, and no ripple onto every game's tests. Purely decorative and
+// non-interactive; layered behind the modal's real content via CSS (see
+// .game-stage-modal__sky* in styles.css).
+function ModalSkyDecoration() {
+  return (
+    <div className="game-stage-modal__sky" aria-hidden="true">
+      <div className="game-stage-modal__sky-day">
+        <span className="game-stage-modal__sky-sun" style={{ top: '10%', right: '14%', width: 24, height: 24 }} />
+        <span className="game-stage-modal__sky-cloud" style={{ top: '18%', left: '10%', width: 66 }} />
+      </div>
+      <div className="game-stage-modal__sky-night">
+        <span className="game-stage-modal__sky-moon" style={{ top: '12%', right: '14%', width: 24, height: 24 }}>
+          <svg viewBox="0 0 32 32">
+            <path d="M23.5 19.2A9.5 9.5 0 1 1 12.8 4a7.5 7.5 0 0 0 10.7 15.2Z" fill="currentColor" />
+          </svg>
+        </span>
+        <svg
+          className="game-stage-modal__sky-star game-stage-modal__sky-star--sparkle"
+          style={{ top: '16%', left: '18%', width: 14, height: 14 }}
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 1.5c.9 5.8 3.4 8.3 9 9-5.6.7-8.1 3.2-9 9-.9-5.8-3.4-8.3-9-9 5.6-.7 8.1-3.2 9-9Z" />
+        </svg>
+        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '32%', left: '76%', width: 3, height: 3 }} />
+        <span className="game-stage-modal__sky-star game-stage-modal__sky-star--dot" style={{ top: '62%', left: '12%', width: 2, height: 2 }} />
+      </div>
+    </div>
+  );
+}
+
 export function GameStageOverlay({
   children,
   className = '',
@@ -67,6 +103,7 @@ export function GameStageOverlay({
 export function GameStageModal({ children, className = '', style, ...props }) {
   return (
     <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
+      <ModalSkyDecoration />
       {Children.map(children, addActionCount)}
     </div>
   );
