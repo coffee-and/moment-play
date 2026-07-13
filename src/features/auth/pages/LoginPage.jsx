@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
+import { AUTH_MESSAGES } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
 export function LoginPage() {
@@ -21,7 +22,7 @@ export function LoginPage() {
     event.preventDefault();
 
     if (!email.trim() || !password) {
-      setErrorMessage("이메일과 비밀번호를 입력해 주세요.");
+      setErrorMessage(AUTH_MESSAGES.emailAndPasswordRequired);
       return;
     }
 
@@ -32,7 +33,7 @@ export function LoginPage() {
       await signIn({ email: email.trim(), password });
       navigate("/", { replace: true });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "로그인에 실패했습니다.");
+      setErrorMessage(error instanceof Error ? error.message : AUTH_MESSAGES.signInFailed);
     } finally {
       setSubmitting(false);
     }
@@ -75,9 +76,7 @@ export function LoginPage() {
             </Button>
           </form>
         ) : (
-          <p className="auth-notice is-error" role="alert">
-            Supabase 환경 변수가 설정되지 않아 로그인을 사용할 수 없습니다.
-          </p>
+          <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
         <p className="auth-switch">계정이 없으신가요? <Link to="/signup">회원가입</Link></p>

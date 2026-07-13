@@ -10,6 +10,7 @@ let configured = true;
 
 const mockClient = {
   auth: {
+    exchangeCodeForSession: vi.fn(),
     getSession: vi.fn(async () => ({ data: { session: null }, error: null })),
     onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     signInWithPassword: vi.fn(),
@@ -53,6 +54,8 @@ async function renderAuth() {
 
 afterEach(() => {
   document.body.innerHTML = "";
+  window.localStorage.clear();
+  window.sessionStorage.clear();
   vi.clearAllMocks();
   mockClient.auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
   mockClient.auth.onAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } });
@@ -135,25 +138,29 @@ describe("AuthProvider / useAuth", () => {
     unmount();
   });
 
-  it("signUp upgrades an existing anonymous session via updateUser instead of creating a new account", async () => {
+  it("signUp refuses to run against an anonymous session instead of abandoning it", async () => {
     mockClient.auth.getSession.mockResolvedValueOnce({
       data: { session: session({ user: { id: "anon-user", is_anonymous: true } }) },
-      error: null,
-    });
-    mockClient.auth.updateUser.mockResolvedValueOnce({
-      data: { user: { id: "anon-user", email: "upgraded@a.com", is_anonymous: false } },
       error: null,
     });
 
     const unmount = await renderAuth();
     expect(latest.status).toBe("anonymous");
 
-    const result = await latest.signUp({ email: "upgraded@a.com", password: "secret1" });
-
-    expect(mockClient.auth.updateUser).toHaveBeenCalledWith({ email: "upgraded@a.com", password: "secret1" });
+    await expect(latest.signUp({ email: "upgraded@a.com", password: "secret1" })).rejects.toThrow(/게스트로 플레이/);
     expect(mockClient.auth.signUp).not.toHaveBeenCalled();
-    expect(result.user.id).toBe("anon-user");
-    expect(result.session).not.toBeNull();
+    expect(mockClient.auth.updateUser).not.toHaveBeenCalled();
+    unmount();
+  });
+
+  it("signUp maps an already-registered email to a clear conflict message", async () => {
+    mockClient.auth.signUp.mockResolvedValueOnce({
+      data: { session: null, user: null },
+      error: { message: "User already registered" },
+    });
+
+    const unmount = await renderAuth();
+    await expect(latest.signUp({ email: "taken@a.com", password: "secret1" })).rejects.toThrow(/이미 가입된 이메일/);
     unmount();
   });
 
@@ -164,5 +171,123 @@ describe("AuthProvider / useAuth", () => {
     await expect(latest.signOut()).rejects.toThrow("network down");
     expect(mockClient.auth.signOut).toHaveBeenCalled();
     unmount();
+  });
+
+  describe("anonymous -> permanent upgrade (two-step)", () => {
+    it("linkEmail attaches only the email to an anonymous user, never a password", async () => {
+      mockClient.auth.getSession.mockResolvedValueOnce({
+        data: { session: session({ user: { id: "anon-user", is_anonymous: true } }) },
+        error: null,
+      });
+      mockClient.auth.updateUser.mockResolvedValueOnce({
+        data: { user: { id: "anon-user", email: "new@a.com", is_anonymous: true } },
+        error: null,
+      });
+
+      const unmount = await renderAuth();
+      expect(latest.status).toBe("anonymous");
+
+      await latest.linkEmail({ email: "new@a.com" });
+
+      expect(mockClient.auth.updateUser).toHaveBeenCalledTimes(1);
+      const [attributes] = mockClient.auth.updateUser.mock.calls[0];
+      expect(attributes).toEqual({ email: "new@a.com" });
+      expect(attributes.password).toBeUndefined();
+      unmount();
+    });
+
+    it("linkEmail refuses to run for a non-anonymous session", async () => {
+      const unmount = await renderAuth(); // guest, no session
+      await expect(latest.linkEmail({ email: "new@a.com" })).rejects.toThrow(/게스트로 플레이 중인 계정/);
+      expect(mockClient.auth.updateUser).not.toHaveBeenCalled();
+      unmount();
+    });
+
+    it("linkEmail maps an already-registered email to a clear conflict message instead of claiming a merge", async () => {
+      mockClient.auth.getSession.mockResolvedValueOnce({
+        data: { session: session({ user: { id: "anon-user", is_anonymous: true } }) },
+        error: null,
+      });
+      mockClient.auth.updateUser.mockResolvedValueOnce({
+        data: { user: null },
+        error: { message: "A user with this email address has already been registered" },
+      });
+
+      const unmount = await renderAuth();
+      await expect(latest.linkEmail({ email: "taken@a.com" })).rejects.toThrow(/이미 가입된 이메일/);
+      unmount();
+    });
+
+    it("completeAccountUpgrade refuses to set a password before the email is verified", async () => {
+      mockClient.auth.getSession.mockResolvedValueOnce({
+        data: { session: session({ user: { id: "anon-user", is_anonymous: true } }) },
+        error: null,
+      });
+
+      const unmount = await renderAuth();
+      expect(latest.status).toBe("anonymous");
+
+      await expect(latest.completeAccountUpgrade({ password: "secret1" })).rejects.toThrow(/인증이 아직 완료되지 않았습니다/);
+      expect(mockClient.auth.updateUser).not.toHaveBeenCalled();
+      unmount();
+    });
+
+    it("completeEmailVerification exchanges the code, and completeAccountUpgrade then sets the password with the same user_id preserved", async () => {
+      mockClient.auth.getSession.mockResolvedValueOnce({
+        data: { session: session({ user: { id: "anon-user", is_anonymous: true } }) },
+        error: null,
+      });
+
+      let authStateCallback;
+      mockClient.auth.onAuthStateChange.mockImplementation((callback) => {
+        authStateCallback = callback;
+        return { data: { subscription: { unsubscribe: vi.fn() } } };
+      });
+
+      mockClient.auth.exchangeCodeForSession.mockImplementationOnce(async () => {
+        // A real exchange fires onAuthStateChange with the now-verified
+        // session before resolving - simulate that ordering here.
+        authStateCallback("SIGNED_IN", session({ user: { id: "anon-user", is_anonymous: false } }));
+        return { data: { session: session({ user: { id: "anon-user", is_anonymous: false } }) }, error: null };
+      });
+
+      const unmount = await renderAuth();
+      expect(latest.status).toBe("anonymous");
+
+      await act(async () => {
+        await latest.completeEmailVerification("the-code");
+      });
+      expect(mockClient.auth.exchangeCodeForSession).toHaveBeenCalledWith("the-code");
+      expect(latest.status).toBe("authenticated");
+
+      mockClient.auth.updateUser.mockResolvedValueOnce({
+        data: { user: { id: "anon-user", email: "new@a.com", is_anonymous: false } },
+        error: null,
+      });
+
+      const result = await latest.completeAccountUpgrade({ password: "secret1" });
+      expect(mockClient.auth.updateUser).toHaveBeenCalledWith({ password: "secret1" });
+      expect(result.user.id).toBe("anon-user");
+      unmount();
+    });
+
+    it("never persists a plaintext password to localStorage or sessionStorage", async () => {
+      mockClient.auth.getSession.mockResolvedValueOnce({
+        data: { session: session({ user: { id: "anon-user", is_anonymous: false } }) },
+        error: null,
+      });
+      mockClient.auth.updateUser.mockResolvedValueOnce({
+        data: { user: { id: "anon-user", is_anonymous: false } },
+        error: null,
+      });
+
+      const unmount = await renderAuth();
+      await latest.completeAccountUpgrade({ password: "super-secret-password" });
+
+      const dump = (storage) => Object.keys(storage).map((key) => storage.getItem(key)).join("\n");
+      expect(dump(window.localStorage)).not.toContain("super-secret-password");
+      expect(dump(window.sessionStorage)).not.toContain("super-secret-password");
+      unmount();
+    });
   });
 });

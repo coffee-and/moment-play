@@ -3,13 +3,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
+import { AUTH_MESSAGES, COMPLETE_SIGNUP_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
-const MIN_PASSWORD_LENGTH = 6;
-
+// Guests (no session at all) get the standard one-step email+password
+// signup. A player who has been playing anonymously (e.g. via the Omok
+// online-room flow) instead only attaches an email here - Supabase requires
+// manual linking for that, and setting a password in the same request would
+// mean setting one on a still-unverified identity, which is unsafe. The
+// password is chosen afterwards, once verified, on CompleteSignupPage.
 export function SignupPage() {
   const navigate = useNavigate();
-  const { isConfigured, signUp, status } = useAuth();
+  const { isConfigured, linkEmail, signUp, status } = useAuth();
+  const isAnonymousUpgrade = status === "anonymous";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,26 +27,45 @@ export function SignupPage() {
     if (status === "authenticated") navigate("/", { replace: true });
   }, [status, navigate]);
 
-  async function handleSubmit(event) {
+  async function handleAnonymousUpgradeSubmit(event) {
+    event.preventDefault();
+    setErrorMessage(null);
+
+    if (!email.trim()) {
+      setErrorMessage(AUTH_MESSAGES.emailRequired);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await linkEmail({ email: email.trim() });
+      navigate(COMPLETE_SIGNUP_PATH);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : AUTH_MESSAGES.linkEmailFailed);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleNewAccountSubmit(event) {
     event.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
     if (!email.trim() || !password) {
-      setErrorMessage("이메일과 비밀번호를 입력해 주세요.");
+      setErrorMessage(AUTH_MESSAGES.emailAndPasswordRequired);
       return;
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(`비밀번호는 최소 ${MIN_PASSWORD_LENGTH}자 이상이어야 합니다.`);
+      setErrorMessage(AUTH_MESSAGES.passwordTooShort);
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("비밀번호가 일치하지 않습니다.");
+      setErrorMessage(AUTH_MESSAGES.passwordMismatch);
       return;
     }
 
     setSubmitting(true);
-
     try {
       const { session } = await signUp({ email: email.trim(), password });
       if (session) {
@@ -49,7 +74,7 @@ export function SignupPage() {
         setSuccessMessage("가입 확인 이메일을 보냈어요. 메일함을 확인한 뒤 다시 로그인해 주세요.");
       }
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "회원가입에 실패했습니다.");
+      setErrorMessage(error instanceof Error ? error.message : AUTH_MESSAGES.signUpFailed);
     } finally {
       setSubmitting(false);
     }
@@ -60,53 +85,75 @@ export function SignupPage() {
       <div className="card auth-card reveal d1">
         <Brand />
         <h1 className="auth-card__title">회원가입</h1>
-        <p className="auth-card__subtitle">이메일과 비밀번호로 계정을 만드세요.</p>
+        <p className="auth-card__subtitle">
+          {isAnonymousUpgrade
+            ? "이메일을 연결하면 지금까지의 플레이 기록을 그대로 이어갈 수 있어요."
+            : "이메일과 비밀번호로 계정을 만드세요."}
+        </p>
 
         {isConfigured ? (
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <div>
-              <label className="f-label" htmlFor="signup-email">이메일</label>
-              <input
-                className="txt"
-                id="signup-email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </div>
-            <div>
-              <label className="f-label" htmlFor="signup-password">비밀번호</label>
-              <input
-                className="txt"
-                id="signup-password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </div>
-            <div>
-              <label className="f-label" htmlFor="signup-confirm-password">비밀번호 확인</label>
-              <input
-                className="txt"
-                id="signup-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-              />
-            </div>
-            {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
-            {successMessage ? <p className="auth-notice is-success" role="status">{successMessage}</p> : null}
-            <Button type="submit" variant="primary" fullWidth disabled={submitting}>
-              {submitting ? "가입 처리 중…" : "회원가입"}
-            </Button>
-          </form>
+          isAnonymousUpgrade ? (
+            <form className="auth-form" onSubmit={handleAnonymousUpgradeSubmit} noValidate>
+              <div>
+                <label className="f-label" htmlFor="signup-email">이메일</label>
+                <input
+                  className="txt"
+                  id="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
+              {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
+              <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+                {submitting ? "이메일 연결 중…" : "이메일 연결하기"}
+              </Button>
+            </form>
+          ) : (
+            <form className="auth-form" onSubmit={handleNewAccountSubmit} noValidate>
+              <div>
+                <label className="f-label" htmlFor="signup-email">이메일</label>
+                <input
+                  className="txt"
+                  id="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
+              <div>
+                <label className="f-label" htmlFor="signup-password">비밀번호</label>
+                <input
+                  className="txt"
+                  id="signup-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+              </div>
+              <div>
+                <label className="f-label" htmlFor="signup-confirm-password">비밀번호 확인</label>
+                <input
+                  className="txt"
+                  id="signup-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                />
+              </div>
+              {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
+              {successMessage ? <p className="auth-notice is-success" role="status">{successMessage}</p> : null}
+              <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+                {submitting ? "가입 처리 중…" : "회원가입"}
+              </Button>
+            </form>
+          )
         ) : (
-          <p className="auth-notice is-error" role="alert">
-            Supabase 환경 변수가 설정되지 않아 회원가입을 사용할 수 없습니다.
-          </p>
+          <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
         <p className="auth-switch">이미 계정이 있으신가요? <Link to="/login">로그인</Link></p>
