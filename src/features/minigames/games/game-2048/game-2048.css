@@ -5,15 +5,15 @@
   aspect-ratio: 1;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  border-radius: var(--r2);
+  gap: var(--game-2048-grid-gap);
+  border-radius: var(--r-lg);
   padding: 12px;
-  background: var(--field);
+  background: var(--game-2048-board-bg);
   touch-action: none;
 }
 
 .game-2048__board:focus-visible {
-  outline: 3px solid var(--coral);
+  outline: 3px solid var(--accent);
   outline-offset: 4px;
 }
 
@@ -26,9 +26,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: color-mix(in oklab, var(--ink) 6%, var(--field));
-  color: var(--ink);
-  font-family: var(--lat);
+  border: 1px solid var(--game-2048-cell-border);
+  background: var(--game-2048-empty-cell-bg);
+  box-shadow: var(--game-2048-cell-shadow);
+  color: var(--text);
+  font-family: var(--label);
   font-size: clamp(19px, 3.4vw, 28px);
   font-weight: 700;
   letter-spacing: 0;
@@ -52,40 +54,41 @@
 }
 
 .game-2048__cell[data-value="2"] {
-  background: color-mix(in oklab, var(--coral) 10%, var(--field));
+  background: color-mix(in oklab, var(--accent) 10%, var(--game-2048-empty-cell-bg));
 }
 
 .game-2048__cell[data-value="4"] {
-  background: color-mix(in oklab, var(--coral) 20%, var(--field));
+  background: color-mix(in oklab, var(--accent) 20%, var(--game-2048-empty-cell-bg));
 }
 
 .game-2048__cell[data-value="8"] {
-  background: color-mix(in oklab, var(--coral) 34%, var(--field));
+  background: color-mix(in oklab, var(--accent) 34%, var(--game-2048-empty-cell-bg));
 }
 
 .game-2048__cell[data-value="16"] {
-  background: color-mix(in oklab, var(--coral) 50%, var(--field));
+  background: color-mix(in oklab, var(--accent) 50%, var(--game-2048-empty-cell-bg));
 }
 
 .game-2048__cell[data-value="32"] {
-  background: color-mix(in oklab, var(--coral) 68%, var(--field));
+  background: color-mix(in oklab, var(--accent) 68%, var(--game-2048-empty-cell-bg));
 }
 
 .game-2048__cell[data-value="64"] {
-  background: var(--coral);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .game-2048__cell[data-value="128"],
 .game-2048__cell[data-value="256"] {
-  background: var(--coral2);
-  color: var(--card);
+  background: var(--accent-2);
+  color: var(--on-accent);
 }
 
 .game-2048__cell[data-value="512"],
 .game-2048__cell[data-value="1024"],
 .game-2048__cell[data-value="2048"] {
-  background: var(--ink);
-  color: var(--card);
+  background: var(--text);
+  color: var(--surface);
 }
 
 .game-2048__dpad {
@@ -98,16 +101,16 @@
 
 .game-2048__dpad-button {
   border: 1.5px solid transparent;
-  border-radius: var(--r3);
-  background: var(--field);
-  color: var(--ink);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
   cursor: pointer;
   font-size: 19px;
   transition: transform 0.15s, border-color 0.15s;
 }
 
 .game-2048__dpad-button:hover:not(:disabled) {
-  border-color: var(--ink);
+  border-color: var(--text);
 }
 
 .game-2048__dpad-button:active:not(:disabled) {
@@ -136,8 +139,8 @@
 
 .game-2048__target-label {
   margin-top: 10px;
-  color: var(--ink3);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 10px;
   letter-spacing: 0.12em;
 }
@@ -145,8 +148,8 @@
 .game-2048__target-value {
   display: block;
   margin: 10px 0;
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 44px;
   font-style: italic;
   font-variant-numeric: tabular-nums;

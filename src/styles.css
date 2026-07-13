@@ -80,6 +80,16 @@
   --modal-action-secondary-border: color-mix(in oklab, var(--accent) 50%, transparent);
   --modal-action-secondary-text: var(--accent-2);
 
+  /* 2048 board surface layers - board container sits on the shared .card
+     surface, empty cells sit on the board, so each needs its own step of
+     contrast (day: cool neutral scale off --surface/--surface-2; night:
+     --bg-2/--surface-2 below). Grid gap is theme-independent spacing. */
+  --game-2048-board-bg: color-mix(in oklab, var(--text) 10%, var(--surface-2));
+  --game-2048-empty-cell-bg: color-mix(in oklab, var(--text) 4%, var(--surface));
+  --game-2048-grid-gap: 10px;
+  --game-2048-cell-border: color-mix(in oklab, var(--text) 10%, transparent);
+  --game-2048-cell-shadow: 0 1px 2px color-mix(in oklab, var(--text) 14%, transparent);
+
   font-family: var(--font);
   line-height: 1.5;
   color: var(--text);
@@ -125,6 +135,13 @@
   --modal-action-secondary-bg: rgba(255, 255, 255, 0.1);
   --modal-action-secondary-border: rgba(255, 255, 255, 0.2);
   --modal-action-secondary-text: #ffffff;
+
+  /* Board darker than the empty cells it holds, both lighter than pure
+     black - reuses the existing deep-navy scale instead of new hex values. */
+  --game-2048-board-bg: var(--bg-2);
+  --game-2048-empty-cell-bg: var(--surface-2);
+  --game-2048-cell-border: color-mix(in oklab, white 10%, transparent);
+  --game-2048-cell-shadow: 0 1px 2px color-mix(in oklab, black 45%, transparent);
 }
 
 * {
