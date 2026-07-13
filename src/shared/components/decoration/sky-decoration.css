@@ -1,0 +1,84 @@
+/*
+ * Ambient day/night backdrop. Fixed + negative z-index so it always paints
+ * behind normal page content (cards, text, nav) without affecting layout or
+ * scroll size. Purely decorative (aria-hidden) and low-contrast by design -
+ * never let it compete with foreground text.
+ */
+.sky-decoration {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, #cfe9ff 0%, #e6f2ff 45%, #f7fbff 100%);
+  transition: background 0.5s var(--ease);
+}
+
+[data-theme="dark"] .sky-decoration {
+  background:
+    radial-gradient(120% 60% at 50% -10%, #1b2454 0%, transparent 60%),
+    linear-gradient(180deg, #0b1029 0%, #0e1533 100%);
+}
+
+.sky-decoration__clouds {
+  position: absolute;
+  inset: 0;
+}
+
+.sky-decoration__stars {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+[data-theme="dark"] .sky-decoration__clouds {
+  display: none;
+}
+
+[data-theme="dark"] .sky-decoration__stars {
+  display: block;
+}
+
+.sky-decoration__cloud {
+  position: absolute;
+  aspect-ratio: 100 / 34;
+  border-radius: 100px;
+  background: #fff;
+  opacity: 0.75;
+  filter: blur(5px);
+  box-shadow:
+    34px 6px 0 -6px #fff,
+    -30px 9px 0 -8px #fff,
+    4px -14px 0 -8px #fff;
+}
+
+.sky-decoration__star {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.sky-decoration__star--sparkle {
+  color: var(--star);
+  animation: sky-decoration-twinkle 3.2s ease-in-out infinite;
+}
+
+.sky-decoration__star--dot {
+  background: var(--star);
+}
+
+@keyframes sky-decoration-twinkle {
+  0%,
+  100% {
+    transform: scale(0.85);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-decoration__star--sparkle {
+    animation: none;
+  }
+}

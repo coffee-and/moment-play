@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Brand } from "../shared/components/Brand.jsx";
+import { SkyDecoration } from "../shared/components/decoration/SkyDecoration.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
@@ -24,6 +25,7 @@ export function AppLayout() {
 
   return (
     <div className="moment-app">
+      <SkyDecoration />
       <header className="hd">
         <div className="wrap hd-in">
           <Brand />
@@ -34,7 +36,9 @@ export function AppLayout() {
           </div>
         </div>
       </header>
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <TabBar />
     </div>
   );

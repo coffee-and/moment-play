@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
+import { ThemeProvider } from "../../../shared/theme/ThemeContext.jsx";
 import { MiniGamesPage } from "./MiniGamesPage.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -18,12 +19,14 @@ describe("MiniGamesPage", () => {
     document.body.appendChild(host);
     const root = createRoot(host);
     act(() => root.render(
-      <MemoryRouter>
-        <Routes>
-          <Route path="/" element={<MiniGamesPage />} />
-          <Route path="/minigames/omok" element={<div>Omok route</div>} />
-        </Routes>
-      </MemoryRouter>,
+      <ThemeProvider>
+        <MemoryRouter>
+          <Routes>
+            <Route path="/" element={<MiniGamesPage />} />
+            <Route path="/minigames/omok" element={<div>Omok route</div>} />
+          </Routes>
+        </MemoryRouter>
+      </ThemeProvider>,
     ));
 
     expect(host.textContent).toContain("전체 게임");

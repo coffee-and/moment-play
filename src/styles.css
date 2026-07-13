@@ -286,8 +286,7 @@ a {
 }
 
 @media (max-width: 560px) {
-  .nav,
-  .hd-right .bell {
+  .nav {
     display: none;
   }
 
@@ -328,8 +327,106 @@ a {
     width: 22px;
     height: 22px;
   }
+
+  /* Compact hero/featured so the game catalog appears sooner. */
+  .greet {
+    padding: 16px 0 4px;
+  }
+
+  .greet h1 {
+    font-size: 22px;
+  }
+
+  .greet p {
+    margin-top: 4px;
+    font-size: 13.5px;
+  }
+
+  .f-body {
+    padding: 20px;
+  }
+
+  .f-body h2 {
+    margin: 8px 0 6px;
+    font-size: 24px;
+  }
+
+  .f-body p {
+    margin-bottom: 16px;
+    font-size: 13.5px;
+  }
+
+  .f-art {
+    padding: 0 0 18px;
+  }
+
+  .f-art .board {
+    width: 130px;
+    height: 130px;
+  }
+
+  /* Category chips scroll horizontally instead of wrapping. */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chipf {
+    flex: 0 0 auto;
+  }
+
+  /* Compact two-column game catalog. */
+  .gcard {
+    min-height: 0;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .gc-preview {
+    height: 56px;
+  }
+
+  .gc-preview-icon {
+    font-size: 19px;
+  }
+
+  .gc-name {
+    font-size: 15px;
+  }
+
+  .gc-desc {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 3px;
+    font-size: 11.5px;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .gcard .badge {
+    padding: 3px 7px;
+    font-size: 8px;
+  }
+
+  .gc-play {
+    gap: 4px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .gc-play .arw {
+    width: 12px;
+    height: 12px;
+  }
 }
 
+/* Very narrow phones: description adds too much height for two columns. */
 .nav-link,
 .kicker,
 .editorial-label,
@@ -1043,6 +1140,11 @@ a {
 
   .game-stage-modal__actions .button {
     white-space: normal;
+  }
+
+  /* Very narrow phones: the description adds too much height for two columns. */
+  .gc-desc {
+    display: none;
   }
 }
 
@@ -1849,18 +1951,9 @@ a {
 }
 
 @media (max-width: 1000px) {
-  .hero,
-  .duo,
   .game-stage__inner {
     grid-template-columns: 1fr;
-  }
-
-  .game-stage__inner {
     --stage-card-min-height: clamp(300px, 38vh, 400px);
-  }
-
-  .h-visual {
-    min-height: 280px;
   }
 
   .ggrid {
@@ -1869,12 +1962,15 @@ a {
 }
 
 @media (max-width: 620px) {
-  .ggrid,
-  .steps,
   .omok-game__menu-grid,
   .omok-game__room-slots,
   .sudoku-game__level-list {
     grid-template-columns: 1fr;
+  }
+
+  .ggrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .omok-game__invite-row,
@@ -1892,17 +1988,9 @@ a {
     text-align: left;
   }
 
-  .h-cta .btn,
-  .h-cta .btn-ghost,
-  .omok-ctas .btn,
-  .omok-ctas .btn-ghost,
   .button,
   .btn {
     width: 100%;
-  }
-
-  .h-title {
-    font-size: 34px;
   }
 
   .game-2048__meta,
