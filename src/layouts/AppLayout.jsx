@@ -1,40 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { Brand } from "../shared/components/Brand.jsx";
+import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
+import { TabBar } from "../shared/components/nav/TabBar.jsx";
+import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 
 export function AppLayout() {
-  const [theme, setTheme] = useState("dark");
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
-  // react-router's plain <Routes> (non-data router) doesn't restore scroll on navigation.
+  // react-router's plain <Routes> (non-data router) doesn't restore scroll on
+  // navigation. Scroll to an in-page section when the URL carries a hash
+  // (e.g. the "게임" nav item linking to "/#games"), otherwise reset to top.
   useEffect(() => {
+    if (location.hash) {
+      const target = document.getElementById(location.hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ block: "start" });
+        return;
+      }
+    }
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   return (
-    <div className={`moment-app pal-${theme}`}>
-      <div className="wrap">
-        <header className="card nav reveal">
-          <Link className="brand" to="/" aria-label="Moment Play home">
-            <span className="bd" aria-hidden="true" />moment<b>PLAY</b>
-          </Link>
-          {isHome ? (
-            <nav className="nav-links" aria-label="Moment Play navigation">
-              <a className="nav-link on" href="#games">Games</a>
-              <a className="nav-link" href="#featured">Featured</a>
-              <a className="nav-link" href="#about">About</a>
-            </nav>
-          ) : null}
-          <button
-            className="mode-btn"
-            type="button"
-            onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
-          >
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
-        </header>
-      </div>
+    <div className="moment-app">
+      <header className="hd">
+        <div className="wrap hd-in">
+          <Brand />
+          <PrimaryNav />
+          <div className="hd-right">
+            <ThemeToggle />
+            <Link className="avatar" to="/login" aria-label="프로필">🙂</Link>
+          </div>
+        </div>
+      </header>
       <Outlet />
+      <TabBar />
     </div>
   );
 }

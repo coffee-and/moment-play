@@ -1,31 +1,76 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap");
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+/*
+ * Moment Play — "soft sky" design tokens.
+ * :root = day (light, default), [data-theme="dark"] = night.
+ * Fonts (Pretendard + Space Grotesk) are loaded via <link> tags in index.html.
+ * Single source of truth for tokens: moment_play_design/momentplay-design-guide.md
+ */
+:root {
+  --bg: #f4f2fc;
+  --bg-2: #efeafb;
+  --surface: #ffffff;
+  --surface-2: #f6f4fd;
+  --text: #232a4d;
+  --muted: #888fb2;
+  --line: #ececf6;
+  --accent: #6c5ce7;
+  --accent-2: #8b7ff2;
+  --on-accent: #ffffff;
+  --chip: #f0eefb;
+  --star: #c9b6ff;
+
+  /* Featured/modal night-sky surface — always dark, in both themes */
+  --night-1: #1b2450;
+  --night-2: #2a2f6b;
+
+  --font: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --label: "Space Grotesk", "Pretendard Variable", sans-serif;
+  --r-xl: 26px;
+  --r-lg: 20px;
+  --r-md: 15px;
+  --r-sm: 11px;
+  --gap: 14px;
+  --maxw: 1240px;
+  --ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --sh-sm: 0 2px 10px -4px rgba(70, 60, 140, 0.18);
+  --sh: 0 16px 40px -20px rgba(70, 60, 140, 0.4);
+
+  font-family: var(--font);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+[data-theme="dark"] {
+  --bg: #0e1533;
+  --bg-2: #0b1029;
+  --surface: #182147;
+  --surface-2: #1e2854;
+  --text: #eef1fb;
+  --muted: #98a0c8;
+  --line: rgba(255, 255, 255, 0.09);
+  --accent: #8b7ff2;
+  --accent-2: #a59bf7;
+  --on-accent: #ffffff;
+  --chip: #202a56;
+  --star: #7f8cd8;
+  --night-1: #141c42;
+  --night-2: #232a63;
+  --sh-sm: 0 2px 12px -6px rgba(0, 0, 0, 0.5);
+  --sh: 0 20px 46px -22px rgba(0, 0, 0, 0.7);
+}
 
 * {
   box-sizing: border-box;
 }
 
-:root {
-  --coral: oklch(0.81 0.13 34);
-  --coral2: oklch(0.72 0.145 34);
-  --kr: "Pretendard Variable", Pretendard, system-ui, sans-serif;
-  --lat: "Archivo", system-ui, sans-serif;
-  --r: 26px;
-  --r2: 18px;
-  --r3: 13px;
-  --gap: 14px;
-  --maxw: 1240px;
-  font-family: var(--kr);
-  line-height: 1.5;
-  color: #111;
-  background: oklch(0.188 0.007 40);
-}
-
 body {
   margin: 0;
   min-height: 100vh;
-  background: oklch(0.188 0.007 40);
+  background: var(--bg);
+  color: var(--text);
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
 }
 
 button,
@@ -47,37 +92,10 @@ a {
   min-height: 100vh;
 }
 
-.pal-dark {
-  --bg: oklch(0.188 0.007 40);
-  --card: oklch(0.887 0.03 17);
-  --card2: oklch(0.855 0.036 19);
-  --ink: oklch(0.235 0.012 40);
-  --ink2: oklch(0.44 0.015 32);
-  --ink3: oklch(0.575 0.016 30);
-  --line: oklch(0.79 0.022 22);
-  --field: oklch(0.955 0.013 45);
-  --onbg: oklch(0.9 0.02 28);
-  --onbg2: oklch(0.62 0.02 30);
-}
-
-.pal-light {
-  --bg: oklch(0.972 0.009 40);
-  --card: oklch(0.997 0.003 60);
-  --card2: oklch(0.963 0.017 22);
-  --ink: oklch(0.245 0.012 40);
-  --ink2: oklch(0.44 0.015 32);
-  --ink3: oklch(0.585 0.016 30);
-  --line: oklch(0.92 0.011 30);
-  --field: oklch(0.957 0.02 22);
-  --onbg: oklch(0.28 0.012 40);
-  --onbg2: oklch(0.52 0.016 30);
-}
-
 .moment-app {
   min-height: 100vh;
   background: var(--bg);
-  color: var(--onbg);
-  transition: background 0.4s;
+  color: var(--text);
 }
 
 .wrap {
@@ -89,13 +107,11 @@ a {
 .card {
   position: relative;
   overflow: hidden;
-  border-radius: var(--r);
-  background: var(--card);
-  color: var(--ink);
-}
-
-.pal-light .card {
-  box-shadow: 0 1px 2px rgba(70, 40, 30, 0.04), 0 10px 26px -14px rgba(120, 70, 50, 0.15);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--sh-sm);
 }
 
 .board-motif {
@@ -107,8 +123,8 @@ a {
   opacity: 0.32;
   pointer-events: none;
   background-image:
-    linear-gradient(color-mix(in oklab, var(--ink) 30%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--ink) 30%, transparent) 1px, transparent 1px);
+    linear-gradient(color-mix(in oklab, var(--text) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--text) 30%, transparent) 1px, transparent 1px);
   background-size: 25px 25px;
   mask: radial-gradient(circle at 35% 65%, #000 30%, transparent 75%);
 }
@@ -123,73 +139,208 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-family: var(--lat);
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-family: var(--font);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .brand b {
   font-weight: 800;
 }
 
-.brand .bd {
-  position: relative;
-  width: 22px;
-  height: 22px;
+.brand-icon {
+  width: 26px;
+  height: 26px;
   flex: none;
-  border-radius: 6px;
-  background: var(--coral);
 }
 
-.brand .bd::before,
-.brand .bd::after {
-  content: "";
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+/* ============================ Sticky app header ============================ */
+.hd {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(16px) saturate(1.1);
 }
 
-.brand .bd::before {
-  top: 4px;
-  left: 4px;
-  background: var(--ink);
-}
-
-.brand .bd::after {
-  right: 4px;
-  bottom: 4px;
-  background: var(--card);
+.hd-in {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 66px;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: var(--gap);
-  padding: 17px clamp(20px, 2.4vw, 30px);
+  gap: 2px;
+  margin-left: 14px;
 }
 
-.nav-links {
+.nav .lk {
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.nav .lk.on {
+  color: var(--accent);
+}
+
+.nav .lk:hover {
+  color: var(--text);
+}
+
+.hd-right {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* Day/night pill toggle */
+.toggle {
+  position: relative;
+  width: 74px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 3px;
+}
+
+.toggle .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  transition: transform 0.32s var(--ease);
+}
+
+[data-theme="dark"] .toggle .knob {
+  transform: translateX(40px);
+}
+
+.toggle .ic {
+  width: 50%;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+
+.toggle .ic svg {
+  width: 16px;
+  height: 16px;
+}
+
+.toggle .t-sun {
+  color: #f7a827;
+}
+
+.toggle .t-moon {
+  color: #8b93c8;
+}
+
+.iconbtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-sm);
+  transition: transform 0.2s;
+}
+
+.iconbtn:hover {
+  transform: translateY(-1px);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #f0a1d0);
+  color: var(--on-accent);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  box-shadow: var(--sh-sm);
+}
+
+/* ============================ Bottom tab bar (mobile) ============================ */
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .nav,
+  .hd-right .bell {
+    display: none;
+  }
+
+  main {
+    padding-bottom: 84px;
+  }
+
+  .tabbar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .tabbar a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+
+  .tabbar a.on {
+    color: var(--accent);
+  }
+
+  .tabbar svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 .nav-link,
-.mode-btn,
 .kicker,
 .editorial-label,
 .badge,
 .f-label {
-  font-family: var(--lat);
+  font-family: var(--label);
   text-transform: uppercase;
 }
 
 .nav-link {
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 11.5px;
   letter-spacing: 0.1em;
   transition: color 0.25s;
@@ -197,28 +348,13 @@ a {
 
 .nav-link:hover,
 .nav-link.on {
-  color: var(--ink);
-}
-
-.mode-btn {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 7px 14px;
-  background: none;
-  color: var(--ink2);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-}
-
-.mode-btn:hover {
-  color: var(--ink);
+  color: var(--text);
 }
 
 .kicker,
 .editorial-label {
   display: inline-block;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 11.5px;
   letter-spacing: 0.17em;
 }
@@ -236,7 +372,7 @@ a {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 9px;
-  color: var(--ink3);
+  color: var(--muted);
   font-size: 9px;
   letter-spacing: 0.12em;
   white-space: nowrap;
@@ -244,14 +380,14 @@ a {
 
 .badge.online,
 .badge.coral {
-  border-color: color-mix(in oklab, var(--coral) 55%, transparent);
-  color: var(--coral2);
+  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  color: var(--accent-2);
 }
 
 .f-label {
   display: block;
   margin-bottom: 9px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 10.5px;
   letter-spacing: 0.08em;
 }
@@ -259,19 +395,19 @@ a {
 .txt {
   width: 100%;
   border: 1.5px solid transparent;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 14px 15px;
-  background: var(--field);
-  color: var(--ink);
+  background: var(--surface-2);
+  color: var(--text);
   font-size: 15px;
 }
 
 .txt::placeholder {
-  color: var(--ink3);
+  color: var(--muted);
 }
 
 .txt:focus {
-  border-color: var(--ink);
+  border-color: var(--text);
   outline: none;
 }
 
@@ -282,10 +418,10 @@ a {
   justify-content: center;
   gap: 10px;
   border: none;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 15px 26px;
-  background: var(--coral);
-  color: var(--ink);
+  background: var(--accent);
+  color: var(--text);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -294,7 +430,7 @@ a {
 
 .button:hover:not(:disabled),
 .btn:hover {
-  background: var(--coral2);
+  background: var(--accent-2);
   transform: translateY(-2px);
 }
 
@@ -304,11 +440,11 @@ a {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1.5px solid var(--ink);
-  border-radius: var(--r3);
+  border: 1.5px solid var(--text);
+  border-radius: var(--r-md);
   padding: 13px 22px;
   background: none;
-  color: var(--ink);
+  color: var(--text);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
@@ -317,8 +453,8 @@ a {
 
 .button--secondary:hover:not(:disabled),
 .btn-ghost:hover {
-  background: var(--ink);
-  color: var(--card);
+  background: var(--text);
+  color: var(--surface);
   transform: none;
 }
 
@@ -361,7 +497,7 @@ a {
 
 .h-title {
   margin: 12px 0 14px;
-  color: var(--ink);
+  color: var(--text);
   font-size: clamp(32px, 4.6vw, 56px);
   font-weight: 800;
   letter-spacing: 0;
@@ -369,7 +505,7 @@ a {
 }
 
 .h-title em {
-  font-family: var(--lat);
+  font-family: var(--label);
   font-style: italic;
   font-weight: 600;
 }
@@ -377,7 +513,7 @@ a {
 .h-sub {
   max-width: 38ch;
   margin: 0;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -418,11 +554,11 @@ a {
   min-height: 190px;
   flex: 1;
   overflow: hidden;
-  border-radius: var(--r2);
-  background-color: var(--field);
+  border-radius: var(--r-lg);
+  background-color: var(--surface-2);
   background-image:
-    linear-gradient(color-mix(in oklab, var(--ink) 22%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--ink) 22%, transparent) 1px, transparent 1px);
+    linear-gradient(color-mix(in oklab, var(--text) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--text) 22%, transparent) 1px, transparent 1px);
   background-position: center;
   background-size: 34px 34px;
 }
@@ -435,16 +571,16 @@ a {
 }
 
 .stone.is-black {
-  background: var(--ink);
+  background: var(--text);
 }
 
 .stone.is-white {
-  border: 1.5px solid var(--ink2);
-  background: var(--card);
+  border: 1.5px solid var(--muted);
+  background: var(--surface);
 }
 
 .stone.is-coral {
-  background: var(--coral);
+  background: var(--accent);
 }
 
 .tile-row {
@@ -458,17 +594,17 @@ a {
   align-items: center;
   justify-content: center;
   aspect-ratio: 1.6;
-  border-radius: var(--r3);
-  background: var(--field);
-  color: var(--ink2);
-  font-family: var(--lat);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 12px;
   font-style: italic;
 }
 
 .tile.hot {
-  background: color-mix(in oklab, var(--coral) 20%, var(--field));
-  color: var(--coral2);
+  background: color-mix(in oklab, var(--accent) 20%, var(--surface-2));
+  color: var(--accent-2);
   font-weight: 600;
 }
 
@@ -504,8 +640,8 @@ a {
 .omok-t small {
   display: block;
   margin-top: 4px;
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 14px;
   font-style: italic;
   font-weight: 400;
@@ -518,25 +654,25 @@ a {
 }
 
 .stp {
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 14px 12px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .stp.on {
-  border: 1.5px solid var(--coral);
+  border: 1.5px solid var(--accent);
 }
 
 .stp .n {
-  color: var(--ink3);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 13px;
   font-style: italic;
 }
 
 .stp .t {
   margin-top: 5px;
-  color: var(--ink);
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -544,7 +680,7 @@ a {
 .omok-copy,
 .qm p {
   margin: 0;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -559,8 +695,8 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--ink3);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 12px;
   font-style: italic;
 }
@@ -577,16 +713,16 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 14px 16px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .spin {
   width: 22px;
   height: 22px;
   flex: none;
-  border: 2.5px dashed var(--coral2);
+  border: 2.5px dashed var(--accent-2);
   border-radius: 50%;
   animation: spin 2.6s linear infinite;
 }
@@ -611,15 +747,15 @@ a {
 }
 
 .sec-title {
-  color: var(--onbg);
+  color: var(--text);
   font-size: clamp(22px, 3vw, 30px);
   font-weight: 800;
   letter-spacing: 0;
 }
 
 .sec-sub {
-  color: var(--onbg2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 14px;
   font-style: italic;
 }
@@ -633,24 +769,24 @@ a {
 }
 
 .chipf {
-  border: 1px solid color-mix(in oklab, var(--onbg) 22%, transparent);
+  border: 1px solid color-mix(in oklab, var(--text) 22%, transparent);
   border-radius: 999px;
   padding: 9px 17px;
   background: none;
-  color: var(--onbg2);
+  color: var(--muted);
   font-size: 12.5px;
   cursor: pointer;
   transition: color 0.25s, background 0.25s;
 }
 
 .chipf:hover {
-  color: var(--onbg);
+  color: var(--text);
 }
 
 .chipf.on {
   border-color: transparent;
-  background: var(--card);
-  color: var(--ink);
+  background: var(--surface);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -673,22 +809,22 @@ a {
   justify-content: space-between;
   gap: 16px;
   overflow: hidden;
-  border-radius: var(--r);
+  border-radius: var(--r-xl);
   padding: 22px;
-  background: var(--card);
-  color: var(--ink);
+  background: var(--surface);
+  color: var(--text);
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.3s, outline-color 0.3s;
 }
 
 .gcard.open:hover,
 .gcard.is-active {
-  background: var(--card2);
+  background: var(--surface-2);
   transform: translateY(-5px);
 }
 
 .gcard.is-active {
-  outline: 2px solid var(--coral);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
@@ -706,16 +842,16 @@ a {
 }
 
 .gc-num {
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 15px;
   font-style: italic;
 }
 
 .gc-en {
   display: block;
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 13px;
   font-style: italic;
 }
@@ -731,7 +867,7 @@ a {
 .gc-desc {
   display: block;
   margin-top: 7px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12.5px;
   line-height: 1.5;
 }
@@ -742,15 +878,15 @@ a {
   gap: 7px;
   border-radius: 999px;
   padding: 9px 18px;
-  background: var(--coral);
-  color: var(--ink);
+  background: var(--accent);
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
 
 .gcard.soon .gc-play {
-  background: var(--field);
-  color: var(--ink3);
+  background: var(--surface-2);
+  color: var(--muted);
 }
 
 .gc-play .arw {
@@ -779,20 +915,20 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 11px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .foot-links a:hover {
-  color: var(--ink);
+  color: var(--text);
 }
 
 .foot-copy {
   width: 100%;
-  color: var(--ink3);
+  color: var(--muted);
   font-size: 11.5px;
 }
 
@@ -805,7 +941,7 @@ a {
   inset: 16px;
   z-index: 20;
   overflow: auto;
-  border-radius: var(--r);
+  border-radius: var(--r-xl);
   padding: var(--gap);
   background: var(--bg);
 }
@@ -849,7 +985,7 @@ a {
 .game-stage__copy p,
 .game-stage__side-note {
   margin: 8px 0 0;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -888,15 +1024,15 @@ a {
   border: 1.5px solid var(--line);
   border-radius: 10px;
   background: none;
-  color: var(--ink2);
+  color: var(--muted);
   cursor: pointer;
   font-size: 15px;
   transition: border-color 0.25s, color 0.25s;
 }
 
 .game-guide-icon:hover {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .game-guide-modal {
@@ -938,10 +1074,10 @@ a {
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
   border: none;
-  border-radius: var(--r);
+  border-radius: var(--r-xl);
   padding: 32px 28px;
-  background: var(--card);
-  color: var(--ink);
+  background: var(--surface);
+  color: var(--text);
   text-align: center;
   animation: pop 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -994,7 +1130,7 @@ a {
 
 .game-stage-modal p {
   margin: 0;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 13.5px;
   line-height: 1.65;
 }
@@ -1006,14 +1142,14 @@ a {
 }
 
 .stat {
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 13px 15px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .stat .l {
-  color: var(--coral2);
-  font-family: var(--lat);
+  color: var(--accent-2);
+  font-family: var(--label);
   font-size: 9.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -1021,8 +1157,8 @@ a {
 }
 
 .stat .v {
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 24px;
   font-style: italic;
   font-variant-numeric: tabular-nums;
@@ -1030,7 +1166,7 @@ a {
 }
 
 .stat .v small {
-  color: var(--ink3);
+  color: var(--muted);
   font-size: 12px;
   font-style: normal;
 }
@@ -1058,16 +1194,16 @@ a {
 
 .game-2048__meta div,
 .sudoku-game__meta div {
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 13px 15px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .game-2048__meta span,
 .sudoku-game__meta span {
   display: block;
-  color: var(--coral2);
-  font-family: var(--lat);
+  color: var(--accent-2);
+  font-family: var(--label);
   font-size: 9.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -1076,8 +1212,8 @@ a {
 
 .game-2048__meta strong,
 .sudoku-game__meta strong {
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 21px;
   font-style: italic;
   font-variant-numeric: tabular-nums;
@@ -1093,7 +1229,7 @@ a {
   justify-content: center;
   gap: 8px 12px;
   margin: 0;
-  color: var(--ink3);
+  color: var(--muted);
   font-size: 11.5px;
   text-align: center;
 }
@@ -1103,8 +1239,8 @@ a {
 .memory-game__state-kicker,
 .omok-game__modal-eyebrow {
   margin-bottom: 8px;
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 11px;
   letter-spacing: 0.17em;
   text-transform: uppercase;
@@ -1113,8 +1249,8 @@ a {
 .game-stage-modal > strong {
   display: block;
   margin: 10px 0;
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 44px;
   font-style: italic;
   font-variant-numeric: tabular-nums;
@@ -1139,17 +1275,17 @@ a {
 
 .sudoku-game__level-button {
   border: 1.5px solid transparent;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 14px;
-  background: var(--field);
-  color: var(--ink);
+  background: var(--surface-2);
+  color: var(--text);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s, transform 0.2s;
 }
 
 .sudoku-game__level-button:hover {
-  border-color: var(--ink);
+  border-color: var(--text);
   transform: translateY(-2px);
 }
 
@@ -1160,7 +1296,7 @@ a {
 
 .sudoku-game__level-button span {
   margin-top: 5px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -1180,9 +1316,9 @@ a {
   overflow: hidden;
   grid-template-columns: repeat(9, minmax(0, 1fr));
   grid-template-rows: repeat(9, minmax(0, 1fr));
-  border: 2.5px solid var(--ink);
+  border: 2.5px solid var(--text);
   border-radius: 14px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .sudoku-game__cell {
@@ -1195,7 +1331,7 @@ a {
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: transparent;
-  color: var(--ink);
+  color: var(--text);
   cursor: pointer;
   font-size: clamp(15px, 2.6vw, 21px);
   font-weight: 600;
@@ -1204,7 +1340,7 @@ a {
 }
 
 .sudoku-game__cell:nth-child(3n) {
-  border-right: 2px solid var(--ink);
+  border-right: 2px solid var(--text);
 }
 
 .sudoku-game__cell:nth-child(9n) {
@@ -1213,29 +1349,29 @@ a {
 
 .sudoku-game__cell:nth-child(n + 19):nth-child(-n + 27),
 .sudoku-game__cell:nth-child(n + 46):nth-child(-n + 54) {
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--text);
 }
 
 .sudoku-game__cell.is-given {
-  color: var(--ink);
+  color: var(--text);
   font-weight: 800;
 }
 
 .sudoku-game__cell.is-user {
-  color: var(--coral2);
+  color: var(--accent-2);
 }
 
 .sudoku-game__cell:hover,
 .sudoku-game__cell.is-related {
-  background: color-mix(in oklab, var(--ink) 5%, var(--field));
+  background: color-mix(in oklab, var(--text) 5%, var(--surface-2));
 }
 
 .sudoku-game__cell.is-selected {
-  background: color-mix(in oklab, var(--coral) 22%, var(--field));
+  background: color-mix(in oklab, var(--accent) 22%, var(--surface-2));
 }
 
 .sudoku-game__cell.is-conflict {
-  box-shadow: inset 0 0 0 2px var(--coral2);
+  box-shadow: inset 0 0 0 2px var(--accent-2);
 }
 
 .sudoku-game__controls {
@@ -1250,24 +1386,24 @@ a {
 .sudoku-game__erase-button {
   aspect-ratio: 1.25;
   border: 1.5px solid transparent;
-  border-radius: var(--r3);
-  background: var(--field);
-  color: var(--ink);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
   cursor: pointer;
-  font-family: var(--lat);
+  font-family: var(--label);
   font-size: 20px;
   font-weight: 600;
   transition: transform 0.15s, border-color 0.15s;
 }
 
 .sudoku-game__erase-button {
-  font-family: var(--kr);
+  font-family: var(--font);
   font-size: 12.5px;
 }
 
 .sudoku-game__number-button:hover:not(:disabled),
 .sudoku-game__erase-button:hover:not(:disabled) {
-  border-color: var(--ink);
+  border-color: var(--text);
   transform: translateY(-2px);
 }
 
@@ -1292,7 +1428,7 @@ a {
 
 .omok-game__section-title {
   margin: 6px 0 0;
-  color: var(--ink);
+  color: var(--text);
   font-size: 21px;
   font-weight: 800;
   letter-spacing: 0;
@@ -1301,17 +1437,17 @@ a {
 .omok-game__menu-option {
   min-height: clamp(96px, 12vw, 128px);
   border: 1.5px solid transparent;
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 20px 18px;
-  background: var(--field);
-  color: var(--ink);
+  background: var(--surface-2);
+  color: var(--text);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.25s, transform 0.25s;
 }
 
 .omok-game__menu-option:hover:not(:disabled) {
-  border-color: var(--ink);
+  border-color: var(--text);
   transform: translateY(-3px);
 }
 
@@ -1331,7 +1467,7 @@ a {
 
 .omok-game__menu-desc {
   margin-top: 5px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -1344,17 +1480,17 @@ a {
 .omok-game__board {
   position: relative;
   aspect-ratio: 1;
-  border: 2px solid var(--ink);
-  border-radius: var(--r2);
-  background: var(--field);
+  border: 2px solid var(--text);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
 }
 
 .omok-game__grid {
   position: absolute;
   inset: 6.5%;
   background-image:
-    linear-gradient(color-mix(in oklab, var(--ink) 45%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--ink) 45%, transparent) 1px, transparent 1px);
+    linear-gradient(color-mix(in oklab, var(--text) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--text) 45%, transparent) 1px, transparent 1px);
   background-position: 0 0;
   background-size: calc(100% / 14) calc(100% / 14);
 }
@@ -1366,7 +1502,7 @@ a {
   bottom: 0;
   width: 1px;
   height: 100%;
-  background: color-mix(in oklab, var(--ink) 45%, transparent);
+  background: color-mix(in oklab, var(--text) 45%, transparent);
 }
 
 .omok-game__grid::before {
@@ -1376,7 +1512,7 @@ a {
   left: 0;
   width: 100%;
   height: 1px;
-  background: color-mix(in oklab, var(--ink) 45%, transparent);
+  background: color-mix(in oklab, var(--text) 45%, transparent);
 }
 
 .omok-game__star,
@@ -1389,7 +1525,7 @@ a {
 .omok-game__star {
   width: 1.6%;
   aspect-ratio: 1;
-  background: color-mix(in oklab, var(--ink) 60%, transparent);
+  background: color-mix(in oklab, var(--text) 60%, transparent);
 }
 
 .omok-game__intersection {
@@ -1407,7 +1543,7 @@ a {
 }
 
 .omok-game__intersection:focus-visible {
-  outline: 2px solid var(--coral);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -1415,20 +1551,20 @@ a {
   content: "";
   position: absolute;
   inset: 31%;
-  border: 1.5px dashed var(--coral2);
+  border: 1.5px dashed var(--accent-2);
   border-radius: 50%;
-  background: color-mix(in oklab, var(--coral) 18%, transparent);
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 .omok-game__intersection.is-rejected::before {
   content: "";
   position: absolute;
   inset: 24%;
-  border: 1.5px solid var(--coral2);
+  border: 1.5px solid var(--accent-2);
   border-radius: 50%;
-  background: color-mix(in oklab, var(--coral) 18%, transparent);
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
   border-style: solid;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--coral) 18%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 .omok-game__stone {
@@ -1438,12 +1574,12 @@ a {
 }
 
 .omok-game__stone.is-black {
-  background: var(--ink);
+  background: var(--text);
 }
 
 .omok-game__stone.is-white {
-  border: 1.5px solid var(--ink2);
-  background: var(--card);
+  border: 1.5px solid var(--muted);
+  background: var(--surface);
 }
 
 .omok-game__stone.is-last::after {
@@ -1451,16 +1587,16 @@ a {
   position: absolute;
   inset: 32%;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--accent);
 }
 
 .omok-game__stone.is-winning::before {
   content: "";
   position: absolute;
   inset: -17%;
-  border: 2px solid var(--coral2);
+  border: 2px solid var(--accent-2);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--card) 65%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--surface) 65%, transparent);
 }
 
 .omok-game__turns {
@@ -1472,13 +1608,13 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 13px 16px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .omok-game__player.is-active {
-  border: 1.5px solid var(--coral);
+  border: 1.5px solid var(--accent);
 }
 
 .omok-game__dot {
@@ -1489,12 +1625,12 @@ a {
 }
 
 .omok-game__dot.is-black {
-  background: var(--ink);
+  background: var(--text);
 }
 
 .omok-game__dot.is-white {
-  border: 1.5px solid var(--ink2);
-  background: var(--card);
+  border: 1.5px solid var(--muted);
+  background: var(--surface);
 }
 
 .omok-game__player-name {
@@ -1504,12 +1640,12 @@ a {
 
 .omok-game__player-status,
 .omok-game__vs {
-  color: var(--ink3);
+  color: var(--muted);
   font-size: 10.5px;
 }
 
 .omok-game__vs {
-  font-family: var(--lat);
+  font-family: var(--label);
   font-size: 13px;
   font-style: italic;
 }
@@ -1517,11 +1653,11 @@ a {
 .omok-game__dialog-link {
   width: 100%;
   margin-top: 14px;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 13px;
-  background: var(--field);
-  color: var(--ink2);
-  font-family: var(--lat);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 12.5px;
   word-break: break-all;
 }
@@ -1529,17 +1665,17 @@ a {
 .omok-game__notice {
   width: 100%;
   margin: 0;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 10px 12px;
-  background: var(--field);
-  color: var(--ink2);
+  background: var(--surface-2);
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
 }
 
 .omok-game__notice.is-error {
-  color: var(--coral2);
+  color: var(--accent-2);
 }
 
 .omok-game__invite {
@@ -1566,9 +1702,9 @@ a {
   min-width: 0;
   align-items: center;
   gap: 10px;
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 13px 16px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .omok-game__waiting-actions {
@@ -1595,10 +1731,10 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 10px 12px;
-  background: var(--field);
-  color: var(--ink2);
+  background: var(--surface-2);
+  color: var(--muted);
   font-size: 12px;
   text-align: left;
 }
@@ -1607,16 +1743,16 @@ a {
   width: 16px;
   height: 16px;
   flex: none;
-  accent-color: var(--coral);
+  accent-color: var(--accent);
 }
 
 .omok-game__setting-chip {
   min-height: 38px;
   border: 1.5px solid transparent;
-  border-radius: var(--r3);
+  border-radius: var(--r-md);
   padding: 9px 12px;
-  background: var(--field);
-  color: var(--ink2);
+  background: var(--surface-2);
+  color: var(--muted);
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
@@ -1624,14 +1760,14 @@ a {
 }
 
 .omok-game__setting-chip:hover:not(:disabled) {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--text);
+  color: var(--text);
   transform: translateY(-1px);
 }
 
 .omok-game__setting-chip.is-selected {
-  border-color: var(--coral);
-  color: var(--ink);
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 .omok-game__setting-chip:disabled,
@@ -1644,9 +1780,9 @@ a {
   display: grid;
   width: 100%;
   gap: 8px;
-  border-radius: var(--r2);
+  border-radius: var(--r-lg);
   padding: 14px 16px;
-  background: var(--field);
+  background: var(--surface-2);
 }
 
 .omok-game__rule-panel-header,
@@ -1664,10 +1800,10 @@ a {
   justify-content: center;
   width: 22px;
   height: 22px;
-  border: 1.5px solid var(--ink2);
+  border: 1.5px solid var(--muted);
   border-radius: 50%;
   background: transparent;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -1675,14 +1811,14 @@ a {
 }
 
 .omok-game__rule-info-button:hover {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .omok-game__rule-list {
   margin: 0;
   padding-left: 18px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -1699,17 +1835,17 @@ a {
   justify-content: space-between;
   gap: 10px;
   padding: 7px 0;
-  border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  border-top: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
 }
 
 .omok-game__rule-info-list dt {
-  color: var(--ink2);
+  color: var(--muted);
   font-weight: 600;
 }
 
 .omok-game__rule-info-list dd {
   margin: 0;
-  color: var(--ink);
+  color: var(--text);
   font-weight: 700;
   text-align: right;
 }
@@ -1720,7 +1856,7 @@ a {
 }
 
 .omok-game__player-guide-role {
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1784,10 +1920,6 @@ a {
 }
 
 @media (max-width: 620px) {
-  .nav-links {
-    display: none;
-  }
-
   .ggrid,
   .steps,
   .omok-game__menu-grid,
@@ -1871,24 +2003,24 @@ a {
 
 .game-detail__title {
   margin: 8px 0 6px;
-  color: var(--onbg);
+  color: var(--text);
   font-size: clamp(20px, 2.6vw, 26px);
 }
 
 .game-detail__desc {
-  color: var(--onbg2);
+  color: var(--muted);
 }
 
 .game-detail__howto {
-  color: var(--onbg2);
+  color: var(--muted);
   font-size: 13px;
 }
 
 .game-detail__status {
   display: inline-block;
   margin-top: 6px;
-  color: var(--coral2);
-  font-family: var(--lat);
+  color: var(--accent-2);
+  font-family: var(--label);
   font-size: 12px;
   font-style: italic;
 }
@@ -1896,7 +2028,7 @@ a {
 .game-detail__section-title {
   display: block;
   margin-bottom: 9px;
-  color: var(--onbg2);
+  color: var(--muted);
   font-size: 10.5px;
   letter-spacing: 0.08em;
 }
@@ -1909,13 +2041,13 @@ a {
 
 .status-panel__title {
   display: block;
-  color: var(--ink);
+  color: var(--text);
   font-size: 15px;
 }
 
 .status-panel__description {
   margin-top: 6px;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 13px;
 }
 
