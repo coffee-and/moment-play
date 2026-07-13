@@ -13,11 +13,27 @@ import "./memory-game.css";
 export const MEMORY_BEST_ROUND_KEY = "eunContents.memoryOrderGame.bestRound";
 const KEY = MEMORY_BEST_ROUND_KEY;
 const COUNTDOWN_LABELS = ["3", "2", "1", "START!"];
-const COUNTDOWN_STEP_MS = 1000;
-const TURN_READY_MS = 700;
-const ROUND_TRANSITION_MS = 900;
-const CORRECT_FEEDBACK_MS = 520;
 
+// Single source of truth for every round-transition timing value below, so
+// the sequence (roundClear -> countdown -> showingSequence -> inputGuide ->
+// playerTurn) can be retimed in one place instead of scattered literals.
+export const MEMORY_TIMING = {
+  COUNTDOWN_STEP_MS: 1000,
+  // How long the "ROUND {n} CLEAR!" overlay (PHASE.CLEARED) stays visible
+  // before the next round's countdown is allowed to start.
+  ROUND_CLEAR_DURATION_MS: 1400,
+  // How long the "순서대로 선택하세요" instruction (PHASE.TURN_READY) stays
+  // visible, with card input still disabled, after the sequence preview ends
+  // and before the player's turn (PHASE.PLAYING) begins.
+  INPUT_GUIDE_DURATION_MS: 1200,
+  CORRECT_FEEDBACK_MS: 520,
+};
+
+// PHASE.PREVIEW / PHASE.TURN_READY / PHASE.CLEARED correspond to the
+// showingSequence / inputGuide / roundClear phases described in the game's
+// round-transition spec - kept under their original names here since they're
+// also used as GameStageOverlay `state` values and asserted on by existing
+// tests.
 const PHASE = {
   IDLE: "idle",
   COUNTDOWN: "countdown",
@@ -262,7 +278,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     if (kind === "countdown") {
       const nextIndex = countdownIndexRef.current + 1;
       if (nextIndex < COUNTDOWN_LABELS.length) {
-        startCountdown(nextIndex, COUNTDOWN_STEP_MS);
+        startCountdown(nextIndex, MEMORY_TIMING.COUNTDOWN_STEP_MS);
         return;
       }
       startPreview();
@@ -281,7 +297,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     }
   }
 
-  function startCountdown(index = 0, durationMs = COUNTDOWN_STEP_MS) {
+  function startCountdown(index = 0, durationMs = MEMORY_TIMING.COUNTDOWN_STEP_MS) {
     setPhase(PHASE.COUNTDOWN);
     phaseRef.current = PHASE.COUNTDOWN;
     setCountdownIndex(index);
@@ -301,7 +317,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setPhase(PHASE.TURN_READY);
     phaseRef.current = PHASE.TURN_READY;
     setRemainingMs(dataRef.current.selectionSeconds * 1000);
-    runTimer("turn-ready", TURN_READY_MS);
+    runTimer("turn-ready", MEMORY_TIMING.INPUT_GUIDE_DURATION_MS);
   }
 
   function startSelection() {
@@ -416,7 +432,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     roundTransitionTimerRef.current = window.setTimeout(() => {
       roundTransitionTimerRef.current = null;
       startRound(roundRef.current + 1, { resetRecord: false });
-    }, ROUND_TRANSITION_MS);
+    }, MEMORY_TIMING.ROUND_CLEAR_DURATION_MS);
   }
 
   function playCorrectButtonMotion(button) {
@@ -442,7 +458,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       feedbackTimerRef.current = null;
       setCorrectFeedback(null);
       setCorrectAnnouncement("");
-    }, CORRECT_FEEDBACK_MS);
+    }, MEMORY_TIMING.CORRECT_FEEDBACK_MS);
   }
 
   function choose(symbol, event) {
