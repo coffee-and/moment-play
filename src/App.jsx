@@ -1,10 +1,13 @@
 import { AppRoutes } from "./routes/AppRoutes.jsx";
+import { AuthProvider } from "./shared/auth/AuthContext.jsx";
 import { ThemeProvider } from "./shared/theme/ThemeContext.jsx";
 
 function App() {
   return (
     <ThemeProvider>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

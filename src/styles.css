@@ -328,12 +328,15 @@ a {
 .avatar {
   width: 40px;
   height: 40px;
+  border: none;
   border-radius: 50%;
+  padding: 0;
   background: linear-gradient(135deg, var(--accent), #f0a1d0);
   color: var(--on-accent);
   display: grid;
   place-items: center;
   font-size: 18px;
+  cursor: pointer;
   box-shadow: var(--sh-sm);
 }
 

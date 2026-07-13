@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../shared/auth/AuthContext.jsx";
 import { Brand } from "../shared/components/Brand.jsx";
 import { SkyDecoration } from "../shared/components/decoration/SkyDecoration.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
@@ -8,6 +9,7 @@ import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 
 export function AppLayout() {
   const location = useLocation();
+  const { signOut, status } = useAuth();
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
   // navigation. Scroll to an in-page section when the URL carries a hash
@@ -32,7 +34,11 @@ export function AppLayout() {
           <PrimaryNav />
           <div className="hd-right">
             <ThemeToggle />
-            <Link className="avatar" to="/login" aria-label="프로필">🙂</Link>
+            {status === "authenticated" ? (
+              <button type="button" className="avatar" aria-label="로그아웃" onClick={() => signOut()}>🙂</button>
+            ) : (
+              <Link className="avatar" to="/login" aria-label="프로필">🙂</Link>
+            )}
           </div>
         </div>
       </header>
