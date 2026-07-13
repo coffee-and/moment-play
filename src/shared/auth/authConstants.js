@@ -15,6 +15,15 @@ export const AUTH_LABELS = {
   logout: "로그아웃",
 };
 
+// Shared by the desktop header and mobile tab-bar account controls so both
+// surfaces derive the exact same label from the same AuthContext user.
+export function getAccountLabel(user) {
+  const nickname = user?.user_metadata?.nickname?.trim();
+  if (nickname) return nickname;
+  const emailPrefix = user?.email?.split("@")[0]?.trim();
+  return emailPrefix || AUTH_LABELS.accountFallback;
+}
+
 export const AUTH_MESSAGES = {
   notConfigured: "Supabase 환경 변수가 설정되지 않아 이 기능을 사용할 수 없습니다.",
   emailRequired: "이메일을 입력해 주세요.",

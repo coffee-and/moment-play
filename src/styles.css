@@ -481,7 +481,9 @@ a {
     padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
   }
 
-  .tabbar a {
+  .tabbar a,
+  .tabbar-account-menu summary,
+  .tabbar-account {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -500,6 +502,29 @@ a {
   .tabbar svg {
     width: 22px;
     height: 22px;
+  }
+
+  .tabbar-account {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .tabbar-account__badge {
+    font-size: 8.5px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* The tab bar itself is pinned to the viewport bottom, so its account
+     menu panel must open upward instead of the header version's downward
+     placement (see .account-menu__panel above) or it would render past the
+     bottom of the screen. */
+  .tabbar-account-menu .account-menu__panel {
+    top: auto;
+    right: auto;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   /* Compact hero/featured so the game catalog appears sooner. */
