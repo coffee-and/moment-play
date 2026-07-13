@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "../../shared/components/Button.jsx";
+import { AUTH_LABELS, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { RESULT_SUBMISSION_STATUS } from "./useGameResultSubmission.js";
 
 export function ResultSubmissionStatus({ submission }) {
@@ -9,7 +10,7 @@ export function ResultSubmissionStatus({ submission }) {
     return (
       <div className="result-submission" role="status">
         <p>로컬 기록은 유지됩니다. 로그인하면 다음 기록부터 랭킹에 저장할 수 있어요.</p>
-        <Button as={Link} to="/login" size="small">로그인</Button>
+        <Button as={Link} to={LOGIN_PATH} size="small">{AUTH_LABELS.login}</Button>
       </div>
     );
   }

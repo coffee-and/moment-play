@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchLeaderboard } from "../../infrastructure/supabase/gameResultsGateway.js";
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
+import { AUTH_LABELS, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { Button } from "../../shared/components/Button.jsx";
 import { StatusPanel } from "../../shared/components/StatusPanel.jsx";
 import {
@@ -60,7 +61,7 @@ export function RankingPage() {
       {authStatus !== "authenticated" ? (
         <div className="ranking-page__guest card">
           <p>로그인하면 완료한 게임 기록을 랭킹에 저장할 수 있어요.</p>
-          <Button as={Link} to="/login" size="small">로그인</Button>
+          <Button as={Link} to={LOGIN_PATH} size="small">{AUTH_LABELS.login}</Button>
         </div>
       ) : null}
 

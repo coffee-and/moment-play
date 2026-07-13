@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
-import { AUTH_MESSAGES, COMPLETE_SIGNUP_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
+import { AUTH_LABELS, AUTH_MESSAGES, COMPLETE_SIGNUP_PATH, LOGIN_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
 // Guests (no session at all) get the standard one-step email+password
@@ -156,7 +156,7 @@ export function SignupPage() {
           <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
-        <p className="auth-switch">이미 계정이 있으신가요? <Link to="/login">로그인</Link></p>
+        <p className="auth-switch">이미 계정이 있으신가요? <Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link></p>
         <p className="auth-switch"><Link to="/">게스트로 계속하기</Link></p>
       </div>
     </div>

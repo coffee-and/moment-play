@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
-import { AUTH_MESSAGES } from "../../../shared/auth/authConstants.js";
+import { AUTH_LABELS, AUTH_MESSAGES, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
 export function LoginPage() {
@@ -31,7 +31,6 @@ export function LoginPage() {
 
     try {
       await signIn({ email: email.trim(), password });
-      navigate("/", { replace: true });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : AUTH_MESSAGES.signInFailed);
     } finally {
@@ -43,7 +42,7 @@ export function LoginPage() {
     <div className="wrap auth-page">
       <div className="card auth-card reveal d1">
         <Brand />
-        <h1 className="auth-card__title">로그인</h1>
+        <h1 className="auth-card__title">{AUTH_LABELS.login}</h1>
         <p className="auth-card__subtitle">이메일과 비밀번호로 로그인하세요.</p>
 
         {isConfigured ? (
@@ -72,14 +71,14 @@ export function LoginPage() {
             </div>
             {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
             <Button type="submit" variant="primary" fullWidth disabled={submitting}>
-              {submitting ? "로그인 중…" : "로그인"}
+              {submitting ? "로그인 중…" : AUTH_LABELS.login}
             </Button>
           </form>
         ) : (
           <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
-        <p className="auth-switch">계정이 없으신가요? <Link to="/signup">회원가입</Link></p>
+        <p className="auth-switch">계정이 없으신가요? <Link to={SIGNUP_PATH}>회원가입</Link></p>
         <p className="auth-switch"><Link to="/">게스트로 계속하기</Link></p>
       </div>
     </div>

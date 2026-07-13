@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
-import { AUTH_MESSAGES, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
+import { AUTH_LABELS, AUTH_MESSAGES, LOGIN_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
 // The confirmation link's `?code=` param normally lands before the
@@ -103,7 +103,7 @@ export function CompleteSignupPage() {
     body = (
       <>
         <p className="auth-notice is-error" role="alert">{verifyError}</p>
-        <p className="auth-switch"><Link to="/login">로그인으로 이동</Link></p>
+        <p className="auth-switch"><Link to={LOGIN_PATH}>{AUTH_LABELS.login}으로 이동</Link></p>
       </>
     );
   } else if (status !== "authenticated") {

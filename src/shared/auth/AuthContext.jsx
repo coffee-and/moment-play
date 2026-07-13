@@ -1,9 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { getExistingSession } from "../../infrastructure/supabase/supabaseAuth.js";
 import { getSupabaseClient, isSupabaseConfigured } from "../../infrastructure/supabase/supabaseClient.js";
 import { AUTH_MESSAGES, COMPLETE_SIGNUP_PATH } from "./authConstants.js";
 
 const AuthContext = createContext(null);
+const SESSION_EVENTS = new Set(["INITIAL_SESSION", "SIGNED_IN", "SIGNED_OUT", "USER_UPDATED", "TOKEN_REFRESHED"]);
 
 function deriveStatus(session) {
   if (!session) return "guest";
@@ -33,46 +34,56 @@ function getEmailRedirectUrl() {
   return `${window.location.origin}${window.location.pathname}#${COMPLETE_SIGNUP_PATH}`;
 }
 
-// App-wide real-account auth session (email/password), separate from the
-// existing anonymous Omok online-room flow (see useOmokOnlineRoom.js /
-// omokOnlineRoomGateway.js), which keeps using ensureAnonymousSession()
-// directly and is untouched by this provider. This provider only ever reads
-// the current session (getExistingSession) and subscribes to changes - it
-// never creates a session itself, so guest browsing of every game is
-// unaffected by mounting it.
+// Initial session reads never create an anonymous session, so mounting the
+// provider does not make login mandatory for guest play.
 export function AuthProvider({ children }) {
   const configured = isSupabaseConfigured();
   const [session, setSession] = useState(null);
-  const [status, setStatus] = useState(configured ? "loading" : "guest");
+  const [initialized, setInitialized] = useState(!configured);
+  const sessionRef = useRef(null);
+  const initializedRef = useRef(!configured);
+  const sessionRevisionRef = useRef(0);
+
+  const applySession = useCallback((nextSession) => {
+    const normalizedSession = nextSession ?? null;
+    if (initializedRef.current && sessionRef.current === normalizedSession) return;
+    sessionRevisionRef.current += 1;
+    sessionRef.current = normalizedSession;
+    initializedRef.current = true;
+    setSession(normalizedSession);
+    setInitialized(true);
+  }, []);
+
+  const status = initialized ? deriveStatus(session) : "loading";
 
   useEffect(() => {
     if (!configured) return undefined;
 
     let mounted = true;
     const client = getSupabaseClient();
+    const initialRevision = sessionRevisionRef.current;
+
+    const { data: listener } = client.auth.onAuthStateChange((event, nextSession) => {
+      if (!mounted || !SESSION_EVENTS.has(event)) return;
+      if (event === "INITIAL_SESSION" && sessionRevisionRef.current !== initialRevision) return;
+      applySession(nextSession);
+    });
 
     getExistingSession(client)
       .then((existingSession) => {
-        if (!mounted) return;
-        setSession(existingSession);
-        setStatus(deriveStatus(existingSession));
+        if (!mounted || sessionRevisionRef.current !== initialRevision) return;
+        applySession(existingSession);
       })
       .catch(() => {
-        if (!mounted) return;
-        setStatus("guest");
+        if (!mounted || sessionRevisionRef.current !== initialRevision) return;
+        applySession(null);
       });
-
-    const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
-      if (!mounted) return;
-      setSession(nextSession);
-      setStatus(deriveStatus(nextSession));
-    });
 
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [configured]);
+  }, [applySession, configured]);
 
   // Plain new-account signup (the caller is a guest with no anonymous
   // session at all). Email+password together is the standard, safe Supabase
@@ -91,9 +102,10 @@ export function AuthProvider({ children }) {
         if (isEmailAlreadyRegisteredError(error)) throw new Error(AUTH_MESSAGES.emailAlreadyRegistered);
         throw new Error(getErrorMessage(error, AUTH_MESSAGES.signUpFailed));
       }
+      if (data.session) applySession(data.session);
       return { user: data.user, session: data.session ?? null };
     },
-    [configured, session],
+    [applySession, configured, session],
   );
 
   const signIn = useCallback(
@@ -102,9 +114,11 @@ export function AuthProvider({ children }) {
       const client = getSupabaseClient();
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw new Error(getErrorMessage(error, AUTH_MESSAGES.signInFailed));
+      if (!data.session) throw new Error(AUTH_MESSAGES.signInFailed);
+      applySession(data.session);
       return { user: data.user, session: data.session };
     },
-    [configured],
+    [applySession, configured],
   );
 
   const signOut = useCallback(async () => {
@@ -112,7 +126,8 @@ export function AuthProvider({ children }) {
     const client = getSupabaseClient();
     const { error } = await client.auth.signOut();
     if (error) throw new Error(getErrorMessage(error, AUTH_MESSAGES.signOutFailed));
-  }, [configured]);
+    applySession(null);
+  }, [applySession, configured]);
 
   // Step 1 of the anonymous -> permanent upgrade. Attaches an email address
   // to the current anonymous user WITHOUT a password - Supabase requires
@@ -168,10 +183,11 @@ export function AuthProvider({ children }) {
     async (code) => {
       if (!configured) throw new Error(AUTH_MESSAGES.notConfigured);
       const client = getSupabaseClient();
-      const { error } = await client.auth.exchangeCodeForSession(code);
+      const { data, error } = await client.auth.exchangeCodeForSession(code);
       if (error) throw new Error(getErrorMessage(error, AUTH_MESSAGES.verifyCodeFailed));
+      if (data.session) applySession(data.session);
     },
-    [configured],
+    [applySession, configured],
   );
 
   // Re-reads the current session from Supabase. Used when the user verifies
@@ -181,9 +197,8 @@ export function AuthProvider({ children }) {
     if (!configured) return;
     const client = getSupabaseClient();
     const existingSession = await getExistingSession(client);
-    setSession(existingSession);
-    setStatus(deriveStatus(existingSession));
-  }, [configured]);
+    applySession(existingSession);
+  }, [applySession, configured]);
 
   const value = useMemo(
     () => ({

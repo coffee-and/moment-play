@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
+import { AUTH_LABELS, LOGIN_PATH } from "../../../shared/auth/authConstants.js";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG } from "../data/minigameCatalog.js";
 
@@ -56,7 +57,7 @@ export function MiniGamesPage() {
 
       <footer className="card footer">
         <Brand />
-        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><Link to="/login">로그인</Link></div>
+        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link></div>
         <div className="foot-copy">© 2026 momentPLAY · 짧은 순간을 위한 미니게임.</div>
       </footer>
     </div>

@@ -37,15 +37,16 @@ function Harness() {
   return null;
 }
 
-async function renderAuth() {
+async function renderAuth({ flushInitialSession = true } = {}) {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
   await act(async () => {
     root.render(<AuthProvider><Harness /></AuthProvider>);
   });
-  // Flush the initial getExistingSession().then(...) microtask.
-  await act(async () => {});
+  if (flushInitialSession) {
+    await act(async () => {});
+  }
   return () => act(() => {
     root.unmount();
     host.remove();
@@ -97,6 +98,17 @@ describe("AuthProvider / useAuth", () => {
 
     expect(latest.status).toBe("authenticated");
     expect(latest.user.id).toBe("user-1");
+
+    await act(async () => {
+      authStateCallback("TOKEN_REFRESHED", session({ user: { email: "fresh@example.com" } }));
+    });
+    expect(latest.user.email).toBe("fresh@example.com");
+
+    await act(async () => {
+      authStateCallback("SIGNED_OUT", null);
+    });
+    expect(latest.status).toBe("guest");
+    expect(latest.user).toBeNull();
     unmount();
   });
 
@@ -121,6 +133,104 @@ describe("AuthProvider / useAuth", () => {
     await expect(latest.signIn({ email: "a@a.com", password: "wrong" })).rejects.toThrow("Invalid login credentials");
     expect(mockClient.auth.signInWithPassword).toHaveBeenCalledWith({ email: "a@a.com", password: "wrong" });
     unmount();
+  });
+
+  it("immediately stores the session returned by signInWithPassword", async () => {
+    const signedInSession = session({ user: { email: "sky@example.com" } });
+    mockClient.auth.signInWithPassword.mockResolvedValueOnce({
+      data: { session: signedInSession, user: signedInSession.user },
+      error: null,
+    });
+
+    const unmount = await renderAuth();
+    expect(latest.status).toBe("guest");
+
+    await act(async () => {
+      await latest.signIn({ email: "sky@example.com", password: "secret1" });
+    });
+
+    expect(latest.status).toBe("authenticated");
+    expect(latest.user).toBe(signedInSession.user);
+    unmount();
+  });
+
+  it("does not let a stale initial guest result overwrite a successful sign in", async () => {
+    let resolveInitialSession;
+    let authStateCallback;
+    mockClient.auth.getSession.mockReturnValueOnce(new Promise((resolve) => {
+      resolveInitialSession = resolve;
+    }));
+    mockClient.auth.onAuthStateChange.mockImplementationOnce((callback) => {
+      authStateCallback = callback;
+      return { data: { subscription: { unsubscribe: vi.fn() } } };
+    });
+    const signedInSession = session({ user: { email: "sky@example.com" } });
+    mockClient.auth.signInWithPassword.mockResolvedValueOnce({
+      data: { session: signedInSession, user: signedInSession.user },
+      error: null,
+    });
+
+    const unmount = await renderAuth({ flushInitialSession: false });
+    expect(latest.status).toBe("loading");
+
+    await act(async () => {
+      await latest.signIn({ email: "sky@example.com", password: "secret1" });
+    });
+    expect(latest.status).toBe("authenticated");
+
+    await act(async () => {
+      resolveInitialSession({ data: { session: null }, error: null });
+      authStateCallback("INITIAL_SESSION", null);
+    });
+    expect(latest.status).toBe("authenticated");
+    expect(latest.user.email).toBe("sky@example.com");
+    unmount();
+  });
+
+  it("keeps initialization unresolved until the initial session check completes", async () => {
+    let resolveInitialSession;
+    mockClient.auth.getSession.mockReturnValueOnce(new Promise((resolve) => {
+      resolveInitialSession = resolve;
+    }));
+
+    const unmount = await renderAuth({ flushInitialSession: false });
+    expect(latest.status).toBe("loading");
+    expect(latest.user).toBeNull();
+
+    await act(async () => {
+      resolveInitialSession({ data: { session: session() }, error: null });
+    });
+    expect(latest.status).toBe("authenticated");
+    unmount();
+  });
+
+  it("restores an authenticated session on refresh", async () => {
+    mockClient.auth.getSession.mockResolvedValueOnce({ data: { session: session() }, error: null });
+    const unmount = await renderAuth();
+    expect(latest.status).toBe("authenticated");
+    expect(latest.user.id).toBe("user-1");
+    unmount();
+  });
+
+  it("clears the session immediately after a successful sign out", async () => {
+    mockClient.auth.getSession.mockResolvedValueOnce({ data: { session: session() }, error: null });
+    const unmount = await renderAuth();
+    expect(latest.status).toBe("authenticated");
+
+    await act(async () => {
+      await latest.signOut();
+    });
+    expect(latest.status).toBe("guest");
+    expect(latest.user).toBeNull();
+    unmount();
+  });
+
+  it("unsubscribes the auth listener exactly once", async () => {
+    const unsubscribe = vi.fn();
+    mockClient.auth.onAuthStateChange.mockReturnValueOnce({ data: { subscription: { unsubscribe } } });
+    const unmount = await renderAuth();
+    unmount();
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 
   it("signUp creates a fresh account when there is no existing session", async () => {

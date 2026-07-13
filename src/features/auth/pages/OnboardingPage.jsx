@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
+import { AUTH_LABELS, LOGIN_PATH } from "../../../shared/auth/authConstants.js";
 import "../auth.css";
 
 export function OnboardingPage() {
@@ -15,7 +16,7 @@ export function OnboardingPage() {
       </div>
       <div className="onboarding-page__actions">
         <Button as={Link} to="/" variant="primary" fullWidth>게스트로 시작하기</Button>
-        <Button as={Link} to="/login" variant="secondary" fullWidth>로그인</Button>
+        <Button as={Link} to={LOGIN_PATH} variant="secondary" fullWidth>{AUTH_LABELS.login}</Button>
       </div>
     </div>
   );

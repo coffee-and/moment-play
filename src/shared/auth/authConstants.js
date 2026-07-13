@@ -2,7 +2,18 @@
 // the account-completion route and user-facing auth copy, so validation
 // messages and the route name aren't duplicated across files.
 export const COMPLETE_SIGNUP_PATH = "/complete-signup";
+export const LOGIN_PATH = "/login";
+export const SIGNUP_PATH = "/signup";
 export const MIN_PASSWORD_LENGTH = 6;
+
+export const AUTH_LABELS = {
+  accountFallback: "내 계정",
+  anonymous: "게스트",
+  createAccount: "계정 만들기",
+  loading: "계정 확인 중",
+  login: "로그인",
+  logout: "로그아웃",
+};
 
 export const AUTH_MESSAGES = {
   notConfigured: "Supabase 환경 변수가 설정되지 않아 이 기능을 사용할 수 없습니다.",
