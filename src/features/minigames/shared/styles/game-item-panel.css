@@ -2,8 +2,8 @@
   width: min(560px, 100%);
   border: none;
   padding: 24px;
-  border-radius: var(--r2);
-  background: var(--field);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
   text-align: center;
 }
 
@@ -23,8 +23,8 @@
 }
 
 .game-item-panel__title {
-  color: var(--ink2);
-  font-family: var(--lat);
+  color: var(--muted);
+  font-family: var(--label);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.14em;
