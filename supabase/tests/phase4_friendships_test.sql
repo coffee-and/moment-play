@@ -232,20 +232,6 @@ values
   ('41000000-0000-4000-8000-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    null, '', now(), '{"provider":"anonymous","providers":["anonymous"]}', '{}', now(), now(), true);
 
-update public.profiles
-set nickname = case user_id
-  when '41000000-0000-4000-8000-000000000001' then 'FriendAlpha'
-  when '41000000-0000-4000-8000-000000000002' then 'FriendBeta'
-  when '41000000-0000-4000-8000-000000000003' then 'FriendGamma'
-  else 'FriendAnon'
-end
-where user_id in (
-  '41000000-0000-4000-8000-000000000001',
-  '41000000-0000-4000-8000-000000000002',
-  '41000000-0000-4000-8000-000000000003',
-  '41000000-0000-4000-8000-000000000004'
-);
-
 select is(
   (select count(*) from public.profiles
    where user_id::text like '41000000-0000-4000-8000-%'
@@ -259,6 +245,30 @@ select is(
    where user_id::text like '41000000-0000-4000-8000-%'),
   4::bigint,
   'generated friend codes are unique'
+);
+
+-- Stable fixture codes are assigned before switching to restricted roles.
+-- RPC arguments are evaluated with the caller's permissions, so tests must not
+-- query another user's profile as authenticated merely to obtain its code.
+update public.profiles
+set
+  nickname = case user_id
+    when '41000000-0000-4000-8000-000000000001' then 'FriendAlpha'
+    when '41000000-0000-4000-8000-000000000002' then 'FriendBeta'
+    when '41000000-0000-4000-8000-000000000003' then 'FriendGamma'
+    else 'FriendAnon'
+  end,
+  friend_code = case user_id
+    when '41000000-0000-4000-8000-000000000001' then 'AAAAAAAA01'
+    when '41000000-0000-4000-8000-000000000002' then 'BBBBBBBB02'
+    when '41000000-0000-4000-8000-000000000003' then 'CCCCCCCC03'
+    else 'DDDDDDDD04'
+  end
+where user_id in (
+  '41000000-0000-4000-8000-000000000001',
+  '41000000-0000-4000-8000-000000000002',
+  '41000000-0000-4000-8000-000000000003',
+  '41000000-0000-4000-8000-000000000004'
 );
 
 -- Anonymous and direct-access denial ------------------------------------------
@@ -286,6 +296,12 @@ select throws_ok(
   'anonymous authenticated users cannot use friend features'
 );
 
+select throws_ok(
+  $$select public.send_friend_request('BBBBBBBB02')$$,
+  '42501', 'Permanent account required',
+  'anonymous authenticated users cannot send friend requests'
+);
+
 reset role;
 select set_config(
   'request.jwt.claims',
@@ -311,26 +327,19 @@ select throws_ok(
 
 select results_eq(
   $$select friend_code, nickname from public.get_my_friend_profile()$$,
-  $$select friend_code, nickname from public.profiles
-    where user_id = '41000000-0000-4000-8000-000000000001'$$,
+  $$values ('AAAAAAAA01'::text, 'FriendAlpha'::text)$$,
   'permanent users can read only their public friend profile'
 );
 
 select results_eq(
-  $$select nickname, relationship_status
-    from public.find_friend_by_code(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000002')
-    )$$,
-  $$values ('FriendBeta'::text, 'none'::text)$$,
-  'search returns a permanent user without private identifiers'
+  $$select friend_code, nickname, relationship_status
+    from public.find_friend_by_code('bbbbbbbb02')$$,
+  $$values ('BBBBBBBB02'::text, 'FriendBeta'::text, 'none'::text)$$,
+  'search normalizes a code and returns no private identifiers'
 );
 
 select throws_ok(
-  $$select * from public.find_friend_by_code(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000001')
-    )$$,
+  $$select * from public.find_friend_by_code('AAAAAAAA01')$$,
   'P0001', 'You cannot add yourself',
   'users cannot search themselves as a friend target'
 );
@@ -342,19 +351,13 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$select * from public.find_friend_by_code(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000004')
-    )$$,
+  $$select * from public.find_friend_by_code('DDDDDDDD04')$$,
   'P0001', 'Friend code not found',
   'anonymous accounts cannot be found as friend targets'
 );
 
 select lives_ok(
-  $$select public.send_friend_request(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000002')
-    )$$,
+  $$select public.send_friend_request('BBBBBBBB02')$$,
   'a permanent user can send a friend request by code'
 );
 
@@ -366,7 +369,6 @@ select set_config(
      and addressee_id = '41000000-0000-4000-8000-000000000002'),
   true
 );
-
 select set_config(
   'request.jwt.claims',
   '{"sub":"41000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
@@ -380,13 +382,16 @@ select results_eq(
   'the requester sees an outgoing pending request'
 );
 
+select results_eq(
+  $$select relationship_status from public.find_friend_by_code('BBBBBBBB02')$$,
+  $$values ('pending_outgoing'::text)$$,
+  'search reports an outgoing pending relationship'
+);
+
 select throws_ok(
-  $$select public.send_friend_request(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000002')
-    )$$,
+  $$select public.send_friend_request('BBBBBBBB02')$$,
   'P0001', 'Friend request already exists',
-  'duplicate and reverse-pair requests are rejected'
+  'duplicate requests are rejected'
 );
 
 select throws_ok(
@@ -412,6 +417,27 @@ select results_eq(
   'the addressee sees an incoming pending request'
 );
 
+select results_eq(
+  $$select relationship_status from public.find_friend_by_code('AAAAAAAA01')$$,
+  $$values ('pending_incoming'::text)$$,
+  'search reports an incoming pending relationship'
+);
+
+select throws_ok(
+  $$select public.send_friend_request('AAAAAAAA01')$$,
+  'P0001', 'Friend request already exists',
+  'a reverse-direction request is rejected'
+);
+
+select throws_ok(
+  $$select public.respond_friend_request(
+      current_setting('phase4.ab_request_id')::uuid,
+      null
+    )$$,
+  'P0001', 'Unsupported friend request action',
+  'null request actions are rejected explicitly'
+);
+
 select lives_ok(
   $$select public.respond_friend_request(
       current_setting('phase4.ab_request_id')::uuid,
@@ -424,6 +450,18 @@ select results_eq(
   $$select nickname, status, direction from public.get_friend_overview()$$,
   $$values ('FriendAlpha'::text, 'accepted'::text, 'friend'::text)$$,
   'an accepted request appears as a friend'
+);
+
+select results_eq(
+  $$select relationship_status from public.find_friend_by_code('AAAAAAAA01')$$,
+  $$values ('friend'::text)$$,
+  'search reports an accepted friendship'
+);
+
+select throws_ok(
+  $$select public.send_friend_request('AAAAAAAA01')$$,
+  'P0001', 'Already friends',
+  'accepted friends cannot create another request'
 );
 
 reset role;
@@ -462,10 +500,7 @@ select is(
 -- Reject lifecycle ------------------------------------------------------------
 
 select lives_ok(
-  $$select public.send_friend_request(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000002')
-    )$$,
+  $$select public.send_friend_request('BBBBBBBB02')$$,
   'a removed pair can send a new request later'
 );
 
@@ -510,10 +545,7 @@ select set_config(
 set local role authenticated;
 
 select lives_ok(
-  $$select public.send_friend_request(
-      (select friend_code from public.profiles
-       where user_id = '41000000-0000-4000-8000-000000000003')
-    )$$,
+  $$select public.send_friend_request('CCCCCCCC03')$$,
   'a permanent user can send another request'
 );
 
