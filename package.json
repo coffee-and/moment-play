@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:db:ranking": "npx supabase test db supabase/tests/phase3_game_results_test.sql --linked",
-    "test:db:friends": "npx supabase test db supabase/tests/phase4_friendships_test.sql --linked"
+    "test:db:ranking": "npx supabase db query --linked --file supabase/tests/phase3_game_results_test.sql",
+    "test:db:friends": "npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
