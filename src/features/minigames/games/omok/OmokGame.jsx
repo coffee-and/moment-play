@@ -263,6 +263,11 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     if (online.needsNicknameSetup) {
       setDialog(DIALOG.NICKNAME);
       setOnlineNickname(getNicknamePrefillForOnlineSetup());
+    } else {
+      // A successful save flips needsNicknameSetup false - close the
+      // nickname dialog exactly once instead of leaving it open on top of
+      // the room flow it just unblocked.
+      setDialog((current) => (current === DIALOG.NICKNAME ? null : current));
     }
   }, [online.needsNicknameSetup]);
 
@@ -869,8 +874,10 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
               />
               {online.errorMessage ? <p className="omok-game__notice is-error" role="alert">{online.errorMessage}</p> : null}
               <div className="game-stage-modal__actions">
-                <Button type="button" onClick={saveOnlineNickname} disabled={online.actionStatus === ONLINE_ACTION_STATUS.SAVING_NICKNAME}>저장</Button>
-                <Button type="button" variant="secondary" onClick={closeOnlineError}>취소</Button>
+                <Button type="button" onClick={saveOnlineNickname} disabled={online.actionStatus === ONLINE_ACTION_STATUS.SAVING_NICKNAME}>
+                  {online.actionStatus === ONLINE_ACTION_STATUS.SAVING_NICKNAME ? "저장 중…" : "저장"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={closeOnlineError} disabled={online.actionStatus === ONLINE_ACTION_STATUS.SAVING_NICKNAME}>취소</Button>
               </div>
             </GameStageModal>
           ) : null}

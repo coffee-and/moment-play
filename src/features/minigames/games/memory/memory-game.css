@@ -17,8 +17,8 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 18px;
   font-style: italic;
   font-variant-numeric: tabular-nums;
@@ -37,7 +37,7 @@
 }
 
 .memory-game__clock.is-urgent {
-  color: var(--coral2);
+  color: var(--accent-2);
   font-weight: 800;
   animation: memory-timer-urgent-shake 0.5s ease-in-out infinite;
 }
@@ -141,7 +141,7 @@
   height: 16px;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: color-mix(in oklab, var(--ink) 12%, var(--field));
+  background: color-mix(in oklab, var(--text) 12%, var(--surface-2));
 }
 
 .memory-pedestal__body,
@@ -169,7 +169,7 @@
   justify-content: center;
   border: 2px solid var(--line);
   border-radius: 50%;
-  background: var(--card);
+  background: var(--surface);
   cursor: pointer;
   font-size: 30px;
   transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.18s;
@@ -197,7 +197,7 @@
 .memory-card__success-ring {
   position: absolute;
   inset: 8px;
-  border: 2px solid var(--coral);
+  border: 2px solid var(--accent);
   border-radius: 50%;
   animation: memory-goodpop 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -210,12 +210,12 @@
 @keyframes memory-goodpop {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--coral) 25%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 25%, transparent);
   }
 
   40% {
     transform: scale(1.16);
-    box-shadow: 0 0 0 10px color-mix(in oklab, var(--coral) 25%, transparent);
+    box-shadow: 0 0 0 10px color-mix(in oklab, var(--accent) 25%, transparent);
   }
 
   100% {
@@ -225,8 +225,8 @@
 }
 
 .memory-game__state-title {
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: 52px;
   font-style: italic;
   font-weight: 700;
@@ -252,10 +252,10 @@
   width: min(360px, 100%);
   gap: 8px;
   border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
-  border-radius: calc(var(--r) - 4px);
+  border-radius: calc(var(--r-xl) - 4px);
   padding: 26px 28px;
   overflow: hidden;
-  background: color-mix(in oklab, var(--card) 94%, var(--coral) 6%);
+  background: color-mix(in oklab, var(--surface) 94%, var(--accent) 6%);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
 }
 
@@ -264,14 +264,14 @@
 }
 
 .memory-game__transition-view--clear {
-  background: color-mix(in oklab, var(--card) 86%, var(--coral) 14%);
+  background: color-mix(in oklab, var(--surface) 86%, var(--accent) 14%);
   animation: memory-round-clear-in 0.28s cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 
 .memory-game__transition-title {
   margin: 0;
-  color: var(--ink);
-  font-family: var(--lat);
+  color: var(--text);
+  font-family: var(--label);
   font-size: clamp(30px, 6vw, 46px);
   font-style: italic;
   font-weight: 800;
@@ -282,7 +282,7 @@
 
 .memory-game__transition-copy {
   margin: 2px 0 0;
-  color: var(--ink2);
+  color: var(--muted);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.5;

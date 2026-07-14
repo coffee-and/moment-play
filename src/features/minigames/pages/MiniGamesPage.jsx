@@ -1,7 +1,19 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../shared/auth/AuthContext.jsx";
+import { AUTH_LABELS, getAccountLabel, LOGIN_PATH, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
+import { Brand } from "../../../shared/components/Brand.jsx";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG } from "../data/minigameCatalog.js";
+
+function FooterAccountItem() {
+  const { status, user } = useAuth();
+
+  if (status === "loading") return <span aria-label={AUTH_LABELS.loading} />;
+  if (status === "anonymous") return <Link to={SIGNUP_PATH}>{AUTH_LABELS.createAccount}</Link>;
+  if (status === "authenticated") return <span>{getAccountLabel(user)}</span>;
+  return <Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link>;
+}
 
 export function MiniGamesPage() {
   const navigate = useNavigate();
@@ -18,37 +30,29 @@ export function MiniGamesPage() {
 
   return (
     <div className="wrap minigames-page">
-      <section className="hero" id="top" aria-labelledby="moment-play-title">
-        <div className="card h-main reveal d1">
-          <span className="board-motif" aria-hidden="true" />
-          <div>
-            <div className="kicker">Mini games · <em>Moment Play</em></div>
-            <h1 className="h-title" id="moment-play-title">Moment <em>Play</em></h1>
-            <p className="h-sub">짧은 순간에도 바로 시작할 수 있는 퍼즐과 보드게임을 만나보세요.</p>
-          </div>
-          <div className="h-cta">
-            <a className="btn" href="#games">게임 둘러보기 <span className="arw" aria-hidden="true" /></a>
-            <button className="btn-ghost" type="button" onClick={() => openGame("omok")}>오목 시작하기</button>
-          </div>
-        </div>
-        <div className="card h-visual reveal d2" aria-hidden="true">
-          <div className="mini-board">
-            <span className="stone is-black" style={{ top: "36%", left: "30%" }} />
-            <span className="stone is-white" style={{ top: "36%", left: "47%" }} />
-            <span className="stone is-black" style={{ top: "53%", left: "47%" }} />
-            <span className="stone is-coral" style={{ top: "53%", left: "64%" }} />
-          </div>
-          <div className="tile-row"><div className="tile hot">2048</div><div className="tile">Sudoku</div><div className="tile">Sequence</div><div className="tile">Omok</div></div>
-        </div>
+      <section className="greet reveal d1" id="top">
+        <h1>오늘은 어떤 게임으로 시작해볼까요?</h1>
+        <p>짧은 순간에도 바로 시작할 수 있는 퍼즐과 보드게임을 만나보세요.</p>
       </section>
 
-      <section className="duo minigames-page__featured" id="featured" aria-labelledby="featured-title">
-        <div className="card omok reveal d2">
-          <span className="board-motif is-bottom" aria-hidden="true" />
-          <div className="omok-head"><div className="omok-t" id="featured-title">오늘의 추천 <small>Omok · 1 vs 1</small></div><span className="badge online">Board</span></div>
-          <p className="omok-copy">친구를 초대하거나 컴퓨터와 대국하며 Standard와 Free 규칙을 골라 즐겨보세요.</p>
-          <div className="omok-ctas"><button className="btn" type="button" onClick={() => openGame("omok")}>오목 시작하기 <span className="arw" aria-hidden="true" /></button></div>
-        </div>
+      <section className="section" aria-labelledby="featured-title">
+        <button type="button" className="featured reveal d2" onClick={() => openGame("omok")}>
+          <span className="fx" aria-hidden="true" />
+          <span className="f-body">
+            <span className="f-tag">★ Featured</span>
+            <h2 id="featured-title">오목</h2>
+            <p>다섯 개를 먼저 잇는 정통 전략 게임. 오늘 머리 좀 굴려볼까요?</p>
+            <span className="btn btn-soft">오목 시작하기</span>
+          </span>
+          <span className="f-art" aria-hidden="true">
+            <span className="board">
+              <span className="stone is-black" style={{ top: "55%", left: "35%" }} />
+              <span className="stone is-white" style={{ top: "55%", left: "55%" }} />
+              <span className="stone is-black" style={{ top: "35%", left: "55%" }} />
+              <span className="stone is-accent" style={{ top: "75%", left: "75%" }} />
+            </span>
+          </span>
+        </button>
       </section>
 
       <section className="section" id="games" aria-labelledby="games-title">
@@ -61,9 +65,9 @@ export function MiniGamesPage() {
         </div>
       </section>
 
-      <footer className="card footer" id="about">
-        <a className="brand" href="#top"><span className="bd" aria-hidden="true" />moment<b>PLAY</b></a>
-        <div className="foot-links"><a href="#games">Games</a><a href="#featured">Featured</a><a href="#about">About</a></div>
+      <footer className="card footer">
+        <Brand />
+        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><FooterAccountItem /></div>
         <div className="foot-copy">© 2026 momentPLAY · 짧은 순간을 위한 미니게임.</div>
       </footer>
     </div>

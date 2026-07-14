@@ -11,6 +11,7 @@ import {
 import {
   ONLINE_ACTION_STATUS,
   ONLINE_COPY_RESET_MS,
+  ONLINE_NICKNAME_SAVE_FAILED_MESSAGE,
   ONLINE_PENDING_ACTION,
   ONLINE_POLL_INTERVAL_MS,
   ONLINE_ROOM_LOAD_STATUS,
@@ -285,6 +286,10 @@ export function useOmokOnlineRoom({
 
   const saveNicknameAndResume = useCallback(
     async (nickname) => {
+      // Guards against a double Confirm click landing before the disabled
+      // button prop re-renders.
+      if (state.actionStatus === ONLINE_ACTION_STATUS.SAVING_NICKNAME) return null;
+
       const validation = validateOnlineNickname(nickname);
       if (!validation.valid) {
         setState((previous) => ({ ...previous, errorMessage: validation.message }));
@@ -316,12 +321,12 @@ export function useOmokOnlineRoom({
         setState((previous) => ({
           ...previous,
           actionStatus: ONLINE_ACTION_STATUS.IDLE,
-          errorMessage: getErrorMessage(error, "닉네임을 저장하지 못했습니다."),
+          errorMessage: getErrorMessage(error, ONLINE_NICKNAME_SAVE_FAILED_MESSAGE),
         }));
         return null;
       }
     },
-    [executePendingAction, gateway, state.pendingAction],
+    [executePendingAction, gateway, state.actionStatus, state.pendingAction],
   );
 
   const setReady = useCallback(

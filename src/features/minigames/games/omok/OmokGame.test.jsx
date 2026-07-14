@@ -120,6 +120,12 @@ function findButtonByText(container, text) {
   return Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes(text)) ?? null;
 }
 
+function setInputValue(input, value) {
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+  setter.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 describe("OmokGame top-level menu", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -229,6 +235,61 @@ describe("OmokGame settings menu", () => {
     expect(payload.gameMode).toBe(OMOK_MODE.STANDARD);
     expect(payload.roomGuideSettings).toEqual({ allowForbiddenPositions: false, allowForbiddenReasons: true });
     expect(payload.guideSettings).toEqual({ explainForbiddenReasons: true, showForbiddenPositions: true });
+
+    view.unmount();
+  });
+
+  it("closes the nickname modal exactly once after a successful save and resumes room creation", async () => {
+    mockGateway.getCurrentProfileState.mockResolvedValue({ needsNicknameSetup: true, nickname: null, userId: "host" });
+    mockGateway.saveCurrentProfileNickname.mockResolvedValue({ needsNicknameSetup: false, nickname: "New Host", userId: "host" });
+    mockGateway.createRoom.mockResolvedValue({
+      inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+      moves: [],
+      room: createRoomFixture({ players: [createRoomFixture().players[0]] }),
+      userId: "host",
+    });
+
+    const view = renderOmokGame();
+    await view.click(findButtonByText(view.container, "친구 초대"));
+    await view.click(findButtonByText(view.container, "방 만들기"));
+
+    expect(document.querySelector('[aria-labelledby="omok-online-nickname-title"]')).not.toBeNull();
+    expect(mockGateway.createRoom).not.toHaveBeenCalled();
+
+    await act(async () => {
+      setInputValue(document.getElementById("omok-online-nickname"), "New Host");
+      await flushMicrotasks();
+    });
+    await view.click(findButtonByText(view.container, "저장"));
+
+    expect(mockGateway.saveCurrentProfileNickname).toHaveBeenCalledWith("New Host");
+    expect(mockGateway.saveCurrentProfileNickname).toHaveBeenCalledTimes(1);
+    expect(mockGateway.createRoom).toHaveBeenCalledTimes(1);
+    expect(document.querySelector('[aria-labelledby="omok-online-nickname-title"]')).toBeNull();
+
+    view.unmount();
+  });
+
+  it("keeps the nickname modal open, stops the pending state, and shows the shared inline error on a save failure", async () => {
+    mockGateway.getCurrentProfileState.mockResolvedValue({ needsNicknameSetup: true, nickname: null, userId: "host" });
+    mockGateway.saveCurrentProfileNickname.mockRejectedValue(new Error("닉네임을 저장하지 못했어요. 잠시 후 다시 시도해 주세요."));
+
+    const view = renderOmokGame();
+    await view.click(findButtonByText(view.container, "친구 초대"));
+    await view.click(findButtonByText(view.container, "방 만들기"));
+    await act(async () => {
+      setInputValue(document.getElementById("omok-online-nickname"), "New Host");
+      await flushMicrotasks();
+    });
+    await view.click(findButtonByText(view.container, "저장"));
+
+    expect(document.querySelector('[aria-labelledby="omok-online-nickname-title"]')).not.toBeNull();
+    expect(document.body.textContent).toContain("닉네임을 저장하지 못했어요");
+    expect(mockGateway.createRoom).not.toHaveBeenCalled();
+
+    const saveButton = findButtonByText(view.container, "저장");
+    expect(saveButton.disabled).toBe(false);
+    expect(saveButton.textContent).toBe("저장");
 
     view.unmount();
   });

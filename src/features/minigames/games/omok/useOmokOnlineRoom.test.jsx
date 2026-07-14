@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OMOK_MODE, STONE } from "./omok.constants.js";
-import { ONLINE_POLL_INTERVAL_MS } from "./online/omokOnline.constants.js";
+import { ONLINE_ACTION_STATUS, ONLINE_POLL_INTERVAL_MS } from "./online/omokOnline.constants.js";
 import { useOmokOnlineRoom } from "./useOmokOnlineRoom.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -178,6 +178,62 @@ describe("useOmokOnlineRoom", () => {
 
     expect(gateway.saveCurrentProfileNickname).toHaveBeenCalledWith("New Host");
     expect(gateway.createRoom).toHaveBeenCalledTimes(1);
+    hook.unmount();
+  });
+
+  it("keeps needsNicknameSetup on a save failure, clears the pending action status, and shows the error - without resuming the room flow", async () => {
+    const gateway = createGateway({
+      getCurrentProfileState: vi.fn(async () => ({ needsNicknameSetup: true, nickname: null, userId: "host" })),
+      saveCurrentProfileNickname: vi.fn(async () => {
+        throw new Error("닉네임을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.");
+      }),
+    });
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true } });
+    });
+    expect(hook.current.needsNicknameSetup).toBe(true);
+
+    await act(async () => {
+      await hook.current.saveNicknameAndResume("New Host");
+    });
+
+    expect(hook.current.needsNicknameSetup).toBe(true);
+    expect(hook.current.actionStatus).toBe(ONLINE_ACTION_STATUS.IDLE);
+    expect(hook.current.errorMessage).toMatch(/저장하지 못했어요/);
+    expect(gateway.createRoom).not.toHaveBeenCalled();
+    hook.unmount();
+  });
+
+  it("blocks a duplicate confirmation while a nickname save is already pending", async () => {
+    let resolveSave;
+    const gateway = createGateway({
+      getCurrentProfileState: vi.fn(async () => ({ needsNicknameSetup: true, nickname: null, userId: "host" })),
+      saveCurrentProfileNickname: vi.fn(() => new Promise((resolve) => {
+        resolveSave = resolve;
+      })),
+    });
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true } });
+    });
+
+    act(() => {
+      hook.current.saveNicknameAndResume("New Host");
+    });
+    expect(hook.current.actionStatus).toBe(ONLINE_ACTION_STATUS.SAVING_NICKNAME);
+
+    // A second Confirm click while the first save is still in flight.
+    await act(async () => {
+      await hook.current.saveNicknameAndResume("New Host");
+    });
+    expect(gateway.saveCurrentProfileNickname).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveSave({ needsNicknameSetup: false, nickname: "New Host", userId: "host" });
+    });
     hook.unmount();
   });
 
