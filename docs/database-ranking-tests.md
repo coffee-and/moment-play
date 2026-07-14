@@ -6,8 +6,14 @@ Run the Phase 3 ranking database verification against the currently linked Supab
 npm run test:db:ranking
 ```
 
-The pgTAP suite creates isolated test users and ranking rows inside a transaction and automatically rolls everything back. It does not require a real user UUID or modify retained project data.
+Equivalent command:
+
+```sh
+npx supabase db query --linked --file supabase/tests/phase3_game_results_test.sql
+```
+
+The pgTAP suite creates isolated test users and ranking rows inside a transaction and automatically rolls everything back. It does not require a local Docker daemon, a real user UUID, or retained test data.
 
 Use the linked database credentials requested by the Supabase CLI. Never use a service-role or secret API key to claim that RLS has been verified because those roles bypass RLS.
 
-Each assertion prints an `ok`/`not ok` result with a focused description. A complete run ends with `All tests successful` and `Result: PASS`; any failed assertion makes the command exit non-zero and its description identifies the failed schema, privilege, RLS, constraint, or leaderboard behavior.
+Review the output for `not ok` lines and confirm the final pgTAP result reports success. Each assertion has a focused description identifying the failed schema, privilege, RLS, constraint, or leaderboard behavior.
