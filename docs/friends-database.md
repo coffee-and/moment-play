@@ -48,7 +48,7 @@ Run the application tests:
 npm test
 ```
 
-Run the Phase 4 database test with the Supabase pgTAP runner:
+Run the Phase 4 database test directly against the currently linked Supabase project:
 
 ```sh
 npm run test:db:friends
@@ -57,12 +57,12 @@ npm run test:db:friends
 Equivalent command:
 
 ```sh
-npx supabase test db supabase/tests/phase4_friendships_test.sql --linked
+npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql
 ```
 
-The Supabase `test db` runner requires Docker because it runs `pg_prove` in a container. When Docker is unavailable, the SQL file can still be inspected or executed transactionally through a linked database query, but only `pg_prove` interprets pgTAP failures as a failing test process.
+This runner does not require a local Docker daemon. The SQL file opens a transaction, creates isolated test users and relationships, runs the pgTAP assertions, and rolls everything back.
 
-The test opens a transaction, creates isolated users and relationships, runs the assertions, and rolls everything back.
+Review the output for `not ok` lines and confirm the final pgTAP result reports success. Because this command sends the SQL directly to the linked database rather than using the Docker-hosted `pg_prove` runner, the console output itself is the source of truth for assertion failures.
 
 ## Next phase
 
