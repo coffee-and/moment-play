@@ -48,7 +48,7 @@ Run the application tests:
 npm test
 ```
 
-Run the Phase 4 database test directly against the currently linked Supabase project:
+Run the Phase 4 database test against the linked Supabase project:
 
 ```sh
 npm run test:db:friends
@@ -60,9 +60,11 @@ Equivalent command:
 npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql
 ```
 
-This runner does not require a local Docker daemon. The SQL file opens a transaction, creates isolated test users and relationships, runs the pgTAP assertions, and rolls everything back.
+The SQL file opens a transaction, creates isolated users and relationships, runs the pgTAP assertions, and rolls everything back.
 
-Review the output for `not ok` lines and confirm the final pgTAP result reports success. Because this command sends the SQL directly to the linked database rather than using the Docker-hosted `pg_prove` runner, the console output itself is the source of truth for assertion failures.
+Friend-code fixtures are assigned before the test switches to restricted database roles. This matters because SQL function arguments are evaluated with the caller's permissions: an authenticated user must not query another user's `profiles` row merely to discover the code passed to a SECURITY DEFINER RPC.
+
+The linked query command returns a non-zero result when an uncaught SQL exception interrupts the suite. Review all emitted pgTAP rows as well and confirm that none begin with `not ok`.
 
 ## Next phase
 
