@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.jsx";
-import { AUTH_LABELS, getAccountLabel, LOGIN_PATH, SIGNUP_PATH } from "../../auth/authConstants.js";
+import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../../auth/authConstants.js";
 import { AccountIcon } from "./navIcons.jsx";
 import { isNavItemActive, NAV_ITEMS } from "./navItems.js";
 
@@ -14,16 +14,6 @@ function AccountTab({ pathname }) {
       <span className="tabbar-account" aria-label={AUTH_LABELS.loading}>
         <AccountIcon />
       </span>
-    );
-  }
-
-  if (status === "anonymous") {
-    return (
-      <Link className={pathname.startsWith(SIGNUP_PATH) ? "on" : undefined} to={SIGNUP_PATH}>
-        <AccountIcon />
-        {AUTH_LABELS.createAccount}
-        <span className="tabbar-account__badge">{AUTH_LABELS.anonymous}</span>
-      </Link>
     );
   }
 

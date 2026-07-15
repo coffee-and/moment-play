@@ -52,12 +52,12 @@ describe("TabBar account item", () => {
     view.unmount();
   });
 
-  it("shows 계정 만들기 for anonymous users and navigates to /signup", () => {
+  it("shows 로그인 for anonymous users and navigates to /login", () => {
     auth = { status: "anonymous", user: { id: "anon-1", is_anonymous: true }, signOut };
     const view = renderTabBar();
-    const link = view.host.querySelector('a[href="/signup"]');
-    expect(link?.textContent).toContain("계정 만들기");
-    expect(view.host.textContent).toContain("게스트");
+    const link = view.host.querySelector('a[href="/login"]');
+    expect(link?.textContent).toContain("로그인");
+    expect(view.host.querySelector('a[href="/signup"]')).toBeNull();
     view.unmount();
   });
 
@@ -104,10 +104,10 @@ describe("TabBar account item", () => {
     view.unmount();
   });
 
-  it("keeps the desktop and mobile account controls consistent for the same auth status", () => {
+  it("keeps the desktop and mobile account controls consistent for anonymous sessions", () => {
     auth = { status: "anonymous", user: { id: "anon-1", is_anonymous: true }, signOut };
     const view = renderTabBar();
-    expect(view.host.querySelector('a[href="/signup"]')?.textContent).toContain("계정 만들기");
+    expect(view.host.querySelector('a[href="/login"]')?.textContent).toContain("로그인");
     view.unmount();
   });
 });

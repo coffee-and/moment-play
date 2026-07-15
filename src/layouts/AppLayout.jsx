@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../shared/auth/AuthContext.jsx";
-import { AUTH_LABELS, getAccountLabel, LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
+import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { Brand } from "../shared/components/Brand.jsx";
 import { SkyDecoration } from "../shared/components/decoration/SkyDecoration.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
@@ -13,15 +13,6 @@ function AccountControl() {
 
   if (status === "loading") {
     return <span className="account-control account-control--loading" aria-label={AUTH_LABELS.loading} />;
-  }
-
-  if (status === "anonymous") {
-    return (
-      <div className="account-anonymous">
-        <span>{AUTH_LABELS.anonymous}</span>
-        <Link to={SIGNUP_PATH}>{AUTH_LABELS.createAccount}</Link>
-      </div>
-    );
   }
 
   if (status === "authenticated") {

@@ -59,7 +59,7 @@ describe("AppLayout account control", () => {
     view.unmount();
   });
 
-  it("shows login for guests and account creation for anonymous users", () => {
+  it("shows login for both guest and anonymous sessions", () => {
     auth = { status: "guest", user: null, signOut };
     const guestView = renderLayout();
     expect(guestView.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
@@ -67,8 +67,8 @@ describe("AppLayout account control", () => {
 
     auth = { status: "anonymous", user: { id: "anon-1", is_anonymous: true }, signOut };
     const anonymousView = renderLayout();
-    expect(anonymousView.host.textContent).toContain("게스트");
-    expect(anonymousView.host.querySelector('a[href="/signup"]')?.textContent).toBe("계정 만들기");
+    expect(anonymousView.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
+    expect(anonymousView.host.querySelector('a[href="/signup"]')).toBeNull();
     anonymousView.unmount();
   });
 
