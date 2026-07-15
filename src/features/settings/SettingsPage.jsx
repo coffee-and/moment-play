@@ -1,0 +1,245 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import packageInfo from "../../../package.json";
+import { fetchMyFriendProfile } from "../../infrastructure/supabase/friendsGateway.js";
+import { FRIENDS_PATH } from "../friends/friendsConstants.js";
+import { useAuth } from "../../shared/auth/AuthContext.jsx";
+import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../../shared/auth/authConstants.js";
+import { Button } from "../../shared/components/Button.jsx";
+import { clearMomentPlayLocalData } from "../../shared/settings/localDataSettings.js";
+import { useTheme } from "../../shared/theme/ThemeContext.jsx";
+import "./settings.css";
+
+const FRIEND_STATUS = {
+  IDLE: "idle",
+  LOADING: "loading",
+  READY: "ready",
+  ERROR: "error",
+};
+
+export function SettingsPage() {
+  const { isConfigured, signOut, status: authStatus, user } = useAuth();
+  const { setTheme, theme } = useTheme();
+  const [friendProfile, setFriendProfile] = useState(null);
+  const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.IDLE);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [accountMessage, setAccountMessage] = useState("");
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
+
+  useEffect(() => {
+    if (authStatus !== "authenticated" || !isConfigured) {
+      setFriendProfile(null);
+      setFriendStatus(FRIEND_STATUS.IDLE);
+      return undefined;
+    }
+
+    let active = true;
+    setFriendStatus(FRIEND_STATUS.LOADING);
+
+    fetchMyFriendProfile()
+      .then((profile) => {
+        if (!active) return;
+        setFriendProfile(profile);
+        setFriendStatus(FRIEND_STATUS.READY);
+      })
+      .catch(() => {
+        if (!active) return;
+        setFriendStatus(FRIEND_STATUS.ERROR);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [authStatus, isConfigured]);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    setAccountMessage("");
+
+    try {
+      await signOut();
+    } catch {
+      setAccountMessage("로그아웃하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
+  function handleResetLocalData() {
+    setResetMessage("");
+
+    try {
+      const removedCount = clearMomentPlayLocalData();
+      setResetMessage(
+        removedCount > 0
+          ? "이 기기의 게임 기록과 임시 플레이 데이터를 초기화했어요."
+          : "초기화할 기기 내 게임 기록이 없어요.",
+      );
+      setIsResetConfirmOpen(false);
+    } catch {
+      setResetMessage("기기 내 데이터를 초기화하지 못했습니다.");
+    }
+  }
+
+  const isPermanentAccount = authStatus === "authenticated";
+
+  return (
+    <section className="wrap settings-page" aria-labelledby="settings-title">
+      <header className="settings-page__header">
+        <p className="eyebrow">Preferences</p>
+        <h1 id="settings-title">설정</h1>
+        <p>화면 테마와 계정, 이 기기에 저장된 플레이 데이터를 관리할 수 있어요.</p>
+      </header>
+
+      <div className="settings-grid">
+        <section className="card settings-card" aria-labelledby="appearance-title">
+          <div className="settings-card__heading">
+            <div>
+              <p className="eyebrow">Appearance</p>
+              <h2 id="appearance-title">화면 테마</h2>
+              <p>선택한 테마는 이 기기에 저장됩니다.</p>
+            </div>
+            <span className="settings-card__badge">{theme === "dark" ? "밤" : "낮"}</span>
+          </div>
+
+          <div className="theme-options" role="radiogroup" aria-label="화면 테마 선택">
+            <button
+              className={`theme-option${theme === "light" ? " is-selected" : ""}`}
+              type="button"
+              role="radio"
+              aria-checked={theme === "light"}
+              onClick={() => setTheme("light")}
+            >
+              <span className="theme-option__preview theme-option__preview--light" aria-hidden="true">
+                <span className="theme-option__orb" />
+              </span>
+              <span><strong>라이트</strong><small>밝은 하늘과 선명한 카드</small></span>
+            </button>
+            <button
+              className={`theme-option${theme === "dark" ? " is-selected" : ""}`}
+              type="button"
+              role="radio"
+              aria-checked={theme === "dark"}
+              onClick={() => setTheme("dark")}
+            >
+              <span className="theme-option__preview theme-option__preview--dark" aria-hidden="true">
+                <span className="theme-option__orb" />
+              </span>
+              <span><strong>다크</strong><small>차분한 밤하늘과 낮은 눈부심</small></span>
+            </button>
+          </div>
+        </section>
+
+        <section className="card settings-card" aria-labelledby="account-title">
+          <div className="settings-card__heading">
+            <div>
+              <p className="eyebrow">Account</p>
+              <h2 id="account-title">계정</h2>
+              <p>랭킹과 친구 기능에 사용하는 계정 상태입니다.</p>
+            </div>
+            <span className="settings-card__badge">
+              {isPermanentAccount ? "로그인됨" : authStatus === "loading" ? "확인 중" : "로그아웃"}
+            </span>
+          </div>
+
+          {authStatus === "loading" ? (
+            <p className="settings-muted" role="status">계정 정보를 확인하고 있어요.</p>
+          ) : isPermanentAccount ? (
+            <div className="account-settings">
+              <div className="account-settings__identity">
+                <span className="settings-avatar" aria-hidden="true">{getAccountLabel(user).slice(0, 1).toUpperCase()}</span>
+                <div>
+                  <strong>{getAccountLabel(user)}</strong>
+                  <span>{user?.email ?? "이메일 정보 없음"}</span>
+                </div>
+              </div>
+
+              <dl className="account-details">
+                <div>
+                  <dt>친구 코드</dt>
+                  <dd>
+                    {friendStatus === FRIEND_STATUS.LOADING ? "불러오는 중…" : null}
+                    {friendStatus === FRIEND_STATUS.READY ? friendProfile?.friendCode ?? "확인할 수 없음" : null}
+                    {friendStatus === FRIEND_STATUS.ERROR ? "불러오지 못함" : null}
+                  </dd>
+                </div>
+                <div>
+                  <dt>서버 연결</dt>
+                  <dd>{isConfigured ? "연결됨" : "설정 필요"}</dd>
+                </div>
+              </dl>
+
+              <div className="settings-actions">
+                <Button as={Link} to={FRIENDS_PATH} variant="secondary">친구 관리</Button>
+                <Button type="button" variant="secondary" disabled={isSigningOut} onClick={() => void handleSignOut()}>
+                  {isSigningOut ? "로그아웃 중…" : AUTH_LABELS.logout}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="account-settings account-settings--guest">
+              <p>로그인하면 랭킹 기록 저장, 친구 관리, 친구 오목 초대를 사용할 수 있어요.</p>
+              <Button as={Link} to={LOGIN_PATH}>{AUTH_LABELS.login}</Button>
+            </div>
+          )}
+
+          {accountMessage ? <p className="settings-notice is-error" role="alert">{accountMessage}</p> : null}
+        </section>
+
+        <section className="card settings-card settings-card--wide" aria-labelledby="data-title">
+          <div className="settings-card__heading">
+            <div>
+              <p className="eyebrow">Device Data</p>
+              <h2 id="data-title">기기 내 플레이 데이터</h2>
+              <p>게임 최고 기록, 임시 닉네임 등 이 브라우저에 저장된 데이터만 초기화합니다.</p>
+            </div>
+          </div>
+
+          <div className="data-settings">
+            <div className="data-settings__copy">
+              <strong>서버 데이터와 테마는 유지돼요</strong>
+              <p>로그인 계정, 서버 랭킹, 친구 관계, 현재 화면 테마는 삭제하지 않습니다.</p>
+            </div>
+
+            {!isResetConfirmOpen ? (
+              <Button type="button" variant="secondary" onClick={() => {
+                setResetMessage("");
+                setIsResetConfirmOpen(true);
+              }}>
+                게임 기록 초기화
+              </Button>
+            ) : (
+              <div className="reset-confirm" role="group" aria-label="게임 기록 초기화 확인">
+                <p>이 기기의 게임 기록과 임시 플레이 데이터를 삭제할까요?</p>
+                <div className="settings-actions">
+                  <Button type="button" variant="secondary" onClick={() => setIsResetConfirmOpen(false)}>취소</Button>
+                  <Button type="button" onClick={handleResetLocalData}>초기화</Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {resetMessage ? <p className="settings-notice" role="status">{resetMessage}</p> : null}
+        </section>
+
+        <section className="card settings-card settings-card--wide" aria-labelledby="about-title">
+          <div className="settings-card__heading">
+            <div>
+              <p className="eyebrow">About</p>
+              <h2 id="about-title">Moment Play 정보</h2>
+              <p>짧게 즐기는 게임과 친구 플레이를 위한 미니게임 서비스입니다.</p>
+            </div>
+            <span className="settings-card__badge">v{packageInfo.version}</span>
+          </div>
+
+          <div className="about-settings">
+            <div><strong>기기 저장</strong><span>테마, 로컬 최고 기록, 임시 플레이 정보</span></div>
+            <div><strong>서버 저장</strong><span>계정, 랭킹 결과, 친구 관계와 온라인 오목 방</span></div>
+            <div><strong>현재 단계</strong><span>친구 초대 기능을 준비 중인 출시 전 MVP</span></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
