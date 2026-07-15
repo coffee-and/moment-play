@@ -22,10 +22,10 @@ function normalizeAndValidate(rawNickname) {
   return normalizeOnlineNickname(validation.value);
 }
 
-// Precedence: existing profiles.nickname (only if a Supabase session already
-// exists - never creates one) -> valid locally stored nickname -> "Guest".
-// Used for Local Player 1 display, the Computer match, and to seed the online
-// nickname-setup modal.
+// A signed-in account owns its server profile identity. Never fall back to a
+// nickname left in this browser by another account; that caused newly created
+// accounts to inherit a previous user's local nickname. Local storage is used
+// only when there is no Supabase session at all.
 export async function resolveSharedNickname() {
   if (isSupabaseConfigured()) {
     try {
@@ -33,9 +33,9 @@ export async function resolveSharedNickname() {
       const session = await getExistingSession(client);
       if (session) {
         const profile = await getProfileByUserId(session.user.id, client);
-        if (profile?.nickname && !isFallbackOnlineNickname(profile.nickname)) {
-          return profile.nickname;
-        }
+        return profile?.nickname && !isFallbackOnlineNickname(profile.nickname)
+          ? profile.nickname
+          : GUEST_FALLBACK_NICKNAME;
       }
     } catch {
       // A Supabase hiccup must never block local nickname resolution.
