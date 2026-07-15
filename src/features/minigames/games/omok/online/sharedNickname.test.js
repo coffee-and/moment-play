@@ -51,6 +51,17 @@ describe("resolveSharedNickname precedence", () => {
     expect(ensureAnonymousSession).not.toHaveBeenCalled();
   });
 
+  it("does not inherit a previous account's local nickname when the signed-in profile still has a fallback", async () => {
+    isSupabaseConfigured.mockReturnValue(true);
+    getExistingSession.mockResolvedValue({ user: { id: "user-2" } });
+    getProfileByUserId.mockResolvedValue({ nickname: "Guest-abc123" });
+    saveLocalSharedNickname("PreviousUser");
+
+    const result = await resolveSharedNickname();
+
+    expect(result).toBe(GUEST_FALLBACK_NICKNAME);
+  });
+
   it("falls back to the locally stored nickname when no session exists", async () => {
     isSupabaseConfigured.mockReturnValue(true);
     getExistingSession.mockResolvedValue(null);
