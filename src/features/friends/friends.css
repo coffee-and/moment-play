@@ -129,6 +129,12 @@
   text-transform: uppercase;
 }
 
+.friend-search-submit {
+  min-width: 84px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .friend-search-result {
   display: flex;
   align-items: center;
