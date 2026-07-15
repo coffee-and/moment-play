@@ -96,15 +96,18 @@ describe("FriendsPage", () => {
   it("asks guest users to log in without calling friend APIs", async () => {
     const view = await renderPage();
     expect(view.host.textContent).toContain("로그인하면 친구와 연결할 수 있어요");
+    expect(view.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
     expect(fetchMyFriendProfile).not.toHaveBeenCalled();
     expect(fetchFriendOverview).not.toHaveBeenCalled();
     view.unmount();
   });
 
-  it("asks anonymous users to upgrade their account", async () => {
+  it("asks anonymous users to log in instead of showing only account creation", async () => {
     auth = { isConfigured: true, status: "anonymous" };
     const view = await renderPage();
-    expect(view.host.textContent).toContain("계정을 만들면 친구 기능이 열려요");
+    expect(view.host.textContent).toContain("로그인하면 친구와 연결할 수 있어요");
+    expect(view.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
+    expect(view.host.querySelector('a[href="/signup"]')).toBeNull();
     expect(fetchMyFriendProfile).not.toHaveBeenCalled();
     view.unmount();
   });
