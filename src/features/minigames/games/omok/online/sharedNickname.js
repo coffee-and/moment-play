@@ -84,9 +84,9 @@ export async function saveSharedNickname(rawNickname) {
   return normalized;
 }
 
-// Prefill for the online nickname-setup modal: local storage only (setup is
-// only shown when no valid server nickname exists yet).
+// Online profile setup always starts empty. Reusing the browser's local
+// nickname here can leak a previous account's name into a newly created
+// account on the same device.
 export function getNicknamePrefillForOnlineSetup() {
-  const localNickname = getLocalNickname();
-  return isValidLocalNickname(localNickname) ? localNickname : "";
+  return "";
 }
