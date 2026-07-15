@@ -25,6 +25,7 @@ vi.mock("../../../../../infrastructure/supabase/omokOnlineRoomGateway.js", () =>
 
 const {
   GUEST_FALLBACK_NICKNAME,
+  getNicknamePrefillForOnlineSetup,
   resolveSharedNickname,
   saveLocalSharedNickname,
   saveSharedNickname,
@@ -91,6 +92,11 @@ describe("resolveSharedNickname precedence", () => {
     saveLocalSharedNickname("LocalOnly");
 
     expect(ensureAnonymousSession).not.toHaveBeenCalled();
+  });
+
+  it("starts online account nickname setup empty even when a local nickname exists", () => {
+    saveLocalSharedNickname("PreviousUser");
+    expect(getNicknamePrefillForOnlineSetup()).toBe("");
   });
 });
 
