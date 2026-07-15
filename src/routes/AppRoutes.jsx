@@ -4,6 +4,8 @@ import { CompleteSignupPage } from "../features/auth/pages/CompleteSignupPage.js
 import { LoginPage } from "../features/auth/pages/LoginPage.jsx";
 import { OnboardingPage } from "../features/auth/pages/OnboardingPage.jsx";
 import { SignupPage } from "../features/auth/pages/SignupPage.jsx";
+import { FriendsPage } from "../features/friends/FriendsPage.jsx";
+import { FRIENDS_PATH } from "../features/friends/friendsConstants.js";
 import { COMPLETE_SIGNUP_PATH, LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
 import { MiniGamesPage } from "../features/minigames/pages/MiniGamesPage.jsx";
 import { MinigamePlayPage } from "../features/minigames/pages/MinigamePlayPage.jsx";
@@ -21,6 +23,7 @@ export function AppRoutes() {
         <Route path={SIGNUP_PATH} element={<SignupPage />} />
         <Route path={COMPLETE_SIGNUP_PATH} element={<CompleteSignupPage />} />
         <Route path={RANKING_PATH} element={<RankingPage />} />
+        <Route path={FRIENDS_PATH} element={<FriendsPage />} />
         <Route path="/minigames/:gameId/room/:roomId" element={<MinigamePlayPage />} />
         <Route path="/minigames/:gameId" element={<MinigamePlayPage />} />
         <Route path="*" element={<NotFoundPage />} />
