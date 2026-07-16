@@ -42,7 +42,7 @@ export function MiniGamesPage() {
             <span className="f-tag">★ Featured</span>
             <h2 id="featured-title">오목</h2>
             <p>다섯 개를 먼저 잇는 정통 전략 게임. 오늘 머리 좀 굴려볼까요?</p>
-            <span className="btn btn-soft">오목 시작하기</span>
+            <span className="f-action">바로 플레이<span className="arw" aria-hidden="true" /></span>
           </span>
           <span className="f-art" aria-hidden="true">
             <span className="board">
