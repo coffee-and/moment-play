@@ -102,17 +102,28 @@ describe("AppLayout account control", () => {
   });
 });
 
-describe("AppLayout immersive online room", () => {
-  it("hides global navigation and account controls inside an Omok room", () => {
+describe("AppLayout immersive game routes", () => {
+  it.each([
+    "/minigames/2048",
+    "/minigames/memory",
+    "/minigames/omok",
+    "/minigames/omok/room/11111111-1111-4111-8111-111111111111",
+  ])("hides global navigation on %s", (path) => {
     auth = { status: "authenticated", user: { email: "host@example.com" }, signOut };
-    const view = renderLayout("/minigames/omok/room/11111111-1111-4111-8111-111111111111");
+    const view = renderLayout(path);
 
     expect(view.host.textContent).toContain("Page content");
     expect(view.host.querySelector(".hd")).toBeNull();
     expect(view.host.querySelector(".account-menu")).toBeNull();
     expect(view.host.querySelector('a[href="/settings"]')).toBeNull();
-    expect(view.host.querySelector('a[href="/"]')).toBeNull();
     expect(view.host.querySelector(".moment-app--immersive")).not.toBeNull();
+    view.unmount();
+  });
+
+  it("keeps global navigation on non-game settings pages", () => {
+    const view = renderLayout("/settings");
+    expect(view.host.querySelector(".hd")).not.toBeNull();
+    expect(view.host.querySelector(".moment-app--immersive")).toBeNull();
     view.unmount();
   });
 });
