@@ -51,3 +51,63 @@
     grid-column: auto;
   }
 }
+
+
+.game-stage {
+  position: relative;
+}
+
+.game-stage button,
+.game-stage [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.game-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  top: var(--game-touch-y, 50%);
+  left: var(--game-touch-x, 50%);
+  width: 18px;
+  aspect-ratio: 1;
+  border: 2px solid color-mix(in oklab, var(--accent) 58%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.35);
+}
+
+.game-stage.has-touch-feedback::after {
+  animation: game-touch-feedback 0.4s ease-out;
+}
+
+.game-stage button:focus-visible,
+.game-stage [role="button"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@keyframes game-touch-feedback {
+  0% {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(0.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.4);
+  }
+}
+
+@media (hover: none) {
+  .game-stage button:active:not(:disabled),
+  .game-stage [role="button"]:active {
+    filter: saturate(1.08) brightness(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-stage.has-touch-feedback::after {
+    animation: none;
+  }
+}
