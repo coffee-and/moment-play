@@ -25,6 +25,7 @@ export function SettingsPage() {
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.IDLE);
   const [nicknameInput, setNicknameInput] = useState("");
   const [nicknameMessage, setNicknameMessage] = useState("");
+  const [nicknameMessageType, setNicknameMessageType] = useState("status");
   const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [accountMessage, setAccountMessage] = useState("");
@@ -72,8 +73,10 @@ export function SettingsPage() {
       }));
       setNicknameInput(savedProfile.nickname);
       await refreshSession?.();
+      setNicknameMessageType("status");
       setNicknameMessage("닉네임을 변경했어요. 친구와 온라인 게임에서도 이 이름으로 표시됩니다.");
     } catch (error) {
+      setNicknameMessageType("error");
       setNicknameMessage(error instanceof Error ? error.message : "닉네임을 변경하지 못했습니다.");
     } finally {
       setIsSavingNickname(false);
@@ -208,7 +211,10 @@ export function SettingsPage() {
               </form>
 
               {nicknameMessage ? (
-                <p className={`settings-notice${nicknameMessage.includes("못") || nicknameMessage.includes("이상") || nicknameMessage.includes("이하") ? " is-error" : ""}`} role="status">
+                <p
+                  className={`settings-notice${nicknameMessageType === "error" ? " is-error" : ""}`}
+                  role={nicknameMessageType === "error" ? "alert" : "status"}
+                >
                   {nicknameMessage}
                 </p>
               ) : null}
