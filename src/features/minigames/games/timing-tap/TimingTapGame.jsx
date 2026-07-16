@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -36,6 +37,7 @@ function vibrate(duration = 10) {
 
 export function TimingTapGame({ game }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
   const [phase, setPhase] = useState("idle");
   const [round, setRound] = useState(1);
   const [roundConfig, setRoundConfig] = useState(() => getTimingRoundConfig(1));
@@ -54,6 +56,7 @@ export function TimingTapGame({ game }) {
   roundRef.current = round;
 
   function beginRound(nextRound) {
+    playSound("countdownFinal");
     const config = getTimingRoundConfig(nextRound);
     setRound(nextRound);
     setRoundConfig(config);
@@ -86,6 +89,7 @@ export function TimingTapGame({ game }) {
   }, []);
 
   function completeGame(finalScore) {
+    playSound("clear");
     setPhase("completed");
     setBest((currentBest) => {
       const nextBest = Math.max(currentBest, finalScore);
@@ -96,11 +100,13 @@ export function TimingTapGame({ game }) {
 
   function tapNow() {
     if (phaseRef.current !== "playing") return;
+    phaseRef.current = "feedback";
     window.cancelAnimationFrame(frameRef.current);
     const judged = judgeTiming(needlePosition, roundConfig.targetCenter, roundConfig.targetWidth);
     const nextScore = score + judged.score;
     setScore(nextScore);
     setResult(judged);
+    playSound(judged.grade === "MISS" ? "wrong" : judged.grade === "PERFECT" ? "success" : "correct");
     setPhase("feedback");
     vibrate(judged.grade === "PERFECT" ? 24 : judged.grade === "MISS" ? 8 : 14);
     feedbackTimerRef.current = window.setTimeout(() => {
