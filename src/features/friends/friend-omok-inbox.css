@@ -1,0 +1,41 @@
+.friend-invite-dashboard {
+  scroll-margin-top: 84px;
+}
+
+.friend-invite-dashboard__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.friend-invite-dashboard__refresh {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.friend-invite-dashboard__refresh > span {
+  color: var(--muted);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.friend-invite-dashboard__refresh .button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+@media (max-width: 620px) {
+  .friend-invite-dashboard__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .friend-invite-dashboard__refresh {
+    justify-content: flex-end;
+  }
+}
