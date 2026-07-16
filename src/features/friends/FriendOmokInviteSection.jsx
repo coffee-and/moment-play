@@ -1,4 +1,5 @@
 import { Button } from "../../shared/components/Button.jsx";
+import { useInviteNotifications } from "../../shared/invitations/InviteNotificationContext.jsx";
 import {
   getInviteResultMessage,
   INVITE_STATUS_LABEL,
@@ -118,7 +119,6 @@ function RecentInviteResults({ items, onEnterRoom }) {
 export function FriendOmokInviteSection({
   incoming,
   outgoing,
-  recentResults = [],
   busyInviteId,
   isRefreshing = false,
   onAccept,
@@ -127,6 +127,8 @@ export function FriendOmokInviteSection({
   onEnterRoom,
   onRefresh,
 }) {
+  const { recentResults } = useInviteNotifications();
+
   return (
     <section className="friend-invite-dashboard" id="omok-invites" aria-labelledby="friend-invite-dashboard-title">
       <header className="friend-invite-dashboard__header">
