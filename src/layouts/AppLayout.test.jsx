@@ -101,3 +101,18 @@ describe("AppLayout account control", () => {
     view.unmount();
   });
 });
+
+describe("AppLayout immersive online room", () => {
+  it("hides global navigation and account controls inside an Omok room", () => {
+    auth = { status: "authenticated", user: { email: "host@example.com" }, signOut };
+    const view = renderLayout("/minigames/omok/room/11111111-1111-4111-8111-111111111111");
+
+    expect(view.host.textContent).toContain("Page content");
+    expect(view.host.querySelector(".hd")).toBeNull();
+    expect(view.host.querySelector(".account-menu")).toBeNull();
+    expect(view.host.querySelector('a[href="/settings"]')).toBeNull();
+    expect(view.host.querySelector('a[href="/"]')).toBeNull();
+    expect(view.host.querySelector(".moment-app--immersive")).not.toBeNull();
+    view.unmount();
+  });
+});
