@@ -219,6 +219,45 @@
   font-weight: 700;
 }
 
+.nickname-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px;
+  background: var(--surface-2);
+}
+
+.nickname-settings .f-label {
+  margin: 0;
+}
+
+.nickname-settings__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nickname-settings__row .txt {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.nickname-settings__row .button {
+  min-height: 42px;
+  flex: none;
+  padding-inline: 15px;
+  white-space: nowrap;
+}
+
+.nickname-settings__help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
 .account-details {
   display: grid;
   margin: 0;
@@ -381,7 +420,8 @@
 
   .settings-card__heading,
   .data-settings,
-  .reset-confirm {
+  .reset-confirm,
+  .nickname-settings__row {
     align-items: stretch;
     flex-direction: column;
   }
@@ -391,7 +431,8 @@
   }
 
   .data-settings > .button,
-  .settings-actions .button {
+  .settings-actions .button,
+  .nickname-settings__row .button {
     width: 100%;
   }
 
