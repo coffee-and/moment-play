@@ -961,8 +961,7 @@ a {
   color: var(--accent);
 }
 
-.game-card-preview.is-2048,
-.game-card-preview.is-sudoku {
+.game-card-preview.is-2048 {
   grid-template-columns: repeat(2, 1fr);
   gap: 3px;
 }
@@ -998,26 +997,21 @@ a {
 .game-card-preview.is-memory span:nth-child(3) { transform: translateY(4px) rotate(8deg); }
 
 .game-card-preview.is-sudoku {
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-  padding: 2px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
 }
 
 .game-card-preview.is-sudoku span {
-  display: grid;
-  place-items: center;
-  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
-  border-radius: 4px;
-  background: color-mix(in oklab, var(--surface) 82%, var(--accent) 3%);
   color: var(--text);
   font-family: var(--label);
-  font-size: 9px;
-  font-weight: 700;
+  font-size: clamp(15px, 3.8vw, 19px);
+  font-weight: 750;
+  line-height: 1;
 }
 
-.game-card-preview.is-sudoku span:nth-child(5) {
-  border-color: color-mix(in oklab, var(--accent) 34%, transparent);
-  background: color-mix(in oklab, var(--accent) 13%, var(--surface));
+.game-card-preview.is-sudoku span:nth-child(2) {
   color: var(--accent);
 }
 
