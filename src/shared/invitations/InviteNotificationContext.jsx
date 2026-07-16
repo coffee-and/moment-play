@@ -18,6 +18,7 @@ const EMPTY_CONTEXT = Object.freeze({
   isRefreshing: false,
   lastUpdatedAt: null,
   pendingCount: 0,
+  recentResults: [],
   refreshInviteNotifications: async () => 0,
   syncPendingCountFromInvites: () => 0,
 });
@@ -68,6 +69,7 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
   const seenResultKeysRef = useRef(new Set());
   const resultBaselineReadyRef = useRef(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [recentResults, setRecentResults] = useState([]);
   const [refreshStatus, setRefreshStatus] = useState("idle");
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
   const [resultNotification, setResultNotification] = useState(null);
@@ -76,14 +78,16 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
 
   const applyInviteSnapshot = useCallback((invites) => {
     const count = countActiveIncomingInvites(invites);
+    const recentInviteResults = getRecentInviteResults(invites, 4);
     setPendingCount(count);
+    setRecentResults(recentInviteResults);
     setRefreshStatus("ready");
     setLastUpdatedAt(Date.now());
 
     if (!activeUserId) return count;
 
-    const recentResults = getRecentInviteResults(invites, MAX_STORED_RESULT_KEYS);
-    const entries = recentResults
+    const resultHistory = getRecentInviteResults(invites, MAX_STORED_RESULT_KEYS);
+    const entries = resultHistory
       .map((invite) => ({ invite, key: getInviteResultKey(invite) }))
       .filter((entry) => entry.key);
 
@@ -118,6 +122,7 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
   const refreshInviteNotifications = useCallback(async () => {
     if (!isConfigured || !activeUserId) {
       setPendingCount(0);
+      setRecentResults([]);
       setRefreshStatus("idle");
       setLastUpdatedAt(null);
       return 0;
@@ -157,6 +162,7 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
       seenResultKeysRef.current = new Set();
       resultBaselineReadyRef.current = false;
       setPendingCount(0);
+      setRecentResults([]);
       setRefreshStatus("idle");
       setLastUpdatedAt(null);
       return undefined;
@@ -195,9 +201,10 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
     isRefreshing: refreshStatus === "loading" || refreshStatus === "refreshing",
     lastUpdatedAt,
     pendingCount,
+    recentResults,
     refreshInviteNotifications,
     syncPendingCountFromInvites,
-  }), [lastUpdatedAt, pendingCount, refreshInviteNotifications, refreshStatus, syncPendingCountFromInvites]);
+  }), [lastUpdatedAt, pendingCount, recentResults, refreshInviteNotifications, refreshStatus, syncPendingCountFromInvites]);
 
   return (
     <InviteNotificationContext.Provider value={value}>
