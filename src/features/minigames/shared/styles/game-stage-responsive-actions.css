@@ -25,6 +25,15 @@
   grid-column: 1 / -1;
 }
 
+.game-stage-modal__actions[data-action-count="1"] {
+  grid-template-columns: minmax(0, 180px);
+  justify-content: center;
+}
+
+.game-stage-modal__actions[data-action-count="1"] > .button {
+  width: 100%;
+}
+
 .game-stage-modal__actions[data-action-count="3"] > .button:first-child {
   grid-column: 1 / -1;
 }
