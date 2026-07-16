@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -54,6 +55,7 @@ function vibrate(duration = 10) {
 
 export function SnakeGame({ game }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
   const initialSnake = useMemo(() => createInitialSnake(), []);
   const [snake, setSnake] = useState(initialSnake);
   const [food, setFood] = useState(() => createFood(initialSnake));
@@ -78,6 +80,7 @@ export function SnakeGame({ game }) {
   }
 
   function startGame() {
+    playSound("countdownFinal");
     const nextSnake = createInitialSnake();
     directionRef.current = SNAKE_DIRECTION.RIGHT;
     queuedDirectionRef.current = SNAKE_DIRECTION.RIGHT;
@@ -89,6 +92,7 @@ export function SnakeGame({ game }) {
   }
 
   function finishGame() {
+    playSound("gameOver");
     setPhase("over");
     vibrate(30);
     setBest((currentBest) => {
@@ -111,6 +115,7 @@ export function SnakeGame({ game }) {
 
       setSnake(result.snake);
       if (result.ateFood) {
+        playSound("correct");
         const nextScore = score + 1;
         setScore(nextScore);
         setFood(createFood(result.snake));
