@@ -1,4 +1,6 @@
 .settings-page {
+  --settings-action-height: 42px;
+  --settings-action-min-width: 120px;
   padding-top: clamp(28px, 5vw, 56px);
   padding-bottom: clamp(44px, 8vw, 88px);
 }
@@ -234,21 +236,28 @@
 }
 
 .nickname-settings__row {
-  display: flex;
+  display: grid;
   align-items: center;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) var(--settings-action-min-width);
+  gap: 10px;
 }
 
 .nickname-settings__row .txt {
   min-width: 0;
-  flex: 1 1 auto;
+}
+
+.nickname-settings__row .button,
+.settings-actions .button,
+.data-settings > .button {
+  min-height: var(--settings-action-height);
+  padding: 0 16px;
+  font-size: 13px;
+  box-shadow: none;
+  white-space: nowrap;
 }
 
 .nickname-settings__row .button {
-  min-height: 42px;
-  flex: none;
-  padding-inline: 15px;
-  white-space: nowrap;
+  width: 100%;
 }
 
 .nickname-settings__help {
@@ -291,17 +300,18 @@
 }
 
 .settings-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(var(--settings-action-min-width), 1fr));
+  gap: 10px;
 }
 
 .settings-actions .button {
-  min-height: 40px;
-  padding: 0 15px;
-  font-size: 13px;
-  box-shadow: none;
-  white-space: nowrap;
+  width: 100%;
+}
+
+.account-settings > .settings-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .data-settings {
@@ -313,6 +323,10 @@
   border-radius: var(--r-md);
   padding: 18px;
   background: var(--surface-2);
+}
+
+.data-settings__copy {
+  min-width: 0;
 }
 
 .data-settings__copy strong {
@@ -328,18 +342,21 @@
 }
 
 .data-settings > .button {
+  width: var(--settings-action-min-width);
   flex: none;
-  min-height: 42px;
-  white-space: nowrap;
 }
 
 .reset-confirm {
   display: flex;
-  max-width: 420px;
-  align-items: flex-end;
+  width: min(100%, 280px);
+  align-items: stretch;
   flex-direction: column;
   gap: 10px;
-  text-align: right;
+  text-align: left;
+}
+
+.reset-confirm .settings-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .about-settings {
@@ -414,14 +431,16 @@
   }
 
   .theme-options,
-  .account-details {
+  .account-details,
+  .nickname-settings__row,
+  .account-settings > .settings-actions,
+  .reset-confirm .settings-actions {
     grid-template-columns: 1fr;
   }
 
   .settings-card__heading,
   .data-settings,
-  .reset-confirm,
-  .nickname-settings__row {
+  .reset-confirm {
     align-items: stretch;
     flex-direction: column;
   }
@@ -437,7 +456,7 @@
   }
 
   .reset-confirm {
+    width: 100%;
     max-width: none;
-    text-align: left;
   }
 }
