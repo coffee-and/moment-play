@@ -35,6 +35,15 @@ afterEach(() => {
   signOut.mockClear();
 });
 
+describe("TabBar layout", () => {
+  it("renders the five navigation items and account as six direct grid cells", () => {
+    auth = { status: "authenticated", user: { email: "sky.player@example.com", is_anonymous: false }, signOut };
+    const view = renderTabBar();
+    expect(view.host.querySelector(".tabbar")?.children).toHaveLength(6);
+    view.unmount();
+  });
+});
+
 describe("TabBar account item", () => {
   it("does not flash the guest login item while the initial session is unresolved", () => {
     auth = { status: "loading", user: null, signOut };
