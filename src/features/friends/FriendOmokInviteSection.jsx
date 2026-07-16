@@ -1,4 +1,8 @@
 import { Button } from "../../shared/components/Button.jsx";
+import {
+  getInviteResultMessage,
+  INVITE_STATUS_LABEL,
+} from "../../shared/invitations/inviteStatus.js";
 import { OMOK_MODE_LABEL } from "../minigames/games/omok/omok.constants.js";
 import "./friend-omok-inbox.css";
 
@@ -7,6 +11,18 @@ function formatInviteDeadline(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit" }).format(date);
+}
+
+function formatResultTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function InviteList({ title, description, items, emptyText, busyInviteId, direction, onAccept, onDecline, onCancel, onEnterRoom }) {
@@ -62,9 +78,47 @@ function InviteList({ title, description, items, emptyText, busyInviteId, direct
   );
 }
 
+function RecentInviteResults({ items, onEnterRoom }) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="card friend-invite-results" aria-labelledby="friend-invite-results-title">
+      <header className="friend-invite-results__header">
+        <div>
+          <h3 id="friend-invite-results-title">최근 초대 결과</h3>
+          <p>수락·거절·취소·만료된 최근 기록입니다.</p>
+        </div>
+      </header>
+      <ul className="friend-invite-results__list">
+        {items.map((invite) => {
+          const resultTime = formatResultTime(invite.respondedAt ?? invite.expiresAt);
+          const canEnterRoom = invite.status === "accepted" && invite.direction === "outgoing" && invite.roomId;
+          return (
+            <li key={`${invite.inviteId}:${invite.status}`}>
+              <div className="friend-invite-results__copy">
+                <span className={`friend-invite-results__status is-${invite.status}`}>
+                  {INVITE_STATUS_LABEL[invite.status] ?? invite.status}
+                </span>
+                <strong>{getInviteResultMessage(invite)}</strong>
+                {resultTime ? <time dateTime={invite.respondedAt ?? invite.expiresAt}>{resultTime}</time> : null}
+              </div>
+              {canEnterRoom ? (
+                <Button size="small" type="button" variant="secondary" onClick={() => onEnterRoom(invite)}>
+                  대기실 입장
+                </Button>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 export function FriendOmokInviteSection({
   incoming,
   outgoing,
+  recentResults = [],
   busyInviteId,
   isRefreshing = false,
   onAccept,
@@ -110,6 +164,7 @@ export function FriendOmokInviteSection({
           onEnterRoom={onEnterRoom}
         />
       </div>
+      <RecentInviteResults items={recentResults} onEnterRoom={onEnterRoom} />
     </section>
   );
 }
