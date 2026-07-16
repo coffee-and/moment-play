@@ -164,7 +164,13 @@ export class GameAudioEngine {
   }
 
   playSound(sound) {
-    if (!this.enabled || !this.isRunning) return;
+    if (!this.enabled) return;
+    if (!this.isRunning) {
+      void this.unlock().then((unlocked) => {
+        if (unlocked) this.playSound(sound);
+      });
+      return;
+    }
     const sequences = {
       countdown: [[660, 660, 0.08, 0]],
       countdownFinal: [[880, 1174.66, 0.18, 0]],
