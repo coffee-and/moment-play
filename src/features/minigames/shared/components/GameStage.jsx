@@ -3,6 +3,7 @@ import { Button } from '../../../../shared/components/Button.jsx';
 import { EditorialLabel } from '../../../../shared/components/editorial/EditorialLabel.jsx';
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
+import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
 import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
@@ -119,7 +120,10 @@ export function GameStage({
             {eyebrow ? <EditorialLabel variant="section">{eyebrow}</EditorialLabel> : null}
             <div className="game-stage__title-row">
               <h2>{title}</h2>
-              {guide ? <GameGuideIconButton label={`${title} guide`} onClick={() => setIsGuideOpen(true)} /> : null}
+              <div className="game-stage__title-actions">
+                <SoundToggle compact />
+                {guide ? <GameGuideIconButton label={`${title} guide`} onClick={() => setIsGuideOpen(true)} /> : null}
+              </div>
             </div>
             {description ? <p>{description}</p> : null}
           </div>
