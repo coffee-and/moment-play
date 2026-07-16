@@ -9,9 +9,9 @@ function App() {
     <ThemeProvider>
       <GameAudioProvider>
         <AuthProvider>
-        <InviteNotificationProvider>
-          <AppRoutes />
-        </InviteNotificationProvider>
+          <InviteNotificationProvider>
+            <AppRoutes />
+          </InviteNotificationProvider>
         </AuthProvider>
       </GameAudioProvider>
     </ThemeProvider>
