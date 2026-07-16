@@ -241,6 +241,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       winner: activeWinner,
     })
     : getResultCopy({ activeMatch, draw, resultReason, winner });
+  const resultTitle = resultCopy?.title ?? null;
   const activeForbiddenMessage = !isOnlinePlaying && forbiddenFeedback && activeMatch.explainForbiddenReasons
     ? FORBIDDEN_REASON_LABEL[forbiddenFeedback.reason]
     : null;
@@ -260,7 +261,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     });
 
   useEffect(() => {
-    const resultTitle = resultCopy?.title ?? null;
     if (!resultTitle) {
       resultSoundRef.current = null;
       return;
@@ -268,7 +268,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     if (resultSoundRef.current === resultTitle) return;
     resultSoundRef.current = resultTitle;
     playSound(resultTitle.includes("승리") ? "clear" : "gameOver");
-  }, [playSound, resultCopy?.title]);
+  }, [playSound, resultTitle]);
 
   useEffect(() => {
     let cancelled = false;
