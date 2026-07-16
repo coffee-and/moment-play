@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
@@ -69,6 +70,7 @@ function getCompletedCopy(level) { const nextLevel = getNextLevel(level); if (ne
 
 export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
   const rankingSubmission = useGameResultSubmission();
   const [activePuzzle, setActivePuzzle] = useState(DEFAULT_SUDOKU_PUZZLE);
   const [userValues, setUserValues] = useState(() => createEmptyUserValues());
@@ -136,7 +138,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
 
   function focusCell(index) { window.requestAnimationFrame(() => { cellRefs.current[index]?.focus({ preventScroll: true }); }); }
   function getCurrentElapsedSeconds() { if (!startedAtRef.current) return elapsedSecondsRef.current; return Math.max(0, Math.floor((performance.now() - startedAtRef.current) / 1000)); }
-  function startPuzzle(puzzle) { const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
+  function startPuzzle(puzzle) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
   function startLevel(level) { startPuzzle(getFirstPuzzleByLevel(level)); }
   function requestNewGame() { if (phaseRef.current === SUDOKU_PHASE.IDLE) { startLevel(activeLevel); return; } if (phaseRef.current === SUDOKU_PHASE.COMPLETED) { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); return; } if (phaseRef.current !== SUDOKU_PHASE.RESET_CONFIRM) setPhase(SUDOKU_PHASE.RESET_CONFIRM); }
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
@@ -146,8 +148,25 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function cancelExit() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
   function confirmExit() { startedAtRef.current = null; navigate("/"); }
   function continueAfterComplete() { startLevel(completedCopy.nextLevel); }
-  function completeGame() { const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: currentLevelRecord.bestTimeSeconds === null || finalTimeSeconds < currentLevelRecord.bestTimeSeconds ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: currentRecords.bestTimeSeconds === null || finalTimeSeconds < currentRecords.bestTimeSeconds ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
-  function updateSelectedValue(value) { if (!canEditSelected) return; const index = selectedIndexRef.current; const nextUserValues = [...userValues]; nextUserValues[index] = value; const nextBoard = createBoard(activePuzzle.puzzle, nextUserValues); setUserValues(nextUserValues); if (isBoardComplete(nextBoard, activePuzzle.solution)) completeGame(); }
+  function completeGame() { playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: currentLevelRecord.bestTimeSeconds === null || finalTimeSeconds < currentLevelRecord.bestTimeSeconds ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: currentRecords.bestTimeSeconds === null || finalTimeSeconds < currentRecords.bestTimeSeconds ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
+  function updateSelectedValue(value) {
+    if (!canEditSelected) return;
+    const index = selectedIndexRef.current;
+    const nextUserValues = [...userValues];
+    nextUserValues[index] = value;
+    const nextBoard = createBoard(activePuzzle.puzzle, nextUserValues);
+    const isComplete = isBoardComplete(nextBoard, activePuzzle.solution);
+    setUserValues(nextUserValues);
+    if (isComplete) {
+      completeGame();
+      return;
+    }
+    if (value === 0) {
+      playSound("move");
+      return;
+    }
+    playSound(nextBoard[index] === activePuzzle.solution[index] ? "correct" : "wrong");
+  }
   function eraseSelectedValue() { updateSelectedValue(0); }
   function selectCell(index) { setSelectedIndex(index); }
   function moveSelectedCell(key) { const move = ARROW_KEY_MOVES[key]; if (!move || selectedIndexRef.current === null) return; const row = getRowIndex(selectedIndexRef.current); const column = getColumnIndex(selectedIndexRef.current); const nextRow = clamp(row + move.row, 0, SUDOKU_BOARD_SIZE - 1); const nextColumn = clamp(column + move.column, 0, SUDOKU_BOARD_SIZE - 1); const nextIndex = nextRow * SUDOKU_BOARD_SIZE + nextColumn; setSelectedIndex(nextIndex); focusCell(nextIndex); }
