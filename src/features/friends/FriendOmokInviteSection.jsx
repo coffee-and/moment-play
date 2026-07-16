@@ -61,14 +61,30 @@ function InviteList({ title, description, items, emptyText, busyInviteId, direct
   );
 }
 
-export function FriendOmokInviteSection({ incoming, outgoing, busyInviteId, onAccept, onDecline, onCancel, onEnterRoom }) {
+export function FriendOmokInviteSection({
+  incoming,
+  outgoing,
+  busyInviteId,
+  isRefreshing = false,
+  onAccept,
+  onCancel,
+  onDecline,
+  onEnterRoom,
+  onRefresh,
+}) {
   return (
-    <section className="friend-invite-dashboard" aria-labelledby="friend-invite-dashboard-title">
+    <section className="friend-invite-dashboard" id="omok-invites" aria-labelledby="friend-invite-dashboard-title">
       <header className="friend-invite-dashboard__header">
         <div>
           <p className="eyebrow">Play Together</p>
-          <h2 id="friend-invite-dashboard-title">오목 초대</h2>
+          <h2 id="friend-invite-dashboard-title">오목 초대함</h2>
           <p>친구가 보낸 초대를 수락하거나 내가 만든 대기실로 이동할 수 있어요.</p>
+        </div>
+        <div className="friend-invite-dashboard__refresh">
+          <span>자동 갱신</span>
+          <Button size="small" type="button" variant="secondary" disabled={isRefreshing} onClick={onRefresh}>
+            {isRefreshing ? "갱신 중…" : "새로고침"}
+          </Button>
         </div>
       </header>
       <div className="friend-invite-dashboard__grid">
