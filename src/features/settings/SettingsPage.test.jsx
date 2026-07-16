@@ -14,14 +14,11 @@ let auth = {
   status: "guest",
   user: null,
 };
-let theme = "dark";
-const setTheme = vi.fn();
 const fetchMyFriendProfile = vi.fn();
 const saveCurrentProfileNickname = vi.fn();
 const clearMomentPlayLocalData = vi.fn();
 
 vi.mock("../../shared/auth/AuthContext.jsx", () => ({ useAuth: () => auth }));
-vi.mock("../../shared/theme/ThemeContext.jsx", () => ({ useTheme: () => ({ setTheme, theme }) }));
 vi.mock("../../infrastructure/supabase/friendsGateway.js", () => ({ fetchMyFriendProfile }));
 vi.mock("../../infrastructure/supabase/omokOnlineRoomGateway.js", () => ({ saveCurrentProfileNickname }));
 vi.mock("../../shared/settings/localDataSettings.js", () => ({ clearMomentPlayLocalData }));
@@ -57,8 +54,6 @@ afterEach(() => {
     status: "guest",
     user: null,
   };
-  theme = "dark";
-  setTheme.mockReset();
   fetchMyFriendProfile.mockReset();
   saveCurrentProfileNickname.mockReset();
   clearMomentPlayLocalData.mockReset();
@@ -72,10 +67,10 @@ describe("SettingsPage", () => {
     view.unmount();
   });
 
-  it("changes the selected theme through the shared theme context", async () => {
+  it("does not duplicate the global theme control inside settings", async () => {
     const view = await renderPage();
-    act(() => findButton(view.host, "라이트").click());
-    expect(setTheme).toHaveBeenCalledWith("light");
+    expect(view.host.textContent).not.toContain("화면 테마");
+    expect(view.host.querySelector('[role="radiogroup"]')).toBeNull();
     view.unmount();
   });
 
@@ -95,7 +90,7 @@ describe("SettingsPage", () => {
     expect(view.host.textContent).toContain("달빛여우");
     expect(view.host.textContent).toContain("sky.player@example.com");
     expect(view.host.textContent).toContain("AAAAAAAA01");
-    expect(view.host.querySelector('#account-nickname')?.value).toBe("달빛여우");
+    expect(view.host.querySelector("#account-nickname")?.value).toBe("달빛여우");
     expect(view.host.querySelector('a[href="/friends"]')).not.toBeNull();
     view.unmount();
   });
@@ -119,7 +114,7 @@ describe("SettingsPage", () => {
     const view = await renderPage();
     await act(async () => {});
     await act(async () => changeInput(view.host.querySelector("#account-nickname"), "바비"));
-    await act(async () => findButton(view.host, "닉네임 저장").click());
+    await act(async () => findButton(view.host, "저장").click());
 
     expect(saveCurrentProfileNickname).toHaveBeenCalledWith("바비");
     expect(refreshSession).toHaveBeenCalledTimes(1);
@@ -142,7 +137,7 @@ describe("SettingsPage", () => {
     const view = await renderPage();
     await act(async () => {});
     await act(async () => changeInput(view.host.querySelector("#account-nickname"), "a"));
-    await act(async () => findButton(view.host, "닉네임 저장").click());
+    await act(async () => findButton(view.host, "저장").click());
 
     expect(view.host.querySelector('[role="alert"]')?.textContent).toContain("2자 이상");
     view.unmount();
