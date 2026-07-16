@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
@@ -139,6 +140,7 @@ function CorrectBurst() {
 
 export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
   const rankingSubmission = useGameResultSubmission();
   const initialData = useMemo(() => createMemoryRound(1, MEMORY_SYMBOLS), []);
   const [round, setRound] = useState(1);
@@ -298,6 +300,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   }
 
   function startCountdown(index = 0, durationMs = MEMORY_TIMING.COUNTDOWN_STEP_MS) {
+    playSound(index === COUNTDOWN_LABELS.length - 1 ? "countdownFinal" : "countdown");
     setPhase(PHASE.COUNTDOWN);
     phaseRef.current = PHASE.COUNTDOWN;
     setCountdownIndex(index);
@@ -409,6 +412,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function failRound(reason) {
     if (resolvingRef.current) return;
     resolvingRef.current = true;
+    playSound("gameOver");
     clearActiveTimer();
     clearRoundTransitionTimer();
     clearCorrectFeedback();
@@ -424,6 +428,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function completeRound() {
     if (resolvingRef.current) return;
     resolvingRef.current = true;
+    playSound("clear");
     clearActiveTimer();
     updateBestCompletedRound(roundRef.current);
     setPhase(PHASE.CLEARED);
@@ -450,6 +455,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   }
 
   function showCorrectFeedback(symbol) {
+    playSound("correct");
     if (feedbackTimerRef.current) window.clearTimeout(feedbackTimerRef.current);
     feedbackSequenceRef.current += 1;
     setCorrectFeedback({ symbolId: symbol.id, sequence: feedbackSequenceRef.current });
