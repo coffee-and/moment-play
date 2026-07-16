@@ -31,7 +31,7 @@ export function MiniGameCard({ game, isActive, onSelect }) {
       </span>
       <span className="gc-bot">
         <span className="badge">{STATUS_BADGE_LABEL[game.status] ?? game.status}</span>
-        <span className="gc-play">{statusLabel}<span className="arw" aria-hidden="true" /></span>
+        {canOpen ? <span className="gc-play">{statusLabel}<span className="arw" aria-hidden="true" /></span> : null}
       </span>
     </button>
   );
