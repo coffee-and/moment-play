@@ -591,10 +591,6 @@ a {
     height: 56px;
   }
 
-  .gc-preview-icon {
-    font-size: 19px;
-  }
-
   .gc-name {
     font-size: 15px;
   }
@@ -1045,11 +1041,152 @@ a {
   background: var(--surface-2);
 }
 
-.gc-preview-icon {
+
+.game-card-preview {
+  position: relative;
+  display: grid;
+  width: clamp(46px, 12vw, 68px);
+  aspect-ratio: 1.22;
   color: var(--accent);
+}
+
+.game-card-preview.is-2048,
+.game-card-preview.is-sudoku {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+}
+
+.game-card-preview.is-2048 span {
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--accent) 15%, var(--surface));
   font-family: var(--label);
-  font-size: 26px;
-  font-style: italic;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.game-card-preview.is-memory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.game-card-preview.is-memory span {
+  width: 11px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.game-card-preview.is-memory span:nth-child(2) { opacity: 0.72; transform: translateY(-8px); }
+.game-card-preview.is-memory span:nth-child(3) { opacity: 0.5; }
+.game-card-preview.is-memory span:nth-child(4) { opacity: 0.3; transform: translateY(8px); }
+
+.game-card-preview.is-sudoku {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 2px solid var(--accent);
+  border-radius: 5px;
+}
+
+.game-card-preview.is-sudoku span {
+  display: grid;
+  place-items: center;
+  border-right: 1px solid color-mix(in oklab, var(--accent) 38%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 38%, transparent);
+  font-family: var(--label);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.game-card-preview.is-sudoku span:nth-child(3n) { border-right: 0; }
+.game-card-preview.is-sudoku span:nth-child(n + 7) { border-bottom: 0; }
+
+.game-card-preview.is-omok {
+  border-radius: 5px;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--accent) 42%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--accent) 42%, transparent) 1px, transparent 1px);
+  background-size: 25% 25%;
+  background-position: center;
+}
+
+.game-card-preview.is-omok .preview-stone {
+  position: absolute;
+  width: 15px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px color-mix(in oklab, var(--text) 18%, transparent);
+}
+
+.game-card-preview.is-omok .is-black { top: 20%; left: 24%; background: var(--text); }
+.game-card-preview.is-omok .is-white { top: 49%; left: 49%; border: 1px solid var(--muted); background: var(--surface); }
+.game-card-preview.is-omok .is-accent { right: 8%; bottom: 3%; background: var(--accent); }
+
+.game-card-preview.is-snake {
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.game-card-preview.is-snake span,
+.game-card-preview.is-snake i {
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.game-card-preview.is-snake span:nth-child(1) { grid-column: 1; grid-row: 3; }
+.game-card-preview.is-snake span:nth-child(2) { grid-column: 2; grid-row: 3; }
+.game-card-preview.is-snake span:nth-child(3) { grid-column: 3; grid-row: 3; }
+.game-card-preview.is-snake span:nth-child(4) { grid-column: 3; grid-row: 2; }
+.game-card-preview.is-snake i { grid-column: 6; grid-row: 1; border-radius: 50%; background: var(--accent-2); }
+
+.game-card-preview.is-timing {
+  align-self: center;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 12%, var(--surface));
+}
+
+.game-card-preview.is-timing::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  left: 6px;
+  height: 2px;
+  background: color-mix(in oklab, var(--accent) 34%, transparent);
+}
+
+.game-card-preview.is-timing .preview-target {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  bottom: 2px;
+  left: 54%;
+  width: 24%;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+}
+
+.game-card-preview.is-timing .preview-needle {
+  position: absolute;
+  z-index: 2;
+  top: -6px;
+  bottom: -6px;
+  left: 64%;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--text);
+}
+
+.game-card-preview.is-future {
+  place-items: center;
+  font-family: var(--label);
+  font-size: 30px;
   font-weight: 700;
 }
 
