@@ -8,7 +8,7 @@ import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 
-const OMOK_ROOM_PATH_PATTERN = /^\/minigames\/omok\/room\/[^/]+\/?$/;
+const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
 
 function AccountControl() {
   const { signOut, status, user } = useAuth();
@@ -33,7 +33,7 @@ function AccountControl() {
 
 export function AppLayout() {
   const location = useLocation();
-  const isImmersiveRoom = OMOK_ROOM_PATH_PATTERN.test(location.pathname);
+  const isImmersiveGame = MINIGAME_PLAY_PATH_PATTERN.test(location.pathname);
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
   // navigation. Scroll to an in-page section when the URL carries a hash
@@ -49,13 +49,14 @@ export function AppLayout() {
     window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
 
-  // A joined online room owns its own leave confirmation and server cleanup.
-  // Hide global navigation there so users cannot bypass that flow by jumping
-  // directly to Home, Settings, or another tab from the app chrome.
+  // Every playable game route owns its own exit or return action. Hiding the
+  // global chrome prevents Home, Settings, Ranking, or Friends navigation from
+  // competing with an active attempt. Room routes also preserve their required
+  // leave confirmation and server cleanup flow.
   return (
-    <div className={`moment-app${isImmersiveRoom ? " moment-app--immersive" : ""}`}>
+    <div className={`moment-app${isImmersiveGame ? " moment-app--immersive" : ""}`}>
       <SkyDecoration />
-      {!isImmersiveRoom ? (
+      {!isImmersiveGame ? (
         <header className="hd">
           <div className="wrap hd-in">
             <Brand />
@@ -67,10 +68,10 @@ export function AppLayout() {
           </div>
         </header>
       ) : null}
-      <main className={isImmersiveRoom ? "app-main--immersive" : undefined}>
+      <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>
-      {!isImmersiveRoom ? <TabBar /> : null}
+      {!isImmersiveGame ? <TabBar /> : null}
     </div>
   );
 }
