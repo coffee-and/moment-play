@@ -12,7 +12,7 @@ export function MiniGamePreview({ gameId }) {
   }
 
   if (gameId === "sudoku") {
-    return <span className="game-card-preview is-sudoku">{PreviewCells(["8", "", "2", "", "5", "", "1", "", "9"])}</span>;
+    return <span className="game-card-preview is-sudoku">{PreviewCells(["1", "5", "9"])}</span>;
   }
 
   if (gameId === "omok") {
