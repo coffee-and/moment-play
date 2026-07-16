@@ -8,6 +8,8 @@ import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 
+const OMOK_ROOM_PATH_PATTERN = /^\/minigames\/omok\/room\/[^/]+\/?$/;
+
 function AccountControl() {
   const { signOut, status, user } = useAuth();
 
@@ -31,6 +33,7 @@ function AccountControl() {
 
 export function AppLayout() {
   const location = useLocation();
+  const isImmersiveRoom = OMOK_ROOM_PATH_PATTERN.test(location.pathname);
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
   // navigation. Scroll to an in-page section when the URL carries a hash
@@ -47,22 +50,24 @@ export function AppLayout() {
   }, [location.pathname, location.hash]);
 
   return (
-    <div className="moment-app">
+    <div className={`moment-app${isImmersiveRoom ? " moment-app--immersive" : ""}`}>
       <SkyDecoration />
-      <header className="hd">
-        <div className="wrap hd-in">
-          <Brand />
-          <PrimaryNav />
-          <div className="hd-right">
-            <ThemeToggle />
-            <AccountControl />
+      {!isImmersiveRoom ? (
+        <header className="hd">
+          <div className="wrap hd-in">
+            <Brand />
+            <PrimaryNav />
+            <div className="hd-right">
+              <ThemeToggle />
+              <AccountControl />
+            </div>
           </div>
-        </div>
-      </header>
-      <main>
+        </header>
+      ) : null}
+      <main className={isImmersiveRoom ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>
-      <TabBar />
+      {!isImmersiveRoom ? <TabBar /> : null}
     </div>
   );
 }
