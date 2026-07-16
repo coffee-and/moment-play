@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:db:ranking": "npx supabase db query --linked --file supabase/tests/phase3_game_results_test.sql",
     "test:db:friends": "npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql",
-    "test:db:invites": "npx supabase db query --linked --file supabase/tests/phase5_friend_omok_invites_test.sql"
+    "test:db:invites": "npx supabase db query --linked --file supabase/tests/phase5_friend_omok_invites_test.sql && npx supabase db query --linked --file supabase/tests/phase5_omok_nickname_sync_test.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",

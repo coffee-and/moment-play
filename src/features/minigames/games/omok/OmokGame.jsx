@@ -216,6 +216,15 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   const activeForbiddenPositionKeys = isOnlinePlaying ? online.forbiddenPositionKeys : forbiddenPositionKeys;
   const activeMatchType = isOnlineContext ? MATCH_TYPE.ONLINE : activeMatch.matchType;
   const isGameScreenVisible = isOnlinePlaying || screen === SCREEN.GAME_START || screen === SCREEN.PLAYING;
+  const canEditSidebarNickname = !isOnlineContext && !isGameScreenVisible;
+  const sidebarNickname = isOnlineContext
+    ? (online.currentPlayer?.nickname ?? online.profileNickname ?? GUEST_FALLBACK_NICKNAME)
+    : sharedNickname;
+  const nicknameHelpText = isOnlineContext
+    ? "온라인 대기실과 대국 중에는 닉네임을 변경할 수 없어요."
+    : isGameScreenVisible
+      ? "대국 중에는 닉네임을 변경할 수 없어요."
+      : "대국 전에 사용할 이름을 입력하세요.";
   const activeGameMode = online.room?.gameMode ?? activeMatch.gameMode;
   const currentGuideSettings = {
     explainForbiddenReasons: online.currentPlayer?.explainForbiddenReasons ?? settings.explainForbiddenReasons,
@@ -468,14 +477,19 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
           className="txt"
           id="omok-nickname"
           type="text"
-          value={sharedNickname}
+          value={sidebarNickname}
           maxLength="12"
-          onChange={(event) => setSharedNickname(event.target.value)}
+          readOnly={!canEditSidebarNickname}
+          aria-readonly={!canEditSidebarNickname}
+          onChange={(event) => {
+            if (canEditSidebarNickname) setSharedNickname(event.target.value);
+          }}
           onBlur={() => {
+            if (!canEditSidebarNickname) return;
             saveSharedNickname(sharedNickname).then(setSharedNickname).catch(() => {});
           }}
         />
-        <p className="game-stage__side-note">로그인 전에는 대국에서 사용할 이름만 이 화면에서 입력합니다.</p>
+        <p className="game-stage__side-note">{nicknameHelpText}</p>
       </div>
       <div className="stat-row">
         <div className="stat"><div className="l">Board</div><div className="v">{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>

@@ -25,6 +25,7 @@ vi.mock("../../../../../infrastructure/supabase/omokOnlineRoomGateway.js", () =>
 
 const {
   GUEST_FALLBACK_NICKNAME,
+  getNicknamePrefillForOnlineSetup,
   resolveSharedNickname,
   saveLocalSharedNickname,
   saveSharedNickname,
@@ -49,6 +50,17 @@ describe("resolveSharedNickname precedence", () => {
 
     expect(result).toBe("ServerNick");
     expect(ensureAnonymousSession).not.toHaveBeenCalled();
+  });
+
+  it("does not inherit a previous account's local nickname when the signed-in profile still has a fallback", async () => {
+    isSupabaseConfigured.mockReturnValue(true);
+    getExistingSession.mockResolvedValue({ user: { id: "user-2" } });
+    getProfileByUserId.mockResolvedValue({ nickname: "Guest-abc123" });
+    saveLocalSharedNickname("PreviousUser");
+
+    const result = await resolveSharedNickname();
+
+    expect(result).toBe(GUEST_FALLBACK_NICKNAME);
   });
 
   it("falls back to the locally stored nickname when no session exists", async () => {
@@ -80,6 +92,11 @@ describe("resolveSharedNickname precedence", () => {
     saveLocalSharedNickname("LocalOnly");
 
     expect(ensureAnonymousSession).not.toHaveBeenCalled();
+  });
+
+  it("starts online account nickname setup empty even when a local nickname exists", () => {
+    saveLocalSharedNickname("PreviousUser");
+    expect(getNicknamePrefillForOnlineSetup()).toBe("");
   });
 });
 

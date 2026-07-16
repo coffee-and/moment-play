@@ -93,6 +93,17 @@ export async function saveCurrentProfileNickname(nickname, client = getSupabaseC
     throw new Error(ONLINE_NICKNAME_SAVE_FAILED_MESSAGE);
   }
 
+  // Header/account labels use Supabase user metadata. Keep it aligned with the
+  // public profile nickname so a successful nickname setup does not continue
+  // to show the email prefix until the next login. This is best-effort because
+  // the profile row is the authoritative gameplay identity.
+  const { error: metadataError } = await client.auth.updateUser({
+    data: { nickname: normalizedNickname },
+  });
+  if (metadataError && import.meta.env.DEV) {
+    console.warn("saveCurrentProfileNickname metadata sync failed:", metadataError);
+  }
+
   return {
     userId,
     nickname: normalizedNickname,

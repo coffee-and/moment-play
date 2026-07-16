@@ -8,6 +8,8 @@ import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 
+const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
+
 function AccountControl() {
   const { signOut, status, user } = useAuth();
 
@@ -31,6 +33,7 @@ function AccountControl() {
 
 export function AppLayout() {
   const location = useLocation();
+  const isImmersiveGame = MINIGAME_PLAY_PATH_PATTERN.test(location.pathname);
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
   // navigation. Scroll to an in-page section when the URL carries a hash
@@ -46,23 +49,29 @@ export function AppLayout() {
     window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
 
+  // Every playable game route owns its own exit or return action. Hiding the
+  // global chrome prevents Home, Settings, Ranking, or Friends navigation from
+  // competing with an active attempt. Room routes also preserve their required
+  // leave confirmation and server cleanup flow.
   return (
-    <div className="moment-app">
+    <div className={`moment-app${isImmersiveGame ? " moment-app--immersive" : ""}`}>
       <SkyDecoration />
-      <header className="hd">
-        <div className="wrap hd-in">
-          <Brand />
-          <PrimaryNav />
-          <div className="hd-right">
-            <ThemeToggle />
-            <AccountControl />
+      {!isImmersiveGame ? (
+        <header className="hd">
+          <div className="wrap hd-in">
+            <Brand />
+            <PrimaryNav />
+            <div className="hd-right">
+              <ThemeToggle />
+              <AccountControl />
+            </div>
           </div>
-        </div>
-      </header>
-      <main>
+        </header>
+      ) : null}
+      <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>
-      <TabBar />
+      {!isImmersiveGame ? <TabBar /> : null}
     </div>
   );
 }
