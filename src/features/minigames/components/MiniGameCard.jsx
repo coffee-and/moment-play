@@ -1,5 +1,6 @@
 import { STATUS_BADGE_LABEL, STATUS_CTA_LABEL } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
+import { MiniGamePreview } from "./MiniGamePreview.jsx";
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(" ");
@@ -21,7 +22,7 @@ export function MiniGameCard({ game, isActive, onSelect }) {
         <span className={joinClassNames(["badge", game.category === "Online" ? "online" : ""])}>{game.category}</span>
       </span>
       <span className="gc-preview" aria-hidden="true">
-        <span className="gc-preview-icon">{game.icon}</span>
+        <MiniGamePreview gameId={game.id} />
       </span>
       <span className="minigame-card__body">
         <span className="gc-en">{game.route.replace("/minigames/", "")}</span>
