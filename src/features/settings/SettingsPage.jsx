@@ -216,7 +216,7 @@ export function SettingsPage() {
           {accountMessage ? <p className="settings-notice is-error" role="alert">{accountMessage}</p> : null}
         </section>
 
-        <section className="card settings-card" aria-labelledby="data-title">
+        <section className="card settings-card settings-card--data" aria-labelledby="data-title">
           <div className="settings-card__heading">
             <div>
               <p className="eyebrow">Device Data</p>
@@ -252,7 +252,7 @@ export function SettingsPage() {
           {resetMessage ? <p className="settings-notice" role="status">{resetMessage}</p> : null}
         </section>
 
-        <section className="card settings-card" aria-labelledby="about-title">
+        <section className="card settings-card settings-card--about" aria-labelledby="about-title">
           <div className="settings-card__heading settings-card__heading--about">
             <div>
               <p className="eyebrow">About</p>
