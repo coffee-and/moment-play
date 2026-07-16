@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   cancelFriendOmokInvite,
@@ -19,10 +19,13 @@ import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { Button } from "../../shared/components/Button.jsx";
 import { StatusPanel } from "../../shared/components/StatusPanel.jsx";
+import { useInviteNotifications } from "../../shared/invitations/InviteNotificationContext.jsx";
 import { FriendOmokInviteDialog } from "./FriendOmokInviteDialog.jsx";
 import { FriendOmokInviteSection } from "./FriendOmokInviteSection.jsx";
 import "./friends.css";
 import "./friend-omok-invites.css";
+
+const INVITE_REFRESH_INTERVAL_MS = 20_000;
 
 const LOAD_STATUS = {
   IDLE: "idle",
@@ -137,6 +140,8 @@ function FriendListSection({ title, description, items, emptyText, actionKey, in
 export function FriendsPage() {
   const navigate = useNavigate();
   const { isConfigured, status: authStatus } = useAuth();
+  const { refreshInviteNotifications, syncPendingCountFromInvites } = useInviteNotifications();
+  const inviteRefreshRequestRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const [overview, setOverview] = useState([]);
   const [invites, setInvites] = useState([]);
@@ -145,6 +150,7 @@ export function FriendsPage() {
   const [inviteError, setInviteError] = useState("");
   const [inviteTarget, setInviteTarget] = useState(null);
   const [busyInviteId, setBusyInviteId] = useState("");
+  const [isRefreshingInvites, setIsRefreshingInvites] = useState(false);
   const [searchCode, setSearchCode] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [searchStatus, setSearchStatus] = useState("idle");
@@ -161,7 +167,35 @@ export function FriendsPage() {
     setProfile(nextProfile);
     setOverview(nextOverview);
     setInvites(nextInvites);
-  }, []);
+    syncPendingCountFromInvites(nextInvites);
+  }, [syncPendingCountFromInvites]);
+
+  const refreshInvites = useCallback(({ surfaceError = false } = {}) => {
+    if (inviteRefreshRequestRef.current) return inviteRefreshRequestRef.current;
+
+    setIsRefreshingInvites(true);
+    if (surfaceError) setInviteError("");
+
+    const request = fetchFriendOmokInvites()
+      .then((nextInvites) => {
+        setInvites(nextInvites);
+        syncPendingCountFromInvites(nextInvites);
+        return nextInvites;
+      })
+      .catch((error) => {
+        if (surfaceError) {
+          setInviteError(getFriendlyErrorMessage(error, "오목 초대함을 새로고침하지 못했습니다."));
+        }
+        throw error;
+      })
+      .finally(() => {
+        if (inviteRefreshRequestRef.current === request) inviteRefreshRequestRef.current = null;
+        setIsRefreshingInvites(false);
+      });
+
+    inviteRefreshRequestRef.current = request;
+    return request;
+  }, [syncPendingCountFromInvites]);
 
   useEffect(() => {
     if (authStatus !== "authenticated" || !isConfigured) {
@@ -187,6 +221,27 @@ export function FriendsPage() {
       active = false;
     };
   }, [authStatus, isConfigured, loadDashboard]);
+
+  useEffect(() => {
+    if (authStatus !== "authenticated" || !isConfigured || loadStatus !== LOAD_STATUS.READY) return undefined;
+
+    const refreshSilently = () => {
+      void refreshInvites().catch(() => {});
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") refreshSilently();
+    };
+
+    const intervalId = window.setInterval(refreshSilently, INVITE_REFRESH_INTERVAL_MS);
+    window.addEventListener("focus", refreshSilently);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refreshSilently);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [authStatus, isConfigured, loadStatus, refreshInvites]);
 
   const groups = useMemo(() => ({
     friends: overview.filter((item) => item.status === "accepted"),
@@ -316,6 +371,7 @@ export function FriendsPage() {
     try {
       if (action === "accept") {
         const acceptedInvite = await respondToFriendOmokInvite(invite.inviteId, "accept");
+        void refreshInviteNotifications().catch(() => {});
         navigateToRoom(acceptedInvite?.roomId);
         return;
       }
@@ -324,7 +380,7 @@ export function FriendsPage() {
       } else if (action === "cancel") {
         await cancelFriendOmokInvite(invite.inviteId);
       }
-      await loadDashboard();
+      await refreshInvites({ surfaceError: true });
     } catch (error) {
       setInviteError(getFriendlyErrorMessage(error, "오목 초대를 처리하지 못했습니다."));
     } finally {
@@ -467,10 +523,12 @@ export function FriendsPage() {
               incoming={inviteGroups.incoming}
               outgoing={inviteGroups.outgoing}
               busyInviteId={busyInviteId}
+              isRefreshing={isRefreshingInvites}
               onAccept={(invite) => void handleInviteAction(invite, "accept")}
               onDecline={(invite) => void handleInviteAction(invite, "decline")}
               onCancel={(invite) => void handleInviteAction(invite, "cancel")}
               onEnterRoom={(invite) => navigateToRoom(invite.roomId)}
+              onRefresh={() => void refreshInvites({ surfaceError: true }).catch(() => {})}
             />
 
             <div className="friend-stats" aria-label="친구 현황">

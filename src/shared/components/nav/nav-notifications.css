@@ -1,0 +1,39 @@
+.nav .lk {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav-notification-badge {
+  display: inline-grid;
+  min-width: 17px;
+  height: 17px;
+  place-items: center;
+  border-radius: 999px;
+  padding: 0 4px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--label);
+  font-size: 9px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  box-shadow: 0 2px 8px -4px color-mix(in oklab, var(--accent) 65%, transparent);
+}
+
+.tabbar__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.tabbar__icon .nav-notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -11px;
+  min-width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in oklab, var(--bg) 92%, transparent);
+  padding: 0 3px;
+  font-size: 8px;
+}
