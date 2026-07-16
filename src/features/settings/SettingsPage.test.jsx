@@ -9,6 +9,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let auth = {
   isConfigured: true,
+  refreshSession: vi.fn(),
   signOut: vi.fn(),
   status: "guest",
   user: null,
@@ -16,11 +17,13 @@ let auth = {
 let theme = "dark";
 const setTheme = vi.fn();
 const fetchMyFriendProfile = vi.fn();
+const saveCurrentProfileNickname = vi.fn();
 const clearMomentPlayLocalData = vi.fn();
 
 vi.mock("../../shared/auth/AuthContext.jsx", () => ({ useAuth: () => auth }));
 vi.mock("../../shared/theme/ThemeContext.jsx", () => ({ useTheme: () => ({ setTheme, theme }) }));
 vi.mock("../../infrastructure/supabase/friendsGateway.js", () => ({ fetchMyFriendProfile }));
+vi.mock("../../infrastructure/supabase/omokOnlineRoomGateway.js", () => ({ saveCurrentProfileNickname }));
 vi.mock("../../shared/settings/localDataSettings.js", () => ({ clearMomentPlayLocalData }));
 
 const { SettingsPage } = await import("./SettingsPage.jsx");
@@ -39,10 +42,17 @@ function findButton(host, label) {
   return button;
 }
 
+function changeInput(input, value) {
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+  setter.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 afterEach(() => {
   document.body.innerHTML = "";
   auth = {
     isConfigured: true,
+    refreshSession: vi.fn(async () => {}),
     signOut: vi.fn(async () => {}),
     status: "guest",
     user: null,
@@ -50,6 +60,7 @@ afterEach(() => {
   theme = "dark";
   setTheme.mockReset();
   fetchMyFriendProfile.mockReset();
+  saveCurrentProfileNickname.mockReset();
   clearMomentPlayLocalData.mockReset();
 });
 
@@ -71,6 +82,7 @@ describe("SettingsPage", () => {
   it("loads account and friend-code details for an authenticated user", async () => {
     auth = {
       isConfigured: true,
+      refreshSession: vi.fn(async () => {}),
       signOut: vi.fn(async () => {}),
       status: "authenticated",
       user: { email: "sky.player@example.com", user_metadata: { nickname: "달빛여우" } },
@@ -83,7 +95,36 @@ describe("SettingsPage", () => {
     expect(view.host.textContent).toContain("달빛여우");
     expect(view.host.textContent).toContain("sky.player@example.com");
     expect(view.host.textContent).toContain("AAAAAAAA01");
+    expect(view.host.querySelector('#account-nickname')?.value).toBe("달빛여우");
     expect(view.host.querySelector('a[href="/friends"]')).not.toBeNull();
+    view.unmount();
+  });
+
+  it("saves one account nickname and refreshes the auth session label", async () => {
+    const refreshSession = vi.fn(async () => {});
+    auth = {
+      isConfigured: true,
+      refreshSession,
+      signOut: vi.fn(async () => {}),
+      status: "authenticated",
+      user: { email: "sky.player@example.com", user_metadata: { nickname: "후츄" } },
+    };
+    fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "후츄" });
+    saveCurrentProfileNickname.mockResolvedValue({
+      userId: "user-1",
+      nickname: "바비",
+      needsNicknameSetup: false,
+    });
+
+    const view = await renderPage();
+    await act(async () => {});
+    await act(async () => changeInput(view.host.querySelector("#account-nickname"), "바비"));
+    await act(async () => findButton(view.host, "닉네임 저장").click());
+
+    expect(saveCurrentProfileNickname).toHaveBeenCalledWith("바비");
+    expect(refreshSession).toHaveBeenCalledTimes(1);
+    expect(view.host.textContent).toContain("닉네임을 변경했어요");
+    expect(view.host.querySelector("#account-nickname").value).toBe("바비");
     view.unmount();
   });
 
@@ -91,6 +132,7 @@ describe("SettingsPage", () => {
     const signOut = vi.fn(async () => {});
     auth = {
       isConfigured: true,
+      refreshSession: vi.fn(async () => {}),
       signOut,
       status: "authenticated",
       user: { email: "sky.player@example.com" },
