@@ -2,15 +2,18 @@ import { AppRoutes } from "./routes/AppRoutes.jsx";
 import { AuthProvider } from "./shared/auth/AuthContext.jsx";
 import { InviteNotificationProvider } from "./shared/invitations/InviteNotificationContext.jsx";
 import { ThemeProvider } from "./shared/theme/ThemeContext.jsx";
+import { GameAudioProvider } from "./shared/audio/GameAudioContext.jsx";
 
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <GameAudioProvider>
+        <AuthProvider>
         <InviteNotificationProvider>
           <AppRoutes />
         </InviteNotificationProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </GameAudioProvider>
     </ThemeProvider>
   );
 }
