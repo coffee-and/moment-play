@@ -36,6 +36,7 @@ export function GameStage({
   const rootRef = useRef(null);
   const expandButtonRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const touchTimerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -83,6 +84,22 @@ export function GameStage({
     window.setTimeout(() => focusElement(previousFocusRef.current ?? expandButtonRef.current), 0);
   }
 
+  function handleTouchFeedback(event) {
+    if (event.button != null && event.button !== 0) return;
+    const rootElement = rootRef.current;
+    if (!rootElement) return;
+    const bounds = rootElement.getBoundingClientRect();
+    rootElement.style.setProperty('--game-touch-x', `${event.clientX - bounds.left}px`);
+    rootElement.style.setProperty('--game-touch-y', `${event.clientY - bounds.top}px`);
+    rootElement.classList.remove('has-touch-feedback');
+    void rootElement.offsetWidth;
+    rootElement.classList.add('has-touch-feedback');
+    window.clearTimeout(touchTimerRef.current);
+    touchTimerRef.current = window.setTimeout(() => {
+      rootElement.classList.remove('has-touch-feedback');
+    }, 420);
+  }
+
   function handleToggleExpanded() {
     if (isExpanded) {
       exitExpandedMode();
@@ -91,8 +108,10 @@ export function GameStage({
     enterExpandedMode();
   }
 
+  useEffect(() => () => window.clearTimeout(touchTimerRef.current), []);
+
   return (
-    <section ref={rootRef} className={joinClassNames(['game-stage', isExpanded ? 'is-expanded' : '', isFocusMode ? 'is-focus-mode' : '', className])} aria-label={ariaLabel ?? title}>
+    <section ref={rootRef} onPointerDownCapture={handleTouchFeedback} className={joinClassNames(['game-stage', isExpanded ? 'is-expanded' : '', isFocusMode ? 'is-focus-mode' : '', className])} aria-label={ariaLabel ?? title}>
       <div className="game-stage__inner">
         <aside className="card game-stage__side">
           <span className="board-motif" aria-hidden="true" />
