@@ -49,6 +49,9 @@ export function AppLayout() {
     window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
 
+  // A joined online room owns its own leave confirmation and server cleanup.
+  // Hide global navigation there so users cannot bypass that flow by jumping
+  // directly to Home, Settings, or another tab from the app chrome.
   return (
     <div className={`moment-app${isImmersiveRoom ? " moment-app--immersive" : ""}`}>
       <SkyDecoration />
