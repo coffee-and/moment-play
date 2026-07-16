@@ -1,5 +1,6 @@
 import { Button } from "../../shared/components/Button.jsx";
 import { OMOK_MODE_LABEL } from "../minigames/games/omok/omok.constants.js";
+import "./friend-omok-inbox.css";
 
 function formatInviteDeadline(value) {
   if (!value) return "";
