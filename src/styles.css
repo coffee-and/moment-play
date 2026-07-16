@@ -62,8 +62,6 @@
   --featured-surface: linear-gradient(135deg, #e7f2ff 0%, #f7fbff 100%);
   --featured-border: color-mix(in oklab, var(--accent) 24%, transparent);
   --featured-shadow: 0 12px 26px -18px color-mix(in oklab, var(--accent) 40%, transparent);
-  --featured-cta-bg: var(--accent);
-  --featured-cta-text: var(--on-accent);
 
   /* Shared game-result modal - theme-aware surface/border/shadow. */
   --modal-surface: linear-gradient(160deg, #ffffff 0%, #eaf2ff 100%);
@@ -123,8 +121,6 @@
   --featured-surface: linear-gradient(120deg, var(--night-1), var(--night-2));
   --featured-border: transparent;
   --featured-shadow: var(--sh);
-  --featured-cta-bg: #ffffff;
-  --featured-cta-text: var(--night-1);
 
   --modal-surface: linear-gradient(160deg, var(--night-1), var(--night-2));
   --modal-border: rgba(255, 255, 255, 0.08);
@@ -527,101 +523,8 @@ a {
     transform: translateX(-50%);
   }
 
-  /* Compact hero/featured so the game catalog appears sooner. */
-  .greet {
-    padding: 16px 0 4px;
-  }
-
-  .greet h1 {
-    font-size: 22px;
-  }
-
-  .greet p {
-    margin-top: 4px;
-    font-size: 13.5px;
-  }
-
-  .f-body {
-    padding: 20px;
-  }
-
-  .f-body h2 {
-    margin: 8px 0 6px;
-    font-size: 24px;
-  }
-
-  .f-body p {
-    margin-bottom: 16px;
-    font-size: 13.5px;
-  }
-
-  .f-art {
-    padding: 0 0 18px;
-  }
-
-  .f-art .board {
-    width: 130px;
-    height: 130px;
-  }
-
-  /* Category chips scroll horizontally instead of wrapping. */
-  .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-  }
-
-  .chips::-webkit-scrollbar {
-    display: none;
-  }
-
-  .chipf {
-    flex: 0 0 auto;
-  }
-
-  /* Compact two-column game catalog. */
-  .gcard {
-    min-height: 0;
-    gap: 8px;
-    padding: 12px;
-  }
-
-  .gc-preview {
-    height: 56px;
-  }
-
-  .gc-name {
-    font-size: 15px;
-  }
-
-  .gc-desc {
-    display: -webkit-box;
-    overflow: hidden;
-    margin-top: 3px;
-    font-size: 11.5px;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
-  .gcard .badge {
-    padding: 3px 7px;
-    font-size: 8px;
-  }
-
-  .gc-play {
-    gap: 4px;
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-
-  .gc-play .arw {
-    width: 12px;
-    height: 12px;
-  }
 }
 
-/* Very narrow phones: description adds too much height for two columns. */
 .nav-link,
 .kicker,
 .editorial-label,
@@ -860,10 +763,18 @@ a {
   line-height: 1.5;
 }
 
-.f-body .btn-soft {
-  border: 0;
-  background: var(--featured-cta-bg);
-  color: var(--featured-cta-text);
+.f-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.f-action .arw {
+  width: 14px;
+  height: 14px;
 }
 
 .f-art {
@@ -1237,25 +1148,138 @@ a {
 .gc-play {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  border-radius: 999px;
-  padding: 8px 16px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 12.5px;
-  font-weight: 700;
-  box-shadow: 0 6px 14px -7px var(--accent);
-}
-
-.gcard.soon .gc-play {
-  background: var(--surface-2);
-  color: var(--muted);
-  box-shadow: none;
+  gap: 5px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .gc-play .arw {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 560px) {
+  .greet {
+    padding: 14px 0 2px;
+  }
+
+  .greet h1 {
+    font-size: 21px;
+  }
+
+  .greet p {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .section {
+    margin-bottom: 26px;
+  }
+
+  .featured {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    align-items: center;
+  }
+
+  .f-body {
+    min-width: 0;
+    padding: 17px 8px 17px 18px;
+  }
+
+  .f-tag {
+    font-size: 9px;
+  }
+
+  .f-body h2 {
+    margin: 6px 0 4px;
+    font-size: 20px;
+  }
+
+  .f-body p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-bottom: 9px;
+    font-size: 11.5px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .f-action {
+    font-size: 11.5px;
+  }
+
+  .f-art {
+    padding: 12px 12px 12px 0;
+  }
+
+  .f-art .board {
+    width: 78px;
+    height: 78px;
+    border-radius: 12px;
+  }
+
+  .f-art .stone {
+    width: 13px;
+    height: 13px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chipf {
+    flex: 0 0 auto;
+    padding: 7px 13px;
+  }
+
+  .gcard {
+    min-height: 0;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .gc-preview {
+    height: 52px;
+  }
+
+  .gc-en {
+    font-size: 10.5px;
+  }
+
+  .gc-name {
+    font-size: 15px;
+  }
+
+  .gc-desc {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 3px;
+    font-size: 11px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .gcard .badge {
+    padding: 3px 7px;
+    font-size: 8px;
+  }
+
+  .gc-play {
+    font-size: 11px;
+  }
+
+  .gc-play .arw {
+    width: 11px;
+    height: 11px;
+  }
 }
 
 .game-card {
