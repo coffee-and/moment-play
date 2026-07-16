@@ -1,18 +1,18 @@
-function PreviewCells({ values }) {
+function PreviewCells(values) {
   return values.map((value, index) => <span key={`${value}-${index}`}>{value}</span>);
 }
 
 export function MiniGamePreview({ gameId }) {
   if (gameId === "2048") {
-    return <span className="game-card-preview is-2048">{PreviewCells({ values: ["2", "4", "8", "16"] })}</span>;
+    return <span className="game-card-preview is-2048">{PreviewCells(["2", "4", "8", "16"])}</span>;
   }
 
   if (gameId === "memory") {
-    return <span className="game-card-preview is-memory">{PreviewCells({ values: ["", "", "", ""] })}</span>;
+    return <span className="game-card-preview is-memory">{PreviewCells(["★", "♥", "✿"])}</span>;
   }
 
   if (gameId === "sudoku") {
-    return <span className="game-card-preview is-sudoku">{PreviewCells({ values: ["8", "", "2", "", "5", "", "1", "", "9"] })}</span>;
+    return <span className="game-card-preview is-sudoku">{PreviewCells(["8", "", "2", "", "5", "", "1", "", "9"])}</span>;
   }
 
   if (gameId === "omok") {
