@@ -306,6 +306,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
         void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
         return;
       }
+      playSound("clear");
       setPhase(GAME_2048_PHASE.MILESTONE_CLEAR);
       return;
     }
