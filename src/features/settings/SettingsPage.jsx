@@ -170,7 +170,7 @@ export function SettingsPage() {
                       {isSavingNickname ? "저장 중…" : "저장"}
                     </Button>
                   </div>
-                  <p className="nickname-settings__help">친구 목록, 초대 화면, 온라인 오목에서 공통으로 사용해요.</p>
+                  <p className="nickname-settings__help">친구와 온라인 오목에서 공통으로 사용하는 이름입니다.</p>
                   {nicknameMessage ? (
                     <p
                       className={`settings-notice${nicknameMessageType === "error" ? " is-error" : ""}`}
