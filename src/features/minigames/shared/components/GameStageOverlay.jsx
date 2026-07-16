@@ -2,6 +2,7 @@ import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react
 import { createPortal } from 'react-dom';
 import { MoonMark, SunMark } from '../../../../shared/components/decoration/CelestialMark.jsx';
 import '../styles/game-stage-responsive-actions.css';
+import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -66,9 +67,15 @@ export function GameStageOverlay({
   ...props
 }) {
   const overlayRef = useRef(null);
+  const { popDucking, pushDucking } = useGameAudio();
   const onCloseRef = useRef(onClose);
   const previousFocusRef = useRef(null);
   onCloseRef.current = onClose;
+
+  useEffect(() => {
+    pushDucking();
+    return () => popDucking();
+  }, [popDucking, pushDucking]);
 
   useEffect(() => {
     previousFocusRef.current = document.activeElement;

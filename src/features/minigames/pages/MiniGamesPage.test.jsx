@@ -55,7 +55,10 @@ describe("MiniGamesPage", () => {
     expect(view.host.textContent).not.toContain("Quick match");
     expect(view.host.textContent).not.toContain("UI 보기");
     expect(view.host.textContent).not.toContain("추후 서버 매칭 자리");
-    const omokButton = Array.from(view.host.querySelectorAll("button")).find((button) => button.textContent.includes("오목 시작하기"));
+    expect(view.host.querySelector(".gcard.open .gc-play")?.textContent).toContain("Play");
+    expect(view.host.querySelector(".gcard.soon .gc-play")).toBeNull();
+    const omokButton = view.host.querySelector(".featured");
+    expect(omokButton).not.toBeNull();
     act(() => omokButton.click());
     expect(view.host.textContent).toContain("Omok route");
     view.unmount();

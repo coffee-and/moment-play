@@ -7,6 +7,7 @@ import { SkyDecoration } from "../shared/components/decoration/SkyDecoration.jsx
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
+import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
 
 const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
 
@@ -62,6 +63,7 @@ export function AppLayout() {
             <Brand />
             <PrimaryNav />
             <div className="hd-right">
+              <SoundToggle />
               <ThemeToggle />
               <AccountControl />
             </div>

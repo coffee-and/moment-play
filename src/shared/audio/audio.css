@@ -1,0 +1,82 @@
+.sound-toggle {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: var(--sh-sm);
+  transition: border-color 0.2s, color 0.2s, transform 0.2s, background 0.2s;
+}
+
+.sound-toggle:hover,
+.sound-toggle.is-active {
+  border-color: color-mix(in oklab, var(--accent) 54%, var(--line));
+  color: var(--accent);
+}
+
+.sound-toggle:active {
+  transform: scale(0.92);
+}
+
+.sound-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sound-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sound-toggle--compact {
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sound-unlock-hint {
+  position: fixed;
+  z-index: 90;
+  top: 76px;
+  right: max(16px, calc((100vw - var(--maxw)) / 2 + 18px));
+  max-width: min(300px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 15px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--sh);
+  cursor: pointer;
+  animation: sound-hint-in 0.35s ease-out;
+}
+
+@keyframes sound-hint-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .sound-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .sound-unlock-hint {
+    top: 60px;
+    right: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-unlock-hint {
+    animation: none;
+  }
+}

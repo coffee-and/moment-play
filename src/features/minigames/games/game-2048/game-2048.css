@@ -92,7 +92,7 @@
 }
 
 .game-2048__dpad {
-  display: grid;
+  display: none;
   grid-template-columns: repeat(3, 56px);
   grid-template-rows: repeat(2, 56px);
   gap: 8px;
@@ -154,6 +154,12 @@
   font-style: italic;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+@media (max-width: 1000px) {
+  .game-2048__dpad {
+    display: grid;
+  }
 }
 
 @media (max-width: 620px) {

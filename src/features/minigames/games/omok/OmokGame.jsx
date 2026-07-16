@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -162,6 +163,8 @@ function getPlayerByRole(room, role) {
 
 export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
+  const resultSoundRef = useRef(null);
   const [screen, setScreen] = useState(SCREEN.MENU);
   const [dialog, setDialog] = useState(null);
   const [sharedNickname, setSharedNickname] = useState(GUEST_FALLBACK_NICKNAME);
@@ -238,6 +241,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       winner: activeWinner,
     })
     : getResultCopy({ activeMatch, draw, resultReason, winner });
+  const resultTitle = resultCopy?.title ?? null;
   const activeForbiddenMessage = !isOnlinePlaying && forbiddenFeedback && activeMatch.explainForbiddenReasons
     ? FORBIDDEN_REASON_LABEL[forbiddenFeedback.reason]
     : null;
@@ -255,6 +259,16 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       gameMode: activeMatch.gameMode,
       showForbiddenPositions: activeMatch.showForbiddenPositions,
     });
+
+  useEffect(() => {
+    if (!resultTitle) {
+      resultSoundRef.current = null;
+      return;
+    }
+    if (resultSoundRef.current === resultTitle) return;
+    resultSoundRef.current = resultTitle;
+    playSound(resultTitle.includes("승리") ? "clear" : "gameOver");
+  }, [playSound, resultTitle]);
 
   useEffect(() => {
     let cancelled = false;
@@ -326,6 +340,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   }
 
   function completeStart() {
+    playSound("countdownFinal");
     if (isOnlineContext) setStartedOnlineRound(online.room?.currentRound ?? null);
     else setScreen(SCREEN.PLAYING);
     closeDialog();
@@ -443,6 +458,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   }
 
   function handleIntersectionClick(position) {
+    playSound("move");
     if (isOnlinePlaying) {
       online.submitMove(position);
       return;

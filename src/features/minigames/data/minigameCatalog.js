@@ -4,9 +4,9 @@ export const MINIGAME_STATUS = {
   IN_PROGRESS: "inProgress",
 };
 
-// Card CTA label ("View Details" for playable games, etc.)
+// Compact action label for playable game cards.
 export const STATUS_CTA_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "View Details",
+  [MINIGAME_STATUS.AVAILABLE]: "Play",
   [MINIGAME_STATUS.COMING_SOON]: "Coming Soon",
   [MINIGAME_STATUS.IN_PROGRESS]: "Preview",
 };
@@ -40,7 +40,6 @@ export const MINIGAME_CATALOG = [
     howTo: "방향키 또는 스와이프로 타일을 이동해 합치세요.",
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/2048",
-    icon: "2048",
     category: "Number",
     recordType: "score",
     rankingType: "highScore",
@@ -52,7 +51,6 @@ export const MINIGAME_CATALOG = [
     howTo: "제시된 순서를 기억한 뒤 같은 순서로 선택하세요.",
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/memory",
-    icon: "SEQ",
     category: "Memory",
     recordType: "round",
     rankingType: "bestRound",
@@ -64,7 +62,6 @@ export const MINIGAME_CATALOG = [
     howTo: "빈칸을 선택하고 숫자를 입력해 가로·세로·영역을 완성하세요.",
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/sudoku",
-    icon: "SDK",
     category: "Puzzle",
     recordType: "time",
     rankingType: "bestTime",
@@ -76,10 +73,31 @@ export const MINIGAME_CATALOG = [
     howTo: "교차점을 선택해 돌을 놓고, Standard Omok에서는 흑의 금수 자리를 피하세요.",
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/omok",
-    icon: "5",
     category: "Board",
     recordType: "winRate",
     rankingType: "winRate",
+  },
+  {
+    id: "snake",
+    title: "스네이크",
+    description: "먹이를 모으며 길어지는 꼬리를 피해 최고 점수에 도전해요.",
+    howTo: "방향키·스와이프·화면 버튼으로 이동하고 벽과 꼬리를 피하세요.",
+    status: MINIGAME_STATUS.AVAILABLE,
+    route: "/minigames/snake",
+    category: "Arcade",
+    recordType: null,
+    rankingType: null,
+  },
+  {
+    id: "timing-tap",
+    title: "타이밍 탭",
+    description: "움직이는 바를 목표 구간에 정확히 멈춰 반응 속도를 시험해요.",
+    howTo: "목표 구간과 바가 겹치는 순간 화면이나 Space·Enter를 누르세요.",
+    status: MINIGAME_STATUS.AVAILABLE,
+    route: "/minigames/timing-tap",
+    category: "Reaction",
+    recordType: null,
+    rankingType: null,
   },
   {
     id: "future-puzzle",
@@ -88,7 +106,6 @@ export const MINIGAME_CATALOG = [
     howTo: null,
     status: MINIGAME_STATUS.COMING_SOON,
     route: "/minigames/future-puzzle",
-    icon: "+",
     category: "Puzzle",
     recordType: null,
     rankingType: null,
