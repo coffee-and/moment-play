@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import packageInfo from "../../../package.json";
 import { fetchMyFriendProfile } from "../../infrastructure/supabase/friendsGateway.js";
+import { saveCurrentProfileNickname } from "../../infrastructure/supabase/omokOnlineRoomGateway.js";
 import { FRIENDS_PATH } from "../friends/friendsConstants.js";
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../../shared/auth/authConstants.js";
@@ -18,10 +19,13 @@ const FRIEND_STATUS = {
 };
 
 export function SettingsPage() {
-  const { isConfigured, signOut, status: authStatus, user } = useAuth();
+  const { isConfigured, refreshSession, signOut, status: authStatus, user } = useAuth();
   const { setTheme, theme } = useTheme();
   const [friendProfile, setFriendProfile] = useState(null);
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.IDLE);
+  const [nicknameInput, setNicknameInput] = useState("");
+  const [nicknameMessage, setNicknameMessage] = useState("");
+  const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [accountMessage, setAccountMessage] = useState("");
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
@@ -31,6 +35,7 @@ export function SettingsPage() {
     if (authStatus !== "authenticated" || !isConfigured) {
       setFriendProfile(null);
       setFriendStatus(FRIEND_STATUS.IDLE);
+      setNicknameInput("");
       return undefined;
     }
 
@@ -41,6 +46,7 @@ export function SettingsPage() {
       .then((profile) => {
         if (!active) return;
         setFriendProfile(profile);
+        setNicknameInput(profile?.nickname ?? "");
         setFriendStatus(FRIEND_STATUS.READY);
       })
       .catch(() => {
@@ -52,6 +58,27 @@ export function SettingsPage() {
       active = false;
     };
   }, [authStatus, isConfigured]);
+
+  async function handleNicknameSave(event) {
+    event.preventDefault();
+    setIsSavingNickname(true);
+    setNicknameMessage("");
+
+    try {
+      const savedProfile = await saveCurrentProfileNickname(nicknameInput);
+      setFriendProfile((current) => ({
+        ...(current ?? {}),
+        nickname: savedProfile.nickname,
+      }));
+      setNicknameInput(savedProfile.nickname);
+      await refreshSession?.();
+      setNicknameMessage("닉네임을 변경했어요. 친구와 온라인 게임에서도 이 이름으로 표시됩니다.");
+    } catch (error) {
+      setNicknameMessage(error instanceof Error ? error.message : "닉네임을 변경하지 못했습니다.");
+    } finally {
+      setIsSavingNickname(false);
+    }
+  }
 
   async function handleSignOut() {
     setIsSigningOut(true);
@@ -83,6 +110,7 @@ export function SettingsPage() {
   }
 
   const isPermanentAccount = authStatus === "authenticated";
+  const accountNickname = friendProfile?.nickname ?? getAccountLabel(user);
 
   return (
     <section className="wrap settings-page" aria-labelledby="settings-title">
@@ -148,12 +176,42 @@ export function SettingsPage() {
           ) : isPermanentAccount ? (
             <div className="account-settings">
               <div className="account-settings__identity">
-                <span className="settings-avatar" aria-hidden="true">{getAccountLabel(user).slice(0, 1).toUpperCase()}</span>
+                <span className="settings-avatar" aria-hidden="true">{accountNickname.slice(0, 1).toUpperCase()}</span>
                 <div>
-                  <strong>{getAccountLabel(user)}</strong>
+                  <strong>{accountNickname}</strong>
                   <span>{user?.email ?? "이메일 정보 없음"}</span>
                 </div>
               </div>
+
+              <form className="nickname-settings" onSubmit={handleNicknameSave}>
+                <label className="f-label" htmlFor="account-nickname">닉네임</label>
+                <div className="nickname-settings__row">
+                  <input
+                    className="txt"
+                    id="account-nickname"
+                    type="text"
+                    minLength={2}
+                    maxLength={12}
+                    autoComplete="nickname"
+                    value={nicknameInput}
+                    disabled={friendStatus !== FRIEND_STATUS.READY || isSavingNickname}
+                    onChange={(event) => {
+                      setNicknameInput(event.target.value);
+                      setNicknameMessage("");
+                    }}
+                  />
+                  <Button type="submit" disabled={friendStatus !== FRIEND_STATUS.READY || isSavingNickname}>
+                    {isSavingNickname ? "저장 중…" : "닉네임 저장"}
+                  </Button>
+                </div>
+                <p className="nickname-settings__help">친구 목록, 초대 화면, 온라인 오목에서 공통으로 사용하는 이름이에요.</p>
+              </form>
+
+              {nicknameMessage ? (
+                <p className={`settings-notice${nicknameMessage.includes("못") || nicknameMessage.includes("이상") || nicknameMessage.includes("이하") ? " is-error" : ""}`} role="status">
+                  {nicknameMessage}
+                </p>
+              ) : null}
 
               <dl className="account-details">
                 <div>
