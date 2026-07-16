@@ -4,9 +4,9 @@ export const MINIGAME_STATUS = {
   IN_PROGRESS: "inProgress",
 };
 
-// Card CTA label ("View Details" for playable games, etc.)
+// Compact action label for playable game cards.
 export const STATUS_CTA_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "View Details",
+  [MINIGAME_STATUS.AVAILABLE]: "Play",
   [MINIGAME_STATUS.COMING_SOON]: "Coming Soon",
   [MINIGAME_STATUS.IN_PROGRESS]: "Preview",
 };
