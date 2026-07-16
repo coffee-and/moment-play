@@ -1334,8 +1334,16 @@ a {
 .game-stage__title-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   margin-top: 6px;
+}
+
+.game-stage__title-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
 }
 
 .game-stage__title-row h2 {
