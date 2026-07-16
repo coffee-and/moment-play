@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
@@ -93,6 +94,7 @@ function getNextTargetLabel(targetIndex) {
 
 export function Game2048({ game = DEFAULT_GAME_META }) {
   const navigate = useNavigate();
+  const { playSound } = useGameAudio();
   const rankingSubmission = useGameResultSubmission();
   const [board, setBoard] = useState(() => createEmptyBoard());
   const [score, setScore] = useState(0);
@@ -169,6 +171,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   }
 
   function startNewGame() {
+    playSound("countdownFinal");
     rankingSubmission.startAttempt();
     const nextBoard = createInitialBoard();
     setBoard(nextBoard);
@@ -212,18 +215,24 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
     if (phaseRef.current !== GAME_2048_PHASE.ENDLESS && hasReachedTarget(nextBoard, TARGET_TILES[targetIndexRef.current])) {
       if (targetIndexRef.current === TARGET_TILES.length - 1) {
+        playSound("clear");
         setPhase(GAME_2048_PHASE.COMPLETED);
         void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
         return;
       }
+      playSound("clear");
       setPhase(GAME_2048_PHASE.MILESTONE_CLEAR);
       return;
     }
 
     if (!hasAvailableMove(nextBoard)) {
+      playSound("gameOver");
       setPhase(GAME_2048_PHASE.GAME_OVER);
       void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
+      return;
     }
+
+    playSound(scoreDelta > 0 ? "success" : "move");
   }
 
   function handleMove(direction) {
@@ -231,6 +240,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     const result = moveBoard(boardRef.current, direction);
     if (!result.changed) {
       if (!hasAvailableMove(boardRef.current)) {
+        playSound("gameOver");
         setPhase(GAME_2048_PHASE.GAME_OVER);
         void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
       }
@@ -291,6 +301,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     setTargetIndex(nextIndex);
     if (hasReachedTarget(boardRef.current, TARGET_TILES[nextIndex])) {
       if (nextIndex === TARGET_TILES.length - 1) {
+        playSound("clear");
         setPhase(GAME_2048_PHASE.COMPLETED);
         void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
         return;
@@ -299,6 +310,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
       return;
     }
     if (!hasAvailableMove(boardRef.current)) {
+      playSound("gameOver");
       setPhase(GAME_2048_PHASE.GAME_OVER);
       void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
       return;
@@ -309,6 +321,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   function continueEndless() {
     if (!hasAvailableMove(boardRef.current)) {
+      playSound("gameOver");
       setPhase(GAME_2048_PHASE.GAME_OVER);
       return;
     }
@@ -332,7 +345,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
         <div className="stat"><div className="l">Score</div><div className="v">{formatNumber(score)}</div></div>
         <div className="stat"><div className="l">Best</div><div className="v">{formatNumber(bestScore)}</div></div>
       </div>
-      <p className="game-stage__side-note">방향키, 스와이프, 버튼 입력을 모두 같은 이동 처리로 연결합니다.</p>
+      <p className="game-stage__side-note">데스크톱에서는 방향키로, 터치 화면에서는 스와이프와 방향 버튼으로 이동해요.</p>
     </>
   );
 
