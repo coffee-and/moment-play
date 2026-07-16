@@ -128,6 +128,26 @@ describe("SettingsPage", () => {
     view.unmount();
   });
 
+  it("shows nickname validation failures as alerts", async () => {
+    auth = {
+      isConfigured: true,
+      refreshSession: vi.fn(async () => {}),
+      signOut: vi.fn(async () => {}),
+      status: "authenticated",
+      user: { email: "sky.player@example.com" },
+    };
+    fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "Sky" });
+    saveCurrentProfileNickname.mockRejectedValue(new Error("닉네임은 2자 이상 입력해 주세요."));
+
+    const view = await renderPage();
+    await act(async () => {});
+    await act(async () => changeInput(view.host.querySelector("#account-nickname"), "a"));
+    await act(async () => findButton(view.host, "닉네임 저장").click());
+
+    expect(view.host.querySelector('[role="alert"]')?.textContent).toContain("2자 이상");
+    view.unmount();
+  });
+
   it("uses the shared logout action", async () => {
     const signOut = vi.fn(async () => {});
     auth = {
