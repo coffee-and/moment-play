@@ -1,7 +1,8 @@
 .snake-game__wrap {
   display: grid;
   width: min(100%, 620px);
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
   align-items: center;
   gap: clamp(16px, 3vw, 28px);
 }
@@ -99,7 +100,7 @@
 }
 
 .snake-game__pad {
-  display: grid;
+  display: none;
   width: 132px;
   grid-template-columns: repeat(3, 40px);
   grid-template-rows: repeat(3, 40px);
@@ -138,6 +139,17 @@
   to { transform: scale(1.14) rotate(8deg); }
 }
 
+@media (max-width: 1000px) and (min-width: 621px) {
+  .snake-game__wrap {
+    grid-template-columns: minmax(0, 1fr) auto;
+    justify-items: initial;
+  }
+
+  .snake-game__pad {
+    display: grid;
+  }
+}
+
 @media (max-width: 620px) {
   .snake-game__wrap {
     grid-template-columns: minmax(0, 1fr);
@@ -145,6 +157,7 @@
   }
 
   .snake-game__pad {
+    display: grid;
     width: 150px;
     grid-template-columns: repeat(3, 46px);
     grid-template-rows: repeat(2, 46px);
