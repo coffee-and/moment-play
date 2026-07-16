@@ -1070,39 +1070,45 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 7px;
 }
 
 .game-card-preview.is-memory span {
-  width: 11px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--accent);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: clamp(16px, 3vw, 21px);
+  line-height: 1;
+  text-shadow: 0 3px 10px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
-.game-card-preview.is-memory span:nth-child(2) { opacity: 0.72; transform: translateY(-8px); }
-.game-card-preview.is-memory span:nth-child(3) { opacity: 0.5; }
-.game-card-preview.is-memory span:nth-child(4) { opacity: 0.3; transform: translateY(8px); }
+.game-card-preview.is-memory span:nth-child(1) { transform: translateY(6px) rotate(-8deg); }
+.game-card-preview.is-memory span:nth-child(2) { color: var(--accent-2); transform: translateY(-7px); }
+.game-card-preview.is-memory span:nth-child(3) { transform: translateY(4px) rotate(8deg); }
 
 .game-card-preview.is-sudoku {
   grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border: 2px solid var(--accent);
-  border-radius: 5px;
+  gap: 3px;
+  padding: 2px;
 }
 
 .game-card-preview.is-sudoku span {
   display: grid;
   place-items: center;
-  border-right: 1px solid color-mix(in oklab, var(--accent) 38%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--accent) 38%, transparent);
+  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--surface) 82%, var(--accent) 3%);
+  color: var(--text);
   font-family: var(--label);
   font-size: 9px;
   font-weight: 700;
 }
 
-.game-card-preview.is-sudoku span:nth-child(3n) { border-right: 0; }
-.game-card-preview.is-sudoku span:nth-child(n + 7) { border-bottom: 0; }
+.game-card-preview.is-sudoku span:nth-child(5) {
+  border-color: color-mix(in oklab, var(--accent) 34%, transparent);
+  background: color-mix(in oklab, var(--accent) 13%, var(--surface));
+  color: var(--accent);
+}
 
 .game-card-preview.is-omok {
   border-radius: 5px;
@@ -2517,6 +2523,13 @@ a {
 
 .status-panel__action {
   margin-top: var(--gap);
+}
+
+/* Keep immersive game stages visually balanced after the global header is removed. */
+@media (min-width: 900px) and (min-height: 720px) {
+  .app-main--immersive .minigame-play-page {
+    padding-top: clamp(38px, 6vh, 64px);
+  }
 }
 
 /* Gameplay page (MinigamePlayPage) back-link header */
