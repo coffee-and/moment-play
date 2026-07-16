@@ -1,3 +1,5 @@
+import "./nav-notifications.css";
+
 export function formatNotificationCount(count) {
   const normalized = Math.max(0, Number(count) || 0);
   return normalized > 99 ? "99+" : String(normalized);
