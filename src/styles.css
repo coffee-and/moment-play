@@ -288,52 +288,47 @@ a {
   margin-left: auto;
 }
 
-/* Day/night pill toggle */
-.toggle {
-  position: relative;
-  width: 74px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--chip);
+/* Shared circular header controls: sound and target-theme toggle. */
+.header-icon-button {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
   border: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  padding: 3px;
-}
-
-.toggle .knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 28px;
-  height: 28px;
   border-radius: 50%;
   background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
   box-shadow: var(--sh-sm);
-  transition: transform 0.32s var(--ease);
+  transition: border-color 0.2s, color 0.2s, transform 0.2s, background 0.2s;
 }
 
-[data-theme="dark"] .toggle .knob {
-  transform: translateX(40px);
+.header-icon-button:hover,
+.header-icon-button.is-active {
+  border-color: color-mix(in oklab, var(--accent) 54%, var(--line));
+  color: var(--accent);
 }
 
-.toggle .ic {
-  width: 50%;
-  display: grid;
-  place-items: center;
-  z-index: 1;
+.header-icon-button:active {
+  transform: scale(0.92);
 }
 
-.toggle .ic svg {
-  width: 16px;
-  height: 16px;
+.header-icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
-.toggle .t-sun {
+.header-icon-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-toggle.is-light-target {
   color: #f7a827;
 }
 
-.toggle .t-moon {
+.theme-toggle.is-dark-target {
   color: #8b93c8;
 }
 
@@ -443,6 +438,11 @@ a {
     gap: 6px;
   }
 
+  .header-icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
   .account-control {
     min-width: 60px;
     max-width: 96px;
@@ -465,22 +465,26 @@ a {
   }
 
   .tabbar {
-    display: flex;
+    display: grid;
     position: fixed;
+    right: 0;
     bottom: 0;
     left: 0;
-    right: 0;
     z-index: 60;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     background: color-mix(in srgb, var(--bg) 90%, transparent);
     backdrop-filter: blur(16px);
     border-top: 1px solid var(--line);
     padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
   }
 
+  .tabbar > * {
+    min-width: 0;
+  }
+
   .tabbar a,
   .tabbar-account-menu summary,
   .tabbar-account {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -515,6 +519,14 @@ a {
      menu panel must open upward instead of the header version's downward
      placement (see .account-menu__panel above) or it would render past the
      bottom of the screen. */
+  .tabbar-account-menu {
+    width: 100%;
+  }
+
+  .tabbar-account-menu summary {
+    width: 100%;
+  }
+
   .tabbar-account-menu .account-menu__panel {
     top: auto;
     right: auto;
@@ -945,19 +957,21 @@ a {
 }
 
 .gc-preview {
-  display: grid;
-  place-items: center;
+  display: flex;
   height: 90px;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--r-md);
   background: var(--surface-2);
 }
-
 
 .game-card-preview {
   position: relative;
   display: grid;
   width: clamp(46px, 12vw, 68px);
-  aspect-ratio: 1.22;
+  height: 52px;
+  flex: none;
+  margin: 0 auto;
   color: var(--accent);
 }
 
@@ -998,7 +1012,7 @@ a {
 
 .game-card-preview.is-sudoku {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   gap: 8px;
 }
@@ -1242,6 +1256,11 @@ a {
 
   .gc-preview {
     height: 52px;
+  }
+
+  .game-card-preview {
+    width: min(60px, 70%);
+    height: 40px;
   }
 
   .gc-en {
