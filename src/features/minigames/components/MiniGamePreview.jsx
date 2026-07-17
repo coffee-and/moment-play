@@ -33,6 +33,16 @@ export function MiniGamePreview({ gameId }) {
     );
   }
 
+  if (gameId === "flappy") {
+    return (
+      <span className="game-card-preview is-flappy">
+        <span className="preview-flappy-gate is-left" />
+        <span className="preview-flappy-bird"><i /></span>
+        <span className="preview-flappy-gate is-right" />
+      </span>
+    );
+  }
+
   if (gameId === "timing-tap") {
     return (
       <span className="game-card-preview is-timing">

@@ -7,6 +7,7 @@ export const AUDIO_TRACK = {
   SUDOKU: "sudoku",
   OMOK: "omok",
   SNAKE: "snake",
+  FLAPPY: "flappy",
   TIMING_TAP: "timing-tap",
 };
 
@@ -387,6 +388,69 @@ export const AUDIO_TRACKS = {
         notes: score(
           "D2", null, "D2", "A2", "C2", null, "C2", "G2",
           "Bb1", null, "F2", "Bb2", "C2", null, "G2", "C3",
+        ),
+      },
+    ],
+  },
+  [AUDIO_TRACK.FLAPPY]: {
+    stepMs: 320,
+    echo: { delaySeconds: 0.22, feedback: 0.16, wet: 0.18 },
+    layers: [
+      {
+        id: "sky-melody",
+        waveform: "triangle",
+        volume: 0.054,
+        duration: 0.44,
+        attack: 0.025,
+        notes: score(
+          "D5", "F5", "A5", null, "G5", "E5", "D5", "A4",
+          "Bb4", "D5", "F5", "A5", "G5", "E5", "D5", null,
+        ),
+      },
+      {
+        id: "wing-arp",
+        waveform: "sine",
+        volume: 0.025,
+        duration: 0.27,
+        attack: 0.012,
+        notes: score(
+          "D4", "A4", "F5", "A4", "C4", "G4", "E5", "G4",
+          "Bb3", "F4", "D5", "F4", "C4", "G4", "E5", "G4",
+        ),
+      },
+      {
+        id: "cloud-pad",
+        waveform: "sine",
+        volume: 0.016,
+        duration: 2.4,
+        attack: 0.38,
+        strumMs: 26,
+        notes: score(
+          ["D3", "A3", "D4", "F4"], null, null, null, null, null, null, null,
+          ["Bb2", "F3", "Bb3", "D4"], null, null, null,
+          ["C3", "G3", "C4", "E4"], null, null, null,
+        ),
+      },
+      {
+        id: "flight-bass",
+        waveform: "triangle",
+        volume: 0.042,
+        duration: 0.66,
+        attack: 0.035,
+        notes: score(
+          "D2", null, "A2", null, "C2", null, "G2", null,
+          "Bb1", null, "F2", null, "C2", null, "G2", null,
+        ),
+      },
+      {
+        id: "starlight",
+        waveform: "sine",
+        volume: 0.019,
+        duration: 0.76,
+        attack: 0.015,
+        notes: score(
+          null, "D6", null, null, "A5", null, "E6", null,
+          null, "F6", null, "D6", null, "G6", null, null,
         ),
       },
     ],

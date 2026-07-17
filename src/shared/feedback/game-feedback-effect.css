@@ -1,0 +1,124 @@
+.game-feedback-effect {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--accent);
+}
+
+.game-feedback-effect__flash {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+  animation: game-feedback-flash 0.5s ease-out both;
+}
+
+.game-feedback-effect__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(42vw, 360px);
+  aspect-ratio: 1;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 42px color-mix(in oklab, currentColor 38%, transparent);
+  transform: translate(-50%, -50%);
+  animation: game-feedback-ring 0.72s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.game-feedback-effect__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in oklab, currentColor 54%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 84%, transparent);
+  box-shadow: 0 18px 50px color-mix(in oklab, currentColor 24%, transparent);
+  color: currentColor;
+  font-family: var(--label);
+  font-size: clamp(20px, 5vw, 40px);
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transform: translate(-50%, -50%);
+  animation: game-feedback-label 0.68s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+.game-feedback-effect__particles i {
+  position: absolute;
+  top: var(--particle-y);
+  left: var(--particle-x);
+  color: currentColor;
+  font-family: var(--label);
+  font-size: clamp(18px, 4vw, 34px);
+  font-style: normal;
+  opacity: 0;
+  transform: rotate(var(--particle-rotate));
+  animation: game-feedback-particle 0.72s ease-out var(--particle-delay) both;
+}
+
+.game-feedback-effect.is-start {
+  color: var(--accent);
+}
+
+.game-feedback-effect.is-positive {
+  color: color-mix(in oklab, var(--accent) 72%, #41d7a7);
+}
+
+.game-feedback-effect.is-perfect,
+.game-feedback-effect.is-clear {
+  color: color-mix(in oklab, var(--accent) 60%, #ffd76b);
+}
+
+.game-feedback-effect.is-negative,
+.game-feedback-effect.is-game-over {
+  color: var(--accent-2);
+}
+
+.game-feedback-effect.is-negative .game-feedback-effect__particles,
+.game-feedback-effect.is-negative .game-feedback-effect__ring {
+  display: none;
+}
+
+.game-feedback-effect.is-negative .game-feedback-effect__label {
+  font-size: clamp(17px, 4vw, 28px);
+}
+
+.game-feedback-effect.is-game-over .game-feedback-effect__ring {
+  border-style: dashed;
+}
+
+@keyframes game-feedback-flash {
+  0% { opacity: 0; }
+  24% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes game-feedback-ring {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.22); }
+  38% { opacity: 0.78; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.7); }
+}
+
+@keyframes game-feedback-label {
+  0% { opacity: 0; transform: translate(-50%, -42%) scale(0.72); }
+  42% { opacity: 1; transform: translate(-50%, -54%) scale(1.08); }
+  100% { opacity: 0; transform: translate(-50%, -66%) scale(0.98); }
+}
+
+@keyframes game-feedback-particle {
+  0% { opacity: 0; transform: translateY(14px) scale(0.4) rotate(var(--particle-rotate)); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-26px) scale(1.12) rotate(var(--particle-rotate)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-feedback-effect__flash,
+  .game-feedback-effect__ring,
+  .game-feedback-effect__label,
+  .game-feedback-effect__particles i {
+    animation-duration: 0.01ms;
+  }
+}
