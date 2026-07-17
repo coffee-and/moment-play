@@ -46,6 +46,7 @@ export function FlappyGame({ game }) {
   const worldRef = useRef(world);
   const frameRef = useRef(null);
   const lastFrameRef = useRef(0);
+  const resumeAfterDialogRef = useRef(false);
 
   phaseRef.current = phase;
   worldRef.current = world;
@@ -145,13 +146,15 @@ export function FlappyGame({ game }) {
       navigate("/");
       return;
     }
+    resumeAfterDialogRef.current = phase === "playing";
     if (phase === "playing") pauseGame();
     setIsExitOpen(true);
   }
 
   function closeExitDialog() {
     setIsExitOpen(false);
-    if (phaseRef.current === "paused") resumeGame();
+    if (resumeAfterDialogRef.current) resumeGame();
+    resumeAfterDialogRef.current = false;
   }
 
   const sidebar = (
@@ -185,10 +188,11 @@ export function FlappyGame({ game }) {
         <div
           className="flappy-game__sky"
           role="application"
-          tabIndex="0"
+          tabIndex={0}
           aria-label={`별빛 비행, 현재 점수 ${world.score}. 화면이나 Space·Enter를 눌러 날아오르세요.`}
           onPointerDown={(event) => {
             if (event.button != null && event.button !== 0) return;
+            if (event.target.closest("button")) return;
             event.preventDefault();
             flap();
           }}
