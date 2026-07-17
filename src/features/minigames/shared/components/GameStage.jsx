@@ -1,6 +1,8 @@
 import { Children, isValidElement, useEffect, useRef, useState } from 'react';
 import { Button } from '../../../../shared/components/Button.jsx';
 import { EditorialLabel } from '../../../../shared/components/editorial/EditorialLabel.jsx';
+import { GameFeedbackEffect } from '../../../../shared/feedback/GameFeedbackEffect.jsx';
+import { useGameFeedback } from '../../../../shared/feedback/GameFeedbackContext.jsx';
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
@@ -43,6 +45,7 @@ export function GameStage({
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const isExpanded = isFullscreen || isFocusMode;
   const guide = useGameGuide();
+  const { feedback } = useGameFeedback();
   const resolvedActionLayout = actionLayout ?? (getInlineActionCount(actions) > 1 ? 'stacked' : 'split');
 
   useEffect(() => {
@@ -143,6 +146,7 @@ export function GameStage({
           <div className="game-stage__content">{children}</div>
         </main>
       </div>
+      <GameFeedbackEffect feedback={feedback} />
       {isGuideOpen ? <GameGuideModal guide={guide} onClose={() => setIsGuideOpen(false)} /> : null}
     </section>
   );
