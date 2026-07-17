@@ -1,0 +1,256 @@
+.flappy-game__wrap {
+  display: grid;
+  width: min(100%, 760px);
+  justify-items: center;
+  gap: 14px;
+}
+
+.flappy-game__sky {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--accent) 24%, var(--line));
+  border-radius: var(--r-lg);
+  outline: none;
+  background:
+    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 24%),
+    linear-gradient(180deg, color-mix(in oklab, var(--surface-2) 82%, #172454), var(--surface-2));
+  box-shadow:
+    inset 0 -40px 70px color-mix(in oklab, var(--accent) 8%, transparent),
+    0 20px 54px color-mix(in oklab, var(--text) 10%, transparent);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.flappy-game__sky:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--accent) 72%, transparent);
+  outline-offset: 3px;
+}
+
+.flappy-game__moon {
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  width: clamp(38px, 8vw, 74px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--accent) 22%, var(--surface));
+  box-shadow: 0 0 34px color-mix(in oklab, var(--accent) 32%, transparent);
+}
+
+.flappy-game__moon::after {
+  content: "";
+  position: absolute;
+  top: -8%;
+  left: -20%;
+  width: 92%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--surface-2) 88%, #172454);
+}
+
+.flappy-game__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.68;
+  background-image:
+    radial-gradient(circle, var(--accent) 0 1px, transparent 1.6px),
+    radial-gradient(circle, color-mix(in oklab, var(--text) 62%, transparent) 0 1px, transparent 1.5px);
+  background-position: 12px 18px, 48px 42px;
+  background-size: 64px 58px, 92px 74px;
+  animation: flappy-stars-drift 8s linear infinite;
+}
+
+.flappy-game__score {
+  position: absolute;
+  z-index: 5;
+  top: 6%;
+  left: 50%;
+  min-width: 54px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in oklab, var(--accent) 32%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 74%, transparent);
+  color: var(--text);
+  font-family: var(--label);
+  font-size: clamp(20px, 4vw, 32px);
+  font-style: italic;
+  text-align: center;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.flappy-game__gate {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+}
+
+.flappy-game__pillar {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: block;
+  border: 1px solid color-mix(in oklab, var(--accent) 54%, var(--line));
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--accent) 46%, var(--surface-2)), color-mix(in oklab, var(--accent) 18%, var(--surface)), color-mix(in oklab, var(--accent) 52%, var(--surface-2)));
+  box-shadow: 0 0 24px color-mix(in oklab, var(--accent) 16%, transparent);
+}
+
+.flappy-game__pillar::after {
+  content: "";
+  position: absolute;
+  right: -10%;
+  left: -10%;
+  height: 12px;
+  border: 1px solid color-mix(in oklab, var(--accent) 60%, var(--line));
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--accent) 36%, var(--surface));
+  box-shadow: 0 0 18px color-mix(in oklab, var(--accent) 24%, transparent);
+}
+
+.flappy-game__pillar.is-top {
+  top: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.flappy-game__pillar.is-top::after {
+  bottom: -6px;
+}
+
+.flappy-game__pillar.is-bottom {
+  bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.flappy-game__pillar.is-bottom::after {
+  top: -6px;
+}
+
+.flappy-game__bird {
+  position: absolute;
+  z-index: 4;
+  width: clamp(26px, 5.5vw, 44px);
+  aspect-ratio: 1.28;
+  transform: translate(-50%, -50%) rotate(var(--bird-tilt));
+  transition: transform 0.08s linear;
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--accent) 50%, transparent));
+}
+
+.flappy-game__bird-core {
+  position: absolute;
+  inset: 18% 6% 12% 12%;
+  border: 2px solid color-mix(in oklab, var(--accent) 72%, var(--text));
+  border-radius: 58% 48% 52% 56%;
+  background: color-mix(in oklab, var(--accent) 60%, var(--surface));
+}
+
+.flappy-game__bird-core::after {
+  content: "";
+  position: absolute;
+  top: 24%;
+  right: 18%;
+  width: 10%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--text);
+}
+
+.flappy-game__bird-wing {
+  position: absolute;
+  top: 30%;
+  left: 3%;
+  width: 52%;
+  height: 46%;
+  border-radius: 70% 18% 68% 20%;
+  background: color-mix(in oklab, var(--accent-2) 64%, var(--accent));
+  transform-origin: right center;
+  animation: flappy-wing 0.26s ease-in-out infinite alternate;
+}
+
+.flappy-game__bird-tail {
+  position: absolute;
+  top: 38%;
+  left: -10%;
+  width: 30%;
+  height: 34%;
+  background: var(--accent);
+  clip-path: polygon(100% 50%, 0 0, 18% 50%, 0 100%);
+}
+
+.flappy-game__curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  background: color-mix(in oklab, var(--surface) 78%, transparent);
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.flappy-game__curtain-kicker {
+  color: var(--accent);
+  font-family: var(--label);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.flappy-game__curtain strong {
+  max-width: 460px;
+  font-size: clamp(24px, 5vw, 44px);
+  line-height: 1.12;
+}
+
+.flappy-game__curtain p,
+.flappy-game__hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.flappy-game__hint {
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes flappy-stars-drift {
+  to { background-position: -52px 18px, -44px 42px; }
+}
+
+@keyframes flappy-wing {
+  from { transform: rotate(18deg) scaleY(0.74); }
+  to { transform: rotate(-18deg) scaleY(1.08); }
+}
+
+@media (max-width: 620px) {
+  .flappy-game__sky {
+    aspect-ratio: 4 / 5;
+    max-height: 66vh;
+  }
+
+  .flappy-game__curtain {
+    padding: 18px;
+  }
+
+  .flappy-game__curtain p {
+    max-width: 270px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flappy-game__stars,
+  .flappy-game__bird-wing {
+    animation: none;
+  }
+
+  .flappy-game__bird {
+    transition: none;
+  }
+}
