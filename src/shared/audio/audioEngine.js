@@ -12,6 +12,31 @@ function safeCancel(gain, time) {
   gain.setValueAtTime(gain.value, time);
 }
 
+function createTrackBus(context, config, output) {
+  const input = context.createGain();
+  const nodes = [input];
+  input.connect(output);
+
+  if (config.echo && typeof context.createDelay === "function") {
+    const delay = context.createDelay();
+    const wet = context.createGain();
+    const feedback = context.createGain();
+
+    delay.delayTime.value = config.echo.delaySeconds;
+    wet.gain.value = config.echo.wet;
+    feedback.gain.value = config.echo.feedback;
+
+    input.connect(delay);
+    delay.connect(wet);
+    wet.connect(output);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    nodes.push(delay, wet, feedback);
+  }
+
+  return { input, nodes };
+}
+
 export class GameAudioEngine {
   constructor({ AudioContextClass = getAudioContextConstructor() } = {}) {
     this.AudioContextClass = AudioContextClass;
@@ -92,10 +117,13 @@ export class GameAudioEngine {
     gain.gain.linearRampToValueAtTime(this.ducked ? BGM_DUCK_LEVEL : 1, now + FADE_SECONDS);
     gain.connect(this.context.destination);
 
+    const bus = createTrackBus(this.context, config, gain);
     const track = {
       key: trackKey,
       config,
       gain,
+      input: bus.input,
+      effectNodes: bus.nodes,
       index: 0,
       intervalId: null,
       cleanupTimerId: null,
@@ -107,17 +135,26 @@ export class GameAudioEngine {
 
   playTrackStep(track) {
     if (this.currentTrack !== track || !this.enabled || !this.isRunning) return;
-    const note = track.config.notes[track.index % track.config.notes.length];
-    track.index += 1;
-    if (!note) return;
-    this.playTone({
-      destination: track.gain,
-      duration: track.config.duration,
-      frequency: note,
-      type: track.config.waveform,
-      volume: track.config.volume,
-      attack: 0.12,
+
+    track.config.layers.forEach((layer) => {
+      const event = layer.notes[track.index % layer.notes.length];
+      if (!event) return;
+
+      const frequencies = Array.isArray(event) ? event : [event];
+      frequencies.forEach((frequency, noteIndex) => {
+        this.playTone({
+          destination: track.input,
+          duration: layer.duration,
+          frequency,
+          type: layer.waveform,
+          volume: layer.volume,
+          attack: layer.attack,
+          delay: ((layer.strumMs ?? 0) * noteIndex) / 1000,
+        });
+      });
     });
+
+    track.index += 1;
   }
 
   fadeOutTrack(track) {
@@ -127,6 +164,7 @@ export class GameAudioEngine {
     safeCancel(track.gain.gain, now);
     track.gain.gain.linearRampToValueAtTime(0, now + FADE_SECONDS);
     track.cleanupTimerId = globalThis.setTimeout(() => {
+      track.effectNodes.forEach((node) => node.disconnect());
       track.gain.disconnect();
     }, (FADE_SECONDS + 0.08) * 1000);
   }
@@ -140,6 +178,7 @@ export class GameAudioEngine {
 
   playTone({
     attack = 0.01,
+    delay = 0,
     destination = this.sfxGain,
     duration = 0.12,
     endFrequency,
@@ -148,19 +187,20 @@ export class GameAudioEngine {
     volume = 0.09,
   }) {
     if (!this.context || !this.enabled || !this.isRunning || !destination) return;
-    const now = this.context.currentTime;
+    const startTime = this.context.currentTime + Math.max(delay, 0);
+    const endTime = startTime + duration;
     const oscillator = this.context.createOscillator();
     const gain = this.context.createGain();
     oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, now);
-    if (endFrequency) oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + duration);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(volume, now + attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    if (endFrequency) oscillator.frequency.exponentialRampToValueAtTime(endFrequency, endTime);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(volume, startTime + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
     oscillator.connect(gain);
     gain.connect(destination);
-    oscillator.start(now);
-    oscillator.stop(now + duration + 0.02);
+    oscillator.start(startTime);
+    oscillator.stop(endTime + 0.02);
   }
 
   playSound(sound) {
