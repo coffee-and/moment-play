@@ -54,10 +54,11 @@ afterEach(() => {
 });
 
 describe("MinigamePlayPage exit policy", () => {
-  it("keeps the game-list return link for ordinary single-game routes", () => {
+  it("renders ordinary single-game routes without an online room id", () => {
     const view = renderPage("/minigames/2048");
-    expect(view.host.querySelector('a[href="/"]')?.textContent).toContain("게임 목록으로");
+    expect(view.host.querySelector('a[href="/"]')).toBeNull();
     expect(receivedRoomId).toBeNull();
+    expect(view.host.textContent).toContain("Game content");
     view.unmount();
   });
 
