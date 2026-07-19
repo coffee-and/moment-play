@@ -10,6 +10,8 @@ import { SettingsPage } from "../features/settings/SettingsPage.jsx";
 import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
 import { COMPLETE_SIGNUP_PATH, LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
 import { MiniGamesPage } from "../features/minigames/pages/MiniGamesPage.jsx";
+import { HomePage } from "../features/minigames/pages/HomePage.jsx";
+import { MINIGAMES_PATH } from "../features/minigames/data/minigameCatalog.js";
 import { MinigamePlayPage } from "../features/minigames/pages/MinigamePlayPage.jsx";
 import { RankingPage } from "../features/ranking/RankingPage.jsx";
 import { RANKING_PATH } from "../features/ranking/rankingConstants.js";
@@ -19,7 +21,8 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<MiniGamesPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path={MINIGAMES_PATH} element={<MiniGamesPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path={LOGIN_PATH} element={<LoginPage />} />
         <Route path={SIGNUP_PATH} element={<SignupPage />} />

@@ -1,3 +1,6 @@
+import memoryCardPreview from "../../../assets/figma/memory-card-preview.png";
+import starFlightCardPreview from "../../../assets/figma/star-flight-card-preview.png";
+
 function PreviewCells(values) {
   return values.map((value, index) => <span key={`${value}-${index}`}>{value}</span>);
 }
@@ -8,7 +11,7 @@ export function MiniGamePreview({ gameId }) {
   }
 
   if (gameId === "memory") {
-    return <span className="game-card-preview is-memory">{PreviewCells(["♥️", "🎀", "✨", "🍃"])}</span>;
+    return <img className="game-card-preview is-memory" src={memoryCardPreview} alt="" />;
   }
 
   if (gameId === "sudoku") {
@@ -25,12 +28,7 @@ export function MiniGamePreview({ gameId }) {
   }
 
   if (gameId === "flappy") {
-    return (
-      <span className="game-card-preview is-flappy">
-        <span className="preview-flappy-fish"><i /></span>
-        <span className="preview-flappy-sparkle">✦</span>
-      </span>
-    );
+    return <img className="game-card-preview is-flappy" src={starFlightCardPreview} alt="" />;
   }
 
   if (gameId === "timing-tap") {

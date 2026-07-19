@@ -1,19 +1,11 @@
-// Shared sun/moon glyphs - reused by the header Brand logo and the modal's
-// day/night sky decoration, so the same recognizable shapes appear in both
-// places instead of two separate implementations drifting apart. Both use
-// currentColor; the consumer sets `color` on a wrapping element (see
-// Brand.jsx and GameStageOverlay.jsx) to the appropriate decoration token.
-export function SunMark() {
-  return (
-    <>
-      <circle cx="16" cy="16" r="7" fill="currentColor" />
-      <g stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-        <path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.5 6.5l2.1 2.1M23.4 23.4l2.1 2.1M25.5 6.5l-2.1 2.1M8.6 23.4l-2.1 2.1" />
-      </g>
-    </>
-  );
-}
-
+// The Figma wordmark is built from a 40px circle with a 36px offset cutout.
+// Keep that geometry here so every rendered logo uses the approved crescent.
 export function MoonMark() {
-  return <path d="M23.5 19.2A9.5 9.5 0 1 1 12.8 4a7.5 7.5 0 0 0 10.7 15.2Z" fill="currentColor" />;
+  return (
+    <path
+      d="M20 0a20 20 0 1 0 20 20A20 20 0 0 0 20 0Zm12-6a18 18 0 1 1 0 36 18 18 0 1 1 0-36Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  );
 }

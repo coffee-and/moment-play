@@ -5,23 +5,24 @@ function joinClassNames(values) {
   return values.filter(Boolean).join(" ");
 }
 
-export function MiniGameCard({ game, onSelect }) {
+export function MiniGameCard({ game, onSelect, showCategory = false, variant = "catalog" }) {
   const canOpen = Boolean(getMinigameComponent(game.id));
 
   return (
     <button
       type="button"
-      className={joinClassNames(["minigame-card", "gcard", canOpen ? "open" : "soon"])}
+      className={joinClassNames(["minigame-card", "gcard", `gcard--${variant}`, canOpen ? "open" : "soon"])}
       data-game={game.id}
       disabled={!canOpen}
       onClick={() => onSelect(game.id)}
     >
+      {showCategory ? <span className="gc-category">{game.category}</span> : null}
       <span className="gc-preview" aria-hidden="true">
         <MiniGamePreview gameId={game.id} />
       </span>
       <span className="minigame-card__body">
         <strong className="gc-name">{game.title}</strong>
-        <span className="gc-desc">{game.description}</span>
+        <span className="gc-desc">{variant === "home" ? (game.homeCardDescription ?? game.cardDescription ?? game.description) : (game.cardDescription ?? game.description)}</span>
       </span>
       <span className="gc-bot">
         {canOpen ? <span className="gc-play">Play <span className="arw" aria-hidden="true" /></span> : <span className="gc-soon">준비 중</span>}

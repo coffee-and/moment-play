@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppLayout } from "../../../layouts/AppLayout.jsx";
+import { HomePage } from "./HomePage.jsx";
 import { MiniGamesPage } from "./MiniGamesPage.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -20,15 +21,15 @@ function renderPage({ withLayout = false } = {}) {
   document.body.appendChild(host);
   const root = createRoot(host);
   act(() => root.render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={["/games"]}>
       <Routes>
         {withLayout ? (
           <Route element={<AppLayout />}>
-            <Route path="/" element={<MiniGamesPage />} />
+            <Route path="/games" element={<MiniGamesPage />} />
           </Route>
         ) : (
           <>
-            <Route path="/" element={<MiniGamesPage />} />
+            <Route path="/games" element={<MiniGamesPage />} />
             <Route path="/minigames/omok" element={<div>Omok route</div>} />
           </>
         )}
@@ -54,11 +55,30 @@ describe("MiniGamesPage", () => {
     expect(view.host.textContent).not.toContain("추후 서버 매칭 자리");
     expect(view.host.querySelector(".gcard.open .gc-play")?.textContent).toContain("Play");
     expect(view.host.querySelector(".gcard.soon .gc-play")).toBeNull();
-    const omokButton = view.host.querySelector(".featured");
+    const omokButton = view.host.querySelector('[data-game="omok"]');
     expect(omokButton).not.toBeNull();
     act(() => omokButton.click());
     expect(view.host.textContent).toContain("Omok route");
     view.unmount();
+  });
+
+  it("keeps the Figma home hierarchy separate from the full catalog", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    act(() => root.render(
+      <MemoryRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/minigames/omok" element={<div>Omok route</div>} />
+        </Routes>
+      </MemoryRouter>,
+    ));
+
+    expect(host.querySelector(".featured")).not.toBeNull();
+    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(3);
+    expect(host.querySelector(".games-catalog")).toBeNull();
+    act(() => root.unmount());
   });
 
   it("filters the catalog by category", () => {

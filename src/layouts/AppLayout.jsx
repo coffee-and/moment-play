@@ -35,8 +35,8 @@ export function AppLayout() {
   const isImmersiveGame = MINIGAME_PLAY_PATH_PATTERN.test(location.pathname);
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
-  // navigation. Scroll to an in-page section when the URL carries a hash
-  // (e.g. the "게임" nav item linking to "/#games"), otherwise reset to top.
+  // navigation. Scroll to an in-page section when a route carries a hash;
+  // otherwise reset to the top of the new screen.
   useEffect(() => {
     if (location.hash) {
       const target = document.getElementById(location.hash.slice(1));
