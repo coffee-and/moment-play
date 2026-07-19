@@ -87,11 +87,6 @@ a {
 }
 
 .moment-app {
-  /* Establishes a local stacking context (without position/z-index side
-     effects) so SkyDecoration's negative z-index is scoped to this app
-     shell instead of competing with the document root - otherwise this
-     element's own opaque background paints over it. See SkyDecoration.jsx. */
-  isolation: isolate;
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
