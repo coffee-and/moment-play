@@ -92,7 +92,7 @@
 .friend-code-card__value code {
   overflow-wrap: anywhere;
   color: var(--accent-2);
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font);
   font-size: clamp(20px, 4vw, 28px);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -110,7 +110,7 @@
 
 .friend-code-input {
   min-width: 0;
-  font-family: "Space Grotesk", var(--font);
+  font-family: var(--font);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;

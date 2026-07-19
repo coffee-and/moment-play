@@ -1,3 +1,27 @@
+@font-face {
+  font-family: "NanumSquareRound";
+  src: url("./assets/fonts/NanumSquareRoundOTFR.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "NanumSquareRound";
+  src: url("./assets/fonts/NanumSquareRoundOTFB.otf") format("opentype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "NanumSquareRound";
+  src: url("./assets/fonts/NanumSquareRoundOTFEB.otf") format("opentype");
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
 /*
  * Light is the only shipped theme. Components consume semantic tokens instead
  * of theme-specific colors, so a future dark theme can be introduced by
@@ -20,8 +44,8 @@
   --accent-yellow: #f6c85f;
   --chip: #eef3fb;
   --star: #f6c85f;
-  --font: "Pretendard Variable", Pretendard, system-ui, sans-serif;
-  --label: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --font: "NanumSquareRound", system-ui, sans-serif;
+  --label: "NanumSquareRound", system-ui, sans-serif;
   --r-xl: 28px;
   --r-lg: 20px;
   --r-md: 14px;
@@ -64,7 +88,18 @@ body {
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   font-family: var(--font);
+  font-weight: 400;
   transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+h1 {
+  font-weight: 800;
+}
+
+h2,
+h3,
+h4 {
+  font-weight: 700;
 }
 
 button,
@@ -190,14 +225,14 @@ a {
   padding: 9px 0;
   border-radius: 9px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--muted);
   transition: color 0.2s;
 }
 
 .nav .lk.on {
   color: var(--accent-2);
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .nav .lk:hover {
@@ -376,7 +411,7 @@ a {
     align-items: center;
     gap: 2px;
     font-size: 10.5px;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--muted);
     padding: 3px 0;
   }
@@ -563,7 +598,7 @@ a {
 .home-page { padding: 0 46px 72px; }
 .minigames-page { padding-top: 30px; padding-bottom: 72px; }
 .greet { width: min(880px, 100%); padding: 38px 0 28px; }
-.greet h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.3; }
+.greet h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.3; }
 .greet p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
 .section { margin-bottom: 36px; }
 .featured-section { width: min(880px, 100%); }
@@ -585,10 +620,10 @@ a {
 }
 .featured::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 16% 78%, rgba(255,255,255,.35) 0 1px, transparent 2px), radial-gradient(circle at 77% 21%, rgba(246,200,95,.7) 0 2px, transparent 3px); }
 .f-body { position: relative; z-index: 2; display: block; width: 54%; padding: 24px 28px; }
-.f-tag { color: #ffe080; font-size: 11px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
-.f-body h2 { margin: 12px 0 0; font-family: "Nanum Pen Script", "Nanum Pen", var(--font); font-size: 38px; font-weight: 400; line-height: 1.2; }
+.f-tag { color: #ffe080; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.f-body h2 { margin: 12px 0 0; font-family: var(--font); font-size: 38px; font-weight: 700; line-height: 1.2; }
 .f-body p { max-width: 34ch; margin: 0 0 19px; color: #dbe5f4; font-size: 14px; }
-.f-action { display: inline-flex; width: 136px; min-height: 44px; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--featured-surface); border-radius: 12px; padding: 0 20px; background: #fff; color: var(--featured-surface); box-shadow: var(--sh-sm); font-size: 14px; font-weight: 600; }
+.f-action { display: inline-flex; width: 136px; min-height: 44px; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--featured-surface); border-radius: 12px; padding: 0 20px; background: #fff; color: var(--featured-surface); box-shadow: var(--sh-sm); font-size: 14px; font-weight: 700; }
 .f-action .arw { width: 14px; height: 14px; }
 .f-art { position: absolute; z-index: 1; left: 293px; top: 0; width: 438px; height: 205px; }
 .featured-cat { display: block; width: 438px; height: 205px; object-fit: contain; }
@@ -619,7 +654,7 @@ a {
 .gcard[data-game="timing-tap"] { --game-accent: #f29362; }
 .gcard.open:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--game-accent) 45%, var(--line)); box-shadow: var(--sh); }
 .gcard.soon { cursor: not-allowed; opacity: .6; }
-.gc-category { color: #6b7280; font-size: 10px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
+.gc-category { color: #6b7280; font-size: 10px; font-weight: 400; letter-spacing: .02em; text-transform: uppercase; }
 .gc-preview { display: flex; min-width: 0; height: 92px; align-items: center; justify-content: center; border-radius: 15px; background: var(--surface-2); }
 .game-card-preview { position: relative; display: grid; width: 138px; height: 64px; flex: none; margin: 0 auto; color: var(--game-accent); }
 .game-card-preview.is-2048 { grid-template-columns: repeat(3, 38px); align-items: center; justify-content: center; gap: 6px; }
@@ -727,7 +762,7 @@ a {
 
 .game-stage__topbar-title { display: flex; min-width: 0; flex-direction: column; }
 .game-stage__topbar-title strong { overflow: hidden; color: var(--text); font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
-.game-stage__topbar-title span { color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .06em; }
+.game-stage__topbar-title span { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .06em; }
 .game-stage__topbar-actions { display: flex; align-items: center; gap: 8px; }
 .game-stage__topbar-game-actions { display: flex; align-items: center; }
 .game-stage__topbar-game-actions .button { width: auto; padding-inline: 14px; font-size: 12px; }
@@ -765,7 +800,7 @@ a {
 .game-stage__title-row h2 {
   margin: 0;
   font-size: clamp(26px, 3vw, 34px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.1;
 }
@@ -919,7 +954,7 @@ a {
 .game-stage-modal h3 {
   margin: 0 0 10px;
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -964,7 +999,7 @@ a {
   color: var(--muted);
   font-family: var(--label);
   font-size: 9.5px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1018,7 +1053,7 @@ a {
   color: var(--accent-2);
   font-family: var(--label);
   font-size: 9.5px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1147,7 +1182,7 @@ a {
   color: var(--text);
   cursor: pointer;
   font-size: clamp(15px, 2.6vw, 21px);
-  font-weight: 600;
+  font-weight: 700;
   user-select: none;
   transition: background 0.15s;
 }
@@ -1206,7 +1241,7 @@ a {
   cursor: pointer;
   font-family: var(--label);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   transition: transform 0.15s, border-color 0.15s;
 }
 
@@ -1244,7 +1279,7 @@ a {
   margin: 6px 0 0;
   color: var(--text);
   font-size: 21px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -1276,7 +1311,7 @@ a {
   justify-content: space-between;
   gap: 8px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .omok-game__menu-desc {
@@ -1654,7 +1689,7 @@ a {
 
 .omok-game__rule-info-list dt {
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .omok-game__rule-info-list dd {

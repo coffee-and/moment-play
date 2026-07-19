@@ -83,7 +83,7 @@
 .friend-invite-results__copy strong {
   overflow: hidden;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
