@@ -42,19 +42,6 @@
   color: var(--muted);
 }
 
-.friends-page__spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--line);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: friends-spin 0.8s linear infinite;
-}
-
-@keyframes friends-spin {
-  to { transform: rotate(360deg); }
-}
-
 .friends-overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);

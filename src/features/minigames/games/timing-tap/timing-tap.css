@@ -53,10 +53,10 @@
   top: 13px;
   bottom: 13px;
   min-width: 9%;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-yellow);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--accent) 16%, transparent);
-  box-shadow: 0 0 24px color-mix(in oklab, var(--accent) 18%, transparent);
+  background: #fff5d4;
+  box-shadow: 0 0 24px rgba(246, 200, 95, 0.2);
 }
 
 .timing-tap__target::after {
@@ -66,7 +66,7 @@
   bottom: 0;
   left: 50%;
   width: 2px;
-  background: color-mix(in oklab, var(--accent) 54%, transparent);
+  background: var(--accent-orange);
   transform: translateX(-50%);
 }
 
@@ -77,7 +77,7 @@
   bottom: 7px;
   width: 5px;
   border-radius: 999px;
-  background: var(--text);
+  background: var(--accent-2);
   box-shadow: 0 0 0 5px color-mix(in oklab, var(--text) 8%, transparent);
   transform: translateX(-50%);
   will-change: left;
@@ -100,12 +100,12 @@
   gap: 3px;
   border: 0;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-orange);
   color: var(--on-accent);
   cursor: pointer;
   box-shadow:
-    0 13px 0 color-mix(in oklab, var(--accent) 72%, var(--text)),
-    0 24px 34px color-mix(in oklab, var(--accent) 30%, transparent);
+    0 10px 0 #d9823f,
+    0 24px 34px rgba(242, 160, 82, 0.28);
   touch-action: manipulation;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
@@ -124,8 +124,8 @@
 
 .timing-tap__tap-button:active {
   box-shadow:
-    0 4px 0 color-mix(in oklab, var(--accent) 72%, var(--text)),
-    0 10px 18px color-mix(in oklab, var(--accent) 22%, transparent);
+    0 3px 0 #d9823f,
+    0 10px 18px rgba(242, 160, 82, 0.2);
   transform: translateY(9px) scale(0.97);
 }
 
@@ -173,6 +173,8 @@
   .timing-tap__track {
     height: 70px;
   }
+
+  .timing-tap__tap-button small { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

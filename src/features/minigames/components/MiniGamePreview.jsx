@@ -4,11 +4,11 @@ function PreviewCells(values) {
 
 export function MiniGamePreview({ gameId }) {
   if (gameId === "2048") {
-    return <span className="game-card-preview is-2048">{PreviewCells(["2", "4", "8", "16"])}</span>;
+    return <span className="game-card-preview is-2048">{PreviewCells(["2", "4", "16"])}</span>;
   }
 
   if (gameId === "memory") {
-    return <span className="game-card-preview is-memory">{PreviewCells(["★", "♥", "✿"])}</span>;
+    return <span className="game-card-preview is-memory">{PreviewCells(["♥️", "🎀", "✨", "🍃"])}</span>;
   }
 
   if (gameId === "sudoku") {
@@ -20,7 +20,6 @@ export function MiniGamePreview({ gameId }) {
       <span className="game-card-preview is-omok">
         <span className="preview-stone is-black" />
         <span className="preview-stone is-white" />
-        <span className="preview-stone is-accent" />
       </span>
     );
   }
@@ -28,9 +27,8 @@ export function MiniGamePreview({ gameId }) {
   if (gameId === "flappy") {
     return (
       <span className="game-card-preview is-flappy">
-        <span className="preview-flappy-gate is-left" />
-        <span className="preview-flappy-bird"><i /></span>
-        <span className="preview-flappy-gate is-right" />
+        <span className="preview-flappy-fish"><i /></span>
+        <span className="preview-flappy-sparkle">✦</span>
       </span>
     );
   }

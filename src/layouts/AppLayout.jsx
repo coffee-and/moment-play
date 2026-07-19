@@ -3,10 +3,8 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { Brand } from "../shared/components/Brand.jsx";
-import { SkyDecoration } from "../shared/components/decoration/SkyDecoration.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
-import { ThemeToggle } from "../shared/components/nav/ThemeToggle.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
 
 const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
@@ -56,7 +54,6 @@ export function AppLayout() {
   // leave confirmation and server cleanup flow.
   return (
     <div className={`moment-app${isImmersiveGame ? " moment-app--immersive" : ""}`}>
-      <SkyDecoration />
       {!isImmersiveGame ? (
         <header className="hd">
           <div className="wrap hd-in">
@@ -64,7 +61,6 @@ export function AppLayout() {
             <PrimaryNav />
             <div className="hd-right">
               <SoundToggle />
-              <ThemeToggle />
               <AccountControl />
             </div>
           </div>

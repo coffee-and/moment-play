@@ -67,13 +67,6 @@ describe("SettingsPage", () => {
     view.unmount();
   });
 
-  it("does not duplicate the global theme control inside settings", async () => {
-    const view = await renderPage();
-    expect(view.host.textContent).not.toContain("화면 테마");
-    expect(view.host.querySelector('[role="radiogroup"]')).toBeNull();
-    view.unmount();
-  });
-
   it("loads account and friend-code details for an authenticated user", async () => {
     auth = {
       isConfigured: true,

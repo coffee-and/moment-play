@@ -63,6 +63,7 @@
   width: min(720px, 100%);
   flex-direction: column;
   padding: 18px 20px;
+  background: var(--surface);
 }
 
 .memory-game__problem-panel .game-item-panel__title-row,
@@ -83,7 +84,6 @@
 
 .memory-game__selection-panel {
   min-height: clamp(150px, 17vw, 190px);
-  container: memory-selection / inline-size;
 }
 
 .memory-sequence {
@@ -92,13 +92,13 @@
   max-width: 100%;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  gap: 4px;
   margin: 0 auto;
 }
 
 .memory-sequence__item {
   display: flex;
-  min-width: 58px;
+  min-width: 52px;
   flex-direction: column;
   align-items: center;
   gap: 2px;
@@ -153,18 +153,18 @@
   display: grid;
   width: 100%;
   max-width: 100%;
-  grid-template-columns: repeat(8, minmax(60px, 74px));
+  grid-template-columns: repeat(4, 70px);
   justify-content: center;
   justify-items: center;
-  gap: 12px;
+  gap: 7px;
   margin: 0 auto;
 }
 
 .memory-card {
   position: relative;
   display: flex;
-  width: 74px;
-  height: 74px;
+  width: 70px;
+  height: 70px;
   align-items: center;
   justify-content: center;
   border: 2px solid var(--line);
@@ -316,12 +316,6 @@
   }
 }
 
-@container memory-selection (max-width: 670px) {
-  .memory-card-grid {
-    grid-template-columns: repeat(4, 74px);
-  }
-}
-
 @media (max-width: 620px) {
   .memory-card {
     width: 64px;
@@ -331,7 +325,8 @@
 
   .memory-card-grid {
     grid-template-columns: repeat(4, 64px);
-    gap: 11px;
+    column-gap: 6px;
+    row-gap: 10px;
   }
 
   .memory-sequence__item {

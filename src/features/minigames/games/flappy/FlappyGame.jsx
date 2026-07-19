@@ -190,7 +190,6 @@ export function FlappyGame({ game }) {
       className="flappy-game"
       description={game.description}
       eyebrow="ARCADE / FLIGHT"
-      fullscreenEnabled
       sidebar={sidebar}
       title={game.title}
     >

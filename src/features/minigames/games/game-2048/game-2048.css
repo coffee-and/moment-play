@@ -54,27 +54,32 @@
 }
 
 .game-2048__cell[data-value="2"] {
-  background: color-mix(in oklab, var(--accent) 10%, var(--game-2048-empty-cell-bg));
+  background: #dce8fb;
+  color: #3264b4;
 }
 
 .game-2048__cell[data-value="4"] {
-  background: color-mix(in oklab, var(--accent) 20%, var(--game-2048-empty-cell-bg));
+  background: #cbdcf8;
+  color: #2f5ba1;
 }
 
 .game-2048__cell[data-value="8"] {
-  background: color-mix(in oklab, var(--accent) 34%, var(--game-2048-empty-cell-bg));
+  background: #fcd5dd;
+  color: #bb4762;
 }
 
 .game-2048__cell[data-value="16"] {
-  background: color-mix(in oklab, var(--accent) 50%, var(--game-2048-empty-cell-bg));
+  background: #ffe3a3;
+  color: #b76a0f;
 }
 
 .game-2048__cell[data-value="32"] {
-  background: color-mix(in oklab, var(--accent) 68%, var(--game-2048-empty-cell-bg));
+  background: #ffc482;
+  color: #99550d;
 }
 
 .game-2048__cell[data-value="64"] {
-  background: var(--accent);
+  background: #f59d76;
   color: var(--on-accent);
 }
 

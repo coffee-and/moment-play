@@ -635,7 +635,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       description={game.description}
       actions={gameActions}
       sidebar={sidebar}
-      fullscreenEnabled
       ariaLabel={game.title}
     >
       <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>

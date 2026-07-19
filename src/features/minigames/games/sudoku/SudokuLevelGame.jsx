@@ -174,7 +174,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty"]); }
 
   return (
-    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} fullscreenEnabled ariaLabel={game.title}>
+    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} ariaLabel={game.title}>
       <div ref={stageContentRef} className="sudoku-game__stage" aria-hidden={isStageCovered ? "true" : undefined} onKeyDown={handleGameKeyDown}>
         {phase === SUDOKU_PHASE.IDLE ? (
           <GameStageModal className="sudoku-game__modal sudoku-game__start" role="region" aria-labelledby="sudoku-game-start-title">

@@ -18,6 +18,7 @@ import {
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { Button } from "../../shared/components/Button.jsx";
+import { LoadingIndicator } from "../../shared/components/LoadingIndicator.jsx";
 import { StatusPanel } from "../../shared/components/StatusPanel.jsx";
 import { useInviteNotifications } from "../../shared/invitations/InviteNotificationContext.jsx";
 import { FriendOmokInviteDialog } from "./FriendOmokInviteDialog.jsx";
@@ -426,9 +427,8 @@ export function FriendsPage() {
         </header>
 
         {loadStatus === LOAD_STATUS.LOADING ? (
-          <div className="card friends-page__loading" role="status">
-            <span className="friends-page__spinner" aria-hidden="true" />
-            친구 정보를 불러오는 중…
+          <div className="card friends-page__loading">
+            <LoadingIndicator label="친구 정보를 불러오는 중…" />
           </div>
         ) : null}
 

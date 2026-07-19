@@ -228,7 +228,7 @@ export function SettingsPage() {
           <div className="data-settings">
             <div className="data-settings__copy">
               <strong>서버 데이터는 유지돼요</strong>
-              <p>로그인 계정, 서버 랭킹, 친구 관계와 현재 테마는 삭제하지 않습니다.</p>
+              <p>로그인 계정, 서버 랭킹과 친구 관계는 삭제하지 않습니다.</p>
             </div>
 
             {!isResetConfirmOpen ? (
@@ -263,7 +263,7 @@ export function SettingsPage() {
           </div>
 
           <div className="about-settings">
-            <div><strong>기기 저장</strong><span>테마, 로컬 최고 기록, 임시 플레이 정보</span></div>
+            <div><strong>기기 저장</strong><span>로컬 최고 기록과 임시 플레이 정보</span></div>
             <div><strong>서버 저장</strong><span>계정, 랭킹, 친구 관계와 온라인 오목 방</span></div>
             <div><strong>현재 단계</strong><span>친구 초대 기능을 준비 중인 출시 전 MVP</span></div>
           </div>

@@ -1,27 +1,19 @@
 import { Link } from "react-router-dom";
-import { useTheme } from "../theme/ThemeContext.jsx";
-import { MoonMark, SunMark } from "./decoration/CelestialMark.jsx";
+import { MoonMark } from "./decoration/CelestialMark.jsx";
 
-// Shared wordmark, used by the app header and the home page footer.
-// The mark itself swaps for the active theme: a warm sun by day, a
-// crescent moon by night - both kept at full opacity for contrast. Shape
-// shared with the modal's sky decoration (see CelestialMark.jsx).
+// Shared wordmark for the app header. The yellow crescent is the fixed
+// Moment Play mark and does not change with the future color theme.
 export function Brand({ className = "" }) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
   return (
     <Link className={`brand ${className}`.trim()} to="/" aria-label="Moment Play 홈으로">
       <svg
         className="brand-icon"
         viewBox="0 0 32 32"
-        role="img"
-        aria-label={isDark ? "밤 테마 로고 아이콘: 초승달" : "낮 테마 로고 아이콘: 해"}
-        style={{ color: isDark ? "var(--decoration-moon)" : "var(--decoration-sun)" }}
+        aria-hidden="true"
       >
-        {isDark ? <MoonMark /> : <SunMark />}
+        <MoonMark />
       </svg>
-      moment<b>PLAY</b>
+      <span>moment <b>PLAY</b></span>
     </Link>
   );
 }

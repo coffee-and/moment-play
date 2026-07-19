@@ -351,7 +351,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   );
 
   return (
-    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} fullscreenEnabled ariaLabel="2048 게임">
+    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} ariaLabel="2048 게임">
       <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === GAME_2048_PHASE.IDLE ? (
           <GameStageModal className="game-2048__modal game-2048__start-modal" role="region" aria-labelledby="game-2048-start-title">

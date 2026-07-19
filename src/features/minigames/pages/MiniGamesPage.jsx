@@ -1,27 +1,22 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../shared/auth/AuthContext.jsx";
-import { AUTH_LABELS, getAccountLabel, LOGIN_PATH, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
-import { Brand } from "../../../shared/components/Brand.jsx";
+import { useNavigate } from "react-router-dom";
+import { FeaturedCat } from "../components/FeaturedCat.jsx";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG } from "../data/minigameCatalog.js";
-
-function FooterAccountItem() {
-  const { status, user } = useAuth();
-
-  if (status === "loading") return <span aria-label={AUTH_LABELS.loading} />;
-  if (status === "anonymous") return <Link to={SIGNUP_PATH}>{AUTH_LABELS.createAccount}</Link>;
-  if (status === "authenticated") return <span>{getAccountLabel(user)}</span>;
-  return <Link to={LOGIN_PATH}>{AUTH_LABELS.login}</Link>;
-}
 
 export function MiniGamesPage() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const categories = useMemo(() => ["All", ...new Set(MINIGAME_CATALOG.map((game) => game.category))], []);
-  const filteredGames = useMemo(() => activeFilter === "All"
-    ? MINIGAME_CATALOG
-    : MINIGAME_CATALOG.filter((game) => game.category === activeFilter), [activeFilter]);
+  const filteredGames = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase("ko");
+    return MINIGAME_CATALOG.filter((game) => {
+      const matchesCategory = activeFilter === "All" || game.category === activeFilter;
+      const matchesQuery = !normalizedQuery || `${game.title} ${game.description}`.toLocaleLowerCase("ko").includes(normalizedQuery);
+      return matchesCategory && matchesQuery;
+    });
+  }, [activeFilter, searchQuery]);
 
   function openGame(gameId) {
     const game = getMinigameById(gameId);
@@ -37,39 +32,33 @@ export function MiniGamesPage() {
 
       <section className="section" aria-labelledby="featured-title">
         <button type="button" className="featured reveal d2" onClick={() => openGame("omok")}>
-          <span className="fx" aria-hidden="true" />
           <span className="f-body">
             <span className="f-tag">★ Featured</span>
             <h2 id="featured-title">오목</h2>
-            <p>다섯 개를 먼저 잇는 정통 전략 게임. 오늘 머리 좀 굴려볼까요?</p>
+            <p>조용히 생각하고, 결정적인 한 수를 놓아보세요.</p>
             <span className="f-action">바로 플레이<span className="arw" aria-hidden="true" /></span>
           </span>
-          <span className="f-art" aria-hidden="true">
-            <span className="board">
-              <span className="stone is-black" style={{ top: "55%", left: "35%" }} />
-              <span className="stone is-white" style={{ top: "55%", left: "55%" }} />
-              <span className="stone is-black" style={{ top: "35%", left: "55%" }} />
-              <span className="stone is-accent" style={{ top: "75%", left: "75%" }} />
-            </span>
-          </span>
+          <span className="f-art"><FeaturedCat /></span>
         </button>
       </section>
 
       <section className="section" id="games" aria-labelledby="games-title">
-        <div className="sec-head"><span className="sec-title" id="games-title">전체 게임</span><span className="sec-sub">All games</span></div>
-        <div className="chips" role="list" aria-label="Game category filters">
-          {categories.map((category) => <button className={`chipf${category === activeFilter ? " on" : ""}`} type="button" key={category} onClick={() => setActiveFilter(category)}>{category}</button>)}
+        <div className="sec-head">
+          <div><h2 className="sec-title" id="games-title">모든 게임</h2><p className="sec-description">오늘은 어떤 게임을 해볼까요?</p></div>
+          <label className="game-search">
+            <span aria-hidden="true">⌕</span>
+            <span className="sr-only">게임 이름 검색</span>
+            <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="게임 이름 검색" />
+          </label>
+        </div>
+        <div className="chips" role="group" aria-label="게임 카테고리 필터">
+          {categories.map((category) => <button className={`chipf${category === activeFilter ? " on" : ""}`} type="button" key={category} aria-pressed={category === activeFilter} onClick={() => setActiveFilter(category)}>{category}</button>)}
         </div>
         <div className="minigame-hub ggrid" aria-label="Mini-game list">
-          {filteredGames.map((game) => <MiniGameCard key={game.id} game={game} isActive={false} onSelect={openGame} />)}
+          {filteredGames.map((game) => <MiniGameCard key={game.id} game={game} onSelect={openGame} />)}
         </div>
+        {filteredGames.length === 0 ? <p className="games-empty">조건에 맞는 게임이 없어요.</p> : null}
       </section>
-
-      <footer className="card footer">
-        <Brand />
-        <div className="foot-links"><Link to="/">홈</Link><Link to="/#games">게임</Link><FooterAccountItem /></div>
-        <div className="foot-copy">© 2026 momentPLAY · 짧은 순간을 위한 미니게임.</div>
-      </footer>
     </div>
   );
 }

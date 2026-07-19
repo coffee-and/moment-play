@@ -4,7 +4,6 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ThemeProvider } from "../shared/theme/ThemeContext.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 window.scrollTo = vi.fn();
@@ -29,15 +28,13 @@ function renderLayout(initialPath = "/") {
   document.body.appendChild(host);
   const root = createRoot(host);
   const render = () => act(() => root.render(
-    <ThemeProvider>
-      <MemoryRouter initialEntries={[initialPath]}>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="*" element={<LocationProbe />} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
-    </ThemeProvider>,
+    <MemoryRouter initialEntries={[initialPath]}>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="*" element={<LocationProbe />} />
+        </Route>
+      </Routes>
+    </MemoryRouter>,
   ));
   render();
   return { host, render, unmount: () => act(() => root.unmount()) };

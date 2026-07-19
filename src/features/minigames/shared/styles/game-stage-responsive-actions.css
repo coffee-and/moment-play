@@ -1,29 +1,11 @@
-.game-stage__actions .button {
+.game-stage__topbar-game-actions .button {
   min-width: 0;
-  min-height: 44px;
+  min-height: 38px;
   white-space: nowrap;
   word-break: keep-all;
 }
 
-.game-stage__actions--stacked {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.game-stage__actions--stacked .game-stage__action-slot,
-.game-stage__actions--stacked .game-stage__inline-actions {
-  width: 100%;
-  min-width: 0;
-}
-
-.game-stage__actions--stacked .game-stage__inline-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-}
-
-.game-stage__actions--stacked .game-stage__action-slot--expand {
-  grid-column: 1 / -1;
-}
+.game-stage__topbar-game-actions .game-stage__inline-actions { display: flex; gap: 8px; }
 
 .game-stage-modal__actions[data-action-count="1"] {
   grid-template-columns: minmax(0, 180px);

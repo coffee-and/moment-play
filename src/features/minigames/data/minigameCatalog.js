@@ -1,35 +1,6 @@
 export const MINIGAME_STATUS = {
   AVAILABLE: "available",
   COMING_SOON: "comingSoon",
-  IN_PROGRESS: "inProgress",
-};
-
-// Compact action label for playable game cards.
-export const STATUS_CTA_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "Play",
-  [MINIGAME_STATUS.COMING_SOON]: "Coming Soon",
-  [MINIGAME_STATUS.IN_PROGRESS]: "Preview",
-};
-
-// Small mode badge shown on the card (top-right of the CTA row).
-export const STATUS_BADGE_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "Solo",
-  [MINIGAME_STATUS.COMING_SOON]: "Soon",
-  [MINIGAME_STATUS.IN_PROGRESS]: "Next logic",
-};
-
-// Detail-section status blurb.
-export const STATUS_PLAY_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "Now playing",
-  [MINIGAME_STATUS.COMING_SOON]: "Coming soon",
-  [MINIGAME_STATUS.IN_PROGRESS]: "UI first",
-};
-
-// Detail-section "Play Game" button label.
-export const STATUS_PLAY_BUTTON_LABEL = {
-  [MINIGAME_STATUS.AVAILABLE]: "Play Game",
-  [MINIGAME_STATUS.COMING_SOON]: "Coming Soon",
-  [MINIGAME_STATUS.IN_PROGRESS]: "View Game Screen",
 };
 
 export const MINIGAME_CATALOG = [
@@ -57,7 +28,7 @@ export const MINIGAME_CATALOG = [
   },
   {
     id: "sudoku",
-    title: "Sudoku",
+    title: "스도쿠",
     description: "난이도별 퍼즐을 풀고 최고 시간을 줄여요.",
     howTo: "빈칸을 선택하고 숫자를 입력해 가로·세로·영역을 완성하세요.",
     status: MINIGAME_STATUS.AVAILABLE,
@@ -68,7 +39,7 @@ export const MINIGAME_CATALOG = [
   },
   {
     id: "omok",
-    title: "Omok",
+    title: "오목",
     description: "로컬 대국과 컴퓨터 대전으로 다섯 돌을 먼저 완성해요.",
     howTo: "교차점을 선택해 돌을 놓고, Standard Omok에서는 흑의 금수 자리를 피하세요.",
     status: MINIGAME_STATUS.AVAILABLE,

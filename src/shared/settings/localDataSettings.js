@@ -1,5 +1,3 @@
-import { SETTINGS_STORAGE_KEY } from "./settingsStorage.js";
-
 const MOMENT_PLAY_STORAGE_PREFIX = "eunContents.";
 
 function getBrowserStorage() {
@@ -16,7 +14,6 @@ export function clearMomentPlayLocalData(storage = getBrowserStorage()) {
     for (let index = 0; index < storage.length; index += 1) {
       const key = storage.key(index);
       if (!key || !key.startsWith(MOMENT_PLAY_STORAGE_PREFIX)) continue;
-      if (key === SETTINGS_STORAGE_KEY) continue;
       keysToRemove.push(key);
     }
 

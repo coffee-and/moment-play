@@ -8,7 +8,6 @@ export function MinigamePlayPage() {
   const { gameId, roomId } = useParams();
   const game = getMinigameById(gameId);
   const ActiveGameComponent = game ? getMinigameComponent(game.id) : null;
-  const isOnlineRoom = Boolean(roomId);
 
   if (!game) {
     return (
@@ -46,11 +45,6 @@ export function MinigamePlayPage() {
 
   return (
     <div className="wrap minigame-play-page">
-      {!isOnlineRoom ? (
-        <div className="sec-head play-page__head">
-          <Link className="nav-link play-page__back" to="/">← 게임 목록으로</Link>
-        </div>
-      ) : null}
       <ActiveGameComponent game={game} roomId={roomId ?? null} />
     </div>
   );

@@ -576,7 +576,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       title={game.title}
       description={game.description}
       sidebar={sidebar}
-      fullscreenEnabled
       ariaLabel={game.title}
     >
       <div className="omok-game__content">

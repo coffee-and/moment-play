@@ -53,15 +53,6 @@ export function SettingsIcon() {
   );
 }
 
-export function AccountIcon() {
-  return (
-    <svg viewBox="0 0 24 24" {...iconProps}>
-      <circle cx="12" cy="8.5" r="3.5" />
-      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
-    </svg>
-  );
-}
-
 export function SunIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">

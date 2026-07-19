@@ -4,6 +4,7 @@ import { fetchLeaderboard } from "../../infrastructure/supabase/gameResultsGatew
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { Button } from "../../shared/components/Button.jsx";
+import { LoadingIndicator } from "../../shared/components/LoadingIndicator.jsx";
 import { StatusPanel } from "../../shared/components/StatusPanel.jsx";
 import {
   formatRankingDate,
@@ -107,9 +108,8 @@ export function RankingPage() {
       ) : null}
 
       {gameKey !== RANKING_GAME.OMOK && isConfigured && loadStatus === LOAD_STATUS.LOADING ? (
-        <div className="card ranking-page__loading" role="status">
-          <span className="ranking-page__spinner" aria-hidden="true" />
-          랭킹을 불러오는 중…
+        <div className="card ranking-page__loading">
+          <LoadingIndicator label="랭킹을 불러오는 중…" />
         </div>
       ) : null}
 
