@@ -6,7 +6,6 @@ export const AUDIO_TRACK = {
   MEMORY: "memory",
   SUDOKU: "sudoku",
   OMOK: "omok",
-  SNAKE: "snake",
   FLAPPY: "flappy",
   TIMING_TAP: "timing-tap",
 };
@@ -336,58 +335,6 @@ export const AUDIO_TRACKS = {
           "D2", null, null, "A2", "D3", null, "A2", null,
           "G2", null, null, "D3", "G2", null, "A2", null,
           "F2", null, null, "C3", "F2", null, "C3", null,
-        ),
-      },
-    ],
-  },
-  [AUDIO_TRACK.SNAKE]: {
-    stepMs: 260,
-    echo: { delaySeconds: 0.14, feedback: 0.1, wet: 0.11 },
-    layers: [
-      {
-        id: "adventure-melody",
-        waveform: "triangle",
-        volume: 0.052,
-        duration: 0.31,
-        attack: 0.018,
-        notes: score(
-          "D4", "F4", "G4", "A4", "C5", "A4", "G4", "F4",
-          "E4", "G4", "A4", "C5", "D5", "C5", "A4", null,
-        ),
-      },
-      {
-        id: "forest-arp",
-        waveform: "sine",
-        volume: 0.024,
-        duration: 0.22,
-        attack: 0.012,
-        notes: score(
-          "D3", "A3", "F4", "A3", "C3", "G3", "E4", "G3",
-          "Bb2", "F3", "D4", "F3", "C3", "G3", "E4", "G3",
-        ),
-      },
-      {
-        id: "pad",
-        waveform: "sine",
-        volume: 0.014,
-        duration: 1.85,
-        attack: 0.28,
-        strumMs: 18,
-        notes: score(
-          ["D2", "A2", "D3", "F3"], null, null, null, null, null, null, null,
-          ["Bb2", "F3", "Bb3", "D4"], null, null, null,
-          ["C3", "G3", "C4", "E4"], null, null, null,
-        ),
-      },
-      {
-        id: "running-bass",
-        waveform: "square",
-        volume: 0.022,
-        duration: 0.2,
-        attack: 0.01,
-        notes: score(
-          "D2", null, "D2", "A2", "C2", null, "C2", "G2",
-          "Bb1", null, "F2", "Bb2", "C2", null, "G2", "C3",
         ),
       },
     ],

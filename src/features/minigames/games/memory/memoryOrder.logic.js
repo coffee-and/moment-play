@@ -1,4 +1,9 @@
+import { getComboAward } from "../../shared/gameProgression.js";
+
 export const MEMORY_ORDER_MAX_COUNT = 10;
+export const MEMORY_ORDER_ROUNDS = 10;
+export const MEMORY_ORDER_INITIAL_LIVES = 2;
+export const MEMORY_REPLAY_CHARGE_PER_ROUND = 25;
 export const MEMORY_ORDER_PREVIEW_SECONDS = [6, 5, 4];
 export const MEMORY_ORDER_SELECTION_SECONDS_PER_SYMBOL = 2;
 
@@ -53,4 +58,27 @@ export function evaluateMemoryChoice(sequence, step, symbolId) {
     nextStep,
     complete: correct && nextStep === sequence.length,
   };
+}
+
+export function getMemoryRoundAward(count, currentCombo = 0) {
+  const safeCount = Math.max(1, Math.floor(Number(count) || 1));
+  const combo = Math.max(0, Math.floor(Number(currentCombo) || 0)) + 1;
+  const award = getComboAward(safeCount * 100, combo, { maxMultiplier: 3 });
+  return { ...award, combo };
+}
+
+export function chargeMemoryReplayGauge(currentGauge) {
+  return Math.min(100, Math.max(0, Number(currentGauge) || 0) + MEMORY_REPLAY_CHARGE_PER_ROUND);
+}
+
+export function resolveMemoryFailure({ lives, replayGauge }) {
+  const safeLives = Math.max(0, Math.floor(Number(lives) || 0));
+  const safeGauge = Math.min(100, Math.max(0, Number(replayGauge) || 0));
+  if (safeGauge >= 100) {
+    return { status: "replay", lives: safeLives, replayGauge: 0 };
+  }
+  if (safeLives > 1) {
+    return { status: "life", lives: safeLives - 1, replayGauge: safeGauge };
+  }
+  return { status: "over", lives: 0, replayGauge: safeGauge };
 }

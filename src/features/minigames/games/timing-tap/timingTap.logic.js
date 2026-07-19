@@ -1,13 +1,20 @@
-export const TIMING_TAP_ROUNDS = 5;
+import { getComboAward } from "../../shared/gameProgression.js";
 
-export function getTimingRoundConfig(round, random = Math.random) {
+export const TIMING_TAP_ROUNDS = 10;
+export const TIMING_TAP_MAX_SCORE = 25000;
+
+const ROUND_DURATION_MS = [1680, 1540, 1400, 1260, 1140, 1060, 990, 930, 875, 830];
+const ROUND_TARGET_WIDTH = [20, 18.5, 17, 15.5, 14, 13, 12, 11, 10, 9];
+
+export function getTimingRoundConfig(round, random = Math.random, focusBonus = 0) {
   const safeRound = Math.max(1, Math.min(TIMING_TAP_ROUNDS, round));
-  const targetWidth = Math.max(9, 20 - safeRound * 2.2);
+  const targetWidth = Math.min(24, ROUND_TARGET_WIDTH[safeRound - 1] + Math.max(0, focusBonus));
   const targetCenter = 18 + random() * 64;
   return {
-    durationMs: Math.max(820, 1660 - safeRound * 150),
+    durationMs: ROUND_DURATION_MS[safeRound - 1],
     targetCenter,
     targetWidth,
+    focusAssisted: focusBonus > 0,
   };
 }
 
@@ -23,19 +30,34 @@ export function judgeTiming(position, targetCenter, targetWidth) {
   const normalizedDistance = distance / halfWidth;
 
   if (normalizedDistance <= 0.18) {
-    return { grade: "PERFECT", score: 100 };
+    return { grade: "PERFECT", score: 1000 };
   }
   if (normalizedDistance <= 1) {
     return {
       grade: "GOOD",
-      score: Math.max(70, Math.round(100 - normalizedDistance * 30)),
+      score: Math.max(700, Math.round(1000 - normalizedDistance * 300)),
     };
   }
   if (normalizedDistance <= 2) {
     return {
       grade: "CLOSE",
-      score: Math.max(20, Math.round(70 - (normalizedDistance - 1) * 50)),
+      score: Math.max(200, Math.round(700 - (normalizedDistance - 1) * 500)),
     };
   }
   return { grade: "MISS", score: 0 };
+}
+
+export function scoreTimingResult(judgement, currentPerfectCombo = 0) {
+  const isPerfect = judgement?.grade === "PERFECT";
+  const combo = isPerfect ? Math.max(0, currentPerfectCombo) + 1 : 0;
+  const award = isPerfect
+    ? getComboAward(judgement.score, combo, { step: 0.5, maxMultiplier: 3 })
+    : { points: Math.max(0, judgement?.score ?? 0), multiplier: 1 };
+
+  return {
+    ...judgement,
+    combo,
+    multiplier: award.multiplier,
+    points: award.points,
+  };
 }

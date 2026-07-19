@@ -1,3 +1,5 @@
+import { getComboAward } from "../../shared/gameProgression.js";
+
 export const FLAPPY_CONFIG = {
   birdX: 22,
   birdRadius: 2.7,
@@ -8,6 +10,9 @@ export const FLAPPY_CONFIG = {
   pipeSpeed: 20,
   firstPipeX: 82,
   pipeSpacing: 48,
+  initialLives: 3,
+  recoverySeconds: 1.2,
+  shieldChargePerGate: 25,
 };
 
 function createPipe(id, x, random) {
@@ -24,6 +29,13 @@ export function createInitialFlappyState(random = Math.random) {
     birdY: 50,
     velocity: 0,
     score: 0,
+    combo: 0,
+    maxCombo: 0,
+    lives: FLAPPY_CONFIG.initialLives,
+    shieldGauge: 0,
+    shieldReady: false,
+    recoverySeconds: 0,
+    recoveryKind: null,
     nextPipeId: 2,
     pipes: [
       createPipe(0, FLAPPY_CONFIG.firstPipeX, random),
@@ -40,6 +52,7 @@ export function flapFlappyState(state) {
 }
 
 export function hasFlappyCollision(state) {
+  if (state.recoverySeconds > 0) return false;
   const { birdRadius, birdX, gapHeight, pipeWidth } = FLAPPY_CONFIG;
   if (state.birdY - birdRadius <= 0 || state.birdY + birdRadius >= 100) return true;
 
@@ -83,11 +96,28 @@ export function advanceFlappyState(state, deltaSeconds, random = Math.random) {
     nextPipeId += 1;
   }
 
+  let combo = state.combo;
+  let scoreGain = 0;
+  for (let index = 0; index < scored; index += 1) {
+    combo += 1;
+    scoreGain += getComboAward(10, combo).points;
+  }
+  const shieldGauge = state.shieldReady
+    ? 100
+    : Math.min(100, state.shieldGauge + scored * FLAPPY_CONFIG.shieldChargePerGate);
+  const shieldReady = state.shieldReady || shieldGauge >= 100;
+
   const nextState = {
     ...state,
     birdY,
     velocity,
-    score: state.score + scored,
+    score: state.score + scoreGain,
+    combo,
+    maxCombo: Math.max(state.maxCombo, combo),
+    shieldGauge,
+    shieldReady,
+    recoverySeconds: Math.max(0, state.recoverySeconds - delta),
+    recoveryKind: state.recoverySeconds - delta > 0 ? state.recoveryKind : null,
     nextPipeId,
     pipes,
   };
@@ -95,6 +125,49 @@ export function advanceFlappyState(state, deltaSeconds, random = Math.random) {
   return {
     state: nextState,
     scored,
+    scoreGain,
     status: hasFlappyCollision(nextState) ? "collision" : "flying",
+  };
+}
+
+export function recoverFlappyState(state) {
+  const sharedRecovery = {
+    ...state,
+    birdY: 50,
+    velocity: 0,
+    combo: 0,
+    recoverySeconds: FLAPPY_CONFIG.recoverySeconds,
+  };
+
+  if (state.shieldReady) {
+    return {
+      state: {
+        ...sharedRecovery,
+        shieldGauge: 0,
+        shieldReady: false,
+        recoveryKind: "shield",
+      },
+      status: "shield",
+    };
+  }
+
+  if (state.lives > 1) {
+    return {
+      state: {
+        ...sharedRecovery,
+        lives: state.lives - 1,
+        recoveryKind: "life",
+      },
+      status: "life",
+    };
+  }
+
+  return {
+    state: {
+      ...state,
+      lives: 0,
+      combo: 0,
+    },
+    status: "over",
   };
 }

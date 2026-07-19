@@ -25,14 +25,6 @@ export function MiniGamePreview({ gameId }) {
     );
   }
 
-  if (gameId === "snake") {
-    return (
-      <span className="game-card-preview is-snake">
-        <span /><span /><span /><span /><i />
-      </span>
-    );
-  }
-
   if (gameId === "flappy") {
     return (
       <span className="game-card-preview is-flappy">

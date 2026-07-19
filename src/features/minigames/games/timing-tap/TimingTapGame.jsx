@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import "./timing-tap.css";
 import {
   TIMING_TAP_ROUNDS,
+  TIMING_TAP_MAX_SCORE,
   getNeedlePosition,
   getTimingRoundConfig,
   judgeTiming,
+  scoreTimingResult,
 } from "./timingTap.logic.js";
 
 const TIMING_BEST_KEY = "eunContents.timingTap.best";
@@ -43,6 +46,9 @@ export function TimingTapGame({ game }) {
   const [roundConfig, setRoundConfig] = useState(() => getTimingRoundConfig(1));
   const [needlePosition, setNeedlePosition] = useState(0);
   const [score, setScore] = useState(0);
+  const [perfectCombo, setPerfectCombo] = useState(0);
+  const [focusGauge, setFocusGauge] = useState(0);
+  const [mistakes, setMistakes] = useState(0);
   const [best, setBest] = useState(readBestScore);
   const [result, setResult] = useState(null);
   const [isExitOpen, setIsExitOpen] = useState(false);
@@ -51,13 +57,24 @@ export function TimingTapGame({ game }) {
   const feedbackTimerRef = useRef(null);
   const phaseRef = useRef(phase);
   const roundRef = useRef(round);
+  const scoreRef = useRef(score);
+  const perfectComboRef = useRef(perfectCombo);
+  const focusGaugeRef = useRef(focusGauge);
 
   phaseRef.current = phase;
   roundRef.current = round;
+  scoreRef.current = score;
+  perfectComboRef.current = perfectCombo;
+  focusGaugeRef.current = focusGauge;
 
   function beginRound(nextRound) {
     playSound("countdownFinal");
-    const config = getTimingRoundConfig(nextRound);
+    const useFocusAssist = focusGaugeRef.current >= 100;
+    const config = getTimingRoundConfig(nextRound, Math.random, useFocusAssist ? 4 : 0);
+    if (useFocusAssist) {
+      focusGaugeRef.current = 0;
+      setFocusGauge(0);
+    }
     setRound(nextRound);
     setRoundConfig(config);
     setNeedlePosition(0);
@@ -68,7 +85,13 @@ export function TimingTapGame({ game }) {
 
   function startGame() {
     window.clearTimeout(feedbackTimerRef.current);
+    scoreRef.current = 0;
+    perfectComboRef.current = 0;
+    focusGaugeRef.current = 0;
     setScore(0);
+    setPerfectCombo(0);
+    setFocusGauge(0);
+    setMistakes(0);
     setIsExitOpen(false);
     beginRound(1);
   }
@@ -103,9 +126,19 @@ export function TimingTapGame({ game }) {
     phaseRef.current = "feedback";
     window.cancelAnimationFrame(frameRef.current);
     const judged = judgeTiming(needlePosition, roundConfig.targetCenter, roundConfig.targetWidth);
-    const nextScore = score + judged.score;
+    const scored = scoreTimingResult(judged, perfectComboRef.current);
+    const nextScore = scoreRef.current + scored.points;
+    const nextFocusGauge = judged.grade === "MISS"
+      ? focusGaugeRef.current
+      : Math.min(100, focusGaugeRef.current + 20);
+    scoreRef.current = nextScore;
+    perfectComboRef.current = scored.combo;
+    focusGaugeRef.current = nextFocusGauge;
     setScore(nextScore);
-    setResult(judged);
+    setPerfectCombo(scored.combo);
+    setFocusGauge(nextFocusGauge);
+    if (judged.grade === "MISS") setMistakes((current) => current + 1);
+    setResult(scored);
     playSound(judged.grade === "MISS" ? "wrong" : judged.grade === "PERFECT" ? "success" : "correct");
     setPhase("feedback");
     vibrate(judged.grade === "PERFECT" ? 24 : judged.grade === "MISS" ? 8 : 14);
@@ -140,13 +173,19 @@ export function TimingTapGame({ game }) {
   const average = round > 1 || phase === "completed"
     ? Math.round(score / (phase === "completed" ? TIMING_TAP_ROUNDS : Math.max(1, round - (phase === "playing" ? 1 : 0))))
     : 0;
+  const starRating = getStarRating(score / TIMING_TAP_MAX_SCORE, {
+    mistakes,
+    maxMistakesForThree: 1,
+    twoStarThreshold: 0.42,
+    threeStarThreshold: 0.76,
+  });
 
   const sidebar = (
-    <div className="stat-row">
+      <div className="stat-row">
       <div className="stat"><div className="l">Round</div><div className="v">{Math.min(round, TIMING_TAP_ROUNDS)}/{TIMING_TAP_ROUNDS}</div></div>
       <div className="stat"><div className="l">Score</div><div className="v">{score}</div></div>
-      <div className="stat"><div className="l">Best</div><div className="v">{best}</div></div>
-      <div className="stat"><div className="l">Average</div><div className="v">{average}</div></div>
+      <div className="stat"><div className="l">Combo</div><div className="v">×{Math.max(1, perfectCombo)}</div></div>
+      <div className="stat"><div className="l">Focus</div><div className="v">{focusGauge}%</div></div>
     </div>
   );
 
@@ -162,7 +201,7 @@ export function TimingTapGame({ game }) {
     >
       <div className="timing-tap__game">
         <div className="timing-tap__round-copy">
-          <span>{phase === "idle" ? "READY" : `ROUND ${Math.min(round, TIMING_TAP_ROUNDS)}`}</span>
+          <span>{phase === "idle" ? "READY" : roundConfig.focusAssisted ? `ROUND ${Math.min(round, TIMING_TAP_ROUNDS)} · FOCUS` : `ROUND ${Math.min(round, TIMING_TAP_ROUNDS)}`}</span>
           <strong>{result?.grade ?? (phase === "completed" ? "COMPLETE" : "목표 구간에 맞춰 탭!")}</strong>
         </div>
 
@@ -189,14 +228,14 @@ export function TimingTapGame({ game }) {
         ) : null}
         {phase === "feedback" ? (
           <div className="timing-tap__feedback" aria-live="polite">
-            <strong>+{result.score}</strong>
-            <span>{result.grade === "PERFECT" ? "정확해요!" : result.grade === "MISS" ? "조금만 더 집중!" : "좋아요!"}</span>
+            <strong>+{result.points}</strong>
+            <span>{result.grade === "PERFECT" ? `PERFECT 콤보 ×${result.multiplier}` : result.grade === "MISS" ? "콤보가 초기화됐어요" : "좋아요!"}</span>
           </div>
         ) : null}
         {phase === "completed" ? (
           <div className="timing-tap__complete">
             <strong>{score}점</strong>
-            <span>5라운드 평균 {Math.round(score / TIMING_TAP_ROUNDS)}점</span>
+            <span>{formatStarRating(starRating)} · 10라운드 평균 {average}점 · 최고 {Math.max(best, score)}점</span>
             <Button onClick={startGame}>다시 도전</Button>
           </div>
         ) : null}

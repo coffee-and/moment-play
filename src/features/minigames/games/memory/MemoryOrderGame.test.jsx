@@ -118,12 +118,12 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
     expect(document.querySelector(".memory-game__transition-view--clear")).not.toBeNull();
     expect(document.querySelector(".memory-game__feedback")).toBeNull();
-    expect(document.querySelector('.stat .v')?.textContent).toBe("1");
+    expect(Array.from(document.querySelectorAll(".stat")).find((stat) => stat.querySelector(".l")?.textContent === "Round")?.querySelector(".v")?.textContent).toContain("1");
 
     act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS - 1));
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
     expect(document.body.textContent).not.toContain("— 2 ROUND —");
-    expect(document.querySelector('.stat .v')?.textContent).toBe("1");
+    expect(Array.from(document.querySelectorAll(".stat")).find((stat) => stat.querySelector(".l")?.textContent === "Round")?.querySelector(".v")?.textContent).toContain("1");
 
     view.unmount();
   });
@@ -212,16 +212,19 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
 
-    expect(document.body.textContent).toContain("GAME OVER");
-    expect(findButton("재도전")).toBeDefined();
+    expect(document.body.textContent).toContain("한 번 더 도전해요");
+    expect(findButton("남은 목숨으로 재도전")).toBeDefined();
     expect(findButton("처음부터 다시 시작")).toBeDefined();
     expect(findButton("게임 나가기")).toBeDefined();
 
     randomSpy.mockReturnValue(0.99);
-    act(() => findButton("재도전").click());
+    act(() => findButton("남은 목숨으로 재도전").click());
     const retrySequence = getSequenceIds();
     expect(retrySequence).not.toEqual(firstSequence);
-    expect(document.body.textContent).toContain("Best7R");
+    expect(window.localStorage.getItem("eunContents.memoryOrderGame.bestRound")).toBe("7");
+
+    act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
+    expect(document.body.textContent).toContain("GAME OVER");
     view.unmount();
   });
 });

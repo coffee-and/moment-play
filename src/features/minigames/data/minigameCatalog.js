@@ -78,17 +78,6 @@ export const MINIGAME_CATALOG = [
     rankingType: "winRate",
   },
   {
-    id: "snake",
-    title: "스네이크",
-    description: "먹이를 모으며 길어지는 꼬리를 피해 최고 점수에 도전해요.",
-    howTo: "방향키·스와이프·화면 버튼으로 이동하고 벽과 꼬리를 피하세요.",
-    status: MINIGAME_STATUS.AVAILABLE,
-    route: "/minigames/snake",
-    category: "Arcade",
-    recordType: null,
-    rankingType: null,
-  },
-  {
     id: "timing-tap",
     title: "타이밍 탭",
     description: "움직이는 바를 목표 구간에 정확히 멈춰 반응 속도를 시험해요.",

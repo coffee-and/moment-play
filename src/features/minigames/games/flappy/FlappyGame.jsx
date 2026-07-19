@@ -4,11 +4,13 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import {
   FLAPPY_CONFIG,
   advanceFlappyState,
   createInitialFlappyState,
   flapFlappyState,
+  recoverFlappyState,
 } from "./flappy.logic.js";
 import "./flappy-game.css";
 
@@ -81,8 +83,15 @@ export function FlappyGame({ game }) {
       }
 
       if (result.status === "collision") {
-        finishGame(result.state);
-        return;
+        const recovery = recoverFlappyState(result.state);
+        worldRef.current = recovery.state;
+        setWorld(recovery.state);
+        if (recovery.status === "over") {
+          finishGame(recovery.state);
+          return;
+        }
+        playSound(recovery.status === "shield" ? "success" : "wrong");
+        vibrate(recovery.status === "shield" ? [10, 20, 10] : [24, 30, 24]);
       }
 
       frameRef.current = window.requestAnimationFrame(animate);
@@ -160,8 +169,9 @@ export function FlappyGame({ game }) {
   const sidebar = (
     <div className="stat-row">
       <div className="stat"><div className="l">Score</div><div className="v">{world.score}</div></div>
-      <div className="stat"><div className="l">Best</div><div className="v">{best}</div></div>
-      <div className="stat"><div className="l">Speed</div><div className="v">{FLAPPY_CONFIG.pipeSpeed}</div></div>
+      <div className="stat"><div className="l">Combo</div><div className="v">×{Math.min(world.combo, 3)}</div></div>
+      <div className="stat"><div className="l">Lives</div><div className="v">{world.lives}</div></div>
+      <div className="stat"><div className="l">Shield</div><div className="v">{world.shieldReady ? "READY" : `${world.shieldGauge}%`}</div></div>
     </div>
   );
 
@@ -218,7 +228,7 @@ export function FlappyGame({ game }) {
           })}
 
           <span
-            className="flappy-game__bird"
+            className={`flappy-game__bird${world.recoveryKind ? ` is-recovering is-${world.recoveryKind}` : ""}`}
             style={{
               left: `${FLAPPY_CONFIG.birdX}%`,
               top: `${world.birdY}%`,
@@ -237,7 +247,9 @@ export function FlappyGame({ game }) {
                 {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
               </span>
               <strong>
-                {phase === "over" ? `${world.score}점` : phase === "paused" ? "잠시 쉬어갈까요?" : "별빛 사이를 날아보세요"}
+                {phase === "over"
+                  ? `${formatStarRating(getStarRating(Math.min(1, world.score / 1000), { mistakes: FLAPPY_CONFIG.initialLives - world.lives, maxMistakesForThree: 1 }))} ${world.score}점`
+                  : phase === "paused" ? "잠시 쉬어갈까요?" : "별빛 사이를 날아보세요"}
               </strong>
               <p>
                 {phase === "over"
