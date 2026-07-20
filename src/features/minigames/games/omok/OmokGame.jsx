@@ -568,9 +568,29 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     online.status === ONLINE_ROOM_LOAD_STATUS.CHECKING_PROFILE
   );
   const canDismissDialog = dialog === DIALOG.SETTINGS || dialog === DIALOG.RULES;
+  const topbarActions = (
+    <Button
+      type="button"
+      variant="secondary"
+      onClick={() => {
+        if (isOnlineContext && online.room) {
+          requestLeaveOnlineRoom();
+          return;
+        }
+        if (screen === SCREEN.GAME_START || screen === SCREEN.PLAYING) {
+          requestReturnToMenu();
+          return;
+        }
+        navigate("/");
+      }}
+    >
+      게임 나가기
+    </Button>
+  );
 
   return (
     <GameStage
+      actions={topbarActions}
       className="omok-game"
       eyebrow={game.eyebrow}
       title={game.title}

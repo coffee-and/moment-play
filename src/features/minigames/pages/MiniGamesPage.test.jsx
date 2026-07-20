@@ -62,7 +62,7 @@ describe("MiniGamesPage", () => {
     view.unmount();
   });
 
-  it("keeps the Figma home hierarchy separate from the full catalog", () => {
+  it("shows every available game on the home page while keeping the featured card", () => {
     const host = document.createElement("div");
     document.body.appendChild(host);
     const root = createRoot(host);
@@ -76,7 +76,8 @@ describe("MiniGamesPage", () => {
     ));
 
     expect(host.querySelector(".featured")).not.toBeNull();
-    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(3);
+    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(6);
+    expect(host.querySelector('.home-games-grid [data-game="omok"]')).not.toBeNull();
     expect(host.querySelector(".games-catalog")).toBeNull();
     act(() => root.unmount());
   });

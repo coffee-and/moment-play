@@ -145,6 +145,7 @@ describe("OmokGame top-level menu", () => {
 
     const options = getMenuOptionButtons(view.container);
     expect(options).toHaveLength(4);
+    expect(findButtonByText(view.container, "게임 나가기")).not.toBeNull();
 
     const titles = options.map((button) => button.querySelector(".omok-game__menu-title").textContent);
     expect(titles[0]).toContain("빠른 대전");

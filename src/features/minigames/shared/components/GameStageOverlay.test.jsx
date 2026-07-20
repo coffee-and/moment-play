@@ -36,6 +36,7 @@ describe("GameStageOverlay", () => {
     expect(document.body.querySelector(":scope > .game-stage-overlay")).not.toBeNull();
     expect(document.body.style.overflow).toBe("hidden");
     expect(document.querySelector('[role="dialog"]').getAttribute("aria-modal")).toBe("true");
+    expect(document.querySelector('.game-stage-modal__cat')).not.toBeNull();
     unmount();
     expect(document.body.style.overflow).toBe("");
   });

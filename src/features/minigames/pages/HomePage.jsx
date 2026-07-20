@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { FeaturedCat } from "../components/FeaturedCat.jsx";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
-import { getMinigameById } from "../data/minigameCatalog.js";
-
-const HOME_GAME_IDS = ["2048", "memory", "flappy"];
+import { getMinigameById, MINIGAME_CATALOG, MINIGAME_STATUS } from "../data/minigameCatalog.js";
 
 export function HomePage() {
   const navigate = useNavigate();
-  const homeGames = HOME_GAME_IDS.map(getMinigameById).filter(Boolean);
+  const homeGames = MINIGAME_CATALOG.filter((game) => game.status === MINIGAME_STATUS.AVAILABLE);
 
   function openGame(gameId) {
     const game = getMinigameById(gameId);

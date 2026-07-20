@@ -88,8 +88,7 @@
 
 .memory-sequence {
   display: flex;
-  width: fit-content;
-  max-width: 100%;
+  width: min(100%, 360px);
   flex-wrap: wrap;
   justify-content: center;
   gap: 4px;
@@ -98,7 +97,8 @@
 
 .memory-sequence__item {
   display: flex;
-  min-width: 52px;
+  min-width: 0;
+  flex: 0 0 calc((100% - 16px) / 5);
   flex-direction: column;
   align-items: center;
   gap: 2px;
@@ -327,10 +327,6 @@
     grid-template-columns: repeat(4, 64px);
     column-gap: 6px;
     row-gap: 10px;
-  }
-
-  .memory-sequence__item {
-    min-width: 52px;
   }
 
   .memory-game__transition-view {

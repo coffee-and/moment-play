@@ -598,11 +598,18 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     ? didBreakRecordThisAttempt ? "최고기록 갱신!" : "GAME OVER"
     : "한 번 더 도전해요";
   const isTimeoutFailure = failureReason === FAILURE_REASON.TIMEOUT;
-  const gameActions = canPause ? (
-    <Button ref={pauseButtonRef} className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>
-      일시정지
-    </Button>
-  ) : null;
+  const gameActions = (
+    <>
+      {canPause ? (
+        <Button ref={pauseButtonRef} className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>
+          일시정지
+        </Button>
+      ) : null}
+      <Button variant="secondary" type="button" onClick={requestExit}>
+        게임 나가기
+      </Button>
+    </>
+  );
   const sidebar = (
     <>
       <div className="stat-row">

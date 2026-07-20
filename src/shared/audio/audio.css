@@ -23,6 +23,11 @@
   animation: sound-hint-in 0.35s ease-out;
 }
 
+/* Game pages already expose the sound control in their own top bar. */
+#root:has(.app-main--immersive) .sound-unlock-hint {
+  display: none;
+}
+
 @keyframes sound-hint-in {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: none; }

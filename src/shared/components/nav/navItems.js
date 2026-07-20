@@ -7,11 +7,11 @@ import { MINIGAMES_PATH } from "../../../features/minigames/data/minigameCatalog
 // Single source of truth for the app's primary destinations, consumed by both
 // the desktop header nav and the mobile bottom tab bar.
 export const NAV_ITEMS = [
-  { key: "home", label: "홈", to: "/", icon: HomeIcon },
-  { key: "games", label: "게임", to: MINIGAMES_PATH, icon: GamesIcon },
-  { key: "ranking", label: "랭킹", to: RANKING_PATH, icon: RankingIcon },
-  { key: "friends", label: "친구", to: FRIENDS_PATH, icon: FriendsIcon },
-  { key: "settings", label: "설정", to: SETTINGS_PATH, icon: SettingsIcon },
+  { key: "home", label: "Home", accessibleLabel: "홈", to: "/", icon: HomeIcon },
+  { key: "games", label: "Game", accessibleLabel: "게임", to: MINIGAMES_PATH, icon: GamesIcon },
+  { key: "ranking", label: "Ranking", accessibleLabel: "랭킹", to: RANKING_PATH, icon: RankingIcon },
+  { key: "friends", label: "Friends", accessibleLabel: "친구", to: FRIENDS_PATH, icon: FriendsIcon },
+  { key: "settings", label: "Settings", accessibleLabel: "설정", to: SETTINGS_PATH, icon: SettingsIcon },
 ];
 
 export function isNavItemActive(item, pathname) {

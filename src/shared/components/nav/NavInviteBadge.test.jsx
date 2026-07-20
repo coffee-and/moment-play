@@ -39,6 +39,7 @@ describe("invite notification badges", () => {
   it("shows the same accessible count on the desktop Friends navigation", () => {
     const view = renderComponent(<PrimaryNav />);
     const friendsLink = view.host.querySelector('a[href="/friends"]');
+    expect(friendsLink.textContent).toContain("Friends");
     expect(friendsLink.getAttribute("aria-label")).toBe("친구, 받은 오목 초대 3개");
     expect(friendsLink.querySelector(".nav-notification-badge").textContent).toBe("3");
     view.unmount();

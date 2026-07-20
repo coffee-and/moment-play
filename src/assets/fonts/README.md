@@ -1,8 +1,15 @@
 # Bundled fonts
 
-The bundled NanumSquareRound and NanumSquareNeo fonts are provided by NAVER.
+## Mabinogi Classic
 
-- Official source: https://hangeul.naver.com/font
-- NanumSquareNeo source: https://campaign.naver.com/nanumsquare_neo/
+Mabinogi Classic Regular is provided by NEXON and is used throughout the application.
 
-NAVER Nanum fonts are free for personal and commercial use. The font files may be modified and redistributed, but the font files themselves may not be sold.
+- Official source and usage guide: https://brand.nexon.com/en/ci-brand-guidelines/typeface
+
+## Oxanium
+
+Oxanium Regular and SemiBold Latin are bundled only for the English `momentPlay` wordmark and primary navigation.
+
+- Package: `@fontsource/oxanium@5.3.0`
+- License: SIL Open Font License 1.1 (`Oxanium-OFL.txt`)
+- Official specimen: https://fonts.google.com/specimen/Oxanium

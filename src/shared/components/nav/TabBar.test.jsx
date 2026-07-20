@@ -29,6 +29,9 @@ describe("TabBar layout", () => {
   it("renders the five primary navigation items as five direct grid cells", () => {
     const view = renderTabBar();
     expect(view.host.querySelector(".tabbar")?.children).toHaveLength(5);
+    expect(
+      [...view.host.querySelectorAll(".tabbar > a")].map((link) => link.textContent),
+    ).toEqual(["Home", "Game", "Ranking", "Friends", "Settings"]);
     expect(view.host.querySelector('a[href="/settings"]')).not.toBeNull();
     view.unmount();
   });

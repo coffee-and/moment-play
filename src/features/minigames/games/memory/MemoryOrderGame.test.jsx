@@ -159,7 +159,9 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     expect(document.querySelector('.memory-sequence[data-count="3"]')).not.toBeNull();
 
     act(() => findButton("게임 나가기").click());
-    act(() => Array.from(document.querySelectorAll("button")).find((button) => button.textContent === "게임 나가기").click());
+    act(() => Array.from(document.querySelectorAll(".game-stage-modal button"))
+      .find((button) => button.textContent === "게임 나가기")
+      .click());
     expect(document.body.textContent).toContain("Home route");
     act(() => vi.runOnlyPendingTimers());
     expect(vi.getTimerCount()).toBe(0);

@@ -5,6 +5,7 @@ import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
+import modalCat from "../../../../assets/figma/featured-cat-light.png";
 import {
   FLAPPY_CONFIG,
   advanceFlappyState,
@@ -15,6 +16,15 @@ import {
 import "./flappy-game.css";
 
 const FLAPPY_BEST_KEY = "eunContents.flappy.best";
+
+const FLAPPY_STAR_FIELD = [
+  [8, 13, 4, "warm"], [18, 30, 3, "cool"], [29, 17, 5, "cool"],
+  [42, 34, 3, "warm"], [56, 15, 4, "cool"], [70, 29, 3, "warm"],
+  [84, 12, 5, "cool"], [92, 39, 3, "cool"], [12, 55, 3, "warm"],
+  [25, 69, 4, "cool"], [39, 51, 3, "cool"], [53, 78, 5, "warm"],
+  [66, 60, 3, "cool"], [79, 73, 4, "cool"], [91, 57, 3, "warm"],
+  [17, 88, 4, "cool"], [35, 91, 3, "warm"], [72, 92, 3, "cool"],
+];
 
 function readBestScore() {
   try {
@@ -207,7 +217,15 @@ export function FlappyGame({ game }) {
           }}
         >
           <span className="flappy-game__moon" aria-hidden="true" />
-          <span className="flappy-game__stars" aria-hidden="true" />
+          <span className="flappy-game__stars" aria-hidden="true">
+            {FLAPPY_STAR_FIELD.map(([left, top, size, tone], index) => (
+              <i
+                className={`flappy-game__star is-${tone}`}
+                key={`${left}-${top}`}
+                style={{ left: `${left}%`, top: `${top}%`, "--star-size": `${size}px`, "--star-delay": `${(index % 6) * -0.35}s` }}
+              />
+            ))}
+          </span>
           <span className="flappy-game__score" aria-hidden="true">{world.score}</span>
 
           {world.pipes.map((pipe) => {
@@ -242,6 +260,7 @@ export function FlappyGame({ game }) {
 
           {phase !== "playing" ? (
             <div className="flappy-game__curtain">
+              <img className="flappy-game__curtain-cat" src={modalCat} alt="" aria-hidden="true" />
               <span className="flappy-game__curtain-kicker">
                 {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
               </span>

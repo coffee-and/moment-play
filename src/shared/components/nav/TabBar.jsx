@@ -4,8 +4,8 @@ import { NavNotificationBadge } from "./NavNotificationBadge.jsx";
 import { isNavItemActive, NAV_ITEMS } from "./navItems.js";
 
 function getNavItemAriaLabel(item, pendingCount) {
-  if (item.key !== "friends" || pendingCount <= 0) return item.label;
-  return `${item.label}, 받은 오목 초대 ${pendingCount}개`;
+  if (item.key !== "friends" || pendingCount <= 0) return item.accessibleLabel;
+  return `${item.accessibleLabel}, 받은 오목 초대 ${pendingCount}개`;
 }
 
 // Mobile bottom tab bar (hidden above 560px via .tabbar's own media query).
