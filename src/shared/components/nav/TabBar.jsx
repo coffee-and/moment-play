@@ -8,7 +8,7 @@ function getNavItemAriaLabel(item, pendingCount) {
   return `${item.accessibleLabel}, 받은 오목 초대 ${pendingCount}개`;
 }
 
-// Mobile bottom tab bar (hidden above 560px via .tabbar's own media query).
+// Compact bottom navigation (hidden above 900px via .tabbar's own media query).
 export function TabBar() {
   const { pathname } = useLocation();
   const { pendingCount } = useInviteNotifications();

@@ -54,6 +54,7 @@ describe("FlappyGame input surface", () => {
 
     expect(surface.getAttribute("role")).toBe("application");
     expect(surface.tabIndex).toBe(0);
+    expect(surface.querySelector(".flappy-game__curtain img")).toBeNull();
 
     act(() => surface.focus());
     expect(document.activeElement).toBe(surface);
