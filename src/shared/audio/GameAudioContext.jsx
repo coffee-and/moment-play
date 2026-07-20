@@ -16,6 +16,7 @@ const GameAudioContext = createContext({
   playSound: NOOP,
   popDucking: NOOP,
   pushDucking: NOOP,
+  showUnlockHint: false,
   toggleAudio: NOOP,
   unlockAudio: async () => false,
 });
@@ -111,18 +112,14 @@ export function GameAudioProvider({ children }) {
     playSound,
     popDucking,
     pushDucking,
+    showUnlockHint: showUnlockHint && enabled && !isUnlocked,
     toggleAudio,
     unlockAudio,
-  }), [enabled, isUnlocked, playSound, popDucking, pushDucking, toggleAudio, unlockAudio]);
+  }), [enabled, isUnlocked, playSound, popDucking, pushDucking, showUnlockHint, toggleAudio, unlockAudio]);
 
   return (
     <GameAudioContext.Provider value={value}>
       {children}
-      {showUnlockHint && enabled && !isUnlocked ? (
-        <button className="sound-unlock-hint" type="button" onClick={() => void toggleAudio()}>
-          음악을 들으려면 스피커를 눌러주세요
-        </button>
-      ) : null}
     </GameAudioContext.Provider>
   );
 }

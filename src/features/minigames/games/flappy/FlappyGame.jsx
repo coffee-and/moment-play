@@ -5,7 +5,6 @@ import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
-import modalCat from "../../../../assets/figma/featured-cat-light.png";
 import {
   FLAPPY_CONFIG,
   advanceFlappyState,
@@ -260,7 +259,6 @@ export function FlappyGame({ game }) {
 
           {phase !== "playing" ? (
             <div className="flappy-game__curtain">
-              <img className="flappy-game__curtain-cat" src={modalCat} alt="" aria-hidden="true" />
               <span className="flappy-game__curtain-kicker">
                 {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
               </span>

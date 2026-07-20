@@ -63,7 +63,7 @@ describe("MiniGamesPage", () => {
     view.unmount();
   });
 
-  it("shows every available game on the home page while keeping the featured card", () => {
+  it("shows every available game and opens the decorative Featured card", () => {
     const host = document.createElement("div");
     document.body.appendChild(host);
     const root = createRoot(host);
@@ -76,10 +76,18 @@ describe("MiniGamesPage", () => {
       </MemoryRouter>,
     ));
 
-    expect(host.querySelector(".featured")).not.toBeNull();
+    const featured = host.querySelector(".featured");
+    expect(featured).not.toBeNull();
+    const featuredCats = featured.querySelectorAll(".featured-cat-pattern__cat");
+    expect(featuredCats).toHaveLength(3);
+    expect([...featuredCats].every((cat) => cat.getAttribute("alt") === "")).toBe(true);
+    expect([...featuredCats].every((cat) => cat.getAttribute("aria-hidden") === "true")).toBe(true);
+    expect(host.querySelectorAll(".home-games-grid .featured-cat-pattern__cat")).toHaveLength(0);
     expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(6);
     expect(host.querySelector('.home-games-grid [data-game="omok"]')).not.toBeNull();
     expect(host.querySelector(".games-catalog")).toBeNull();
+    act(() => featured.click());
+    expect(host.textContent).toContain("Omok route");
     act(() => root.unmount());
   });
 

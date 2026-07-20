@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FeaturedCat } from "../components/FeaturedCat.jsx";
+import { FeaturedCatPattern } from "../components/FeaturedCatPattern.jsx";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG, MINIGAME_STATUS } from "../data/minigameCatalog.js";
 
@@ -27,7 +27,7 @@ export function HomePage() {
             <p>조용히 생각하고, 결정적인 한 수를 놓아보세요.</p>
             <span className="f-action">바로 플레이</span>
           </span>
-          <span className="f-art"><FeaturedCat /></span>
+          <FeaturedCatPattern />
         </button>
       </section>
 

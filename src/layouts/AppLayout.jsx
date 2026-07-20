@@ -7,6 +7,7 @@ import { Footer } from "../shared/components/Footer.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
+import { SoundUnlockHint } from "../shared/audio/SoundUnlockHint.jsx";
 
 const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
 
@@ -20,7 +21,7 @@ function AccountControl() {
   if (status === "authenticated") {
     return (
       <details className="account-menu">
-        <summary className="account-control">{getAccountLabel(user)}</summary>
+        <summary className="account-control"><span className="account-control__label">{getAccountLabel(user)}</span></summary>
         <div className="account-menu__panel">
           <button type="button" onClick={() => void signOut()}>{AUTH_LABELS.logout}</button>
         </div>
@@ -28,7 +29,7 @@ function AccountControl() {
     );
   }
 
-  return <Link className="account-control" to={LOGIN_PATH}>{AUTH_LABELS.login}</Link>;
+  return <Link className="account-control" to={LOGIN_PATH}><span className="account-control__label">{AUTH_LABELS.login}</span></Link>;
 }
 
 export function AppLayout() {
@@ -67,6 +68,7 @@ export function AppLayout() {
           </div>
         </header>
       ) : null}
+      {!isImmersiveGame ? <SoundUnlockHint /> : null}
       <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>

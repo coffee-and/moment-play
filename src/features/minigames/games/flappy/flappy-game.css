@@ -228,20 +228,6 @@
   text-align: center;
 }
 
-.flappy-game__curtain > :not(.flappy-game__curtain-cat) {
-  position: relative;
-  z-index: 1;
-}
-
-.flappy-game__curtain-cat {
-  position: absolute;
-  left: -18px;
-  bottom: 0;
-  width: min(52%, 250px);
-  opacity: 0.42;
-  pointer-events: none;
-}
-
 .flappy-game__curtain-kicker {
   color: #f6c85f;
   font-family: var(--font);
@@ -314,10 +300,6 @@
     max-width: 292px;
   }
 
-  .flappy-game__curtain-cat {
-    width: 62%;
-    opacity: 0.42;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -76,12 +76,27 @@ describe("AppLayout account control", () => {
     const view = renderLayout();
     const accountControl = view.host.querySelector(".account-menu summary");
     expect(accountControl.textContent).toBe("sky.player");
+    expect(accountControl.querySelector(".account-control__label")?.textContent).toBe("sky.player");
     expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)).toBeNull();
     expect(view.host.textContent).not.toContain("로그인");
 
     act(() => accountControl.click());
     expect(currentPathname).toBe("/");
     expect(view.host.querySelector(".account-menu__panel button").textContent).toBe("로그아웃");
+    view.unmount();
+  });
+
+  it("keeps a long authenticated nickname inside the shared account label", () => {
+    auth = {
+      status: "authenticated",
+      user: { email: "player@example.com", is_anonymous: false, user_metadata: { nickname: "아주긴닉네임테스트사용자" } },
+      signOut,
+    };
+    const view = renderLayout();
+    const accountControl = view.host.querySelector(".account-menu summary");
+
+    expect(accountControl.querySelector(".account-control__label")?.textContent).toBe("아주긴닉네임테스트사용자");
+    expect(accountControl.textContent).toBe("아주긴닉네임테스트사용자");
     view.unmount();
   });
 

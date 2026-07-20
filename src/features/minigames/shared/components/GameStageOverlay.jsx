@@ -2,7 +2,6 @@ import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react
 import { createPortal } from 'react-dom';
 import '../styles/game-stage-responsive-actions.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
-import modalCat from '../../../../assets/figma/featured-cat-light.png';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -17,11 +16,10 @@ function addActionCount(child) {
   });
 }
 
-function ModalCatDecoration() {
+function ModalDecoration() {
   return (
     <div className="game-stage-modal__decoration" aria-hidden="true">
       <span className="game-stage-modal__stars" />
-      <img className="game-stage-modal__cat" src={modalCat} alt="" />
     </div>
   );
 }
@@ -84,7 +82,7 @@ export function GameStageOverlay({
 export function GameStageModal({ children, className = '', style, ...props }) {
   return (
     <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
-      <ModalCatDecoration />
+      <ModalDecoration />
       {Children.map(children, addActionCount)}
     </div>
   );
