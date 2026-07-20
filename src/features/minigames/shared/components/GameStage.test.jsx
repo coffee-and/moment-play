@@ -40,4 +40,50 @@ describe("GameStage", () => {
     expect(host.querySelector(".game-stage__topbar-game-actions")?.textContent).toContain("Exit game");
     act(() => root.unmount());
   });
+
+  it("does not draw shared pointer feedback over an interactive game surface", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+
+    act(() => root.render(
+      <GameStage title="Test game">
+        <div role="application" tabIndex={0}>Interactive surface</div>
+      </GameStage>,
+    ));
+
+    const surface = host.querySelector('[role="application"]');
+    act(() => surface.dispatchEvent(new MouseEvent("pointerdown", {
+      bubbles: true,
+      button: 0,
+      clientX: 20,
+      clientY: 30,
+    })));
+
+    expect(host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(false);
+    act(() => root.unmount());
+  });
+
+  it("keeps shared pointer feedback for ordinary stage controls", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+
+    act(() => root.render(
+      <GameStage title="Test game">
+        <button type="button">Stage action</button>
+      </GameStage>,
+    ));
+
+    const action = host.querySelector(".game-stage__content button");
+    act(() => action.dispatchEvent(new MouseEvent("pointerdown", {
+      bubbles: true,
+      button: 0,
+      clientX: 20,
+      clientY: 30,
+    })));
+
+    expect(host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(true);
+    act(() => root.unmount());
+  });
 });
