@@ -18,7 +18,7 @@
   align-items: center;
   gap: 10px;
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 18px;
   font-style: italic;
   font-variant-numeric: tabular-nums;
@@ -226,7 +226,7 @@
 
 .memory-game__state-title {
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 52px;
   font-style: italic;
   font-weight: 700;
@@ -271,7 +271,7 @@
 .memory-game__transition-title {
   margin: 0;
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: clamp(30px, 6vw, 46px);
   font-style: italic;
   font-weight: 800;

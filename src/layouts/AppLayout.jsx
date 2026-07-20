@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { Brand } from "../shared/components/Brand.jsx";
+import { Footer } from "../shared/components/Footer.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
@@ -69,6 +70,7 @@ export function AppLayout() {
       <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>
+      {!isImmersiveGame ? <Footer /> : null}
       {!isImmersiveGame ? <TabBar /> : null}
     </div>
   );

@@ -90,7 +90,7 @@
   background: rgba(17, 27, 68, 0.86);
   box-shadow: 0 7px 20px rgba(7, 12, 34, 0.26);
   color: #fff7dc;
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: clamp(20px, 4vw, 32px);
   text-align: center;
   font-style: normal;
@@ -243,7 +243,7 @@
 
 .flappy-game__curtain-kicker {
   color: #f6c85f;
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.16em;

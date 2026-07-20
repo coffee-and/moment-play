@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppLayout } from "../../../layouts/AppLayout.jsx";
 import { HomePage } from "./HomePage.jsx";
 import { MiniGamesPage } from "./MiniGamesPage.jsx";
+import { MINIGAMES_PATH } from "../data/minigameCatalog.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 window.scrollTo = vi.fn();
@@ -21,15 +22,15 @@ function renderPage({ withLayout = false } = {}) {
   document.body.appendChild(host);
   const root = createRoot(host);
   act(() => root.render(
-    <MemoryRouter initialEntries={["/games"]}>
+    <MemoryRouter initialEntries={[MINIGAMES_PATH]}>
       <Routes>
         {withLayout ? (
           <Route element={<AppLayout />}>
-            <Route path="/games" element={<MiniGamesPage />} />
+            <Route path={MINIGAMES_PATH} element={<MiniGamesPage />} />
           </Route>
         ) : (
           <>
-            <Route path="/games" element={<MiniGamesPage />} />
+            <Route path={MINIGAMES_PATH} element={<MiniGamesPage />} />
             <Route path="/minigames/omok" element={<div>Omok route</div>} />
           </>
         )}

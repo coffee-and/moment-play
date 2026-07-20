@@ -1,7 +1,7 @@
 .invite-result-toast {
   position: fixed;
   top: 78px;
-  right: max(16px, calc((100vw - var(--maxw)) / 2 + 18px));
+  right: max(16px, calc((100vw - var(--layout-max-width)) / 2 + 18px));
   z-index: 90;
   display: grid;
   width: min(360px, calc(100vw - 32px));

@@ -4,6 +4,8 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
+import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 window.scrollTo = vi.fn();
@@ -59,13 +61,13 @@ describe("AppLayout account control", () => {
   it("shows login for both guest and anonymous sessions", () => {
     auth = { status: "guest", user: null, signOut };
     const guestView = renderLayout();
-    expect(guestView.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
+    expect(guestView.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
     guestView.unmount();
 
     auth = { status: "anonymous", user: { id: "anon-1", is_anonymous: true }, signOut };
     const anonymousView = renderLayout();
-    expect(anonymousView.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
-    expect(anonymousView.host.querySelector('a[href="/signup"]')).toBeNull();
+    expect(anonymousView.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
+    expect(anonymousView.host.querySelector(`a[href="${SIGNUP_PATH}"]`)).toBeNull();
     anonymousView.unmount();
   });
 
@@ -74,7 +76,7 @@ describe("AppLayout account control", () => {
     const view = renderLayout();
     const accountControl = view.host.querySelector(".account-menu summary");
     expect(accountControl.textContent).toBe("sky.player");
-    expect(view.host.querySelector('a[href="/login"]')).toBeNull();
+    expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)).toBeNull();
     expect(view.host.textContent).not.toContain("로그인");
 
     act(() => accountControl.click());
@@ -94,7 +96,7 @@ describe("AppLayout account control", () => {
     });
     expect(signOut).toHaveBeenCalledTimes(1);
     view.render();
-    expect(view.host.querySelector('a[href="/login"]')?.textContent).toBe("로그인");
+    expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
     view.unmount();
   });
 });
@@ -112,15 +114,50 @@ describe("AppLayout immersive game routes", () => {
     expect(view.host.textContent).toContain("Page content");
     expect(view.host.querySelector(".hd")).toBeNull();
     expect(view.host.querySelector(".account-menu")).toBeNull();
-    expect(view.host.querySelector('a[href="/settings"]')).toBeNull();
+    expect(view.host.querySelector(`a[href="${SETTINGS_PATH}"]`)).toBeNull();
+    expect(view.host.querySelector(".app-footer")).toBeNull();
     expect(view.host.querySelector(".moment-app--immersive")).not.toBeNull();
     view.unmount();
   });
 
   it("keeps global navigation on non-game settings pages", () => {
-    const view = renderLayout("/settings");
+    const view = renderLayout(SETTINGS_PATH);
     expect(view.host.querySelector(".hd")).not.toBeNull();
+    expect(view.host.querySelector(".app-footer .footer")).not.toBeNull();
     expect(view.host.querySelector(".moment-app--immersive")).toBeNull();
+    view.unmount();
+  });
+});
+
+describe("AppLayout brand and primary navigation", () => {
+  it("renders the exact wordmark and primary destinations in order", () => {
+    auth = { status: "guest", user: null, signOut };
+    const view = renderLayout("/");
+    const headerBrand = view.host.querySelector(".hd .brand");
+    const wordmark = headerBrand.querySelector(".brand-wordmark");
+    const navLinks = [...view.host.querySelectorAll(".nav .lk")];
+    const navItems = [...view.host.querySelectorAll(".nav .primary-nav__item")];
+
+    expect(headerBrand?.textContent).toBe("moment Play");
+    expect(headerBrand?.getAttribute("aria-label")).toBe("Moment Play 홈으로");
+    expect([...wordmark.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.nodeValue === " ")).toBe(true);
+    expect(navLinks.map((link) => link.textContent)).toEqual([
+      "Home",
+      "Game",
+      "Ranking",
+      "Friends",
+      "Settings",
+    ]);
+    expect(navItems).toHaveLength(5);
+    expect(navItems.map((item) => item.querySelector(".primary-nav__label")?.textContent)).toEqual([
+      "Home",
+      "Game",
+      "Ranking",
+      "Friends",
+      "Settings",
+    ]);
+    expect(navLinks[0].getAttribute("aria-current")).toBe("page");
+    expect(navLinks.slice(1).every((link) => !link.hasAttribute("aria-current"))).toBe(true);
     view.unmount();
   });
 });

@@ -100,7 +100,7 @@
   padding: 3px 7px;
   background: var(--surface-2);
   color: var(--muted);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;

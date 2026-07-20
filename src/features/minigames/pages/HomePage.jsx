@@ -14,12 +14,12 @@ export function HomePage() {
 
   return (
     <div className="wrap home-page">
-      <section className="greet reveal d1" id="top">
-        <h1>오늘은 어떤 게임으로 시작해볼까요?</h1>
+      <section className="page-content greet reveal d1" id="top">
+        <h1 className="page-title">오늘은 어떤 게임으로 시작해볼까요?</h1>
         <p>짧은 순간에도 바로 시작할 수 있는 퍼즐과 미니게임을 만나보세요.</p>
       </section>
 
-      <section className="section featured-section" aria-labelledby="featured-title">
+      <section className="page-content section featured-section" aria-labelledby="featured-title">
         <button type="button" className="featured reveal d2" onClick={() => openGame("omok")}>
           <span className="f-body">
             <span className="f-tag">Featured</span>
@@ -31,7 +31,7 @@ export function HomePage() {
         </button>
       </section>
 
-      <section className="section home-games" aria-label="추천 게임">
+      <section className="page-content section home-games" aria-label="추천 게임">
         <div className="home-games-grid">
           {homeGames.map((game) => (
             <MiniGameCard key={game.id} game={game} onSelect={openGame} variant="home" showCategory />

@@ -30,7 +30,7 @@
   background: var(--game-2048-empty-cell-bg);
   box-shadow: var(--game-2048-cell-shadow);
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: clamp(19px, 3.4vw, 28px);
   font-weight: 700;
   letter-spacing: 0;
@@ -145,7 +145,7 @@
 .game-2048__target-label {
   margin-top: 10px;
   color: var(--muted);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 10px;
   letter-spacing: 0.12em;
 }
@@ -154,7 +154,7 @@
   display: block;
   margin: 10px 0;
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 44px;
   font-style: italic;
   font-variant-numeric: tabular-nums;

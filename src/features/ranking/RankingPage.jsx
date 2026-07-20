@@ -55,7 +55,7 @@ export function RankingPage() {
     <section className="wrap ranking-page" aria-labelledby="ranking-title">
       <header className="ranking-page__header">
         <p className="eyebrow">Leaderboard</p>
-        <h1 id="ranking-title">랭킹</h1>
+        <h1 className="page-title" id="ranking-title">랭킹</h1>
         <p>각 게임의 최고 기록을 확인해 보세요. 플레이는 로그인 없이 계속할 수 있습니다.</p>
       </header>
 

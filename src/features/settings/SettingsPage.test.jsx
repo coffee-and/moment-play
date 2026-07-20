@@ -4,6 +4,8 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { LOGIN_PATH } from "../../shared/auth/authConstants.js";
+import { FRIENDS_PATH } from "../friends/friendsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -62,7 +64,7 @@ afterEach(() => {
 describe("SettingsPage", () => {
   it("shows a login action for users without a permanent account", async () => {
     const view = await renderPage();
-    expect(view.host.querySelector('a[href="/login"]')?.textContent).toContain("로그인");
+    expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toContain("로그인");
     expect(fetchMyFriendProfile).not.toHaveBeenCalled();
     view.unmount();
   });
@@ -84,7 +86,7 @@ describe("SettingsPage", () => {
     expect(view.host.textContent).toContain("sky.player@example.com");
     expect(view.host.textContent).toContain("AAAAAAAA01");
     expect(view.host.querySelector("#account-nickname")?.value).toBe("달빛여우");
-    expect(view.host.querySelector('a[href="/friends"]')).not.toBeNull();
+    expect(view.host.querySelector(`a[href="${FRIENDS_PATH}"]`)).not.toBeNull();
     view.unmount();
   });
 
