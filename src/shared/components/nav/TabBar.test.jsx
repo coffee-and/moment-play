@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
+import { SETTINGS_PATH } from "../../../features/settings/settingsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -32,7 +33,7 @@ describe("TabBar layout", () => {
     expect(
       [...view.host.querySelectorAll(".tabbar > a")].map((link) => link.textContent),
     ).toEqual(["Home", "Game", "Ranking", "Friends", "Settings"]);
-    expect(view.host.querySelector('a[href="/settings"]')).not.toBeNull();
+    expect(view.host.querySelector(`a[href="${SETTINGS_PATH}"]`)).not.toBeNull();
     view.unmount();
   });
 });

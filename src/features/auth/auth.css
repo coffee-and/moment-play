@@ -88,9 +88,6 @@
 
 .onboarding-page h1 {
   margin: 18px 0 0;
-  font-size: clamp(24px, 4vw, 32px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
 }
 
 .onboarding-page__lede {

@@ -17,15 +17,19 @@ export function PrimaryNav() {
     <nav className="nav" aria-label="주요 메뉴">
       {NAV_ITEMS.map((item) => {
         const notificationCount = item.key === "friends" ? pendingCount : 0;
+        const isActive = isNavItemActive(item, pathname);
         return (
           <Link
             key={item.key}
-            className={`lk${isNavItemActive(item, pathname) ? " on" : ""}`}
+            className={`lk${isActive ? " on" : ""}`}
             to={item.to}
             aria-label={getNavItemAriaLabel(item, notificationCount)}
+            aria-current={isActive ? "page" : undefined}
           >
-            <span>{item.label}</span>
-            <NavNotificationBadge count={notificationCount} />
+            <span className="primary-nav__item">
+              <span className="primary-nav__label">{item.label}</span>
+              <NavNotificationBadge count={notificationCount} />
+            </span>
           </Link>
         );
       })}

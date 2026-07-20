@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchFriendOmokInvites } from "../../infrastructure/supabase/friendOmokInvitesGateway.js";
+import { FRIENDS_PATH } from "../../features/friends/friendsConstants.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import {
   getInviteResultKey,
@@ -112,7 +113,7 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
         actionLabel: canEnterRoom ? "대기실 입장" : "초대함 보기",
         to: canEnterRoom
           ? `/minigames/omok/room/${encodeURIComponent(invite.roomId)}`
-          : "/friends#omok-invites",
+          : `${FRIENDS_PATH}#omok-invites`,
       });
     }
 

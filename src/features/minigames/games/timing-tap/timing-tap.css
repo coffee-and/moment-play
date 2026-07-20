@@ -17,7 +17,7 @@
 
 .timing-tap__round-copy span {
   color: var(--muted);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 11px;
   letter-spacing: 0.16em;
 }
@@ -111,7 +111,7 @@
 }
 
 .timing-tap__tap-button span {
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: clamp(28px, 6vw, 42px);
   font-style: italic;
   font-weight: 800;
@@ -142,7 +142,7 @@
 .timing-tap__feedback strong,
 .timing-tap__complete > strong {
   color: var(--accent);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: clamp(38px, 7vw, 58px);
   font-style: italic;
   line-height: 1;

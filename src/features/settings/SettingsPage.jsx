@@ -117,7 +117,7 @@ export function SettingsPage() {
     <section className="wrap settings-page" aria-labelledby="settings-title">
       <header className="settings-page__header">
         <p className="eyebrow">Preferences</p>
-        <h1 id="settings-title">설정</h1>
+        <h1 className="page-title" id="settings-title">설정</h1>
         <p>계정과 이 기기에 저장된 플레이 데이터를 관리할 수 있어요.</p>
       </header>
 

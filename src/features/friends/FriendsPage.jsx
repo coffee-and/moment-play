@@ -422,7 +422,7 @@ export function FriendsPage() {
       <section className="wrap friends-page" aria-labelledby="friends-title">
         <header className="friends-page__header">
           <p className="eyebrow">Play Together</p>
-          <h1 id="friends-title">친구</h1>
+          <h1 className="page-title" id="friends-title">친구</h1>
           <p>친구 코드를 주고받고, 함께 플레이할 사람을 안전하게 관리해 보세요.</p>
         </header>
 

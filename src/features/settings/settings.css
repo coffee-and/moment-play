@@ -13,18 +13,11 @@
 .settings-card .eyebrow {
   margin: 0 0 5px;
   color: var(--accent);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.settings-page__header h1 {
-  margin: 0;
-  font-size: clamp(30px, 4vw, 40px);
-  line-height: 1.08;
-  letter-spacing: -0.04em;
 }
 
 .settings-page__header > p:last-child {
@@ -87,7 +80,7 @@
   padding: 5px 8px;
   background: var(--chip);
   color: var(--accent-2);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
@@ -167,7 +160,7 @@
   border-radius: 50%;
   background: color-mix(in oklab, var(--accent) 14%, var(--surface-2));
   color: var(--accent-2);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 13px;
   font-weight: 700;
 }
@@ -263,7 +256,7 @@
   overflow: hidden;
   margin: 3px 0 0;
   color: var(--text);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 11.5px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -408,10 +401,6 @@
 
   .settings-page__header {
     margin-bottom: 15px;
-  }
-
-  .settings-page__header h1 {
-    font-size: 29px;
   }
 
   .settings-card {

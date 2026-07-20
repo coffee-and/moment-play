@@ -18,12 +18,14 @@ export function TabBar() {
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const notificationCount = item.key === "friends" ? pendingCount : 0;
+        const isActive = isNavItemActive(item, pathname);
         return (
           <Link
             key={item.key}
-            className={isNavItemActive(item, pathname) ? "on" : undefined}
+            className={isActive ? "on" : undefined}
             to={item.to}
             aria-label={getNavItemAriaLabel(item, notificationCount)}
+            aria-current={isActive ? "page" : undefined}
           >
             <span className="tabbar__icon">
               <Icon />

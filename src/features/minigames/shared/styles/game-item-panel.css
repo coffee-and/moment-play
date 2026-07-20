@@ -24,7 +24,7 @@
 
 .game-item-panel__title {
   color: var(--muted);
-  font-family: var(--label);
+  font-family: var(--font);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.14em;

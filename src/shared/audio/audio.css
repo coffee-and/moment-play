@@ -9,7 +9,7 @@
   position: fixed;
   z-index: 90;
   top: 76px;
-  right: max(16px, calc((100vw - var(--maxw)) / 2 + 18px));
+  right: max(16px, calc((100vw - var(--layout-max-width)) / 2 + 18px));
   max-width: min(300px, calc(100vw - 32px));
   border: 1px solid var(--line);
   border-radius: 999px;

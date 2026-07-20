@@ -8,7 +8,11 @@ Mabinogi Classic Regular is provided by NEXON and is used throughout the applica
 
 ## Oxanium
 
-Oxanium Regular and SemiBold Latin are bundled only for the English `momentPlay` wordmark and primary navigation.
+Oxanium Latin is bundled in the three weights used by the interface:
+
+- Regular 400: primary navigation
+- Medium 500: the English `moment Play` wordmark
+- SemiBold 600: active primary navigation
 
 - Package: `@fontsource/oxanium@5.3.0`
 - License: SIL Open Font License 1.1 (`Oxanium-OFL.txt`)

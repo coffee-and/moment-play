@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { FRIENDS_PATH } from "../../../features/friends/friendsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -38,7 +39,7 @@ afterEach(() => {
 describe("invite notification badges", () => {
   it("shows the same accessible count on the desktop Friends navigation", () => {
     const view = renderComponent(<PrimaryNav />);
-    const friendsLink = view.host.querySelector('a[href="/friends"]');
+    const friendsLink = view.host.querySelector(`a[href="${FRIENDS_PATH}"]`);
     expect(friendsLink.textContent).toContain("Friends");
     expect(friendsLink.getAttribute("aria-label")).toBe("친구, 받은 오목 초대 3개");
     expect(friendsLink.querySelector(".nav-notification-badge").textContent).toBe("3");
@@ -47,7 +48,7 @@ describe("invite notification badges", () => {
 
   it("shows the count next to the mobile Friends icon", () => {
     const view = renderComponent(<TabBar />);
-    const friendsLink = view.host.querySelector('a[href="/friends"]');
+    const friendsLink = view.host.querySelector(`a[href="${FRIENDS_PATH}"]`);
     expect(friendsLink.getAttribute("aria-label")).toBe("친구, 받은 오목 초대 3개");
     expect(friendsLink.querySelector(".tabbar__icon .nav-notification-badge").textContent).toBe("3");
     view.unmount();
