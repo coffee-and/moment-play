@@ -34,9 +34,6 @@
   --font-korean: "SUIT Variable", SUIT, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Montserrat Variable", Montserrat, var(--font-korean);
   --font: var(--font-display);
-  --brand-moment: #252932;
-  --brand-play: #1b3870;
-  --brand-text-shadow: none;
   --primary-nav-text: #5f636b;
   --primary-nav-active: #1b3870;
   --r-xl: 28px;
@@ -193,52 +190,13 @@ a {
   display: inline-flex;
   flex: none;
   align-items: center;
-  font-family: var(--font-display);
-  color: var(--brand-moment);
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1;
+  line-height: 0;
 }
 
-.brand-mark {
-  position: relative;
-  width: 34px;
-  height: 38px;
-  flex: none;
-}
-
-.brand-wordmark {
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-  white-space: nowrap;
-  text-shadow: var(--brand-text-shadow);
-}
-.brand b {
-  color: var(--brand-play);
-  font-weight: inherit;
-}
-
-.brand-icon {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 36px;
-  height: 36px;
-  color: var(--accent-yellow);
-}
-
-.brand-icon__cutout { fill: var(--surface); }
-
-.brand-sparkle {
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  z-index: 2;
-  width: 11px;
-  height: 11px;
-  color: var(--accent-yellow);
+.brand-logo {
+  display: block;
+  width: 210px;
+  height: auto;
 }
 
 /* ============================ Sticky app header ============================ */
@@ -487,6 +445,10 @@ a {
 }
 
 @media (max-width: 560px) {
+  .brand-logo {
+    width: 196px;
+  }
+
   .hd-in {
     padding-inline: 14px;
   }
