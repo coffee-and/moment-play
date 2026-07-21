@@ -26,7 +26,7 @@ export function MiniGamesPage() {
     <div className="wrap minigames-page games-page">
       <section className="page-content section games-catalog" id="games" aria-labelledby="games-title">
         <div className="sec-head">
-          <div><h2 className="page-title" id="games-title">모든 게임</h2><p className="sec-description">오늘은 어떤 게임을 해볼까요?</p></div>
+          <div><h2 className="page-title" id="games-title">ALL GAMES</h2><p className="sec-description">오늘은 어떤 게임을 해볼까요?</p></div>
           <label className="game-search">
             <span aria-hidden="true">⌕</span>
             <span className="sr-only">게임 이름 검색</span>

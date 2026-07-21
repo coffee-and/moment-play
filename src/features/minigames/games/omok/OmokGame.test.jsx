@@ -159,6 +159,10 @@ describe("OmokGame top-level menu", () => {
     expect(view.container.textContent).toContain("선택 전");
     expect(view.container.textContent).not.toContain("Computer match");
     expect(view.container.textContent).not.toContain("Moves0");
+    expect([...view.container.querySelectorAll(".omok-game__rule-summary-text > span")].map((node) => node.textContent)).toEqual([
+      "Standard Omok",
+      "금수 도움 사용 중",
+    ]);
 
     view.unmount();
   });

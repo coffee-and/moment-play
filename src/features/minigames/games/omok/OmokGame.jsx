@@ -39,7 +39,7 @@ import { createOmokMatchConfig, isSamePosition, pointToPercent, positionKey } fr
 
 const DEFAULT_GAME_META = {
   eyebrow: "BOARD / 1 VS 1",
-  title: "오목",
+  title: "Omok",
   description: "온라인 대전과 컴퓨터 대전을 지원하는 15x15 보드 게임입니다.",
 };
 
@@ -536,7 +536,10 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
         </div>
       ) : null}
       <p className="game-stage__side-note omok-game__rule-summary">
-        <span>{compactRuleSummaryText}</span>
+        <span className="omok-game__rule-summary-text">
+          <span>{OMOK_MODE_LABEL[activeGameMode]}</span>
+          <span>{compactRuleSummaryText.includes("사용 중") ? "금수 도움 사용 중" : "금수 도움 사용 안 함"}</span>
+        </span>
         <button
           type="button"
           className="omok-game__rule-info-button"

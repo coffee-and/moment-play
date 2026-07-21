@@ -1,11 +1,22 @@
-# Bundled font
+# Bundled fonts
 
-## Pretendard Variable
+## SUIT Variable
 
-Pretendard Variable is used throughout the application, including the `moment Play`
-wordmark, navigation, page titles, controls, and game UI.
+SUIT renders every Korean glyph in copy, controls, and dynamic user text.
 
-- Package: `pretendard@1.3.9`
+- Package: `@sun-typeface/suit@2.0.5`
 - Weight range: 100–900
-- License: SIL Open Font License 1.1 (`Pretendard-OFL.txt`)
-- Official project: https://github.com/orioncactus/pretendard
+- License: SIL Open Font License 1.1 (`SUIT-OFL.txt`)
+- Official project: https://github.com/sunn-us/SUIT
+
+## Montserrat Variable (Latin)
+
+Montserrat renders Latin glyphs throughout the interface, including the `moment Play`
+wordmark, English navigation, page titles, game titles, editorial labels, and actions.
+The Latin-only font automatically falls back to SUIT for Korean glyphs in mixed text.
+
+- Package: `@fontsource-variable/montserrat@5.3.0`
+- Weight range: 100–900
+- Character set: Latin
+- License: SIL Open Font License 1.1 (`Montserrat-OFL.txt`)
+- Official project: https://github.com/JulietaUla/Montserrat

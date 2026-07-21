@@ -67,7 +67,7 @@ const FAILURE_REASON = {
 
 const DEFAULT_GAME_META = {
   eyebrow: "MEMORY / ORDER",
-  title: "순서 맞추기",
+  title: "Memory Sequence",
   description: "제한 시간 동안 순서를 기억하고 그대로 선택하세요.",
 };
 
@@ -418,7 +418,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   }
 
   function requestExit() {
-    if (phaseRef.current === PHASE.FAILED || phaseRef.current === PHASE.COMPLETED) {
+    if (phaseRef.current === PHASE.IDLE || phaseRef.current === PHASE.FAILED || phaseRef.current === PHASE.COMPLETED) {
       clearGameTimers();
       navigate("/");
       return;
