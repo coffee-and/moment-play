@@ -7,6 +7,7 @@ import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import {
@@ -454,7 +455,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
 
   function retryRound() {
     setFailureStatus(null);
-    startRound(roundRef.current);
+    startRound(roundRef.current, { resetRecord: false });
   }
 
   function failRound(reason) {
@@ -598,6 +599,8 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     ? didBreakRecordThisAttempt ? "최고기록 갱신!" : "GAME OVER"
     : "한 번 더 도전해요";
   const isTimeoutFailure = failureReason === FAILURE_REASON.TIMEOUT;
+  const isGameOver = failureStatus === "over";
+  const didFinishWithNewRecord = isGameOver && didBreakRecordThisAttempt;
   const gameActions = (
     <>
       {canPause ? (
@@ -647,6 +650,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === PHASE.IDLE ? (
           <section className="memory-game__idle" aria-labelledby="memory-game-start-title">
+            <GameStageDoodle variant="countdown" />
             <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
             <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
             <Button className="memory-game__primary" type="button" onClick={startGame}>
@@ -767,6 +771,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               role="status"
               aria-live="assertive"
             >
+              <GameStageDoodle variant="countdown" />
               <p className="memory-game__state-kicker" aria-label={`현재 ${round}라운드`}>
                 — {round} ROUND —
               </p>
@@ -808,6 +813,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
 
           {phase === PHASE.COMPLETED && !isExitConfirmOpen ? (
             <GameStageModal className="memory-game__state-view" role="dialog" aria-modal="true">
+              {didBreakRecordThisAttempt ? <GameStageDoodle variant="record" /> : null}
               <h3 className="memory-game__state-title">10 ROUND CLEAR!</h3>
               <p>{formatStarRating(getStarRating(1, { mistakes, maxMistakesForThree: 1 }))} · {score}점</p>
               <ResultSubmissionStatus submission={rankingSubmission} />
@@ -866,6 +872,11 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               aria-modal="true"
               aria-labelledby="memory-game-result-title"
             >
+              {didFinishWithNewRecord ? (
+                <GameStageDoodle variant="record" />
+              ) : isGameOver ? (
+                <GameStageDoodle variant="failure" />
+              ) : null}
               <h3
                 className="memory-game__state-title memory-game__state-title--failed"
                 id="memory-game-result-title"
