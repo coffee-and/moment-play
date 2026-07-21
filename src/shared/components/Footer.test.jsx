@@ -33,7 +33,7 @@ describe("Footer", () => {
     const view = renderFooter();
     const currentYear = new Date().getFullYear();
 
-    expect(view.host.querySelector(`a[href="${MINIGAMES_PATH}"]`)?.textContent).toBe("게임");
+    expect(view.host.querySelector(`a[href="${MINIGAMES_PATH}"]`)?.textContent).toBe("Games");
     expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
     expect(view.host.querySelector(".foot-copy")?.textContent).toBe(
       `© ${currentYear} moment Play · 짧은 순간을 위한 미니게임.`,

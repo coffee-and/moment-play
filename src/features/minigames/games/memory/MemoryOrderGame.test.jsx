@@ -68,6 +68,17 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     document.body.innerHTML = "";
   });
 
+  it("leaves immediately before the first round starts without showing an unsaved-progress warning", () => {
+    const view = renderGame();
+
+    act(() => findButton("게임 나가기").click());
+
+    expect(document.body.textContent).toContain("Home route");
+    expect(document.body.textContent).not.toContain("현재 라운드 진행은 저장되지 않아요.");
+    expect(vi.getTimerCount()).toBe(0);
+    view.unmount();
+  });
+
   it("shows the input-guide overlay only after the sequence preview ends, and keeps card input disabled until it clears", () => {
     const view = renderGame();
     act(() => findButton("게임 시작").click());

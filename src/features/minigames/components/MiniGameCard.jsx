@@ -25,7 +25,7 @@ export function MiniGameCard({ game, onSelect, showCategory = false, variant = "
         <span className="gc-desc">{variant === "home" ? (game.homeCardDescription ?? game.cardDescription ?? game.description) : (game.cardDescription ?? game.description)}</span>
       </span>
       <span className="gc-bot">
-        {canOpen ? <span className="gc-play">Play <span className="arw" aria-hidden="true" /></span> : <span className="gc-soon">준비 중</span>}
+        {canOpen ? <span className="gc-play">PLAY <span className="arw" aria-hidden="true" /></span> : <span className="gc-soon">준비 중</span>}
       </span>
     </button>
   );

@@ -21,8 +21,8 @@ export function Footer() {
         <div className="card footer">
           <Brand />
           <div className="foot-links">
-            <Link to="/">홈</Link>
-            <Link to={MINIGAMES_PATH}>게임</Link>
+            <Link to="/">Home</Link>
+            <Link to={MINIGAMES_PATH}>Games</Link>
             <FooterAccountItem />
           </div>
           <div className="foot-copy">© {currentYear} moment Play · 짧은 순간을 위한 미니게임.</div>

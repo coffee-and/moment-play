@@ -50,11 +50,11 @@ describe("MiniGamesPage", () => {
   it("shows game discovery without development quick-match copy and opens Omok", () => {
     const view = renderPage();
 
-    expect(view.host.textContent).toContain("모든 게임");
+    expect(view.host.textContent).toContain("ALL GAMES");
     expect(view.host.textContent).not.toContain("Quick match");
     expect(view.host.textContent).not.toContain("UI 보기");
     expect(view.host.textContent).not.toContain("추후 서버 매칭 자리");
-    expect(view.host.querySelector(".gcard.open .gc-play")?.textContent).toContain("Play");
+    expect(view.host.querySelector(".gcard.open .gc-play")?.textContent).toContain("PLAY");
     expect(view.host.querySelector(".gcard.soon .gc-play")).toBeNull();
     const omokButton = view.host.querySelector('[data-game="omok"]');
     expect(omokButton).not.toBeNull();
@@ -96,7 +96,7 @@ describe("MiniGamesPage", () => {
     const memoryFilter = [...view.host.querySelectorAll(".chipf")].find((button) => button.textContent === "Memory");
     act(() => memoryFilter.click());
     expect(view.host.querySelectorAll(".gcard")).toHaveLength(1);
-    expect(view.host.querySelector(".gcard")?.textContent).toContain("순서 맞추기");
+    expect(view.host.querySelector(".gcard")?.textContent).toContain("Memory Sequence");
     view.unmount();
   });
 
