@@ -284,10 +284,24 @@ a {
   line-height: 0;
 }
 
-.brand-logo {
-  display: block;
+.brand-logo-stack {
+  display: grid;
   width: 210px;
+}
+
+.brand-logo {
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
   height: auto;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.brand[data-variant="light"] .brand-logo--light-theme,
+.brand[data-variant="dark"] .brand-logo--dark-theme {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ============================ Sticky app header ============================ */
@@ -536,7 +550,7 @@ a {
 }
 
 @media (max-width: 560px) {
-  .brand-logo {
+  .brand-logo-stack {
     width: clamp(126px, 38vw, 196px);
   }
 
