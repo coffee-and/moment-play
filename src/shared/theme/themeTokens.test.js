@@ -17,12 +17,12 @@ function findCssFiles(directory) {
 describe("dark theme tokens", () => {
   it.each([
     ["bg", "#101318"],
-    ["surface", "#171c24"],
-    ["elevated", "#202734"],
+    ["surface", "#151d28"],
+    ["elevated", "#1b2636"],
     ["line", "#313b49"],
     ["text", "#f3f6fa"],
     ["muted", "#a3adbb"],
-    ["accent", "#86a8d8"],
+    ["accent", "#7da6e3"],
     ["coral", "#f08aa0"],
     ["yellow", "#e9c96c"],
   ])("keeps the approved %s color", (token, value) => {

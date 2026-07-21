@@ -33,12 +33,12 @@
 
   /* Direction B — approved dark palette. */
   --palette-dark-bg: #101318;
-  --palette-dark-surface: #171c24;
-  --palette-dark-elevated: #202734;
+  --palette-dark-surface: #151d28;
+  --palette-dark-elevated: #1b2636;
   --palette-dark-line: #313b49;
   --palette-dark-text: #f3f6fa;
   --palette-dark-muted: #a3adbb;
-  --palette-dark-accent: #86a8d8;
+  --palette-dark-accent: #7da6e3;
   --palette-dark-coral: #f08aa0;
   --palette-dark-yellow: #e9c96c;
 
