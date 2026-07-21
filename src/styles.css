@@ -33,12 +33,12 @@
 
   /* Direction B — approved dark palette. */
   --palette-dark-bg: #101318;
-  --palette-dark-surface: #171c24;
-  --palette-dark-elevated: #202734;
+  --palette-dark-surface: #151d28;
+  --palette-dark-elevated: #1b2636;
   --palette-dark-line: #313b49;
   --palette-dark-text: #f3f6fa;
   --palette-dark-muted: #a3adbb;
-  --palette-dark-accent: #86a8d8;
+  --palette-dark-accent: #7da6e3;
   --palette-dark-coral: #f08aa0;
   --palette-dark-yellow: #e9c96c;
 
@@ -284,10 +284,24 @@ a {
   line-height: 0;
 }
 
-.brand-logo {
-  display: block;
+.brand-logo-stack {
+  display: grid;
   width: 210px;
+}
+
+.brand-logo {
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
   height: auto;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.brand[data-variant="light"] .brand-logo--light-theme,
+.brand[data-variant="dark"] .brand-logo--dark-theme {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ============================ Sticky app header ============================ */
@@ -536,7 +550,7 @@ a {
 }
 
 @media (max-width: 560px) {
-  .brand-logo {
+  .brand-logo-stack {
     width: clamp(126px, 38vw, 196px);
   }
 

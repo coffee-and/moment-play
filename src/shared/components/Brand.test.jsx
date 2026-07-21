@@ -42,10 +42,19 @@ describe("Brand", () => {
   it("uses the dark-theme logo when requested", () => {
     const view = renderBrand("dark");
     const link = view.host.querySelector(".brand");
-    const logo = view.host.querySelector(".brand-logo");
+    const logo = view.host.querySelector(".brand-logo--dark-theme");
 
     expect(link?.getAttribute("data-variant")).toBe("dark");
     expect(logo?.getAttribute("src")).toBe(darkLogo);
+    view.unmount();
+  });
+
+  it("keeps both logo variants mounted to prevent a theme-switch loading flash", () => {
+    const view = renderBrand();
+
+    expect(view.host.querySelector(".brand-logo--light-theme")?.getAttribute("src")).toBe(lightLogo);
+    expect(view.host.querySelector(".brand-logo--dark-theme")?.getAttribute("src")).toBe(darkLogo);
+    expect(view.host.querySelectorAll(".brand-logo")).toHaveLength(2);
     view.unmount();
   });
 });

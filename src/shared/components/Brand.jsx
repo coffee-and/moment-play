@@ -12,11 +12,14 @@ const BRAND_LOGOS = {
 export function Brand({ variant }) {
   const { theme } = useTheme();
   const activeVariant = variant ?? theme;
-  const logo = BRAND_LOGOS[activeVariant] ?? BRAND_LOGOS.light;
+  const safeVariant = BRAND_LOGOS[activeVariant] ? activeVariant : "light";
 
   return (
-    <Link className="brand" to="/" aria-label="Moment Play 홈으로" data-variant={activeVariant}>
-      <img className="brand-logo" src={logo} alt="" aria-hidden="true" />
+    <Link className="brand" to="/" aria-label="Moment Play 홈으로" data-variant={safeVariant}>
+      <span className="brand-logo-stack" aria-hidden="true">
+        <img className="brand-logo brand-logo--light-theme" src={BRAND_LOGOS.light} alt="" aria-hidden="true" />
+        <img className="brand-logo brand-logo--dark-theme" src={BRAND_LOGOS.dark} alt="" aria-hidden="true" />
+      </span>
     </Link>
   );
 }
