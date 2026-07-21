@@ -102,8 +102,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
   it("cannot select cards during countdown or sequence display", () => {
     const view = renderGame();
+    expect(document.querySelector('[data-doodle-variant="countdown"]')).not.toBeNull();
     act(() => findButton("게임 시작").click());
     expect(document.body.textContent).toContain("ROUND —");
+    expect(document.querySelector('.game-stage-modal [data-doodle-variant="countdown"]')).not.toBeNull();
     expect(areCardsDisabled()).toBe(true);
 
     act(() => vi.advanceTimersByTime(COUNTDOWN_TOTAL_MS));
@@ -165,6 +167,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
     act(() => findButton("게임 나가기").click());
     expect(document.body.textContent).toContain("현재 라운드 진행은 저장되지 않아요.");
+    expect(document.querySelector('.game-stage-modal [data-doodle-variant]')).toBeNull();
     act(() => findButton("계속하기").click());
     expect(document.body.textContent).toContain("일시정지");
     expect(document.querySelector('.memory-sequence[data-count="3"]')).not.toBeNull();
@@ -238,6 +241,27 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
     expect(document.body.textContent).toContain("GAME OVER");
+    expect(document.querySelector('[data-doodle-variant="failure"]')).not.toBeNull();
+    view.unmount();
+  });
+
+  it("keeps a new-record celebration through a retry and shows it instead of the game-over doodles", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const view = renderGame();
+    act(() => findButton("게임 시작").click());
+    const firstSequence = getSequenceIds();
+
+    act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS));
+    clickSequence(firstSequence);
+    act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS));
+
+    act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
+    act(() => findButton("남은 목숨으로 재도전").click());
+    act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
+
+    expect(document.body.textContent).toContain("최고기록 갱신!");
+    expect(document.querySelector('[data-doodle-variant="record"]')).not.toBeNull();
+    expect(document.querySelector('[data-doodle-variant="failure"]')).toBeNull();
     view.unmount();
   });
 });
