@@ -1,32 +1,8 @@
 @font-face {
-  font-family: "Mabinogi_Classic_OTF";
-  src: url("./assets/fonts/Mabinogi_Classic_OTF.otf") format("opentype");
+  font-family: "Pretendard Variable";
+  src: url("./assets/fonts/PretendardVariable.woff2") format("woff2");
   font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Oxanium";
-  src: url("./assets/fonts/Oxanium-Regular-Latin.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Oxanium";
-  src: url("./assets/fonts/Oxanium-Medium-Latin.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Oxanium";
-  src: url("./assets/fonts/Oxanium-SemiBold-Latin.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 600;
+  font-weight: 100 900;
   font-display: swap;
 }
 
@@ -47,8 +23,7 @@
   --accent-yellow: #f6c85f;
   --chip: #eef3fb;
   --star: #f6c85f;
-  --font: "Mabinogi_Classic_OTF", system-ui, sans-serif;
-  --font-brand: "Oxanium", system-ui, sans-serif;
+  --font: "Pretendard Variable", Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --brand-moment: #252932;
   --brand-play: #1b3870;
   --brand-text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.3);
@@ -64,7 +39,7 @@
   --home-content-max-width: 880px;
   --game-stage-max-width: 1400px;
   --type-page-title-size: 26px;
-  --type-page-title-weight: 400;
+  --type-page-title-weight: 600;
   --type-page-title-color: #343840;
   --type-page-title-line-height: 1.3;
   --type-page-title-letter-spacing: -0.035em;
@@ -104,6 +79,7 @@ body {
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   font-family: var(--font);
+  font-synthesis: none;
   font-weight: 400;
 }
 
@@ -207,11 +183,11 @@ a {
   display: inline-flex;
   flex: none;
   align-items: center;
-  font-family: var(--font-brand);
+  font-family: var(--font);
   color: var(--brand-moment);
   font-size: 24px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-weight: 600;
+  letter-spacing: -0.025em;
   line-height: 1;
 }
 
@@ -286,10 +262,10 @@ a {
   height: 42px;
   place-items: center;
   border-radius: 9px;
-  font-family: var(--font-brand);
+  font-family: var(--font);
   font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--primary-nav-text);
   transition: color 0.2s;
 }
@@ -479,10 +455,10 @@ a {
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    font-family: var(--font-brand);
+    font-family: var(--font);
     font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     color: var(--primary-nav-text);
     padding: 3px 0;
   }
@@ -701,18 +677,17 @@ a {
   text-align: left;
   cursor: pointer;
 }
-.featured::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 16% 78%, rgba(255,255,255,.35) 0 1px, transparent 2px), radial-gradient(circle at 77% 21%, rgba(246,200,95,.7) 0 2px, transparent 3px); }
 .f-body { position: relative; z-index: 2; display: block; width: 100%; max-width: 560px; padding: 24px 28px; }
-.f-tag { color: #ffe080; font-size: 11px; font-weight: 400; letter-spacing: .07em; text-transform: uppercase; }
-.f-body h2 { margin: 12px 0 0; font-family: var(--font); font-size: 38px; font-weight: 400; line-height: 1.2; }
+.f-tag { color: #ffe080; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+.f-body h2 { margin: 12px 0 0; font-family: var(--font); font-size: 38px; font-weight: 600; line-height: 1.2; }
 .f-body p { max-width: 34ch; margin: 0 0 19px; color: #dbe5f4; font-size: 14px; }
-.f-action { display: inline-flex; width: 136px; min-height: 44px; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--featured-surface); border-radius: 12px; padding: 0 20px; background: #fff; color: var(--featured-surface); box-shadow: var(--sh-sm); font-size: 14px; font-weight: 400; }
+.f-action { display: inline-flex; width: 136px; min-height: 44px; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--featured-surface); border-radius: 12px; padding: 0 20px; background: #fff; color: var(--featured-surface); box-shadow: var(--sh-sm); font-size: 14px; font-weight: 500; }
 .f-action .arw { width: 14px; height: 14px; }
-.featured-cat-pattern { position: absolute; z-index: 1; top: 0; right: 0; bottom: 0; left: 60%; overflow: hidden; pointer-events: none; }
+.featured-cat-pattern { position: absolute; z-index: 1; top: 0; right: 0; bottom: 0; left: 61%; overflow: hidden; pointer-events: none; }
 .featured-cat-pattern__cat { position: absolute; display: block; max-width: none; height: auto; pointer-events: none; user-select: none; }
-.featured-cat-pattern__cat.is-ivory { top: -8px; left: -8px; width: 154px; rotate: -8deg; }
-.featured-cat-pattern__cat.is-yellow { top: 12px; right: -4px; width: 142px; rotate: 9deg; }
-.featured-cat-pattern__cat.is-orange { right: 96px; bottom: -12px; width: 128px; rotate: -2deg; }
+.featured-cat-pattern__cat.is-ivory { top: 16px; left: 4px; width: 112px; rotate: -7deg; }
+.featured-cat-pattern__cat.is-yellow { top: 30px; right: 4px; width: 108px; rotate: 5deg; }
+.featured-cat-pattern__cat.is-orange { right: 104px; bottom: -8px; width: 102px; rotate: -2deg; }
 .home-games-grid {
   display: grid;
   width: 100%;
@@ -777,10 +752,10 @@ a {
 .gcard--home .gc-category { position: absolute; top: 17px; left: 19px; }
 .gcard--home .gc-preview { position: absolute; top: 49px; right: 17px; left: 17px; width: auto; height: 80px; background: transparent; }
 .gcard--home .minigame-card__body { position: absolute; top: 147px; right: 17px; left: 17px; }
-.gcard--home .gc-name { font-size: 20px; font-weight: 400; }
+.gcard--home .gc-name { font-size: 20px; font-weight: 600; }
 .gcard--home .gc-desc { margin-top: 7px; color: #626872; font-size: 12px; white-space: nowrap; }
 .gcard--home .gc-bot { position: absolute; top: 215px; right: 17px; }
-.gcard--home .gc-play { min-width: 82px; min-height: 30px; justify-content: center; padding-inline: 12px; font-size: 12px; font-weight: 400; }
+.gcard--home .gc-play { min-width: 82px; min-height: 30px; justify-content: center; padding-inline: 12px; font-size: 12px; font-weight: 500; }
 
 @media (max-width: 900px) {
   .home-page {
@@ -797,19 +772,21 @@ a {
   }
 
   .featured-cat-pattern__cat.is-ivory {
-    top: -12px;
-    left: 8%;
-    width: 142px;
+    top: 14px;
+    left: 2%;
+    width: 98px;
   }
 
   .featured-cat-pattern__cat.is-yellow {
-    top: 34px;
-    right: -12px;
-    width: 126px;
+    top: 40px;
+    right: -2px;
+    width: 92px;
   }
 
   .featured-cat-pattern__cat.is-orange {
-    display: none;
+    right: 88px;
+    bottom: -8px;
+    width: 86px;
   }
 }
 
@@ -830,8 +807,9 @@ a {
   .f-body p { display: -webkit-box; overflow: hidden; margin-bottom: 9px; font-size: 11px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
   .f-action { min-height: 34px; padding-inline: 13px; font-size: 11px; }
   .featured-cat-pattern { left: 52%; }
-  .featured-cat-pattern__cat.is-ivory { top: -10px; left: 4px; width: 112px; rotate: -9deg; }
-  .featured-cat-pattern__cat.is-yellow { top: auto; right: -10px; bottom: -4px; width: 104px; rotate: 8deg; }
+  .featured-cat-pattern__cat.is-ivory { top: 12px; left: 2px; width: 76px; rotate: -8deg; }
+  .featured-cat-pattern__cat.is-yellow { top: 48px; right: -4px; width: 72px; rotate: 6deg; }
+  .featured-cat-pattern__cat.is-orange { right: 57px; bottom: -8px; width: 68px; rotate: -2deg; }
   .games-catalog { min-height: 0; border: 0; padding: 0; background: transparent; }
   .sec-head { align-items: start; }
   .game-search { display: none; }
