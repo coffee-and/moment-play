@@ -5,6 +5,8 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LOGIN_PATH } from "../../shared/auth/authConstants.js";
+import { ThemeProvider } from "../../shared/theme/ThemeContext.jsx";
+import { THEME, THEME_STORAGE_KEY } from "../../shared/theme/theme.js";
 import { FRIENDS_PATH } from "../friends/friendsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -31,7 +33,11 @@ async function renderPage() {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
-  await act(async () => root.render(<MemoryRouter><SettingsPage /></MemoryRouter>));
+  await act(async () => root.render(
+    <MemoryRouter>
+      <ThemeProvider><SettingsPage /></ThemeProvider>
+    </MemoryRouter>,
+  ));
   return { host, unmount: () => act(() => root.unmount()) };
 }
 
@@ -49,6 +55,9 @@ function changeInput(input, value) {
 
 afterEach(() => {
   document.body.innerHTML = "";
+  window.localStorage.clear();
+  document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("style");
   auth = {
     isConfigured: true,
     refreshSession: vi.fn(async () => {}),
@@ -62,6 +71,19 @@ afterEach(() => {
 });
 
 describe("SettingsPage", () => {
+  it("switches and persists the selected screen theme", async () => {
+    const view = await renderPage();
+    const darkThemeButton = findButton(view.host, "다크");
+
+    expect(darkThemeButton.getAttribute("aria-pressed")).toBe("false");
+    act(() => darkThemeButton.click());
+
+    expect(document.documentElement.dataset.theme).toBe(THEME.DARK);
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEME.DARK);
+    expect(darkThemeButton.getAttribute("aria-pressed")).toBe("true");
+    view.unmount();
+  });
+
   it("shows a login action for users without a permanent account", async () => {
     const view = await renderPage();
     expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toContain("로그인");

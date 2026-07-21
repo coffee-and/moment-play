@@ -8,6 +8,8 @@ import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { Button } from "../../shared/components/Button.jsx";
 import { clearMomentPlayLocalData } from "../../shared/settings/localDataSettings.js";
+import { THEME } from "../../shared/theme/theme.js";
+import { useTheme } from "../../shared/theme/useTheme.js";
 import "./settings.css";
 
 const FRIEND_STATUS = {
@@ -19,6 +21,7 @@ const FRIEND_STATUS = {
 
 export function SettingsPage() {
   const { isConfigured, refreshSession, signOut, status: authStatus, user } = useAuth();
+  const { setTheme, theme } = useTheme();
   const [friendProfile, setFriendProfile] = useState(null);
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.IDLE);
   const [nicknameInput, setNicknameInput] = useState("");
@@ -122,6 +125,45 @@ export function SettingsPage() {
       </header>
 
       <div className="settings-grid">
+        <section className="card settings-card settings-card--appearance" aria-labelledby="appearance-title">
+          <div className="settings-card__heading">
+            <div>
+              <p className="eyebrow">Appearance</p>
+              <h2 id="appearance-title">화면 테마</h2>
+              <p>눈에 편한 화면을 선택하세요. 이 기기에 선택한 테마를 기억합니다.</p>
+            </div>
+          </div>
+
+          <div className="theme-choice" role="group" aria-label="화면 테마 선택">
+            <button
+              className={`theme-choice__option${theme === THEME.LIGHT ? " is-selected" : ""}`}
+              type="button"
+              aria-pressed={theme === THEME.LIGHT}
+              onClick={() => setTheme(THEME.LIGHT)}
+            >
+              <span className="theme-choice__preview theme-choice__preview--light" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className="theme-choice__label"><strong>라이트</strong><span>밝고 선명하게</span></span>
+            </button>
+            <button
+              className={`theme-choice__option${theme === THEME.DARK ? " is-selected" : ""}`}
+              type="button"
+              aria-pressed={theme === THEME.DARK}
+              onClick={() => setTheme(THEME.DARK)}
+            >
+              <span className="theme-choice__preview theme-choice__preview--dark" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className="theme-choice__label"><strong>다크</strong><span>차분하고 편안하게</span></span>
+            </button>
+          </div>
+        </section>
+
         <section className="card settings-card settings-card--account" aria-labelledby="account-title">
           <div className="settings-card__heading">
             <div>
