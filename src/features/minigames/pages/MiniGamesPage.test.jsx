@@ -54,6 +54,8 @@ describe("MiniGamesPage", () => {
     expect(view.host.textContent).not.toContain("Quick match");
     expect(view.host.textContent).not.toContain("UI 보기");
     expect(view.host.textContent).not.toContain("추후 서버 매칭 자리");
+    expect(view.host.querySelector(".game-search")).toBeNull();
+    expect(view.host.querySelector('input[placeholder="게임 이름 검색"]')).toBeNull();
     expect(view.host.querySelector(".gcard.open .gc-play")?.textContent).toContain("PLAY");
     expect(view.host.querySelector(".gcard.soon .gc-play")).toBeNull();
     const omokButton = view.host.querySelector('[data-game="omok"]');
@@ -83,7 +85,7 @@ describe("MiniGamesPage", () => {
     expect([...featuredCats].every((cat) => cat.getAttribute("alt") === "")).toBe(true);
     expect([...featuredCats].every((cat) => cat.getAttribute("aria-hidden") === "true")).toBe(true);
     expect(host.querySelectorAll(".home-games-grid .featured-cat-pattern__cat")).toHaveLength(0);
-    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(6);
+    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(8);
     expect(host.querySelector('.home-games-grid [data-game="omok"]')).not.toBeNull();
     expect(host.querySelector(".games-catalog")).toBeNull();
     act(() => featured.click());
@@ -95,8 +97,9 @@ describe("MiniGamesPage", () => {
     const view = renderPage();
     const memoryFilter = [...view.host.querySelectorAll(".chipf")].find((button) => button.textContent === "Memory");
     act(() => memoryFilter.click());
-    expect(view.host.querySelectorAll(".gcard")).toHaveLength(1);
-    expect(view.host.querySelector(".gcard")?.textContent).toContain("Memory Sequence");
+    expect(view.host.querySelectorAll(".gcard")).toHaveLength(2);
+    expect(view.host.textContent).toContain("Memory Sequence");
+    expect(view.host.textContent).toContain("Glow Sequence");
     view.unmount();
   });
 
