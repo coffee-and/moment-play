@@ -29,6 +29,18 @@
   animation: game-stage-doodle-record 0.48s cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 
+.game-stage-modal .game-stage-doodle {
+  color: var(--game-modal-text);
+}
+
+.game-stage-modal .game-stage-doodle[data-doodle-variant="record"] {
+  color: color-mix(in oklab, var(--game-modal-text) 82%, var(--game-modal-highlight));
+}
+
+.game-stage-modal .game-stage-doodle[data-doodle-variant="failure"] {
+  color: color-mix(in oklab, var(--game-modal-text) 82%, var(--game-modal-muted));
+}
+
 .game-stage-doodle[data-doodle-variant="failure"] {
   position: absolute;
   inset: 0;
