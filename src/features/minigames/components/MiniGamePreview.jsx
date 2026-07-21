@@ -40,5 +40,21 @@ export function MiniGamePreview({ gameId }) {
     );
   }
 
+  if (gameId === "glow-sequence") {
+    return (
+      <span className="game-card-preview is-glow-sequence">
+        {PreviewCells(["", "", "", "", "", ""])}
+      </span>
+    );
+  }
+
+  if (gameId === "color-sort") {
+    return (
+      <span className="game-card-preview is-color-sort">
+        {PreviewCells(["", "", "", "", "", ""])}
+      </span>
+    );
+  }
+
   return <span className="game-card-preview is-future" aria-label="준비 중">+</span>;
 }

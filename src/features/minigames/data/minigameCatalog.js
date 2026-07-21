@@ -80,6 +80,32 @@ export const MINIGAME_CATALOG = [
     recordType: null,
     rankingType: null,
   },
+  {
+    id: "glow-sequence",
+    title: "Glow Sequence",
+    description: "빛나는 칸의 위치와 순서를 기억해 마지막 25칸까지 도전해요.",
+    cardDescription: "빛나는 칸의 순서를 기억해요.",
+    homeCardDescription: "빛의 순서를 기억해 끝까지 이어보세요.",
+    howTo: "빛나는 칸을 순서대로 기억한 뒤 같은 위치를 차례대로 선택하세요. 25칸 순서를 완성하면 MASTER를 달성해요.",
+    status: MINIGAME_STATUS.AVAILABLE,
+    route: "/minigames/glow-sequence",
+    category: "Memory",
+    recordType: "round",
+    rankingType: "bestRound",
+  },
+  {
+    id: "color-sort",
+    title: "Color Sort",
+    description: "색상 블록을 옮겨 각 통을 한 가지 색으로 완성해요.",
+    cardDescription: "같은 색끼리 차곡차곡 정리해요.",
+    homeCardDescription: "흩어진 색상 블록을 같은 색끼리 모아보세요.",
+    howTo: "옮길 통과 도착할 통을 차례로 선택하세요. 맨 위의 같은 색 블록은 빈 통이나 같은 색 위로만 이동할 수 있어요.",
+    status: MINIGAME_STATUS.AVAILABLE,
+    route: "/minigames/color-sort",
+    category: "Puzzle",
+    recordType: null,
+    rankingType: null,
+  },
 ];
 
 export const MINIGAME_CATEGORY_ORDER = ["All", "Number", "Memory", "Puzzle", "Board", "Arcade", "Reaction"];

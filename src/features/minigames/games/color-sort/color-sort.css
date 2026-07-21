@@ -1,0 +1,133 @@
+.color-sort__game {
+  display: flex;
+  width: min(100%, 760px);
+  min-height: 440px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.color-sort__status {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.color-sort__status span {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .12em;
+}
+
+.color-sort__status strong {
+  font-size: clamp(18px, 3vw, 25px);
+  font-weight: 600;
+}
+
+.color-sort__board {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(10px, 1.7vw, 18px);
+}
+
+.color-sort__tube {
+  position: relative;
+  width: clamp(46px, 7vw, 66px);
+  height: clamp(148px, 20vw, 188px);
+  border: 2px solid color-mix(in oklab, var(--accent) 28%, var(--line));
+  border-top-color: transparent;
+  border-radius: 10px 10px 26px 26px;
+  padding: 8px 6px 7px;
+  background: color-mix(in oklab, var(--surface) 74%, transparent);
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+  touch-action: manipulation;
+}
+
+.color-sort__tube::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  left: -5px;
+  height: 9px;
+  border: 2px solid color-mix(in oklab, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.color-sort__tube:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.color-sort__tube:not(:disabled):hover {
+  border-color: color-mix(in oklab, var(--accent) 58%, var(--line));
+  transform: translateY(-3px);
+}
+
+.color-sort__tube.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
+  transform: translateY(-10px);
+}
+
+.color-sort__tube:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 4px;
+}
+
+.color-sort__tube-inner {
+  display: flex;
+  height: 100%;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.color-sort__block {
+  display: block;
+  height: calc((100% - 12px) / 4);
+  flex: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.color-sort__block.has-color {
+  background: var(--block-color);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .34),
+    0 3px 10px color-mix(in oklab, var(--block-color) 24%, transparent);
+}
+
+.color-sort__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.color-sort__actions .button {
+  min-width: 108px;
+}
+
+@media (max-width: 620px) {
+  .color-sort__game { min-height: 390px; gap: 20px; }
+  .color-sort__board { gap: 10px; }
+  .color-sort__tube { width: clamp(42px, 12vw, 54px); height: clamp(132px, 36vw, 162px); }
+}
+
+@media (max-width: 390px) {
+  .color-sort__tube { width: 42px; height: 132px; padding-inline: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .color-sort__tube { transition: none; }
+}

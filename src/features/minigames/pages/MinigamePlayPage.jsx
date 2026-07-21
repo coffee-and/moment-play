@@ -3,6 +3,7 @@ import { StatusPanel } from "../../../shared/components/StatusPanel.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { MINIGAME_STATUS, getMinigameById } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
+import { GameGuideProvider } from "../shared/components/GameGuideContext.jsx";
 
 export function MinigamePlayPage() {
   const { gameId, roomId } = useParams();
@@ -45,7 +46,9 @@ export function MinigamePlayPage() {
 
   return (
     <div className="wrap minigame-play-page">
-      <ActiveGameComponent game={game} roomId={roomId ?? null} />
+      <GameGuideProvider guide={{ description: game.howTo }}>
+        <ActiveGameComponent game={game} roomId={roomId ?? null} />
+      </GameGuideProvider>
     </div>
   );
 }

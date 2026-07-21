@@ -4,6 +4,8 @@ import { MemoryOrderGame } from "../games/memory/MemoryOrderGame.jsx";
 import { OmokGame } from "../games/omok/OmokGame.jsx";
 import { SudokuLevelGame } from "../games/sudoku/SudokuLevelGame.jsx";
 import { TimingTapGame } from "../games/timing-tap/TimingTapGame.jsx";
+import { GlowSequenceGame } from "../games/glow-sequence/GlowSequenceGame.jsx";
+import { ColorSortGame } from "../games/color-sort/ColorSortGame.jsx";
 
 export const MINIGAME_COMPONENTS = {
   "2048": Game2048,
@@ -12,6 +14,8 @@ export const MINIGAME_COMPONENTS = {
   sudoku: SudokuLevelGame,
   omok: OmokGame,
   "timing-tap": TimingTapGame,
+  "glow-sequence": GlowSequenceGame,
+  "color-sort": ColorSortGame,
 };
 
 export function getMinigameComponent(gameId) {
