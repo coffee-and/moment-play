@@ -108,14 +108,16 @@
 }
 
 .color-sort__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  width: min(100%, 338px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
 .color-sort__actions .button {
-  min-width: 108px;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 @media (max-width: 620px) {
