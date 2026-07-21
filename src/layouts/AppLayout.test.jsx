@@ -145,17 +145,20 @@ describe("AppLayout immersive game routes", () => {
 });
 
 describe("AppLayout brand and primary navigation", () => {
-  it("renders the exact wordmark and primary destinations in order", () => {
+  it("renders the image logo and primary destinations in order", () => {
     auth = { status: "guest", user: null, signOut };
     const view = renderLayout("/");
     const headerBrand = view.host.querySelector(".hd .brand");
-    const wordmark = headerBrand.querySelector(".brand-wordmark");
+    const logo = headerBrand.querySelector(".brand-logo");
     const navLinks = [...view.host.querySelectorAll(".nav .lk")];
     const navItems = [...view.host.querySelectorAll(".nav .primary-nav__item")];
 
-    expect(headerBrand?.textContent).toBe("moment Play");
+    expect(headerBrand?.textContent).toBe("");
     expect(headerBrand?.getAttribute("aria-label")).toBe("Moment Play 홈으로");
-    expect([...wordmark.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.nodeValue === " ")).toBe(true);
+    expect(headerBrand?.getAttribute("data-variant")).toBe("light");
+    expect(logo?.getAttribute("src")).toContain("moment-play-logo-light.webp");
+    expect(logo?.getAttribute("alt")).toBe("");
+    expect(logo?.getAttribute("aria-hidden")).toBe("true");
     expect(navLinks.map((link) => link.textContent)).toEqual([
       "Home",
       "Game",
