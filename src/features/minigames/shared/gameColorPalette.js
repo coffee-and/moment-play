@@ -5,12 +5,6 @@ export const GAME_COLOR_PALETTE = Object.freeze([
   { id: "green", value: "var(--palette-green)" },
   { id: "teal", value: "var(--palette-teal)" },
   { id: "sage", value: "var(--palette-sage)" },
-  {
-    id: "soft-teal",
-    value: "color-mix(in oklab, var(--palette-teal) 58%, var(--palette-ivory))",
-  },
-  {
-    id: "soft-burgundy",
-    value: "color-mix(in oklab, var(--palette-burgundy) 58%, var(--palette-ivory))",
-  },
+  { id: "slate-blue", value: "var(--palette-slate-blue)" },
+  { id: "dusty-rose", value: "var(--palette-dusty-rose)" },
 ]);

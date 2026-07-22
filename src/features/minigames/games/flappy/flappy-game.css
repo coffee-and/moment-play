@@ -14,8 +14,8 @@
   border-radius: var(--r-lg);
   outline: none;
   background:
-    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--palette-sage) 24%, transparent), transparent 24%),
-    linear-gradient(180deg, color-mix(in oklab, var(--palette-teal) 66%, var(--palette-dark-bg)) 0%, var(--palette-teal) 56%, var(--palette-dark-bg) 100%);
+    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--flappy-preview-fish) 28%, transparent), transparent 24%),
+    linear-gradient(180deg, var(--flappy-sky-top) 0%, var(--flappy-sky-center) 56%, var(--flappy-sky-deep) 100%);
   box-shadow:
     inset 0 -40px 70px color-mix(in oklab, var(--accent) 8%, transparent),
     0 20px 54px color-mix(in oklab, var(--text) 10%, transparent);
@@ -37,8 +37,8 @@
   width: clamp(38px, 8vw, 74px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--palette-ivory);
-  box-shadow: 0 0 34px color-mix(in oklab, var(--palette-sage) 42%, transparent);
+  background: var(--flappy-moon);
+  box-shadow: 0 0 34px color-mix(in oklab, var(--flappy-preview-fish) 42%, transparent);
 }
 
 .flappy-game__moon::after {
@@ -49,7 +49,7 @@
   width: 92%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--palette-teal) 70%, var(--palette-dark-bg));
+  background: var(--flappy-moon-cutout);
 }
 
 .flappy-game__stars {
@@ -64,16 +64,16 @@
   display: block;
   width: var(--star-size);
   aspect-ratio: 1;
-  background: color-mix(in oklab, var(--palette-ivory) 92%, transparent);
+  background: color-mix(in oklab, var(--flappy-star-cool) 92%, transparent);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--palette-sage) 46%, transparent));
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--flappy-star-glow) 46%, transparent));
   animation: flappy-star-twinkle 2.1s ease-in-out infinite;
   animation-delay: var(--star-delay);
 }
 
 .flappy-game__star.is-warm {
-  background: var(--palette-yellow);
-  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--palette-yellow) 42%, transparent));
+  background: var(--flappy-star);
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--flappy-star) 42%, transparent));
 }
 
 .flappy-game__score {
@@ -86,11 +86,11 @@
   min-width: 54px;
   margin-inline: auto;
   padding: 6px 12px;
-  border: 1px solid color-mix(in oklab, var(--palette-yellow) 68%, transparent);
+  border: 1px solid color-mix(in oklab, var(--flappy-star) 68%, transparent);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
-  box-shadow: 0 7px 20px color-mix(in oklab, var(--palette-dark-bg) 26%, transparent);
-  color: var(--palette-ivory);
+  background: color-mix(in oklab, var(--flappy-score-surface) 86%, transparent);
+  box-shadow: 0 7px 20px color-mix(in oklab, var(--flappy-score-shadow) 26%, transparent);
+  color: var(--flappy-score-text);
   font-family: var(--font);
   font-size: clamp(20px, 4vw, 32px);
   text-align: center;
@@ -111,8 +111,8 @@
   left: 0;
   display: block;
   border: 0;
-  background: color-mix(in oklab, var(--palette-sage) 22%, var(--palette-ivory));
-  box-shadow: 0 5px 18px color-mix(in oklab, var(--palette-teal) 14%, transparent);
+  background: var(--flappy-pillar);
+  box-shadow: 0 5px 18px color-mix(in oklab, var(--flappy-sky-deep) 14%, transparent);
 }
 
 .flappy-game__pillar::after {
@@ -123,8 +123,8 @@
   height: 12px;
   border: 0;
   border-radius: 5px;
-  background: color-mix(in oklab, var(--palette-sage) 22%, var(--palette-ivory));
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--palette-teal) 12%, transparent);
+  background: var(--flappy-pillar);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--flappy-sky-deep) 12%, transparent);
 }
 
 .flappy-game__pillar.is-top {
@@ -174,7 +174,7 @@
   inset: 22% 4% 18% 13%;
   border: 0;
   border-radius: 62% 48% 50% 60%;
-  background: var(--palette-sage);
+  background: var(--flappy-fish);
 }
 
 .flappy-game__bird-core::after {
@@ -185,7 +185,7 @@
   width: 8%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--palette-dark-bg);
+  background: var(--text);
 }
 
 .flappy-game__bird-wing {
@@ -195,7 +195,7 @@
   width: 40%;
   height: 46%;
   border-radius: 70% 18% 68% 20%;
-  background: color-mix(in oklab, var(--palette-sage) 58%, var(--palette-ivory));
+  background: var(--flappy-wing);
   transform-origin: right center;
   animation: flappy-wing 0.26s ease-in-out infinite alternate;
 }
@@ -207,7 +207,7 @@
   left: 0;
   width: 27%;
   height: 30%;
-  background: var(--palette-terracotta);
+  background: var(--flappy-tail);
   clip-path: polygon(100% 50%, 20% 4%, 0 20%, 10% 50%, 0 80%, 20% 96%);
 }
 
@@ -223,13 +223,13 @@
   padding: 24px;
   overflow: hidden;
   border-radius: inherit;
-  background: linear-gradient(155deg, color-mix(in oklab, var(--palette-teal) 56%, var(--palette-dark-bg)) 0%, var(--palette-teal) 58%, var(--palette-dark-bg) 100%);
-  color: var(--palette-ivory);
+  background: linear-gradient(155deg, var(--flappy-curtain-start) 0%, var(--flappy-curtain-center) 58%, var(--flappy-sky-deep) 100%);
+  color: var(--flappy-curtain-text);
   text-align: center;
 }
 
 .flappy-game__curtain-kicker {
-  color: var(--palette-yellow);
+  color: var(--flappy-star);
   font-family: var(--font);
   font-size: 11px;
   font-weight: 700;
@@ -245,7 +245,7 @@
 }
 
 .flappy-game__curtain p {
-  color: color-mix(in oklab, var(--palette-ivory) 78%, var(--palette-sage));
+  color: var(--flappy-curtain-muted);
   font-size: 12px;
   line-height: 1.6;
   word-break: keep-all;
