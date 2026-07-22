@@ -6,6 +6,7 @@ import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import {
   DEFAULT_SUDOKU_GAME_META,
@@ -174,10 +175,11 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty"]); }
 
   return (
-    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} ariaLabel={game.title}>
+    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
       <div ref={stageContentRef} className="sudoku-game__stage" aria-hidden={isStageCovered ? "true" : undefined} onKeyDown={handleGameKeyDown}>
         {phase === SUDOKU_PHASE.IDLE ? (
           <GameStageModal className="sudoku-game__modal sudoku-game__start" role="region" aria-labelledby="sudoku-game-start-title">
+            <GameStageDoodle variant="start" />
             <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.start.eyebrow}</p>
             <h3 id="sudoku-game-start-title">{SUDOKU_COPY.start.title}</h3>
             <p>{SUDOKU_COPY.start.description}</p>

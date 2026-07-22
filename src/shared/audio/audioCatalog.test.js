@@ -1,11 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  AUDIO_PREFERENCE_KEY,
   AUDIO_TRACK,
   AUDIO_TRACKS,
   getAudioTrackForPath,
-  readAudioPreference,
-  writeAudioPreference,
 } from "./audioCatalog.js";
 
 function flattenEvents(notes) {
@@ -43,10 +40,4 @@ describe("audio catalog", () => {
     expect(homeTrack.layers.every((layer) => layer.notes.length === 32)).toBe(true);
   });
 
-  it("defaults sound to enabled and persists an explicit mute", () => {
-    const storage = { getItem: vi.fn(() => null), setItem: vi.fn() };
-    expect(readAudioPreference(storage)).toBe(true);
-    writeAudioPreference(false, storage);
-    expect(storage.setItem).toHaveBeenCalledWith(AUDIO_PREFERENCE_KEY, "false");
-  });
 });

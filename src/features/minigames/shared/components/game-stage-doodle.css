@@ -14,7 +14,8 @@
   mask: var(--game-stage-doodle-mask) center / contain no-repeat;
 }
 
-.game-stage-doodle[data-doodle-variant="countdown"] {
+.game-stage-doodle[data-doodle-variant="countdown"],
+.game-stage-doodle[data-doodle-variant="start"] {
   width: clamp(118px, 32vw, 154px);
   aspect-ratio: 332 / 220;
   margin: 0 auto 2px;
@@ -93,6 +94,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .game-stage-doodle[data-doodle-variant="countdown"],
+  .game-stage-doodle[data-doodle-variant="start"],
   .game-stage-doodle[data-doodle-variant="record"] {
     animation: none;
   }

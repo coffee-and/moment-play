@@ -1,5 +1,3 @@
-export const AUDIO_PREFERENCE_KEY = "eunContents.audio.enabled";
-
 export const AUDIO_TRACK = {
   HOME: "home",
   GAME_2048: "2048",
@@ -460,21 +458,4 @@ export function getAudioTrackForPath(pathname) {
   const match = /^\/minigames\/([^/]+)/.exec(pathname);
   if (!match) return AUDIO_TRACK.HOME;
   return Object.values(AUDIO_TRACK).includes(match[1]) ? match[1] : AUDIO_TRACK.HOME;
-}
-
-export function readAudioPreference(storage = globalThis.localStorage) {
-  try {
-    const stored = storage?.getItem(AUDIO_PREFERENCE_KEY);
-    return stored == null ? true : stored === "true";
-  } catch {
-    return true;
-  }
-}
-
-export function writeAudioPreference(enabled, storage = globalThis.localStorage) {
-  try {
-    storage?.setItem(AUDIO_PREFERENCE_KEY, String(enabled));
-  } catch {
-    return;
-  }
 }

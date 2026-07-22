@@ -199,6 +199,8 @@ export function FlappyGame({ game }) {
       className="flappy-game"
       description={game.description}
       eyebrow="ARCADE / FLIGHT"
+      isExitConfirmationOpen={isExitOpen}
+      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >

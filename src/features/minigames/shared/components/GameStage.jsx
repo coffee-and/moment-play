@@ -5,6 +5,7 @@ import { useGameFeedback } from '../../../../shared/feedback/GameFeedbackContext
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
+import { useGameBrowserBackGuard } from '../hooks/useGameBrowserBackGuard.js';
 import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
@@ -18,6 +19,8 @@ export function GameStage({
   className = '',
   description,
   eyebrow,
+  isExitConfirmationOpen = false,
+  onRequestExit,
   sidebar,
   title,
 }) {
@@ -26,6 +29,8 @@ export function GameStage({
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const guide = useGameGuide();
   const { feedback } = useGameFeedback();
+
+  useGameBrowserBackGuard({ isExitConfirmationOpen, onRequestExit });
 
   function handleTouchFeedback(event) {
     if (event.button != null && event.button !== 0) return;

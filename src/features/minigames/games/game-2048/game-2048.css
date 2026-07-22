@@ -54,39 +54,43 @@
 }
 
 .game-2048__cell[data-value="2"] {
-  background: #dce8fb;
-  color: #3264b4;
+  background: var(--tile-2-bg);
+  color: var(--tile-2-text);
 }
 
 .game-2048__cell[data-value="4"] {
-  background: #cbdcf8;
-  color: #2f5ba1;
+  background: var(--tile-4-bg);
+  color: var(--tile-4-text);
 }
 
 .game-2048__cell[data-value="8"] {
-  background: #fcd5dd;
-  color: #bb4762;
+  background: var(--tile-8-bg);
+  color: var(--tile-8-text);
 }
 
 .game-2048__cell[data-value="16"] {
-  background: #ffe3a3;
-  color: #b76a0f;
+  background: var(--tile-16-bg);
+  color: var(--tile-16-text);
 }
 
 .game-2048__cell[data-value="32"] {
-  background: #ffc482;
-  color: #99550d;
+  background: var(--tile-32-bg);
+  color: var(--tile-32-text);
 }
 
 .game-2048__cell[data-value="64"] {
-  background: #f59d76;
-  color: var(--on-accent);
+  background: var(--tile-64-bg);
+  color: var(--tile-64-text);
 }
 
-.game-2048__cell[data-value="128"],
+.game-2048__cell[data-value="128"] {
+  background: var(--tile-128-bg);
+  color: var(--tile-128-text);
+}
+
 .game-2048__cell[data-value="256"] {
-  background: var(--accent-2);
-  color: var(--on-accent);
+  background: var(--tile-256-bg);
+  color: var(--tile-256-text);
 }
 
 .game-2048__cell[data-value="512"],

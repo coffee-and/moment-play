@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { GAME_COLOR_PALETTE } from "../../shared/gameColorPalette.js";
 import {
   GLOW_SEQUENCE_MASTER_COUNT,
   GLOW_SEQUENCE_MAX_ROUND,
@@ -16,16 +17,7 @@ import {
 import "./glow-sequence.css";
 
 const BEST_ROUND_KEY = "eunContents.glowSequence.bestRound";
-const CELL_COLORS = [
-  "#F3C74F",
-  "#F07A2D",
-  "#D957A0",
-  "#8A6BCB",
-  "#315DB7",
-  "#72B7E8",
-  "#43A99A",
-  "#93BE4F",
-];
+const CELL_COLORS = GAME_COLOR_PALETTE.map((color) => color.value);
 
 function readBestRound() {
   try {
@@ -210,6 +202,8 @@ export function GlowSequenceGame({ game }) {
       className="glow-sequence"
       description={game.description}
       eyebrow="MEMORY / LIGHT"
+      isExitConfirmationOpen={isExitOpen}
+      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >

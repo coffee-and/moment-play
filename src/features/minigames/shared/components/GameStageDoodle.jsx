@@ -6,6 +6,7 @@ import "./game-stage-doodle.css";
 
 const SINGLE_DOODLE_ASSETS = {
   countdown: countdownCheer,
+  start: countdownCheer,
   record: recordCelebration,
 };
 

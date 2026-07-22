@@ -7,7 +7,6 @@ import { Footer } from "../shared/components/Footer.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
-import { SoundUnlockHint } from "../shared/audio/SoundUnlockHint.jsx";
 import { ThemeToggle } from "../shared/theme/ThemeToggle.jsx";
 
 const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
@@ -70,7 +69,6 @@ export function AppLayout() {
           </div>
         </header>
       ) : null}
-      {!isImmersiveGame ? <SoundUnlockHint /> : null}
       <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
         <Outlet />
       </main>

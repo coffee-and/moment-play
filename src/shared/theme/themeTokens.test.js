@@ -14,7 +14,20 @@ function findCssFiles(directory) {
   });
 }
 
-describe("dark theme tokens", () => {
+describe("theme tokens", () => {
+  it.each([
+    ["ivory", "#fcfbf7"],
+    ["charcoal", "#343840"],
+    ["teal", "#044f5f"],
+    ["green", "#2f6f3e"],
+    ["burgundy", "#8b1e24"],
+    ["terracotta", "#bf5036"],
+    ["sage", "#c1d7a0"],
+    ["yellow", "#f2c14e"],
+  ])("keeps the approved %s color", (token, value) => {
+    expect(GLOBAL_STYLES).toContain(`--palette-${token}: ${value};`);
+  });
+
   it.each([
     ["bg", "#101318"],
     ["surface", "#151d28"],
@@ -22,11 +35,20 @@ describe("dark theme tokens", () => {
     ["line", "#313b49"],
     ["text", "#f3f6fa"],
     ["muted", "#a3adbb"],
-    ["accent", "#7da6e3"],
-    ["coral", "#f08aa0"],
-    ["yellow", "#e9c96c"],
-  ])("keeps the approved %s color", (token, value) => {
+  ])("keeps the approved dark %s color", (token, value) => {
     expect(GLOBAL_STYLES).toContain(`--palette-dark-${token}: ${value};`);
+  });
+
+  it("uses one shared chrome foreground in light and the brightest text token in dark", () => {
+    expect(GLOBAL_STYLES).toContain("--chrome-foreground: var(--palette-charcoal);");
+    expect(GLOBAL_STYLES).toContain("--chrome-foreground: var(--palette-dark-text);");
+    expect(GLOBAL_STYLES).toContain("--primary-nav-text: var(--chrome-foreground);");
+    expect(GLOBAL_STYLES).toContain("--primary-nav-active: var(--chrome-foreground);");
+  });
+
+  it("does not keep the replaced provisional accent tokens", () => {
+    expect(GLOBAL_STYLES).not.toMatch(/--palette-(?:light-(?:accent|sky|coral|orange|yellow)|dark-(?:accent|coral|yellow)):/);
+    expect(GLOBAL_STYLES).not.toMatch(/--accent-(?:sky|coral|orange):/);
   });
 
   it("does not assign black text directly in any stylesheet", () => {
