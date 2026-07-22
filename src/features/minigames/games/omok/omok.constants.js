@@ -53,10 +53,21 @@ export const OMOK_MODE_LABEL = Object.freeze({
   [OMOK_MODE.FREE]: "Free Omok",
 });
 
+export const OMOK_MODE_COMPACT_LABEL = Object.freeze({
+  [OMOK_MODE.STANDARD]: "STANDARD",
+  [OMOK_MODE.FREE]: "FREE",
+});
+
 export const MATCH_TYPE_LABEL = Object.freeze({
   [MATCH_TYPE.LOCAL]: "Local match",
   [MATCH_TYPE.COMPUTER]: "Computer match",
   [MATCH_TYPE.ONLINE]: "Online room",
+});
+
+export const MATCH_TYPE_COMPACT_LABEL = Object.freeze({
+  [MATCH_TYPE.LOCAL]: "LOCAL",
+  [MATCH_TYPE.COMPUTER]: "AI",
+  [MATCH_TYPE.ONLINE]: "FRIEND",
 });
 
 export const COMPUTER_DIFFICULTY_LABEL = Object.freeze({
@@ -66,8 +77,8 @@ export const COMPUTER_DIFFICULTY_LABEL = Object.freeze({
 });
 
 export const PLAYER_STONE_CHOICE_LABEL = Object.freeze({
-  [PLAYER_STONE_CHOICE.BLACK]: "Black · First",
-  [PLAYER_STONE_CHOICE.WHITE]: "White · Second",
+  [PLAYER_STONE_CHOICE.BLACK]: "Black",
+  [PLAYER_STONE_CHOICE.WHITE]: "White",
   [PLAYER_STONE_CHOICE.RANDOM]: "Random",
 });
 

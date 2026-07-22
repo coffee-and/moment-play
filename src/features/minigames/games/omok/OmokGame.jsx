@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import {
   COMPUTER_DIFFICULTY,
   COMPUTER_DIFFICULTY_LABEL,
   FORBIDDEN_REASON_LABEL,
   MATCH_TYPE,
+  MATCH_TYPE_COMPACT_LABEL,
   MATCH_TYPE_LABEL,
   OMOK_BOARD_SIZE,
   OMOK_MODE,
+  OMOK_MODE_COMPACT_LABEL,
   OMOK_MODE_LABEL,
   OMOK_RESULT_REASON,
   OMOK_RULE_DETAILS,
@@ -55,7 +58,6 @@ const DIALOG = {
   NICKNAME: "nickname",
   ONLINE_ERROR: "online-error",
   SETTINGS: "settings",
-  RESIGN: "resign",
   LEAVE_CONFIRM: "leave-confirm",
   RULES: "rules",
   START: "start",
@@ -82,6 +84,21 @@ const DEFAULT_SETTINGS = Object.freeze({
 const GAME_MODE_OPTIONS = Object.values(OMOK_MODE);
 const DIFFICULTY_OPTIONS = Object.values(COMPUTER_DIFFICULTY);
 const PLAYER_STONE_OPTIONS = Object.values(PLAYER_STONE_CHOICE);
+
+function OmokSettingToggle({ checked, disabled = false, label, onChange }) {
+  return (
+    <button
+      aria-pressed={checked}
+      className={`omok-game__setting-toggle${checked ? " is-on" : ""}`}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      type="button"
+    >
+      <span>{label}</span>
+      <strong>{checked ? "ON" : "OFF"}</strong>
+    </button>
+  );
+}
 
 function getStoneLabel(stone) {
   return stone === STONE.BLACK ? "흑" : "백";
@@ -192,7 +209,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     forbiddenPositionKeys,
     isComputerThinking,
     playUserMove,
-    resign,
     restartGame,
   } = useOmokGame({
     computerDifficulty: activeMatch.computerDifficulty,
@@ -432,15 +448,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     return `${base}, 빈 교차점`;
   }
 
-  function confirmResign() {
-    const resigningStone = activeMatch.computerStone && activeMatch.computerStone === turn
-      ? activeMatch.playerStone
-      : turn;
-
-    resign(resigningStone);
-    closeDialog();
-  }
-
   function saveOnlineNickname() {
     try {
       const normalized = saveLocalSharedNickname(onlineNickname);
@@ -509,7 +516,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       </div>
       <div className="stat-row">
         <div className="stat"><div className="l">Board</div><div className="v">{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>
-        <div className="stat"><div className="l">Mode</div><div className="v"><small>{isGameScreenVisible ? MATCH_TYPE_LABEL[activeMatchType] : isOnlineContext ? "Online waiting" : "선택 전"}</small></div></div>
+        <div className="stat"><div className="l">Match</div><div className="v"><small aria-label={isGameScreenVisible ? MATCH_TYPE_LABEL[activeMatchType] : isOnlineContext ? "Friend room" : "선택 전"}>{isGameScreenVisible ? MATCH_TYPE_COMPACT_LABEL[activeMatchType] : isOnlineContext ? "FRIEND" : "—"}</small></div></div>
         {isGameScreenVisible ? (
           <>
             <div className="stat"><div className="l">Turn</div><div className="v"><small>{getStoneLabel(activeTurn)}</small></div></div>
@@ -517,24 +524,11 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
           </>
         ) : (
           <>
-            <div className="stat"><div className="l">Rule</div><div className="v"><small>{OMOK_MODE_LABEL[activeGameMode]}</small></div></div>
+            <div className="stat"><div className="l">Rule</div><div className="v"><small aria-label={OMOK_MODE_LABEL[activeGameMode]}>{OMOK_MODE_COMPACT_LABEL[activeGameMode]}</small></div></div>
             <div className="stat"><div className="l">Guide</div><div className="v"><small>{compactRuleSummaryText.includes("사용 중") ? "사용 중" : "사용 안 함"}</small></div></div>
           </>
         )}
       </div>
-      {isOnlineContext && online.room ? (
-        <div className="game-stage__actions">
-          <Button type="button" variant="secondary" onClick={() => openDialog(DIALOG.RULES)}>규칙</Button>
-          <Button type="button" variant="secondary" onClick={requestLeaveOnlineRoom} disabled={onlineBusy}>나가기</Button>
-        </div>
-      ) : null}
-      {(screen === SCREEN.GAME_START || screen === SCREEN.PLAYING) && !isOnlineContext ? (
-        <div className="game-stage__actions">
-          <Button type="button" variant="secondary" onClick={() => openDialog(DIALOG.RESIGN)} disabled={Boolean(activeWinner || activeDraw)}>기권</Button>
-          <Button type="button" variant="secondary" onClick={() => openDialog(DIALOG.RULES)}>규칙</Button>
-          <Button type="button" variant="secondary" onClick={requestReturnToMenu}>메뉴</Button>
-        </div>
-      ) : null}
       <p className="game-stage__side-note omok-game__rule-summary">
         <span className="omok-game__rule-summary-text">
           <span>{OMOK_MODE_LABEL[activeGameMode]}</span>
@@ -571,21 +565,24 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     online.status === ONLINE_ROOM_LOAD_STATUS.CHECKING_PROFILE
   );
   const canDismissDialog = dialog === DIALOG.SETTINGS || dialog === DIALOG.RULES;
+
+  function requestGameExit() {
+    if (isOnlineContext && online.room) {
+      requestLeaveOnlineRoom();
+      return;
+    }
+    if (screen === SCREEN.GAME_START || screen === SCREEN.PLAYING) {
+      requestReturnToMenu();
+      return;
+    }
+    navigate("/");
+  }
+
   const topbarActions = (
     <Button
       type="button"
       variant="secondary"
-      onClick={() => {
-        if (isOnlineContext && online.room) {
-          requestLeaveOnlineRoom();
-          return;
-        }
-        if (screen === SCREEN.GAME_START || screen === SCREEN.PLAYING) {
-          requestReturnToMenu();
-          return;
-        }
-        navigate("/");
-      }}
+      onClick={requestGameExit}
     >
       게임 나가기
     </Button>
@@ -594,10 +591,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
   return (
     <GameStage
       actions={topbarActions}
-      className="omok-game"
+      className={`omok-game${isGameScreenVisible ? " is-game-screen" : ""}`}
       eyebrow={game.eyebrow}
       title={game.title}
       description={game.description}
+      isExitConfirmationOpen={dialog === DIALOG.LEAVE_CONFIRM}
+      onRequestExit={requestGameExit}
       sidebar={sidebar}
       ariaLabel={game.title}
     >
@@ -674,26 +673,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
                       </button>
                     ))}
                   </div>
-                  <div className="omok-game__settings omok-game__settings--toggles">
-                    <label>
-                      금수 위치 보기 허용
-                      <input
-                        type="checkbox"
-                        checked={online.room.allowForbiddenPositions}
-                        disabled={onlineBusy || online.room.gameMode === OMOK_MODE.FREE}
-                        onChange={(event) => updateOnlineRoomSetting("allowForbiddenPositions", event.target.checked)}
-                      />
-                    </label>
-                    <label>
-                      금수 이유 설명 허용
-                      <input
-                        type="checkbox"
-                        checked={online.room.allowForbiddenReasons}
-                        disabled={onlineBusy || online.room.gameMode === OMOK_MODE.FREE}
-                        onChange={(event) => updateOnlineRoomSetting("allowForbiddenReasons", event.target.checked)}
-                      />
-                    </label>
-                  </div>
+                  {online.room.gameMode === OMOK_MODE.STANDARD ? (
+                    <div className="omok-game__settings omok-game__settings--toggles">
+                      <OmokSettingToggle checked={online.room.allowForbiddenPositions} disabled={onlineBusy} label="금수 위치 보기 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenPositions", value)} />
+                      <OmokSettingToggle checked={online.room.allowForbiddenReasons} disabled={onlineBusy} label="금수 이유 설명 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenReasons", value)} />
+                    </div>
+                  ) : null}
                 </>
               ) : null}
             </div>
@@ -708,26 +693,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
                     {!player ? (
                       <p className="omok-game__hint">입장 대기 중</p>
                     ) : isMe ? (
-                      <div className="omok-game__settings omok-game__settings--toggles">
-                        <label>
-                          금수 위치 표시
-                          <input
-                            type="checkbox"
-                            checked={currentGuideSettings.showForbiddenPositions}
-                            disabled={onlineBusy || online.room.gameMode === OMOK_MODE.FREE}
-                            onChange={(event) => updateGuideSetting("showForbiddenPositions", event.target.checked)}
-                          />
-                        </label>
-                        <label>
-                          금수 이유 설명
-                          <input
-                            type="checkbox"
-                            checked={currentGuideSettings.explainForbiddenReasons}
-                            disabled={onlineBusy || online.room.gameMode === OMOK_MODE.FREE}
-                            onChange={(event) => updateGuideSetting("explainForbiddenReasons", event.target.checked)}
-                          />
-                        </label>
-                      </div>
+                      online.room.gameMode === OMOK_MODE.STANDARD ? (
+                        <div className="omok-game__settings omok-game__settings--toggles">
+                          <OmokSettingToggle checked={currentGuideSettings.showForbiddenPositions} disabled={onlineBusy} label="금수 위치 표시" onChange={(value) => updateGuideSetting("showForbiddenPositions", value)} />
+                          <OmokSettingToggle checked={currentGuideSettings.explainForbiddenReasons} disabled={onlineBusy} label="금수 이유 설명" onChange={(value) => updateGuideSetting("explainForbiddenReasons", value)} />
+                        </div>
+                      ) : null
                     ) : (
                       <p className="omok-game__hint">{getPlayerGuideSummaryText(player)}</p>
                     )}
@@ -788,10 +759,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
                 </button>
               ))}
             </div>
-            <div className="omok-game__settings omok-game__settings--toggles">
-              <label>금수 위치 보기 허용<input type="checkbox" checked={settings.allowForbiddenPositions} disabled={settings.gameMode === OMOK_MODE.FREE} onChange={(event) => updateSetting("allowForbiddenPositions", event.target.checked)} /></label>
-              <label>금수 이유 설명 허용<input type="checkbox" checked={settings.allowForbiddenReasons} disabled={settings.gameMode === OMOK_MODE.FREE} onChange={(event) => updateSetting("allowForbiddenReasons", event.target.checked)} /></label>
-            </div>
+            {settings.gameMode === OMOK_MODE.STANDARD ? (
+              <div className="omok-game__settings omok-game__settings--toggles">
+                <OmokSettingToggle checked={settings.allowForbiddenPositions} label="금수 위치 보기 허용" onChange={(value) => updateSetting("allowForbiddenPositions", value)} />
+                <OmokSettingToggle checked={settings.allowForbiddenReasons} label="금수 이유 설명 허용" onChange={(value) => updateSetting("allowForbiddenReasons", value)} />
+              </div>
+            ) : null}
             <div className="game-stage__actions omok-game__setup-actions">
               <Button type="button" onClick={createOnlineRoom} disabled={onlineBusy}>방 만들기</Button>
               <Button type="button" variant="secondary" onClick={() => setScreen(SCREEN.MENU)} disabled={onlineBusy}>뒤로</Button>
@@ -813,10 +786,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
             <div className="omok-game__settings" role="group" aria-label="내 돌 선택">
               {PLAYER_STONE_OPTIONS.map((choice) => <button className={`omok-game__setting-chip${settings.playerStoneChoice === choice ? " is-selected" : ""}`} type="button" key={choice} onClick={() => updateSetting("playerStoneChoice", choice)}>{PLAYER_STONE_CHOICE_LABEL[choice]}</button>)}
             </div>
-            <div className="omok-game__settings omok-game__settings--toggles">
-              <label>금수 위치 표시<input type="checkbox" checked={settings.showForbiddenPositions} disabled={settings.gameMode === OMOK_MODE.FREE} onChange={(event) => updateSetting("showForbiddenPositions", event.target.checked)} /></label>
-              <label>금수 이유 설명<input type="checkbox" checked={settings.explainForbiddenReasons} disabled={settings.gameMode === OMOK_MODE.FREE} onChange={(event) => updateSetting("explainForbiddenReasons", event.target.checked)} /></label>
-            </div>
+            {settings.gameMode === OMOK_MODE.STANDARD ? (
+              <div className="omok-game__settings omok-game__settings--toggles">
+                <OmokSettingToggle checked={settings.showForbiddenPositions} label="금수 위치 표시" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
+                <OmokSettingToggle checked={settings.explainForbiddenReasons} label="금수 이유 설명" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
+              </div>
+            ) : null}
             <div className="game-stage__actions omok-game__setup-actions">
               <Button type="button" onClick={startComputerMatch}>게임 시작</Button>
               <Button type="button" variant="secondary" onClick={() => setScreen(SCREEN.MENU)}>뒤로</Button>
@@ -955,26 +930,12 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
               <p className="omok-game__modal-eyebrow">Config</p>
               <h3 id="omok-settings-title">게임 설정</h3>
               <p>대국을 시작할 때 적용할 개인 금수 안내 기본값입니다.</p>
-              <div className="omok-game__settings omok-game__settings--toggles">
-                <label>
-                  내 금수 위치 표시 기본값
-                  <input
-                    type="checkbox"
-                    checked={settings.showForbiddenPositions}
-                    disabled={settings.gameMode === OMOK_MODE.FREE}
-                    onChange={(event) => updateSetting("showForbiddenPositions", event.target.checked)}
-                  />
-                </label>
-                <label>
-                  내 금수 이유 설명 기본값
-                  <input
-                    type="checkbox"
-                    checked={settings.explainForbiddenReasons}
-                    disabled={settings.gameMode === OMOK_MODE.FREE}
-                    onChange={(event) => updateSetting("explainForbiddenReasons", event.target.checked)}
-                  />
-                </label>
-              </div>
+              {settings.gameMode === OMOK_MODE.STANDARD ? (
+                <div className="omok-game__settings omok-game__settings--toggles">
+                  <OmokSettingToggle checked={settings.showForbiddenPositions} label="내 금수 위치 표시 기본값" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
+                  <OmokSettingToggle checked={settings.explainForbiddenReasons} label="내 금수 이유 설명 기본값" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
+                </div>
+              ) : null}
               <div className="game-stage-modal__actions">
                 <Button type="button" onClick={closeDialog}>확인</Button>
               </div>
@@ -982,6 +943,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
           ) : null}
           {dialog === DIALOG.START || (!dialog && needsOnlineStart) ? (
             <GameStageModal role="dialog" aria-modal="true" aria-labelledby="omok-start-title">
+              <GameStageDoodle variant="start" />
               <p className="omok-game__modal-eyebrow">Ready</p>
               <h3 id="omok-start-title">대국을 시작합니다</h3>
               <p>{getStoneLabel(activeTurn)}이 먼저 시작합니다.</p>
@@ -1018,17 +980,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
               )}
               <div className="game-stage-modal__actions">
                 <Button type="button" onClick={closeDialog}>확인</Button>
-              </div>
-            </GameStageModal>
-          ) : null}
-          {dialog === DIALOG.RESIGN ? (
-            <GameStageModal role="dialog" aria-modal="true" aria-labelledby="omok-resign-title">
-              <p className="omok-game__modal-eyebrow">Confirm</p>
-              <h3 id="omok-resign-title">기권할까요?</h3>
-              <p>기권하면 이번 대국은 상대 승리로 종료됩니다.</p>
-              <div className="game-stage-modal__actions">
-                <Button type="button" onClick={closeDialog}>계속 두기</Button>
-                <Button type="button" variant="secondary" onClick={confirmResign}>기권하기</Button>
               </div>
             </GameStageModal>
           ) : null}

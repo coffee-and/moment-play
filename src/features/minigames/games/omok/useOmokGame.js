@@ -139,20 +139,6 @@ export function useOmokGame({
 
   const playUserMove = useCallback((position) => playStone(position), [playStone]);
 
-  const resign = useCallback(
-    (resigningStone = turn) => {
-      if (!isActive || winner || draw) return false;
-      clearComputerMoveTimer();
-      setWinner(getNextStone(resigningStone));
-      setWinningLine([]);
-      setDraw(false);
-      setResultReason(OMOK_RESULT_REASON.RESIGN);
-      setForbiddenFeedback(null);
-      return true;
-    },
-    [clearComputerMoveTimer, draw, isActive, turn, winner],
-  );
-
   useEffect(() => {
     if (!isComputerThinking || !computerStone) return undefined;
 
@@ -185,7 +171,6 @@ export function useOmokGame({
     forbiddenPositionKeys,
     isComputerThinking,
     playUserMove,
-    resign,
     restartGame,
   };
 }

@@ -8,17 +8,18 @@ import {
 } from "./glowSequence.logic.js";
 
 describe("Glow Sequence progression", () => {
-  it("uses the agreed early rounds and three rounds per length from 8 to 24", () => {
-    expect([1, 2, 3, 4, 5, 6, 7, 8].map(getGlowSequenceLength)).toEqual([3, 3, 4, 4, 5, 5, 6, 7]);
-    expect([9, 10, 11].map(getGlowSequenceLength)).toEqual([8, 8, 8]);
-    expect([12, 13, 14].map(getGlowSequenceLength)).toEqual([9, 9, 9]);
-    expect([57, 58, 59].map(getGlowSequenceLength)).toEqual([24, 24, 24]);
-    expect(getGlowSequenceLength(GLOW_SEQUENCE_MAX_ROUND)).toBe(25);
+  it("uses 2, 3, and 4 early repeats, then five repeats through 15 and one final 16-cell round", () => {
+    expect([1, 2].map(getGlowSequenceLength)).toEqual([3, 3]);
+    expect([3, 4, 5].map(getGlowSequenceLength)).toEqual([4, 4, 4]);
+    expect([6, 7, 8, 9].map(getGlowSequenceLength)).toEqual([5, 5, 5, 5]);
+    expect([10, 11, 12, 13, 14].map(getGlowSequenceLength)).toEqual([6, 6, 6, 6, 6]);
+    expect([55, 56, 57, 58, 59].map(getGlowSequenceLength)).toEqual([15, 15, 15, 15, 15]);
+    expect(getGlowSequenceLength(GLOW_SEQUENCE_MAX_ROUND)).toBe(16);
   });
 
-  it("changes to a 5 by 5 grid only after 16 cells", () => {
+  it("keeps every round on the four by four grid", () => {
     expect(getGlowGridSize(16)).toBe(4);
-    expect(getGlowGridSize(17)).toBe(5);
+    expect(getGlowGridSize(25)).toBe(4);
   });
 
   it("creates a unique sequence and evaluates player choices", () => {

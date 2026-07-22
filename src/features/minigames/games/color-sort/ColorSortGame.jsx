@@ -16,6 +16,7 @@ import {
 import "./color-sort.css";
 
 const COLOR_BY_ID = Object.fromEntries(COLOR_SORT_PALETTE.map((color) => [color.id, color.value]));
+const COLOR_SORT_UNDO_LIMIT = 5;
 
 export function ColorSortGame({ game }) {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export function ColorSortGame({ game }) {
   const [initialTubes, setInitialTubes] = useState([]);
   const [selectedTube, setSelectedTube] = useState(null);
   const [history, setHistory] = useState([]);
+  const [undoRemaining, setUndoRemaining] = useState(COLOR_SORT_UNDO_LIMIT);
   const [moves, setMoves] = useState(0);
   const [totalMoves, setTotalMoves] = useState(0);
   const [isExitOpen, setIsExitOpen] = useState(false);
@@ -43,6 +45,7 @@ export function ColorSortGame({ game }) {
     setInitialTubes(board.map((tube) => [...tube]));
     setSelectedTube(null);
     setHistory([]);
+    setUndoRemaining(COLOR_SORT_UNDO_LIMIT);
     setMoves(0);
     setPhase("playing");
   }
@@ -88,12 +91,13 @@ export function ColorSortGame({ game }) {
   }
 
   function undoMove() {
-    if (!history.length || phase !== "playing") return;
+    if (!history.length || !undoRemaining || phase !== "playing") return;
     const previous = history[history.length - 1];
     setTubes(previous);
     setHistory((current) => current.slice(0, -1));
     setMoves((current) => Math.max(0, current - 1));
     setTotalMoves((current) => Math.max(0, current - 1));
+    setUndoRemaining((current) => Math.max(0, current - 1));
     setSelectedTube(null);
     playSound("correct");
   }
@@ -102,6 +106,7 @@ export function ColorSortGame({ game }) {
     setTubes(initialTubes.map((tube) => [...tube]));
     setSelectedTube(null);
     setHistory([]);
+    setUndoRemaining(COLOR_SORT_UNDO_LIMIT);
     setTotalMoves((current) => Math.max(0, current - moves));
     setMoves(0);
     setPhase("playing");
@@ -131,6 +136,8 @@ export function ColorSortGame({ game }) {
       className="color-sort"
       description={game.description}
       eyebrow="PUZZLE / COLOR"
+      isExitConfirmationOpen={isExitOpen}
+      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
@@ -170,7 +177,14 @@ export function ColorSortGame({ game }) {
         {phase === "idle" ? <Button onClick={startGame}>게임 시작</Button> : null}
         {phase === "playing" ? (
           <div className="color-sort__actions">
-            <Button variant="secondary" disabled={!history.length} onClick={undoMove}>되돌리기</Button>
+            <Button
+              aria-label={`되돌리기, ${undoRemaining}회 남음`}
+              variant="secondary"
+              disabled={!history.length || !undoRemaining}
+              onClick={undoMove}
+            >
+              되돌리기 {undoRemaining}
+            </Button>
             <Button variant="secondary" onClick={restartLevel}>처음부터</Button>
           </div>
         ) : null}

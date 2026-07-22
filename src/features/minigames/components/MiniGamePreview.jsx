@@ -1,34 +1,61 @@
-import memoryCardPreview from "../../../assets/figma/memory-card-preview.png";
-import starFlightCardPreview from "../../../assets/figma/star-flight-card-preview.png";
-
-function PreviewCells(values) {
-  return values.map((value, index) => <span key={`${value}-${index}`}>{value}</span>);
-}
+const PREVIEW_2048_TILES = [2, 4, 8, 16, 0, 32, 64, 0, 0, 128, 256, 0, 0, 0, 512, 1024];
+const PREVIEW_SUDOKU_CELLS = [1, "", 5, "", "", 7, "", 3, 4, "", 9, "", "", 2, "", 8];
+const PREVIEW_MEMORY_SYMBOLS = ["circle", "diamond", "heart", "star"];
+const PREVIEW_GLOW_CELLS = Array.from({ length: 16 }, (_, index) => index);
+const PREVIEW_COLOR_TUBES = [
+  ["teal", "terracotta", "yellow", "green"],
+  ["burgundy", "teal", "terracotta", "yellow"],
+  ["green", "burgundy", "teal", "terracotta"],
+  [],
+];
 
 export function MiniGamePreview({ gameId }) {
   if (gameId === "2048") {
-    return <span className="game-card-preview is-2048">{PreviewCells(["2", "4", "16"])}</span>;
+    return (
+      <span className="game-card-preview is-2048">
+        {PREVIEW_2048_TILES.map((value, index) => (
+          <span className="preview-2048-tile" data-value={value || undefined} key={index}>{value || ""}</span>
+        ))}
+      </span>
+    );
   }
 
   if (gameId === "memory") {
-    return <img className="game-card-preview is-memory" src={memoryCardPreview} alt="" />;
+    return (
+      <span className="game-card-preview is-memory">
+        {PREVIEW_MEMORY_SYMBOLS.map((symbol) => <span className={`preview-memory-symbol is-${symbol}`} key={symbol} />)}
+      </span>
+    );
   }
 
   if (gameId === "sudoku") {
-    return <span className="game-card-preview is-sudoku">{PreviewCells(["1", "5", "9"])}</span>;
+    return (
+      <span className="game-card-preview is-sudoku">
+        {PREVIEW_SUDOKU_CELLS.map((value, index) => <span key={index}>{value}</span>)}
+      </span>
+    );
   }
 
   if (gameId === "omok") {
     return (
       <span className="game-card-preview is-omok">
-        <span className="preview-stone is-black" />
-        <span className="preview-stone is-white" />
+        <span className="preview-stone is-black is-one" />
+        <span className="preview-stone is-white is-two" />
+        <span className="preview-stone is-black is-three" />
+        <span className="preview-stone is-white is-four" />
       </span>
     );
   }
 
   if (gameId === "flappy") {
-    return <img className="game-card-preview is-flappy" src={starFlightCardPreview} alt="" />;
+    return (
+      <span className="game-card-preview is-flappy">
+        <span className="preview-flappy-stars" />
+        <span className="preview-flappy-fish"><span /></span>
+        <span className="preview-flappy-pillar is-top" />
+        <span className="preview-flappy-pillar is-bottom" />
+      </span>
+    );
   }
 
   if (gameId === "timing-tap") {
@@ -43,7 +70,7 @@ export function MiniGamePreview({ gameId }) {
   if (gameId === "glow-sequence") {
     return (
       <span className="game-card-preview is-glow-sequence">
-        {PreviewCells(["", "", "", "", "", ""])}
+        {PREVIEW_GLOW_CELLS.map((cell) => <span className={cell === 6 ? "is-lit" : ""} key={cell} />)}
       </span>
     );
   }
@@ -51,7 +78,11 @@ export function MiniGamePreview({ gameId }) {
   if (gameId === "color-sort") {
     return (
       <span className="game-card-preview is-color-sort">
-        {PreviewCells(["", "", "", "", "", ""])}
+        {PREVIEW_COLOR_TUBES.map((colors, tubeIndex) => (
+          <span className="preview-color-tube" key={tubeIndex}>
+            {colors.map((color, index) => <span className={`is-${color}`} key={`${color}-${index}`} />)}
+          </span>
+        ))}
       </span>
     );
   }

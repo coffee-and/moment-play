@@ -1,16 +1,9 @@
+import { GAME_COLOR_PALETTE } from "../../shared/gameColorPalette.js";
+
 export const COLOR_SORT_CAPACITY = 4;
 export const COLOR_SORT_MAX_LEVEL = 5;
 
-export const COLOR_SORT_PALETTE = [
-  { id: "yellow", value: "#F3C74F" },
-  { id: "orange", value: "#F07A2D" },
-  { id: "pink", value: "#D957A0" },
-  { id: "purple", value: "#8A6BCB" },
-  { id: "deep-blue", value: "#315DB7" },
-  { id: "sky-blue", value: "#72B7E8" },
-  { id: "teal", value: "#43A99A" },
-  { id: "lime", value: "#93BE4F" },
-];
+export const COLOR_SORT_PALETTE = GAME_COLOR_PALETTE;
 
 export function getColorSortLevel(level) {
   const safeLevel = Math.min(COLOR_SORT_MAX_LEVEL, Math.max(1, Math.floor(Number(level) || 1)));

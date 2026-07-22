@@ -102,7 +102,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
   it("cannot select cards during countdown or sequence display", () => {
     const view = renderGame();
-    expect(document.querySelector('[data-doodle-variant="countdown"]')).not.toBeNull();
+    expect(document.querySelector('[data-doodle-variant="start"]')).not.toBeNull();
     act(() => findButton("게임 시작").click());
     expect(document.body.textContent).toContain("ROUND —");
     expect(document.querySelector('.game-stage-modal [data-doodle-variant="countdown"]')).not.toBeNull();

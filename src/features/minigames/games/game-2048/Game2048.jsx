@@ -6,6 +6,7 @@ import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import "./game-2048.css";
 import {
@@ -258,14 +259,20 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   function handlePointerDown(event) {
     if (!canMoveBoard) return;
-    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+    if (pointerStartRef.current) return;
+    pointerStartRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
   }
 
   function handlePointerUp(event) {
     if (!canMoveBoard || !pointerStartRef.current) return;
+    if (pointerStartRef.current.pointerId !== event.pointerId) return;
     const deltaX = event.clientX - pointerStartRef.current.x;
     const deltaY = event.clientY - pointerStartRef.current.y;
     pointerStartRef.current = null;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
     const maxDelta = Math.max(absX, absY);
@@ -278,8 +285,12 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     handleMove(deltaY > 0 ? GAME_2048_DIRECTION.DOWN : GAME_2048_DIRECTION.UP);
   }
 
-  function handlePointerCancel() {
+  function handlePointerCancel(event) {
+    if (pointerStartRef.current?.pointerId !== event.pointerId) return;
     pointerStartRef.current = null;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   }
 
   function requestExit() {
@@ -351,10 +362,11 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   );
 
   return (
-    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} sidebar={sidebar} ariaLabel="2048 게임">
+    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
       <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === GAME_2048_PHASE.IDLE ? (
           <GameStageModal className="game-2048__modal game-2048__start-modal" role="region" aria-labelledby="game-2048-start-title">
+            <GameStageDoodle variant="start" />
             <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.start.eyebrow}</p>
             <p className="game-2048__target-label">{GAME_2048_COPY.start.targetLabel}</p>
             <strong className="game-2048__target-value">{formatNumber(currentTarget)}</strong>

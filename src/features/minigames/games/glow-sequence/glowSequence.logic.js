@@ -1,5 +1,5 @@
 export const GLOW_SEQUENCE_MAX_ROUND = 60;
-export const GLOW_SEQUENCE_MASTER_COUNT = 25;
+export const GLOW_SEQUENCE_MASTER_COUNT = 16;
 
 export function getGlowSequenceLength(round) {
   const safeRound = Math.min(
@@ -8,24 +8,19 @@ export function getGlowSequenceLength(round) {
   );
 
   if (safeRound <= 2) return 3;
-  if (safeRound <= 4) return 4;
-  if (safeRound <= 6) return 5;
-  if (safeRound === 7) return 6;
-  if (safeRound === 8) return 7;
+  if (safeRound <= 5) return 4;
+  if (safeRound <= 9) return 5;
   if (safeRound === GLOW_SEQUENCE_MAX_ROUND) return GLOW_SEQUENCE_MASTER_COUNT;
 
-  return Math.min(24, 8 + Math.floor((safeRound - 9) / 3));
+  return Math.min(15, 6 + Math.floor((safeRound - 10) / 5));
 }
 
 export function getGlowGridSize(sequenceLength) {
-  return Math.max(1, Number(sequenceLength) || 0) <= 16 ? 4 : 5;
+  return 4;
 }
 
-export function getGlowPlaybackTiming(sequenceLength) {
-  const gridSize = getGlowGridSize(sequenceLength);
-  return gridSize === 4
-    ? { leadMs: 520, onMs: 430, gapMs: 150 }
-    : { leadMs: 480, onMs: 360, gapMs: 130 };
+export function getGlowPlaybackTiming() {
+  return { leadMs: 520, onMs: 430, gapMs: 150 };
 }
 
 function normalizeRandom(value) {

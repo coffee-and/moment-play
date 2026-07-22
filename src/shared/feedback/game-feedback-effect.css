@@ -64,12 +64,12 @@
 }
 
 .game-feedback-effect.is-positive {
-  color: color-mix(in oklab, var(--accent) 72%, #41d7a7);
+  color: color-mix(in oklab, var(--accent) 72%, var(--palette-green));
 }
 
 .game-feedback-effect.is-perfect,
 .game-feedback-effect.is-clear {
-  color: color-mix(in oklab, var(--accent) 60%, #ffd76b);
+  color: color-mix(in oklab, var(--accent) 60%, var(--palette-yellow));
 }
 
 .game-feedback-effect.is-negative,

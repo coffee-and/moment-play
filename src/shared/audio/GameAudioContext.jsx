@@ -2,21 +2,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useLocation } from "react-router-dom";
 import { useGameFeedback } from "../feedback/GameFeedbackContext.jsx";
 import { GameAudioEngine } from "./audioEngine.js";
-import {
-  getAudioTrackForPath,
-  readAudioPreference,
-  writeAudioPreference,
-} from "./audioCatalog.js";
+import { getAudioTrackForPath } from "./audioCatalog.js";
 import "./audio.css";
 
 const NOOP = () => {};
 const GameAudioContext = createContext({
-  enabled: true,
+  enabled: false,
   isAudible: false,
   playSound: NOOP,
   popDucking: NOOP,
   pushDucking: NOOP,
-  showUnlockHint: false,
   toggleAudio: NOOP,
   unlockAudio: async () => false,
 });
@@ -26,9 +21,8 @@ export function GameAudioProvider({ children }) {
   const { triggerFeedback } = useGameFeedback();
   const engineRef = useRef(null);
   const duckCountRef = useRef(0);
-  const [enabled, setEnabled] = useState(readAudioPreference);
+  const [enabled, setEnabled] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [showUnlockHint, setShowUnlockHint] = useState(false);
 
   if (!engineRef.current) engineRef.current = new GameAudioEngine();
 
@@ -36,26 +30,22 @@ export function GameAudioProvider({ children }) {
     if (!enabled) return false;
     const unlocked = await engineRef.current.unlock();
     setIsUnlocked(unlocked);
-    if (unlocked) setShowUnlockHint(false);
     return unlocked;
   }, [enabled]);
 
   const toggleAudio = useCallback(async () => {
-    if (enabled && isUnlocked) {
+    if (enabled) {
       setEnabled(false);
       setIsUnlocked(false);
-      writeAudioPreference(false);
       engineRef.current.setEnabled(false);
       return;
     }
 
     setEnabled(true);
-    writeAudioPreference(true);
     engineRef.current.setEnabled(true);
     const unlocked = await engineRef.current.unlock();
     setIsUnlocked(unlocked);
-    setShowUnlockHint(!unlocked);
-  }, [enabled, isUnlocked]);
+  }, [enabled]);
 
   const playSound = useCallback((sound) => {
     triggerFeedback(sound);
@@ -78,30 +68,30 @@ export function GameAudioProvider({ children }) {
   }, [enabled, location.pathname]);
 
   useEffect(() => {
-    if (!enabled || isUnlocked) return undefined;
-    const hintTimer = window.setTimeout(() => setShowUnlockHint(true), 1100);
-    const unlockFromInteraction = () => {
-      void unlockAudio();
-    };
-    document.addEventListener("pointerdown", unlockFromInteraction, { once: true, capture: true });
-    document.addEventListener("keydown", unlockFromInteraction, { once: true, capture: true });
-    return () => {
-      window.clearTimeout(hintTimer);
-      document.removeEventListener("pointerdown", unlockFromInteraction, { capture: true });
-      document.removeEventListener("keydown", unlockFromInteraction, { capture: true });
-    };
-  }, [enabled, isUnlocked, unlockAudio]);
+    function suspendAudio() {
+      void engineRef.current.suspend();
+    }
 
-  useEffect(() => {
+    function resumeAudio() {
+      if (enabled && isUnlocked) void engineRef.current.resume();
+    }
+
     function handleVisibilityChange() {
       if (document.hidden) {
-        void engineRef.current.suspend();
-      } else if (enabled && isUnlocked) {
-        void engineRef.current.resume();
+        suspendAudio();
+      } else {
+        resumeAudio();
       }
     }
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", suspendAudio);
+    window.addEventListener("pageshow", resumeAudio);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", suspendAudio);
+      window.removeEventListener("pageshow", resumeAudio);
+    };
   }, [enabled, isUnlocked]);
 
   useEffect(() => () => engineRef.current.destroy(), []);
@@ -112,10 +102,9 @@ export function GameAudioProvider({ children }) {
     playSound,
     popDucking,
     pushDucking,
-    showUnlockHint: showUnlockHint && enabled && !isUnlocked,
     toggleAudio,
     unlockAudio,
-  }), [enabled, isUnlocked, playSound, popDucking, pushDucking, showUnlockHint, toggleAudio, unlockAudio]);
+  }), [enabled, isUnlocked, playSound, popDucking, pushDucking, toggleAudio, unlockAudio]);
 
   return (
     <GameAudioContext.Provider value={value}>

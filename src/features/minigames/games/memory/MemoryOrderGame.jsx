@@ -644,19 +644,21 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       title={game.title}
       description={game.description}
       actions={gameActions}
+      isExitConfirmationOpen={isExitConfirmOpen}
+      onRequestExit={requestExit}
       sidebar={sidebar}
       ariaLabel={game.title}
     >
       <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase === PHASE.IDLE ? (
-          <section className="memory-game__idle" aria-labelledby="memory-game-start-title">
-            <GameStageDoodle variant="countdown" />
+          <GameStageModal className="memory-game__idle" role="region" aria-labelledby="memory-game-start-title">
+            <GameStageDoodle variant="start" />
             <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
             <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
             <Button className="memory-game__primary" type="button" onClick={startGame}>
               게임 시작
             </Button>
-          </section>
+          </GameStageModal>
         ) : (
           <div className="memory-game__play-shell" data-memory-count={data.count} data-phase={phase}>
             <div className="memory-game__timer-row">

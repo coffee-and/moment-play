@@ -196,6 +196,8 @@ export function TimingTapGame({ game }) {
       className="timing-tap"
       description={game.description}
       eyebrow="REACTION / TIMING"
+      isExitConfirmationOpen={isExitOpen}
+      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >

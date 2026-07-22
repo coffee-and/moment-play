@@ -29,7 +29,6 @@ vi.mock("./useOmokGame.js", () => ({
     forbiddenPositionKeys: new Set(),
     isComputerThinking: false,
     playUserMove: vi.fn(),
-    resign: vi.fn(),
     restartGame: vi.fn(),
   }),
 }));

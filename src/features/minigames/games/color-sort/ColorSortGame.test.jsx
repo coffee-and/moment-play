@@ -64,6 +64,24 @@ describe("ColorSortGame", () => {
     act(() => destination.click());
     const movesStat = [...view.host.querySelectorAll(".stat")].find((stat) => stat.querySelector(".l")?.textContent === "Moves");
     expect(movesStat.querySelector(".v")?.textContent).toBe("1");
+    expect([...view.host.querySelectorAll("button")].find((button) => button.textContent === "되돌리기 5")).toBeDefined();
+    view.unmount();
+  });
+
+  it("limits undo to five successful uses per level and resets the allowance on restart", () => {
+    const view = renderGame();
+    act(() => [...view.host.querySelectorAll("button")].find((button) => button.textContent === "게임 시작").click());
+
+    const tubes = [...view.host.querySelectorAll(".color-sort__tube")];
+    const source = tubes.find((tube) => !tube.getAttribute("aria-label").includes("블록 0개"));
+    const destination = tubes.find((tube) => tube.getAttribute("aria-label").includes("블록 0개"));
+    act(() => source.click());
+    act(() => destination.click());
+    act(() => [...view.host.querySelectorAll("button")].find((button) => button.textContent === "되돌리기 5").click());
+    expect([...view.host.querySelectorAll("button")].find((button) => button.textContent === "되돌리기 4")).toBeDefined();
+
+    act(() => [...view.host.querySelectorAll("button")].find((button) => button.textContent === "처음부터").click());
+    expect([...view.host.querySelectorAll("button")].find((button) => button.textContent === "되돌리기 5")).toBeDefined();
     view.unmount();
   });
 });
