@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import {
@@ -259,7 +260,7 @@ export function FlappyGame({ game }) {
             <i className="flappy-game__bird-tail" />
           </span>
 
-          {phase !== "playing" ? (
+          {phase !== "playing" && phase !== "idle" ? (
             <div className="flappy-game__curtain">
               <span className="flappy-game__curtain-kicker">
                 {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
@@ -282,6 +283,18 @@ export function FlappyGame({ game }) {
         </div>
         <p className="flappy-game__hint">탭할 때마다 위로 날아요 · 기둥과 천장·바닥을 피하세요</p>
       </div>
+
+      {phase === "idle" ? (
+        <GameStageOverlay state="start">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="flappy-start-title">
+            <GameStageDoodle variant="start" />
+            <div className="game-stage-modal__eyebrow">ARCADE / FLIGHT</div>
+            <h3 id="flappy-start-title">별빛 사이를 날아보세요</h3>
+            <p>화면을 탭하거나 Space·Enter를 눌러 날개를 펼쳐요.</p>
+            <Button onClick={startGame}>비행 시작</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
 
       {isExitOpen ? (
         <GameStageOverlay state="confirm">

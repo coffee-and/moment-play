@@ -95,11 +95,11 @@ describe("theme tokens", () => {
     expect(GLOBAL_STYLES).toContain("--sudoku-grid-line-strong: color-mix(in oklab, var(--text) 54%, var(--line));");
   });
 
-  it("uses the selected dark featured surface and gives each theme its own modal surface", () => {
+  it("uses the selected dark featured surface and the shared home-card modal surface", () => {
     expect(GLOBAL_STYLES).toContain("--featured-surface: var(--palette-dark-elevated);");
     expect(GLOBAL_STYLES).toContain("--featured-action-bg: var(--featured-surface);");
-    expect(GLOBAL_STYLES).toContain("--game-modal-bg: linear-gradient(155deg, var(--palette-ivory) 0%, var(--palette-neutral-100) 100%);");
-    expect(GLOBAL_STYLES).toContain("--game-modal-bg: linear-gradient(155deg, var(--palette-modal-navy-start) 0%, var(--palette-modal-navy-center) 58%, var(--palette-modal-navy-end) 100%);");
+    expect(GLOBAL_STYLES.match(/--game-modal-bg: var\(--home-card-surface\);/g)).toHaveLength(2);
+    expect(GLOBAL_STYLES).not.toContain("--palette-modal-navy");
   });
 
   it("uses the approved light featured surface and neutral home controls", () => {
@@ -118,10 +118,11 @@ describe("theme tokens", () => {
   });
 
   it("keeps shared buttons on their surrounding neutral surface", () => {
-    expect(GLOBAL_STYLES).toContain("--button-surface: var(--surface);");
+    expect(GLOBAL_STYLES.match(/--button-surface: var\(--home-button-surface\);/g)).toHaveLength(2);
     expect(GLOBAL_STYLES).toContain("background: var(--button-surface);");
     expect(GLOBAL_STYLES).toContain("border: 1px solid var(--button-border);");
     expect(GLOBAL_STYLES).toContain("box-shadow: var(--button-shadow);");
+    expect(GLOBAL_STYLES).not.toContain("--warm-game-action-text");
   });
 
   it("does not keep the replaced provisional accent tokens", () => {

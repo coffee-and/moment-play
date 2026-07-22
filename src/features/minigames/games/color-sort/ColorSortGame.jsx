@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import {
   COLOR_SORT_CAPACITY,
@@ -174,7 +175,6 @@ export function ColorSortGame({ game }) {
           ))}
         </div>
 
-        {phase === "idle" ? <Button onClick={startGame}>게임 시작</Button> : null}
         {phase === "playing" ? (
           <div className="color-sort__actions">
             <Button
@@ -189,6 +189,18 @@ export function ColorSortGame({ game }) {
           </div>
         ) : null}
       </div>
+
+      {phase === "idle" ? (
+        <GameStageOverlay state="start">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="color-start-title">
+            <GameStageDoodle variant="start" />
+            <div className="game-stage-modal__eyebrow">PUZZLE / COLOR</div>
+            <h3 id="color-start-title">색을 정리해 볼까요?</h3>
+            <p>같은 색 블록을 한 통에 모아 모든 통을 완성하세요.</p>
+            <Button onClick={startGame}>게임 시작</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
 
       {phase === "level-clear" ? (
         <GameStageOverlay state="clear">

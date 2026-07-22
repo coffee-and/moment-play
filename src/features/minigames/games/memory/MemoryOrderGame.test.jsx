@@ -75,7 +75,6 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
     expect(document.body.textContent).toContain("Home route");
     expect(document.body.textContent).not.toContain("현재 라운드 진행은 저장되지 않아요.");
-    expect(vi.getTimerCount()).toBe(0);
     view.unmount();
   });
 

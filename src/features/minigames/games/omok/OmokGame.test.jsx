@@ -190,6 +190,10 @@ describe("OmokGame top-level menu", () => {
     await view.click(computerButton);
 
     expect(view.container.textContent).toContain("컴퓨터 대전 설정");
+    expect(findButtonByText(view.container, "금수 위치")).not.toBeNull();
+    expect(findButtonByText(view.container, "금수 이유")).not.toBeNull();
+    expect(view.container.textContent).not.toContain("금수 위치 표시");
+    expect(view.container.textContent).not.toContain("금수 이유 설명");
     expect(view.container.querySelector(".omok-game__board")).toBeNull();
     await view.click(findButtonByText(view.container, "게임 시작"));
     expect(view.container.querySelector(".omok-game__board")).not.toBeNull();
@@ -245,7 +249,7 @@ describe("OmokGame settings menu", () => {
     await view.click(findButtonByText(view.container, "친구 초대"));
 
     const allowPositionsToggle = Array.from(view.container.querySelectorAll(".omok-game__setting-toggle"))
-      .find((button) => button.textContent.includes("금수 위치 보기 허용"));
+      .find((button) => button.textContent.includes("금수 위치 허용"));
     await view.click(allowPositionsToggle);
     expect(view.container.querySelector(".omok-game__board")).toBeNull();
     expect(view.container.textContent).not.toContain("Easy");

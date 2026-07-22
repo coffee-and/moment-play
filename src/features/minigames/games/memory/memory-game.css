@@ -253,12 +253,12 @@
   min-height: 0;
   width: min(360px, 100%);
   gap: 8px;
-  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  border: 1px solid var(--game-modal-border);
   border-radius: calc(var(--r-xl) - 4px);
   padding: 26px 28px;
   overflow: hidden;
-  background: color-mix(in oklab, var(--surface) 94%, var(--game-color-cyan) 6%);
-  box-shadow: 0 16px 44px color-mix(in oklab, var(--palette-neutral-900) 18%, transparent);
+  background: var(--game-modal-bg);
+  box-shadow: var(--modal-shadow);
 }
 
 .memory-game__transition-view--turn {
@@ -266,7 +266,6 @@
 }
 
 .memory-game__transition-view--clear {
-  background: color-mix(in oklab, var(--surface) 86%, var(--game-effect-positive) 14%);
   animation: memory-round-clear-in 0.28s cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 
