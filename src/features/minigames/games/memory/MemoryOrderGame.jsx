@@ -207,6 +207,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     phase === PHASE.REPLAYING ||
     phase === PHASE.COMPLETED ||
     isExitConfirmOpen;
+  const isStartFlow = phase === PHASE.IDLE || phase === PHASE.COUNTDOWN;
   const shouldShowTimer = phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
   const timerText = formatTimer(remainingMs);
   const isTimerUrgent = isMemoryTimerUrgent(phase, remainingMs);
@@ -736,14 +737,34 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
           className="memory-game__overlay-layer"
           state={isExitConfirmOpen ? "exit-confirm" : phase === PHASE.IDLE ? "start" : phase}
         >
-          {phase === PHASE.IDLE && !isExitConfirmOpen ? (
-            <GameStageModal className="memory-game__idle" role="dialog" aria-modal="true" aria-labelledby="memory-game-start-title">
-              <GameStageDoodle variant="start" />
-              <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
-              <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
-              <Button className="memory-game__primary" type="button" onClick={startGame}>
-                게임 시작
-              </Button>
+          {isStartFlow && !isExitConfirmOpen ? (
+            <GameStageModal
+              className="memory-game__idle memory-game__start-flow"
+              data-state={phase === PHASE.IDLE ? "start" : "countdown"}
+              role={phase === PHASE.IDLE ? "dialog" : "status"}
+              aria-modal={phase === PHASE.IDLE ? "true" : undefined}
+              aria-labelledby={phase === PHASE.IDLE ? "memory-game-start-title" : undefined}
+              aria-live={phase === PHASE.COUNTDOWN ? "assertive" : undefined}
+            >
+              <GameStageDoodle variant={phase === PHASE.IDLE ? "start" : "countdown"} />
+              {phase === PHASE.IDLE ? (
+                <>
+                  <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
+                  <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
+                  <Button className="memory-game__primary" type="button" onClick={startGame}>
+                    게임 시작
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="memory-game__state-kicker" aria-label={`현재 ${round}라운드`}>
+                    — {round} ROUND —
+                  </p>
+                  <p className="memory-game__state-title memory-game__state-title--countdown">
+                    {COUNTDOWN_LABELS[countdownIndex]}
+                  </p>
+                </>
+              )}
             </GameStageModal>
           ) : null}
           {isExitConfirmOpen ? (
@@ -765,23 +786,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
                   게임 나가기
                 </Button>
               </div>
-            </GameStageModal>
-          ) : null}
-
-          {phase === PHASE.COUNTDOWN && !isExitConfirmOpen ? (
-            <GameStageModal
-              className="memory-game__state-view"
-              data-state="countdown"
-              role="status"
-              aria-live="assertive"
-            >
-              <GameStageDoodle variant="countdown" />
-              <p className="memory-game__state-kicker" aria-label={`현재 ${round}라운드`}>
-                — {round} ROUND —
-              </p>
-              <p className="memory-game__state-title memory-game__state-title--countdown">
-                {COUNTDOWN_LABELS[countdownIndex]}
-              </p>
             </GameStageModal>
           ) : null}
 

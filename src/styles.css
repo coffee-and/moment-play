@@ -1553,6 +1553,10 @@ a {
   gap: 14px;
 }
 
+.game-stage-modal.memory-game__start-flow {
+  min-height: clamp(320px, 42vh, 380px);
+}
+
 .sudoku-game__level-list {
   display: grid;
   width: 100%;
