@@ -41,7 +41,7 @@
   position: relative;
   width: clamp(46px, 7vw, 66px);
   height: clamp(148px, 20vw, 188px);
-  border: 2px solid color-mix(in oklab, var(--accent) 28%, var(--line));
+  border: 2px solid var(--line);
   border-top-color: transparent;
   border-radius: 10px 10px 26px 26px;
   padding: 8px 6px 7px;
@@ -58,7 +58,7 @@
   right: -5px;
   left: -5px;
   height: 9px;
-  border: 2px solid color-mix(in oklab, var(--accent) 28%, var(--line));
+  border: 2px solid var(--line);
   border-radius: 999px;
   background: var(--surface-2);
 }
@@ -69,18 +69,20 @@
 }
 
 .color-sort__tube:not(:disabled):hover {
-  border-color: color-mix(in oklab, var(--accent) 58%, var(--line));
+  border-color: color-mix(in oklab, var(--text) 46%, var(--line));
   transform: translateY(-3px);
 }
 
 .color-sort__tube.is-selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
+  border-color: var(--game-color-cyan);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--game-color-cyan) 18%, transparent),
+    0 8px 22px color-mix(in oklab, var(--text) 10%, transparent);
   transform: translateY(-10px);
 }
 
 .color-sort__tube:focus-visible {
-  outline: 3px solid var(--accent-2);
+  outline: 3px solid var(--game-color-blue);
   outline-offset: 4px;
 }
 

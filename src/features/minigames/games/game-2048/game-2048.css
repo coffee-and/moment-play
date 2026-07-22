@@ -13,7 +13,7 @@
 }
 
 .game-2048__board:focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--game-color-blue);
   outline-offset: 4px;
 }
 
