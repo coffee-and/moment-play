@@ -59,7 +59,7 @@
   left: var(--game-touch-x, 50%);
   width: 18px;
   aspect-ratio: 1;
-  border: 2px solid color-mix(in oklab, var(--accent) 58%, transparent);
+  border: 2px solid color-mix(in oklab, var(--game-color-cyan) 58%, transparent);
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
@@ -72,7 +72,7 @@
 
 .game-stage button:focus-visible,
 .game-stage [role="button"]:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--game-color-blue);
   outline-offset: 3px;
 }
 

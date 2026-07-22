@@ -1,11 +1,13 @@
+import starFlightCardPreview from "../../../assets/figma/star-flight-card-preview.png";
+
 const PREVIEW_2048_TILES = [2, 4, 8, 16, 0, 32, 64, 0, 0, 128, 256, 0, 0, 0, 512, 1024];
 const PREVIEW_SUDOKU_CELLS = [1, "", 5, "", "", 7, "", 3, 4, "", 9, "", "", 2, "", 8];
 const PREVIEW_MEMORY_SYMBOLS = ["circle", "diamond", "heart", "star"];
 const PREVIEW_GLOW_CELLS = Array.from({ length: 16 }, (_, index) => index);
 const PREVIEW_COLOR_TUBES = [
-  ["teal", "terracotta", "yellow", "green"],
-  ["burgundy", "teal", "terracotta", "yellow"],
-  ["green", "burgundy", "teal", "terracotta"],
+  ["cyan", "orange", "yellow", "green"],
+  ["pink", "cyan", "orange", "yellow"],
+  ["green", "pink", "cyan", "orange"],
   [],
 ];
 
@@ -48,14 +50,7 @@ export function MiniGamePreview({ gameId }) {
   }
 
   if (gameId === "flappy") {
-    return (
-      <span className="game-card-preview is-flappy">
-        <span className="preview-flappy-stars" />
-        <span className="preview-flappy-fish"><span /></span>
-        <span className="preview-flappy-pillar is-top" />
-        <span className="preview-flappy-pillar is-bottom" />
-      </span>
-    );
+    return <img className="game-card-preview is-flappy" src={starFlightCardPreview} alt="" />;
   }
 
   if (gameId === "timing-tap") {

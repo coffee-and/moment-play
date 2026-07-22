@@ -10,14 +10,14 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--accent) 24%, var(--line));
+  border: 1px solid var(--line);
   border-radius: var(--r-lg);
   outline: none;
   background:
-    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--flappy-preview-fish) 28%, transparent), transparent 24%),
+    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--flappy-glow) 28%, transparent), transparent 24%),
     linear-gradient(180deg, var(--flappy-sky-top) 0%, var(--flappy-sky-center) 56%, var(--flappy-sky-deep) 100%);
   box-shadow:
-    inset 0 -40px 70px color-mix(in oklab, var(--accent) 8%, transparent),
+    inset 0 -40px 70px color-mix(in oklab, var(--flappy-glow) 8%, transparent),
     0 20px 54px color-mix(in oklab, var(--text) 10%, transparent);
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
@@ -26,7 +26,7 @@
 }
 
 .flappy-game__sky:focus-visible {
-  outline: 3px solid color-mix(in oklab, var(--accent) 72%, transparent);
+  outline: 3px solid color-mix(in oklab, var(--flappy-star-glow) 72%, transparent);
   outline-offset: 3px;
 }
 
@@ -38,7 +38,7 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--flappy-moon);
-  box-shadow: 0 0 34px color-mix(in oklab, var(--flappy-preview-fish) 42%, transparent);
+  box-shadow: 0 0 34px color-mix(in oklab, var(--flappy-glow) 42%, transparent);
 }
 
 .flappy-game__moon::after {
@@ -152,7 +152,7 @@
   aspect-ratio: 1.68;
   transform: translate(-50%, -50%) rotate(var(--bird-tilt));
   transition: transform 0.08s linear;
-  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--accent) 50%, transparent));
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--flappy-glow) 50%, transparent));
 }
 
 .flappy-game__bird.is-life {
@@ -163,9 +163,9 @@
   content: "";
   position: absolute;
   inset: -28%;
-  border: 2px solid color-mix(in oklab, var(--accent-2) 70%, white);
+  border: 2px solid color-mix(in oklab, var(--flappy-shield) 70%, var(--palette-white));
   border-radius: 50%;
-  box-shadow: 0 0 16px color-mix(in oklab, var(--accent-2) 70%, transparent);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--flappy-shield) 70%, transparent);
   animation: flappy-shield-pulse 0.42s ease-in-out infinite alternate;
 }
 

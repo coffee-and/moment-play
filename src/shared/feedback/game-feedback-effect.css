@@ -60,21 +60,42 @@
 }
 
 .game-feedback-effect.is-start {
-  color: var(--accent);
+  color: var(--game-color-cyan);
 }
 
 .game-feedback-effect.is-positive {
-  color: color-mix(in oklab, var(--accent) 72%, var(--palette-green));
+  color: var(--game-effect-positive);
 }
 
-.game-feedback-effect.is-perfect,
+.game-feedback-effect.is-perfect {
+  color: var(--game-effect-perfect);
+}
+
 .game-feedback-effect.is-clear {
-  color: color-mix(in oklab, var(--accent) 60%, var(--palette-yellow));
+  color: var(--game-effect-clear);
 }
 
 .game-feedback-effect.is-negative,
 .game-feedback-effect.is-game-over {
-  color: var(--accent-2);
+  color: var(--game-effect-negative);
+}
+
+.game-feedback-effect.is-positive .game-feedback-effect__particles i:nth-child(3n + 1),
+.game-feedback-effect.is-perfect .game-feedback-effect__particles i:nth-child(3n + 1),
+.game-feedback-effect.is-clear .game-feedback-effect__particles i:nth-child(3n + 1) {
+  color: var(--game-effect-perfect);
+}
+
+.game-feedback-effect.is-positive .game-feedback-effect__particles i:nth-child(3n + 2),
+.game-feedback-effect.is-perfect .game-feedback-effect__particles i:nth-child(3n + 2),
+.game-feedback-effect.is-clear .game-feedback-effect__particles i:nth-child(3n + 2) {
+  color: var(--game-color-pink);
+}
+
+.game-feedback-effect.is-positive .game-feedback-effect__particles i:nth-child(3n),
+.game-feedback-effect.is-perfect .game-feedback-effect__particles i:nth-child(3n),
+.game-feedback-effect.is-clear .game-feedback-effect__particles i:nth-child(3n) {
+  color: var(--game-effect-impact);
 }
 
 .game-feedback-effect.is-negative .game-feedback-effect__particles,

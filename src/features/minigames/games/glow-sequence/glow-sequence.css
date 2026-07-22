@@ -35,7 +35,7 @@
   gap: clamp(8px, 1.5vw, 13px);
   border-radius: 24px;
   padding: clamp(14px, 2vw, 20px);
-  background: color-mix(in oklab, var(--surface) 72%, var(--accent) 6%);
+  background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--line);
 }
 
@@ -48,7 +48,7 @@
   border: 0;
   border-radius: clamp(10px, 2vw, 17px);
   background: color-mix(in oklab, var(--cell-color) 22%, var(--surface));
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--cell-color) 28%, var(--line));
+  box-shadow: inset 0 0 0 1px var(--line);
   cursor: pointer;
   transition: background .14s ease, box-shadow .14s ease, transform .14s ease;
   touch-action: manipulation;
@@ -72,7 +72,7 @@
 }
 
 .glow-sequence__cell:focus-visible {
-  outline: 3px solid var(--accent-2);
+  outline: 3px solid var(--game-color-blue);
   outline-offset: 3px;
 }
 
@@ -88,7 +88,8 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--game-color-cyan), var(--game-effect-perfect));
+  box-shadow: 0 0 14px color-mix(in oklab, var(--game-effect-perfect) 32%, transparent);
   transition: width .18s ease;
 }
 
