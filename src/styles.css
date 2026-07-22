@@ -24,6 +24,31 @@
   --palette-terracotta: #bf5036;
   --palette-sage: #c1d7a0;
   --palette-yellow: #f2c14e;
+  --palette-slate-blue: #9dabb6;
+  --palette-dusty-rose: #9d545d;
+
+  /* Star Flight keeps its original cool-night artwork palette in both themes. */
+  --flappy-sky-deep: #172454;
+  --flappy-sky-mid: #28326f;
+  --flappy-sky-top: #1b2450;
+  --flappy-sky-center: #2a2f6b;
+  --flappy-moon: #eef4ff;
+  --flappy-moon-cutout: #20295b;
+  --flappy-pillar: #edf4ff;
+  --flappy-fish: #79b5e8;
+  --flappy-preview-fish: #79a7e8;
+  --flappy-wing: #9ccdf1;
+  --flappy-tail: #f08aa0;
+  --flappy-star: #f6c85f;
+  --flappy-star-cool: #ecf3ff;
+  --flappy-star-glow: #b9d3ff;
+  --flappy-score-surface: #111b44;
+  --flappy-score-shadow: #070c22;
+  --flappy-score-text: #fff7dc;
+  --flappy-curtain-start: #141e4b;
+  --flappy-curtain-center: #222e69;
+  --flappy-curtain-text: #ffffff;
+  --flappy-curtain-muted: #dbe5f4;
 
   --palette-light-bg: var(--palette-ivory);
   --palette-light-bg-subtle: color-mix(in oklab, var(--palette-sage) 12%, var(--palette-ivory));
@@ -40,6 +65,7 @@
   --palette-dark-line: #313b49;
   --palette-dark-text: #f3f6fa;
   --palette-dark-muted: #a3adbb;
+  --palette-dark-accent: #7da6e3;
 
   /* Semantic color roles — components consume only these values. */
   --bg: var(--palette-light-bg);
@@ -143,8 +169,8 @@
   --text: var(--palette-dark-text);
   --muted: var(--palette-dark-muted);
   --line: var(--palette-dark-line);
-  --accent: var(--palette-sage);
-  --accent-2: var(--palette-sage);
+  --accent: var(--palette-dark-accent);
+  --accent-2: var(--palette-dark-accent);
   --on-accent: var(--palette-dark-bg);
   --chip: var(--palette-dark-elevated);
   --chrome-foreground: var(--palette-dark-text);
@@ -170,7 +196,7 @@
   --loading-surface: var(--palette-dark-elevated);
   --modal-shadow: 0 24px 60px color-mix(in oklab, var(--palette-dark-bg) 84%, transparent);
   --sudoku-grid-line: var(--palette-dark-line);
-  --sudoku-grid-line-strong: var(--palette-sage);
+  --sudoku-grid-line-strong: var(--palette-dark-accent);
   --sudoku-selected-bg: color-mix(in oklab, var(--palette-yellow) 22%, var(--palette-dark-elevated));
   --sudoku-conflict-bg: color-mix(in oklab, var(--palette-burgundy) 24%, var(--palette-dark-elevated));
   --game-2048-board-bg: var(--palette-dark-elevated);
@@ -833,12 +859,12 @@ a {
 .preview-stone.is-black { background: #24272e; }
 .preview-stone.is-white { border: 1px solid #aeb6c3; background: #fff; }
 .preview-stone.is-one { top: 30px; left: 45px; }.preview-stone.is-two { top: 45px; left: 60px; }.preview-stone.is-three { top: 60px; left: 75px; }.preview-stone.is-four { top: 75px; left: 90px; }
-.game-card-preview.is-flappy { overflow: hidden; background: linear-gradient(160deg, color-mix(in oklab, var(--palette-teal) 68%, var(--palette-dark-bg)), var(--palette-dark-bg)); }
-.preview-flappy-stars { position: absolute; inset: 0; opacity: .8; background-image: radial-gradient(circle at 16% 20%, var(--palette-ivory) 0 1px, transparent 1.5px), radial-gradient(circle at 42% 66%, var(--palette-yellow) 0 1.5px, transparent 2px), radial-gradient(circle at 72% 18%, var(--palette-ivory) 0 1px, transparent 1.5px), radial-gradient(circle at 88% 78%, var(--palette-yellow) 0 1px, transparent 1.5px); }
-.preview-flappy-fish { position: absolute; z-index: 2; top: 47%; left: 41%; width: 48px; height: 22px; border-radius: 55% 48% 48% 55%; background: var(--palette-sage); transform: translate(-50%, -50%) rotate(-5deg); }
-.preview-flappy-fish::before { content: ""; position: absolute; top: 4px; left: -15px; border-width: 7px 17px 7px 0; border-style: solid; border-color: transparent var(--palette-terracotta) transparent transparent; }
-.preview-flappy-fish::after { content: ""; position: absolute; top: 8px; right: 8px; width: 4px; aspect-ratio: 1; border-radius: 50%; background: var(--palette-dark-bg); }
-.preview-flappy-pillar { position: absolute; right: 18px; width: 24px; border-radius: 8px; background: var(--palette-yellow); box-shadow: 0 0 14px color-mix(in oklab, var(--palette-yellow) 36%, transparent); }.preview-flappy-pillar.is-top { top: -12px; height: 48px; }.preview-flappy-pillar.is-bottom { bottom: -12px; height: 44px; }
+.game-card-preview.is-flappy { overflow: hidden; background: linear-gradient(160deg, var(--flappy-sky-deep), var(--flappy-sky-mid)); }
+.preview-flappy-stars { position: absolute; inset: 0; opacity: .8; background-image: radial-gradient(circle at 16% 20%, var(--flappy-curtain-text) 0 1px, transparent 1.5px), radial-gradient(circle at 42% 66%, var(--flappy-star) 0 1.5px, transparent 2px), radial-gradient(circle at 72% 18%, var(--flappy-curtain-text) 0 1px, transparent 1.5px), radial-gradient(circle at 88% 78%, var(--flappy-star) 0 1px, transparent 1.5px); }
+.preview-flappy-fish { position: absolute; z-index: 2; top: 47%; left: 41%; width: 48px; height: 22px; border-radius: 55% 48% 48% 55%; background: var(--flappy-preview-fish); transform: translate(-50%, -50%) rotate(-5deg); }
+.preview-flappy-fish::before { content: ""; position: absolute; top: 4px; left: -15px; border-width: 7px 17px 7px 0; border-style: solid; border-color: transparent var(--flappy-tail) transparent transparent; }
+.preview-flappy-fish::after { content: ""; position: absolute; top: 8px; right: 8px; width: 4px; aspect-ratio: 1; border-radius: 50%; background: var(--flappy-sky-deep); }
+.preview-flappy-pillar { position: absolute; right: 18px; width: 24px; border-radius: 8px; background: var(--flappy-star); box-shadow: 0 0 14px color-mix(in oklab, var(--flappy-star) 36%, transparent); }.preview-flappy-pillar.is-top { top: -12px; height: 48px; }.preview-flappy-pillar.is-bottom { bottom: -12px; height: 44px; }
 .game-card-preview.is-timing { width: 84%; align-self: center; height: 22px; border-radius: 999px; background: color-mix(in oklab, var(--palette-sage) 24%, var(--surface-2)); }
 .game-card-preview.is-timing::after { content: ""; position: absolute; top: 50%; right: 8px; left: 8px; height: 3px; transform: translateY(-50%); border-radius: 99px; background: color-mix(in oklab, var(--palette-green) 32%, var(--surface-2)); }
 .game-card-preview.is-timing .preview-target { position: absolute; z-index: 1; top: -6px; bottom: -6px; left: 48%; width: 28%; border: 1.5px solid var(--palette-yellow); border-radius: 999px; background: color-mix(in oklab, var(--palette-yellow) 26%, var(--surface)); }
