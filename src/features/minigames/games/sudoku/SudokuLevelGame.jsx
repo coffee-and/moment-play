@@ -105,7 +105,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
     return { row: new Set(getRowIndexes(selectedIndex)), column: new Set(getColumnIndexes(selectedIndex)), box: new Set(getBoxIndexes(selectedIndex)) };
   }, [selectedIndex]);
   const canEditSelected = phase === SUDOKU_PHASE.PLAYING && selectedIndex !== null && !isGivenCell(activePuzzle.puzzle, selectedIndex);
-  const isStageCovered = phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen;
+  const isStageCovered = phase === SUDOKU_PHASE.IDLE || phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen;
   const statusText = SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
   const bestTimeText = levelRecords.bestTimeSeconds === null ? SUDOKU_COPY.meta.emptyBestTime : formatTime(levelRecords.bestTimeSeconds);
   const gameActions = <div className="game-stage__inline-actions">{phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>}<Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button></div>;
@@ -177,22 +177,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   return (
     <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
       <div ref={stageContentRef} className="sudoku-game__stage" aria-hidden={isStageCovered ? "true" : undefined} onKeyDown={handleGameKeyDown}>
-        {phase === SUDOKU_PHASE.IDLE ? (
-          <GameStageModal className="sudoku-game__modal sudoku-game__start" role="region" aria-labelledby="sudoku-game-start-title">
-            <GameStageDoodle variant="start" />
-            <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.start.eyebrow}</p>
-            <h3 id="sudoku-game-start-title">{SUDOKU_COPY.start.title}</h3>
-            <p>{SUDOKU_COPY.start.description}</p>
-            <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
-              {SUDOKU_LEVEL_OPTIONS.map((option, index) => (
-                <button ref={index === 0 ? startButtonRef : null} type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} aria-label={`${option.label} 난이도 시작`}>
-                  <strong>{option.label}</strong>
-                  <span>{option.description}</span>
-                </button>
-              ))}
-            </div>
-          </GameStageModal>
-        ) : (
+        {phase !== SUDOKU_PHASE.IDLE ? (
           <div className="sudoku-game__play">
             <section className="sudoku-game__meta" aria-label={`${activeLevelLabel} 스도쿠 기록`}>
               <div><span>{SUDOKU_COPY.meta.completed}</span><strong>{levelRecords.completedCount}</strong></div>
@@ -217,10 +202,26 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <button type="button" className="sudoku-game__erase-button" onClick={eraseSelectedValue} disabled={!canEditSelected} aria-label={SUDOKU_COPY.eraseLabel}>Del</button>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="sudoku-game__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : phase}>
+        <GameStageOverlay className="sudoku-game__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : phase === SUDOKU_PHASE.IDLE ? "start" : phase}>
+          {phase === SUDOKU_PHASE.IDLE && !isExitConfirmOpen ? (
+            <GameStageModal className="sudoku-game__modal sudoku-game__start" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-start-title">
+              <GameStageDoodle variant="start" />
+              <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.start.eyebrow}</p>
+              <h3 id="sudoku-game-start-title">{SUDOKU_COPY.start.title}</h3>
+              <p>{SUDOKU_COPY.start.description}</p>
+              <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
+                {SUDOKU_LEVEL_OPTIONS.map((option, index) => (
+                  <button ref={index === 0 ? startButtonRef : null} type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} aria-label={`${option.label} 난이도 시작`}>
+                    <strong>{option.label}</strong>
+                    <span>{option.description}</span>
+                  </button>
+                ))}
+              </div>
+            </GameStageModal>
+          ) : null}
           {isExitConfirmOpen ? (
             <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-exit-title">
               <h3 id="sudoku-game-exit-title">게임을 나갈까요?</h3>

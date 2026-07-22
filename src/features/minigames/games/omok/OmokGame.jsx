@@ -675,8 +675,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
                   </div>
                   {online.room.gameMode === OMOK_MODE.STANDARD ? (
                     <div className="omok-game__settings omok-game__settings--toggles">
-                      <OmokSettingToggle checked={online.room.allowForbiddenPositions} disabled={onlineBusy} label="금수 위치 보기 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenPositions", value)} />
-                      <OmokSettingToggle checked={online.room.allowForbiddenReasons} disabled={onlineBusy} label="금수 이유 설명 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenReasons", value)} />
+                      <OmokSettingToggle checked={online.room.allowForbiddenPositions} disabled={onlineBusy} label="금수 위치 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenPositions", value)} />
+                      <OmokSettingToggle checked={online.room.allowForbiddenReasons} disabled={onlineBusy} label="금수 이유 허용" onChange={(value) => updateOnlineRoomSetting("allowForbiddenReasons", value)} />
                     </div>
                   ) : null}
                 </>
@@ -695,8 +695,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
                     ) : isMe ? (
                       online.room.gameMode === OMOK_MODE.STANDARD ? (
                         <div className="omok-game__settings omok-game__settings--toggles">
-                          <OmokSettingToggle checked={currentGuideSettings.showForbiddenPositions} disabled={onlineBusy} label="금수 위치 표시" onChange={(value) => updateGuideSetting("showForbiddenPositions", value)} />
-                          <OmokSettingToggle checked={currentGuideSettings.explainForbiddenReasons} disabled={onlineBusy} label="금수 이유 설명" onChange={(value) => updateGuideSetting("explainForbiddenReasons", value)} />
+                          <OmokSettingToggle checked={currentGuideSettings.showForbiddenPositions} disabled={onlineBusy} label="금수 위치" onChange={(value) => updateGuideSetting("showForbiddenPositions", value)} />
+                          <OmokSettingToggle checked={currentGuideSettings.explainForbiddenReasons} disabled={onlineBusy} label="금수 이유" onChange={(value) => updateGuideSetting("explainForbiddenReasons", value)} />
                         </div>
                       ) : null
                     ) : (
@@ -761,8 +761,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
             </div>
             {settings.gameMode === OMOK_MODE.STANDARD ? (
               <div className="omok-game__settings omok-game__settings--toggles">
-                <OmokSettingToggle checked={settings.allowForbiddenPositions} label="금수 위치 보기 허용" onChange={(value) => updateSetting("allowForbiddenPositions", value)} />
-                <OmokSettingToggle checked={settings.allowForbiddenReasons} label="금수 이유 설명 허용" onChange={(value) => updateSetting("allowForbiddenReasons", value)} />
+                <OmokSettingToggle checked={settings.allowForbiddenPositions} label="금수 위치 허용" onChange={(value) => updateSetting("allowForbiddenPositions", value)} />
+                <OmokSettingToggle checked={settings.allowForbiddenReasons} label="금수 이유 허용" onChange={(value) => updateSetting("allowForbiddenReasons", value)} />
               </div>
             ) : null}
             <div className="game-stage__actions omok-game__setup-actions">
@@ -788,8 +788,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
             </div>
             {settings.gameMode === OMOK_MODE.STANDARD ? (
               <div className="omok-game__settings omok-game__settings--toggles">
-                <OmokSettingToggle checked={settings.showForbiddenPositions} label="금수 위치 표시" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
-                <OmokSettingToggle checked={settings.explainForbiddenReasons} label="금수 이유 설명" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
+                <OmokSettingToggle checked={settings.showForbiddenPositions} label="금수 위치" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
+                <OmokSettingToggle checked={settings.explainForbiddenReasons} label="금수 이유" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
               </div>
             ) : null}
             <div className="game-stage__actions omok-game__setup-actions">
@@ -932,8 +932,8 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
               <p>대국을 시작할 때 적용할 개인 금수 안내 기본값입니다.</p>
               {settings.gameMode === OMOK_MODE.STANDARD ? (
                 <div className="omok-game__settings omok-game__settings--toggles">
-                  <OmokSettingToggle checked={settings.showForbiddenPositions} label="내 금수 위치 표시 기본값" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
-                  <OmokSettingToggle checked={settings.explainForbiddenReasons} label="내 금수 이유 설명 기본값" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
+                  <OmokSettingToggle checked={settings.showForbiddenPositions} label="내 금수 위치 기본값" onChange={(value) => updateSetting("showForbiddenPositions", value)} />
+                  <OmokSettingToggle checked={settings.explainForbiddenReasons} label="내 금수 이유 기본값" onChange={(value) => updateSetting("explainForbiddenReasons", value)} />
                 </div>
               ) : null}
               <div className="game-stage-modal__actions">

@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import "./timing-tap.css";
 import {
@@ -219,9 +220,6 @@ export function TimingTapGame({ game }) {
           <span className="timing-tap__track-line" />
         </div>
 
-        {phase === "idle" ? (
-          <Button className="timing-tap__main-button" onClick={startGame}>게임 시작</Button>
-        ) : null}
         {phase === "playing" ? (
           <button className="timing-tap__tap-button" type="button" onPointerDown={tapNow}>
             <span>TAP</span>
@@ -242,6 +240,18 @@ export function TimingTapGame({ game }) {
           </div>
         ) : null}
       </div>
+
+      {phase === "idle" ? (
+        <GameStageOverlay state="start">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="timing-start-title">
+            <GameStageDoodle variant="start" />
+            <div className="game-stage-modal__eyebrow">REACTION / TIMING</div>
+            <h3 id="timing-start-title">목표 구간에 맞춰 탭!</h3>
+            <p>움직이는 바늘이 목표 구간에 들어왔을 때 탭하세요.</p>
+            <Button onClick={startGame}>게임 시작</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
 
       {isExitOpen ? (
         <GameStageOverlay state="confirm">

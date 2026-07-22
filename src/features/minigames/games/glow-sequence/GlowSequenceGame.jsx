@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { GAME_COLOR_PALETTE } from "../../shared/gameColorPalette.js";
 import {
@@ -232,9 +233,20 @@ export function GlowSequenceGame({ game }) {
           ))}
         </div>
 
-        {phase === "idle" ? <Button onClick={startGame}>게임 시작</Button> : null}
         {phase === "input" ? <div className="glow-sequence__progress" aria-hidden="true"><span style={{ width: `${(inputStep / sequenceLength) * 100}%` }} /></div> : null}
       </div>
+
+      {phase === "idle" ? (
+        <GameStageOverlay state="start">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="glow-start-title">
+            <GameStageDoodle variant="start" />
+            <div className="game-stage-modal__eyebrow">MEMORY / LIGHT</div>
+            <h3 id="glow-start-title">빛나는 순서를 기억하세요</h3>
+            <p>반짝인 칸을 같은 순서로 선택하면 다음 라운드로 진행해요.</p>
+            <Button onClick={startGame}>게임 시작</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
 
       {phase === "master" ? (
         <GameStageOverlay state="complete">

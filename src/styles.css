@@ -47,11 +47,6 @@
   --palette-effect-orange: #eb5b00;
   --palette-effect-plum: #640d5f;
 
-  /* The shared dark modal retains its original navy direction. */
-  --palette-modal-navy-start: #18224f;
-  --palette-modal-navy-center: #28326f;
-  --palette-modal-navy-end: #172454;
-
   /* Star Flight keeps its original cool-night artwork palette in both themes. */
   --flappy-sky-deep: #172454;
   --flappy-sky-top: #1b2450;
@@ -126,20 +121,19 @@
   --game-card-category: var(--palette-light-muted);
   --game-card-description: var(--palette-light-muted);
   --game-action-text: var(--palette-ivory);
-  --warm-game-action-text: var(--palette-neutral-900);
   --loading-surface: color-mix(in oklab, var(--palette-yellow) 18%, var(--surface));
   --sudoku-grid-line: var(--palette-light-line);
   --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 52%, var(--line));
   --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 28%, var(--surface));
   --sudoku-conflict-bg: color-mix(in oklab, var(--game-color-red) 16%, var(--surface));
-  --game-modal-border: var(--palette-neutral-300);
-  --game-modal-bg: linear-gradient(155deg, var(--palette-ivory) 0%, var(--palette-neutral-100) 100%);
-  --game-modal-text: var(--palette-neutral-900);
-  --game-modal-muted: var(--palette-neutral-700);
+  --game-modal-border: var(--home-button-border);
+  --game-modal-bg: var(--home-card-surface);
+  --game-modal-text: var(--text);
+  --game-modal-muted: var(--muted);
   --game-modal-highlight: var(--game-effect-perfect);
-  --game-modal-action-border: var(--palette-neutral-300);
-  --game-modal-action-bg: transparent;
-  --game-modal-action-shadow: 0 7px 18px color-mix(in oklab, var(--palette-neutral-900) 18%, transparent);
+  --game-modal-action-border: var(--home-button-border);
+  --game-modal-action-bg: var(--home-button-surface);
+  --game-modal-action-shadow: var(--home-button-shadow);
   --chrome-foreground: var(--palette-neutral-900);
   --font-korean: "SUIT Variable", SUIT, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Montserrat Variable", Montserrat, var(--font-korean);
@@ -170,6 +164,15 @@
   --home-button-border: var(--palette-light-line);
   --home-button-text: var(--palette-light-text);
   --home-button-shadow: 0 3px 8px color-mix(in oklab, var(--palette-neutral-900) 8%, transparent);
+  /* Game screens reuse the same quiet surface system as the home cards. */
+  --stage-surface: var(--bg);
+  --stage-card-surface: var(--home-card-surface);
+  --stage-card-border: var(--home-button-border);
+  --stage-card-shadow: var(--home-card-shadow);
+  --stage-control-surface: var(--home-button-surface);
+  --stage-control-border: var(--home-button-border);
+  --stage-control-shadow: var(--home-button-shadow);
+  --stage-control-selected-border: color-mix(in oklab, var(--text) 58%, var(--line));
   --featured-surface: var(--palette-soft-yellow);
   --featured-border: var(--palette-light-line);
   --featured-shadow: 0 10px 26px color-mix(in oklab, var(--palette-neutral-900) 9%, transparent);
@@ -180,15 +183,15 @@
   --featured-action-border: color-mix(in oklab, var(--palette-neutral-900) 18%, var(--featured-surface));
   --featured-action-text: var(--palette-light-text);
   --featured-action-shadow: 0 5px 14px color-mix(in oklab, var(--palette-neutral-900) 11%, transparent);
-  --button-surface: var(--surface);
-  --button-border: color-mix(in oklab, var(--text) 22%, var(--line));
+  --button-surface: var(--home-button-surface);
+  --button-border: var(--home-button-border);
   --button-text: var(--text);
-  --button-shadow: 0 7px 16px color-mix(in oklab, var(--palette-neutral-900) 10%, transparent);
-  --button-secondary-border: var(--line);
-  --button-secondary-shadow: var(--sh-sm);
+  --button-shadow: var(--home-button-shadow);
+  --button-secondary-border: var(--home-button-border);
+  --button-secondary-shadow: var(--home-button-shadow);
   --modal-shadow: 0 24px 60px color-mix(in oklab, var(--palette-neutral-900) 18%, transparent);
-  --game-2048-board-bg: var(--surface-2);
-  --game-2048-empty-cell-bg: var(--surface);
+  --game-2048-board-bg: var(--home-card-surface);
+  --game-2048-empty-cell-bg: var(--home-button-surface);
   --game-2048-grid-gap: 10px;
   --game-2048-cell-border: var(--line);
   --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--text) 8%, transparent);
@@ -249,12 +252,12 @@
   --featured-action-border: color-mix(in oklab, var(--palette-dark-text) 18%, var(--featured-surface));
   --featured-action-text: var(--palette-dark-text);
   --featured-action-shadow: 0 5px 15px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
-  --button-surface: var(--surface);
-  --button-border: color-mix(in oklab, var(--text) 22%, var(--line));
+  --button-surface: var(--home-button-surface);
+  --button-border: var(--home-button-border);
   --button-text: var(--text);
-  --button-shadow: 0 7px 18px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
-  --button-secondary-border: var(--line);
-  --button-secondary-shadow: var(--sh-sm);
+  --button-shadow: var(--home-button-shadow);
+  --button-secondary-border: var(--home-button-border);
+  --button-secondary-shadow: var(--home-button-shadow);
   --game-color-red: color-mix(in oklab, var(--palette-game-red) 88%, var(--palette-dark-bg));
   --game-color-orange: color-mix(in oklab, var(--palette-game-orange) 88%, var(--palette-dark-bg));
   --game-color-yellow: color-mix(in oklab, var(--palette-game-yellow) 90%, var(--palette-dark-bg));
@@ -268,22 +271,21 @@
   --game-card-category: var(--palette-dark-muted);
   --game-card-description: var(--palette-dark-muted);
   --game-action-text: var(--palette-ivory);
-  --warm-game-action-text: var(--palette-dark-bg);
   --loading-surface: var(--palette-dark-elevated);
   --modal-shadow: 0 24px 60px color-mix(in oklab, var(--palette-dark-bg) 84%, transparent);
-  --game-modal-border: color-mix(in oklab, var(--palette-neutral-700) 48%, transparent);
-  --game-modal-bg: linear-gradient(155deg, var(--palette-modal-navy-start) 0%, var(--palette-modal-navy-center) 58%, var(--palette-modal-navy-end) 100%);
-  --game-modal-text: var(--palette-dark-text);
-  --game-modal-muted: var(--palette-dark-muted);
-  --game-modal-action-border: color-mix(in oklab, var(--palette-dark-text) 24%, transparent);
-  --game-modal-action-bg: transparent;
-  --game-modal-action-shadow: 0 7px 18px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
+  --game-modal-border: var(--home-button-border);
+  --game-modal-bg: var(--home-card-surface);
+  --game-modal-text: var(--text);
+  --game-modal-muted: var(--muted);
+  --game-modal-action-border: var(--home-button-border);
+  --game-modal-action-bg: var(--home-button-surface);
+  --game-modal-action-shadow: var(--home-button-shadow);
   --sudoku-grid-line: var(--palette-dark-line);
   --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 54%, var(--line));
   --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 22%, var(--palette-dark-elevated));
   --sudoku-conflict-bg: color-mix(in oklab, var(--game-color-red) 22%, var(--palette-dark-elevated));
-  --game-2048-board-bg: var(--palette-dark-elevated);
-  --game-2048-empty-cell-bg: var(--palette-dark-surface);
+  --game-2048-board-bg: var(--home-card-surface);
+  --game-2048-empty-cell-bg: var(--home-button-surface);
   --game-2048-cell-border: var(--palette-dark-line);
   --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--palette-dark-bg) 76%, transparent);
 }
@@ -516,7 +518,7 @@ a {
 
 .header-icon-button:hover,
 .header-icon-button.is-active {
-  border-color: color-mix(in oklab, var(--accent) 54%, var(--line));
+  border-color: color-mix(in oklab, var(--chrome-foreground) 46%, var(--line));
   color: var(--chrome-foreground);
 }
 
@@ -525,7 +527,7 @@ a {
 }
 
 .header-icon-button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--chrome-foreground);
   outline-offset: 3px;
 }
 
@@ -556,7 +558,7 @@ a {
 }
 
 .account-control:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--chrome-foreground);
   outline-offset: 3px;
 }
 
@@ -913,7 +915,7 @@ a {
 .gcard[data-game="timing-tap"] { --game-accent: var(--game-color-orange); }
 .gcard[data-game="glow-sequence"] { --game-accent: var(--game-color-cyan); }
 .gcard[data-game="color-sort"] { --game-accent: var(--game-color-green); }
-.gcard.open:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--game-accent) 45%, var(--line)); box-shadow: var(--sh); }
+.gcard.open:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--text) 38%, var(--line)); box-shadow: var(--sh); }
 .gcard.soon { cursor: not-allowed; opacity: .6; }
 .gc-category { position: absolute; z-index: 3; top: 23px; left: 23px; border-radius: 999px; padding: 4px 7px; background: color-mix(in oklab, var(--surface) 88%, transparent); color: var(--game-card-category); font-family: var(--font-display); font-size: 9px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; backdrop-filter: blur(5px); }
 .gc-preview { position: relative; display: flex; min-width: 0; height: 112px; align-items: center; justify-content: center; overflow: hidden; border-radius: 15px; background: color-mix(in oklab, var(--game-accent) 9%, var(--surface-2)); }
@@ -966,8 +968,6 @@ a {
 .gc-desc { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .gc-bot { display: flex; justify-content: flex-end; }
 .gc-play { display: inline-flex; min-height: 28px; align-items: center; gap: 4px; border-radius: 999px; padding: 0 12px; background: var(--game-accent); color: var(--game-action-text); font-family: var(--font-display); font-size: 11px; font-weight: 600; letter-spacing: .02em; box-shadow: 0 5px 12px color-mix(in oklab, var(--game-accent) 20%, transparent); }
-.gcard[data-game="sudoku"] .gc-play,
-.gcard[data-game="flappy"] .gc-play { color: var(--warm-game-action-text); }
 .gc-play .arw { width: 12px; height: 12px; }
 .gc-soon { color: var(--muted); font-size: 12px; }
 
@@ -980,7 +980,7 @@ a {
 .gcard--home .gc-bot { position: absolute; top: 215px; right: 17px; }
 .gcard--home .gc-play { min-width: 82px; min-height: 30px; justify-content: center; border: 1px solid var(--home-button-border); padding-inline: 12px; background: var(--home-button-surface); color: var(--home-button-text); font-size: 12px; font-weight: 500; box-shadow: var(--home-button-shadow); transition: border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease); }
 .gcard--home.open:hover .gc-play,
-.gcard--home.open:focus-visible .gc-play { border-color: var(--game-accent); color: var(--game-accent); box-shadow: 0 5px 12px color-mix(in oklab, var(--game-accent) 14%, transparent); }
+.gcard--home.open:focus-visible .gc-play { border-color: color-mix(in oklab, var(--home-button-text) 38%, var(--home-button-border)); color: var(--home-button-text); box-shadow: var(--home-button-shadow); }
 
 @media (max-width: 900px) {
   :root {
@@ -1134,7 +1134,7 @@ a {
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   padding: 18px;
-  background: var(--surface);
+  background: var(--stage-surface);
   box-shadow: var(--sh-sm);
 }
 
@@ -1207,6 +1207,16 @@ a {
   gap: 14px;
 }
 
+.game-stage .txt {
+  border-color: var(--stage-control-border);
+  background: var(--stage-control-surface);
+  box-shadow: var(--stage-control-shadow);
+}
+
+.game-stage .txt:focus {
+  border-color: var(--stage-control-selected-border);
+}
+
 .game-stage__play {
   position: relative;
   display: flex;
@@ -1214,7 +1224,10 @@ a {
   min-height: var(--stage-card-min-height);
   padding: clamp(18px, 2.4vw, 30px);
   overflow: hidden;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-card-border);
+  border-radius: var(--r-xl);
+  background: var(--stage-card-surface);
+  box-shadow: var(--stage-card-shadow);
   isolation: isolate;
 }
 
@@ -1222,7 +1235,9 @@ a {
 .game-stage__play .btn,
 .game-stage__play .button--secondary,
 .game-stage__play .btn-ghost {
-  background: var(--surface-2);
+  border-color: var(--stage-control-border);
+  background: var(--stage-control-surface);
+  box-shadow: var(--stage-control-shadow);
 }
 
 .game-stage__content {
@@ -1242,8 +1257,9 @@ a {
   flex: none;
   border: 1.5px solid var(--line);
   border-radius: 50%;
-  background: var(--surface);
-  color: var(--accent-2);
+  background: var(--stage-control-surface);
+  color: var(--text);
+  box-shadow: var(--stage-control-shadow);
   cursor: pointer;
   font-size: 15px;
   transition: border-color 0.25s, color 0.25s;
@@ -1289,7 +1305,7 @@ a {
   width: min(400px, 100%);
   flex-direction: column;
   justify-content: center;
-  gap: var(--gap);
+  gap: 12px;
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
   border: 1px solid var(--game-modal-border);
@@ -1334,7 +1350,7 @@ a {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-top: var(--gap);
+  margin-top: 2px;
 }
 
 .game-stage-modal__actions .button {
@@ -1371,7 +1387,7 @@ a {
 }
 
 .game-stage-modal h3 {
-  margin: 0 0 10px;
+  margin: 0;
   color: var(--game-modal-text);
   font-size: 24px;
   font-weight: 700;
@@ -1382,7 +1398,7 @@ a {
   margin: 0;
   color: var(--game-modal-muted);
   font-size: 13.5px;
-  line-height: 1.65;
+  line-height: 1.55;
 }
 
 .game-stage-modal .button--secondary,
@@ -1408,7 +1424,9 @@ a {
   justify-content: center;
   border-radius: 16px;
   padding: 13px 15px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-card-border);
+  background: var(--stage-card-surface);
+  box-shadow: var(--stage-control-shadow);
 }
 
 .stat .l {
@@ -1507,7 +1525,7 @@ a {
 .memory-game__state-kicker,
 .omok-game__modal-eyebrow,
 .game-stage-modal__eyebrow {
-  margin-bottom: 8px;
+  margin-bottom: 0;
   color: var(--game-modal-highlight);
   font-family: var(--font);
   font-size: 11px;
@@ -1517,7 +1535,7 @@ a {
 
 .game-stage-modal > strong {
   display: block;
-  margin: 10px 0;
+  margin: 0;
   color: var(--game-modal-highlight);
   font-family: var(--font);
   font-size: 44px;
@@ -1543,11 +1561,12 @@ a {
 }
 
 .sudoku-game__level-button {
-  border: 1.5px solid transparent;
+  border: 1px solid var(--game-modal-action-border);
   border-radius: var(--r-md);
   padding: 14px;
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--game-modal-action-bg);
+  box-shadow: var(--game-modal-action-shadow);
+  color: var(--game-modal-text);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s, transform 0.2s;
@@ -1706,11 +1725,11 @@ a {
 
 .omok-game__menu-option {
   min-height: clamp(96px, 12vw, 128px);
-  border: 1px solid var(--line);
+  border: 1px solid var(--stage-card-border);
   border-radius: var(--r-lg);
   padding: 20px 18px;
-  background: var(--surface);
-  box-shadow: 0 10px 24px color-mix(in oklab, var(--text) 7%, transparent);
+  background: var(--stage-card-surface);
+  box-shadow: var(--stage-card-shadow);
   color: var(--text);
   cursor: pointer;
   text-align: left;
@@ -1743,6 +1762,12 @@ a {
   line-height: 1.5;
 }
 
+.omok-game .badge.coral,
+.omok-game .badge.online {
+  border-color: var(--stage-control-selected-border);
+  color: var(--text);
+}
+
 .omok-game__board-wrap {
   width: min(100%, 540px);
   max-width: 540px;
@@ -1753,8 +1778,8 @@ a {
   aspect-ratio: 1;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: var(--surface-2);
-  box-shadow: var(--sh-sm);
+  background: var(--stage-card-surface);
+  box-shadow: var(--stage-card-shadow);
 }
 
 .omok-game__grid {
@@ -1815,7 +1840,7 @@ a {
 }
 
 .omok-game__intersection:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--text);
   outline-offset: 3px;
 }
 
@@ -1823,20 +1848,20 @@ a {
   content: "";
   position: absolute;
   inset: 31%;
-  border: 1.5px dashed var(--accent-2);
+  border: 1.5px dashed var(--game-effect-negative);
   border-radius: 50%;
-  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  background: color-mix(in oklab, var(--game-effect-negative) 18%, transparent);
 }
 
 .omok-game__intersection.is-rejected::before {
   content: "";
   position: absolute;
   inset: 24%;
-  border: 1.5px solid var(--accent-2);
+  border: 1.5px solid var(--game-effect-negative);
   border-radius: 50%;
-  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  background: color-mix(in oklab, var(--game-effect-negative) 18%, transparent);
   border-style: solid;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 18%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--game-effect-negative) 18%, transparent);
 }
 
 .omok-game__stone {
@@ -1859,14 +1884,14 @@ a {
   position: absolute;
   inset: 32%;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--game-effect-perfect);
 }
 
 .omok-game__stone.is-winning::before {
   content: "";
   position: absolute;
   inset: -17%;
-  border: 2px solid var(--accent-2);
+  border: 2px solid var(--game-effect-perfect);
   border-radius: 50%;
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--surface) 65%, transparent);
 }
@@ -1882,11 +1907,13 @@ a {
   gap: 10px;
   border-radius: var(--r-lg);
   padding: 13px 16px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-control-border);
+  background: var(--stage-control-surface);
+  box-shadow: var(--stage-control-shadow);
 }
 
 .omok-game__player.is-active {
-  border: 1.5px solid var(--accent);
+  border-color: var(--stage-control-selected-border);
 }
 
 .omok-game__dot {
@@ -1927,7 +1954,9 @@ a {
   margin-top: 14px;
   border-radius: var(--r-md);
   padding: 13px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-control-border);
+  background: var(--stage-control-surface);
+  box-shadow: var(--stage-control-shadow);
   color: var(--muted);
   font-family: var(--font);
   font-size: 12.5px;
@@ -1939,7 +1968,8 @@ a {
   margin: 0;
   border-radius: var(--r-md);
   padding: 10px 12px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-control-border);
+  background: var(--stage-control-surface);
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
@@ -1947,7 +1977,7 @@ a {
 }
 
 .omok-game__notice.is-error {
-  color: var(--accent-2);
+  color: var(--game-effect-negative);
 }
 
 .omok-game__invite {
@@ -1976,7 +2006,9 @@ a {
   gap: 10px;
   border-radius: var(--r-lg);
   padding: 13px 16px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-control-border);
+  background: var(--stage-control-surface);
+  box-shadow: var(--stage-control-shadow);
 }
 
 .omok-game__waiting-actions {
@@ -2005,12 +2037,13 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1.5px solid transparent;
+  border: 1px solid var(--stage-control-border);
   border-radius: var(--r-md);
   padding: 10px 12px;
-  background: var(--surface-2);
+  background: var(--stage-control-surface);
   color: var(--muted);
   cursor: pointer;
+  box-shadow: var(--stage-control-shadow);
   font-size: 12px;
   text-align: left;
   transition: border-color .2s, background .2s, color .2s, transform .2s;
@@ -2031,28 +2064,29 @@ a {
 }
 
 .omok-game__setting-toggle.is-on {
-  border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 12%, var(--surface-2));
+  border-color: var(--stage-control-selected-border);
+  background: var(--stage-control-surface);
   color: var(--text);
 }
 
 .omok-game__setting-toggle.is-on strong {
-  color: var(--accent-2);
+  color: var(--text);
 }
 
 .omok-game__setting-toggle:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--stage-control-selected-border);
   transform: translateY(-1px);
 }
 
 .omok-game__setting-chip {
   min-height: 38px;
-  border: 1.5px solid transparent;
+  border: 1px solid var(--stage-control-border);
   border-radius: var(--r-md);
   padding: 9px 12px;
-  background: var(--surface-2);
+  background: var(--stage-control-surface);
   color: var(--muted);
   cursor: pointer;
+  box-shadow: var(--stage-control-shadow);
   font-size: 12px;
   font-weight: 700;
   transition: border-color 0.2s, color 0.2s, transform 0.2s;
@@ -2065,7 +2099,7 @@ a {
 }
 
 .omok-game__setting-chip.is-selected {
-  border-color: var(--accent);
+  border-color: var(--stage-control-selected-border);
   color: var(--text);
 }
 
@@ -2088,7 +2122,9 @@ a {
   gap: 8px;
   border-radius: var(--r-lg);
   padding: 14px 16px;
-  background: var(--surface-2);
+  border: 1px solid var(--stage-card-border);
+  background: var(--stage-card-surface);
+  box-shadow: var(--stage-control-shadow);
 }
 
 .omok-game__rule-panel-header,
@@ -2240,7 +2276,7 @@ a {
   .game-stage__topbar-title strong { font-size: 19px; }
   .game-stage__topbar-actions .header-icon-button, .game-stage__topbar-actions .game-guide-icon { width: 40px; height: 40px; }
   .game-stage__inner { --stage-card-min-height: min(68vh, 610px); gap: 12px; }
-  .game-stage__play { border: 0; border-radius: 22px; padding: 14px 10px; box-shadow: none; }
+  .game-stage__play { border: 1px solid var(--stage-card-border); border-radius: 22px; padding: 14px 10px; box-shadow: var(--stage-card-shadow); }
   .stat-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .stat { min-width: 0; min-height: 68px; border-radius: 13px; padding: 10px 7px; text-align: center; }
   .stat .l { font-size: 8px; letter-spacing: .02em; }

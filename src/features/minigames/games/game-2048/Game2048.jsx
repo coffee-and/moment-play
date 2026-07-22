@@ -126,7 +126,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const phaseStatus = getPhaseStatus(phase, round, currentTarget);
   const canMoveBoard = (phase === GAME_2048_PHASE.PLAYING || phase === GAME_2048_PHASE.ENDLESS) && !isResetConfirmOpen && !isExitConfirmOpen;
   const hasStarted = phase !== GAME_2048_PHASE.IDLE;
-  const isStageCovered = isResetConfirmOpen || isExitConfirmOpen || phase === GAME_2048_PHASE.MILESTONE_CLEAR || phase === GAME_2048_PHASE.COMPLETED || phase === GAME_2048_PHASE.GAME_OVER;
+  const isStageCovered = phase === GAME_2048_PHASE.IDLE || isResetConfirmOpen || isExitConfirmOpen || phase === GAME_2048_PHASE.MILESTONE_CLEAR || phase === GAME_2048_PHASE.COMPLETED || phase === GAME_2048_PHASE.GAME_OVER;
 
   boardRef.current = board;
   scoreRef.current = score;
@@ -357,24 +357,14 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
         <div className="stat"><div className="l">Score</div><div className="v">{formatNumber(score)}</div></div>
         <div className="stat"><div className="l">Best</div><div className="v">{formatNumber(bestScore)}</div></div>
       </div>
-      <p className="game-stage__side-note">데스크톱에서는 방향키로, 터치 화면에서는 스와이프와 방향 버튼으로 이동해요.</p>
+      <p className="game-stage__side-note">데스크톱에서는 방향키로, 터치 화면에서는 스와이프로 이동해요.</p>
     </>
   );
 
   return (
     <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
       <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
-        {phase === GAME_2048_PHASE.IDLE ? (
-          <GameStageModal className="game-2048__modal game-2048__start-modal" role="region" aria-labelledby="game-2048-start-title">
-            <GameStageDoodle variant="start" />
-            <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.start.eyebrow}</p>
-            <p className="game-2048__target-label">{GAME_2048_COPY.start.targetLabel}</p>
-            <strong className="game-2048__target-value">{formatNumber(currentTarget)}</strong>
-            <h3 id="game-2048-start-title">{formatNumber(currentTarget)} 타일부터 시작해요.</h3>
-            <p>{GAME_2048_COPY.start.description}</p>
-            <Button ref={startButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.start.startButton}</Button>
-          </GameStageModal>
-        ) : (
+        {phase !== GAME_2048_PHASE.IDLE ? (
           <>
             <section className="game-2048__meta" aria-label="2048 게임 정보">
               <div><span>ROUND</span><strong>{phase === GAME_2048_PHASE.ENDLESS ? "COMPLETE" : round}</strong></div>
@@ -395,18 +385,23 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
                 );
               })}
             </div>
-            <div className="game-2048__dpad" role="group" aria-label="2048 이동 버튼">
-              <button className="game-2048__dpad-button is-up" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.UP)} disabled={!canMoveBoard} aria-label="위로 이동">↑</button>
-              <button className="game-2048__dpad-button is-left" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.LEFT)} disabled={!canMoveBoard} aria-label="왼쪽으로 이동">←</button>
-              <button className="game-2048__dpad-button is-down" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.DOWN)} disabled={!canMoveBoard} aria-label="아래로 이동">↓</button>
-              <button className="game-2048__dpad-button is-right" type="button" onClick={() => handleMove(GAME_2048_DIRECTION.RIGHT)} disabled={!canMoveBoard} aria-label="오른쪽으로 이동">→</button>
-            </div>
             <p className="game-2048__hint"><span>{GAME_2048_COPY.guidance.gameOverRule}</span><span>{GAME_2048_COPY.guidance.move} 빈칸 {emptyCellCount}칸 · 최대 타일 {formatNumber(maxTile)}</span></p>
           </>
-        )}
+        ) : null}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="game-2048__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : isResetConfirmOpen ? "reset-confirm" : phase}>
+        <GameStageOverlay className="game-2048__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : isResetConfirmOpen ? "reset-confirm" : phase === GAME_2048_PHASE.IDLE ? "start" : phase}>
+          {phase === GAME_2048_PHASE.IDLE && !isResetConfirmOpen && !isExitConfirmOpen ? (
+            <GameStageModal className="game-2048__modal game-2048__start-modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-start-title">
+              <GameStageDoodle variant="start" />
+              <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.start.eyebrow}</p>
+              <p className="game-2048__target-label">{GAME_2048_COPY.start.targetLabel}</p>
+              <strong className="game-2048__target-value">{formatNumber(currentTarget)}</strong>
+              <h3 id="game-2048-start-title">{formatNumber(currentTarget)} 타일부터 시작해요.</h3>
+              <p>{GAME_2048_COPY.start.description}</p>
+              <Button ref={startButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.start.startButton}</Button>
+            </GameStageModal>
+          ) : null}
           {isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-exit-title">
               <h3 id="game-2048-exit-title">게임을 나갈까요?</h3>

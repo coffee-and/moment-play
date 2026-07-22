@@ -198,6 +198,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
 
   const canPause = phase === PHASE.COUNTDOWN || phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
   const isStageCovered =
+    phase === PHASE.IDLE ||
     phase === PHASE.COUNTDOWN ||
     phase === PHASE.TURN_READY ||
     phase === PHASE.CLEARED ||
@@ -650,16 +651,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       ariaLabel={game.title}
     >
       <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
-        {phase === PHASE.IDLE ? (
-          <GameStageModal className="memory-game__idle" role="region" aria-labelledby="memory-game-start-title">
-            <GameStageDoodle variant="start" />
-            <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
-            <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
-            <Button className="memory-game__primary" type="button" onClick={startGame}>
-              게임 시작
-            </Button>
-          </GameStageModal>
-        ) : (
+        {phase !== PHASE.IDLE ? (
           <div className="memory-game__play-shell" data-memory-count={data.count} data-phase={phase}>
             <div className="memory-game__timer-row">
               {shouldShowTimer ? (
@@ -736,14 +728,24 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               </span>
             </GameItemPanel>
           </div>
-        )}
+        ) : null}
       </div>
 
       {isStageCovered ? (
         <GameStageOverlay
           className="memory-game__overlay-layer"
-          state={isExitConfirmOpen ? "exit-confirm" : phase}
+          state={isExitConfirmOpen ? "exit-confirm" : phase === PHASE.IDLE ? "start" : phase}
         >
+          {phase === PHASE.IDLE && !isExitConfirmOpen ? (
+            <GameStageModal className="memory-game__idle" role="dialog" aria-modal="true" aria-labelledby="memory-game-start-title">
+              <GameStageDoodle variant="start" />
+              <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
+              <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
+              <Button className="memory-game__primary" type="button" onClick={startGame}>
+                게임 시작
+              </Button>
+            </GameStageModal>
+          ) : null}
           {isExitConfirmOpen ? (
             <GameStageModal
               className="memory-game__state-view"

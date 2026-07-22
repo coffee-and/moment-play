@@ -54,7 +54,7 @@ describe("ColorSortGame", () => {
 
   it("starts with four colors, six tubes, and moves a top group into an empty tube", () => {
     const view = renderGame();
-    const start = [...view.host.querySelectorAll("button")].find((button) => button.textContent === "게임 시작");
+    const start = [...document.querySelectorAll("button")].find((button) => button.textContent === "게임 시작");
     act(() => start.click());
     const tubes = [...view.host.querySelectorAll(".color-sort__tube")];
     expect(tubes).toHaveLength(6);
@@ -70,7 +70,7 @@ describe("ColorSortGame", () => {
 
   it("limits undo to five successful uses per level and resets the allowance on restart", () => {
     const view = renderGame();
-    act(() => [...view.host.querySelectorAll("button")].find((button) => button.textContent === "게임 시작").click());
+    act(() => [...document.querySelectorAll("button")].find((button) => button.textContent === "게임 시작").click());
 
     const tubes = [...view.host.querySelectorAll(".color-sort__tube")];
     const source = tubes.find((tube) => !tube.getAttribute("aria-label").includes("블록 0개"));
