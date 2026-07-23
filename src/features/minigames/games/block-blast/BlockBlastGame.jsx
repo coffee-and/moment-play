@@ -288,10 +288,15 @@ export function BlockBlastGame({ game }) {
 
       {phase === "idle" ? (
         <GameStageOverlay state="start">
-          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-start-title">
+          <GameStageModal
+            className="game-stage-start-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="block-blast-start-title"
+          >
             <GameStageDoodle variant="start" />
             <h2 id="block-blast-start-title">Block Blast</h2>
-            <GameGuideContent guide={game.guide ?? { description: game.howTo }} />
+            <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
             <div className="game-stage-modal__actions"><Button autoFocus onClick={startGame}>게임 시작</Button></div>
           </GameStageModal>
         </GameStageOverlay>

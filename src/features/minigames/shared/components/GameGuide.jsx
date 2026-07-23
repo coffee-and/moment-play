@@ -11,12 +11,12 @@ export function GameGuideIconButton({ label, onClick }) {
   );
 }
 
-export function GameGuideContent({ guide }) {
+export function GameGuideContent({ compact = false, guide }) {
   const description = guide?.description ?? "등록된 게임 설명이 없어요.";
   return (
-    <div className="game-guide-content">
+    <div className={`game-guide-content${compact ? " game-guide-content--compact" : ""}`}>
       <p>{description}</p>
-      {guide?.steps?.length ? (
+      {!compact && guide?.steps?.length ? (
         <ol>
           {guide.steps.map((step) => <li key={step}>{step}</li>)}
         </ol>
