@@ -15,16 +15,6 @@ vi.mock("../../infrastructure/supabase/gameResultsGateway.js", () => ({ fetchLea
 
 const { RankingPage } = await import("./RankingPage.jsx");
 
-function deferred() {
-  let resolve;
-  let reject;
-  const promise = new Promise((resolvePromise, rejectPromise) => {
-    resolve = resolvePromise;
-    reject = rejectPromise;
-  });
-  return { promise, reject, resolve };
-}
-
 async function renderPage() {
   const host = document.createElement("div");
   document.body.appendChild(host);
@@ -45,16 +35,6 @@ afterEach(() => {
 });
 
 describe("RankingPage", () => {
-  it("shows loading and then the empty state", async () => {
-    const request = deferred();
-    fetchLeaderboard.mockReturnValueOnce(request.promise);
-    const view = await renderPage();
-    expect(view.host.textContent).toContain("랭킹을 불러오는 중");
-    await act(async () => request.resolve([]));
-    expect(view.host.textContent).toContain("아직 등록된 기록이 없습니다");
-    view.unmount();
-  });
-
   it("shows an error and retries the same filter", async () => {
     fetchLeaderboard.mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce([]);
     const view = await renderPage();

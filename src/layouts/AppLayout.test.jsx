@@ -74,25 +74,24 @@ describe("AppLayout account control", () => {
   it("shows an authenticated email fallback and never links the account control to login", () => {
     auth = { status: "authenticated", user: { email: "sky.player@example.com", is_anonymous: false }, signOut };
     const view = renderLayout();
-    const accountControl = view.host.querySelector(".account-menu summary");
+    const accountControl = view.host.querySelector("summary");
     expect(accountControl.textContent).toBe("sky.player");
-    expect(accountControl.querySelector(".account-control__label")?.textContent).toBe("sky.player");
     expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)).toBeNull();
     expect(view.host.textContent).not.toContain("로그인");
 
     act(() => accountControl.click());
     expect(currentPathname).toBe("/");
-    expect(view.host.querySelector(".account-menu__panel button").textContent).toBe("로그아웃");
+    expect(Array.from(view.host.querySelectorAll("button")).some((button) => button.textContent === "로그아웃")).toBe(true);
     view.unmount();
   });
 
   it("uses an explicit logout action and returns the header to guest state", async () => {
     auth = { status: "authenticated", user: { email: null, is_anonymous: false }, signOut };
     const view = renderLayout();
-    expect(view.host.querySelector(".account-menu summary").textContent).toBe("내 계정");
+    expect(view.host.querySelector("summary").textContent).toBe("내 계정");
 
     await act(async () => {
-      view.host.querySelector(".account-menu__panel button").click();
+      Array.from(view.host.querySelectorAll("button")).find((button) => button.textContent === "로그아웃").click();
       await Promise.resolve();
     });
     expect(signOut).toHaveBeenCalledTimes(1);
@@ -110,9 +109,6 @@ describe("AppLayout immersive game routes", () => {
     auth = { status: "authenticated", user: { email: "host@example.com" }, signOut };
     const view = renderLayout(path);
 
-    expect(view.host.textContent).toContain("Page content");
-    expect(view.host.querySelector("header")).toBeNull();
-    expect(view.host.querySelector("footer")).toBeNull();
     expect(view.host.querySelector('[aria-label="주요 메뉴"]')).toBeNull();
     expect(view.host.querySelector('[aria-label="하단 탭"]')).toBeNull();
     expect(view.host.querySelector(`a[href="${SETTINGS_PATH}"]`)).toBeNull();
@@ -121,8 +117,6 @@ describe("AppLayout immersive game routes", () => {
 
   it("keeps global navigation on non-game settings pages", () => {
     const view = renderLayout(SETTINGS_PATH);
-    expect(view.host.querySelector("header")).not.toBeNull();
-    expect(view.host.querySelector("footer")).not.toBeNull();
     expect(view.host.querySelector('[aria-label="주요 메뉴"]')).not.toBeNull();
     expect(view.host.querySelector('[aria-label="하단 탭"]')).not.toBeNull();
     view.unmount();

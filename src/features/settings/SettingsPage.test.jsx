@@ -71,16 +71,18 @@ afterEach(() => {
 });
 
 describe("SettingsPage", () => {
-  it("switches and persists the selected screen theme", async () => {
+  it("restores, switches, and persists the selected screen theme", async () => {
+    window.localStorage.setItem(THEME_STORAGE_KEY, THEME.DARK);
     const view = await renderPage();
-    const darkThemeButton = findButton(view.host, "다크");
-
-    expect(darkThemeButton.getAttribute("aria-pressed")).toBe("false");
-    act(() => darkThemeButton.click());
+    const lightThemeButton = findButton(view.host, "라이트");
 
     expect(document.documentElement.dataset.theme).toBe(THEME.DARK);
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEME.DARK);
-    expect(darkThemeButton.getAttribute("aria-pressed")).toBe("true");
+    expect(lightThemeButton.getAttribute("aria-pressed")).toBe("false");
+    act(() => lightThemeButton.click());
+
+    expect(document.documentElement.dataset.theme).toBe(THEME.LIGHT);
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEME.LIGHT);
+    expect(lightThemeButton.getAttribute("aria-pressed")).toBe("true");
     view.unmount();
   });
 

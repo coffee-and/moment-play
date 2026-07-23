@@ -1,4 +1,4 @@
-import { readRetainedData, touchRetainedData, writeRetainedData } from "../storage/localRetentionStorage.js";
+import { readRetainedData, writeRetainedData } from "../storage/localRetentionStorage.js";
 
 // Shared across every Moment Play game. Storage-only: callers are responsible
 // for normalizing/validating a nickname before saving it here.
@@ -13,10 +13,6 @@ export function getLocalNickname() {
 export function saveLocalNickname(nickname) {
   const data = readRetainedData(NICKNAME_KEY, { maxAgeMs: LOCAL_MAX_AGE_MS }) ?? {};
   writeRetainedData(NICKNAME_KEY, { ...data, nickname });
-}
-
-export function touchLocalNicknameActivity() {
-  touchRetainedData(NICKNAME_KEY);
 }
 
 export function getLocalPlayerTwoNickname() {

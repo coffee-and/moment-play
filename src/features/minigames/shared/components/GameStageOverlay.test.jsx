@@ -33,7 +33,6 @@ afterEach(() => {
 describe("GameStageOverlay", () => {
   it("portals an accessible modal, locks scrolling, and restores it on close", () => {
     const unmount = renderOverlay();
-    expect(document.body.querySelector(":scope > .game-stage-overlay")).not.toBeNull();
     expect(document.body.style.overflow).toBe("hidden");
     expect(document.querySelector('[role="dialog"]').getAttribute("aria-modal")).toBe("true");
     unmount();
@@ -44,7 +43,7 @@ describe("GameStageOverlay", () => {
     const onClose = vi.fn();
     const unmount = renderOverlay({ closeOnBackdrop: true, closeOnEscape: true, onClose });
     act(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
-    act(() => document.querySelector(".game-stage-overlay").dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
+    act(() => document.querySelector('[role="dialog"]').parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
     expect(onClose).toHaveBeenCalledTimes(2);
     unmount();
   });

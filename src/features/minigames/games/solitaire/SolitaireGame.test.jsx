@@ -46,13 +46,13 @@ describe("SolitaireGame", () => {
     view.unmount();
   });
 
-  it("starts with seven tableau columns and 24 stock cards", () => {
+  it("draws one card after the player chooses easy mode", () => {
     const view = renderGame();
     const easyButton = [...document.querySelectorAll("button")].find((button) => button.textContent.includes("쉬움"));
     act(() => easyButton.click());
-    expect(view.host.querySelector('[role="application"][aria-label="클론다이크 솔리테어 카드판"]')).not.toBeNull();
-    expect(view.host.querySelector('button[aria-label="스톡 24장, 카드 공개"]')).not.toBeNull();
-    expect(view.host.textContent).toContain("1장씩 공개");
+    const stock = view.host.querySelector('button[aria-label="스톡 24장, 카드 공개"]');
+    act(() => stock.click());
+    expect(view.host.querySelector('button[aria-label="스톡 23장, 카드 공개"]')).not.toBeNull();
     view.unmount();
   });
 });
