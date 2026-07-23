@@ -48,6 +48,7 @@
 .logic-puzzle-stage__session-controls {
   display: flex;
   justify-content: center;
+  gap: 8px;
 }
 
 .board-viewport {
@@ -117,7 +118,7 @@
 
   .logic-puzzle-stage__board-wrap > div:has(> .board-viewport) {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
     justify-items: center;
   }
 
@@ -127,8 +128,17 @@
 
   .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    align-items: start;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    align-items: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > :first-child {
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > .logic-board-toolbar {
+    grid-row: 2;
   }
 
   .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > .logic-board-status {
@@ -139,12 +149,14 @@
     grid-row: 1;
     width: min(100%, calc(100dvh - 198px), var(--logic-board-max-size, 480px));
     flex: none;
+    align-self: center;
+    padding: 2px;
     touch-action: pan-x pan-y;
   }
 
   .board-viewport__controls {
     display: flex;
-    grid-row: 3;
+    grid-row: 2;
     min-height: 36px;
     align-items: center;
     justify-content: center;
@@ -162,7 +174,7 @@
   }
 
   .logic-board-toolbar {
-    grid-row: 4;
+    grid-row: 3;
     gap: 10px;
     margin: 10px 0 0;
   }
@@ -181,7 +193,7 @@
   }
 
   .logic-board-status {
-    grid-row: 5;
+    grid-row: 4;
     min-height: 18px;
     margin-top: 6px;
     font-size: 11px;

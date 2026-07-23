@@ -21,8 +21,15 @@ describe("SET rules", () => {
   });
 
   it("always deals twelve cards containing at least one set", () => {
-    const board = dealSetBoard(() => 0.42);
-    expect(board).toHaveLength(12);
-    expect(findSets(board).length).toBeGreaterThan(0);
+    for (let seed = 1; seed <= 50; seed += 1) {
+      let state = seed;
+      const random = () => {
+        state = (state * 1664525 + 1013904223) % 4294967296;
+        return state / 4294967296;
+      };
+      const board = dealSetBoard(random);
+      expect(board).toHaveLength(12);
+      expect(findSets(board).length).toBeGreaterThan(0);
+    }
   });
 });

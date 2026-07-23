@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../../../../shared/components/Button.jsx";
 import {
   ClockIcon,
@@ -28,9 +29,28 @@ export function LogicPuzzleStage({
   game,
   onReset,
   onStart,
+  onSurrender,
   session,
   stats = [],
 }) {
+  const [isSurrenderOpen, setIsSurrenderOpen] = useState(false);
+
+  function requestSurrender() {
+    session.pause();
+    setIsSurrenderOpen(true);
+  }
+
+  function continuePuzzle() {
+    setIsSurrenderOpen(false);
+    session.resume();
+  }
+
+  function confirmSurrender() {
+    setIsSurrenderOpen(false);
+    onSurrender?.();
+    session.resume();
+  }
+
   const sidebar = (
     <div className="logic-puzzle-stage__stats">
       <div className="stat-row">
@@ -93,6 +113,11 @@ export function LogicPuzzleStage({
 
       {session.phase !== "idle" ? (
         <div className="logic-puzzle-stage__session-controls">
+          {onSurrender && session.phase === "playing" ? (
+            <Button size="small" variant="secondary" onClick={requestSurrender}>
+              포기
+            </Button>
+          ) : null}
           <Button size="small" variant="secondary" onClick={onReset}>
             <RestartIcon />
             새 게임
@@ -147,7 +172,7 @@ export function LogicPuzzleStage({
         </GameStageOverlay>
       ) : null}
 
-      {session.phase === "paused" && !session.isExitOpen ? (
+      {session.phase === "paused" && !session.isExitOpen && !isSurrenderOpen ? (
         <GameStageOverlay state="paused">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby={`${game.id}-paused-title`}>
             <h2 id={`${game.id}-paused-title`}>일시정지</h2>
@@ -157,6 +182,19 @@ export function LogicPuzzleStage({
                 <PlayIcon />
                 계속하기
               </Button>
+            </div>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
+
+      {isSurrenderOpen ? (
+        <GameStageOverlay state="confirm">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby={`${game.id}-surrender-title`}>
+            <h2 id={`${game.id}-surrender-title`}>정말 포기할까요?</h2>
+            <p>정답을 확인하면 이번 카드는 완료 횟수에 포함되지 않아요.</p>
+            <div className="game-stage-modal__actions">
+              <Button onClick={confirmSurrender}>정답 보기</Button>
+              <Button variant="secondary" onClick={continuePuzzle}>계속 풀기</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
