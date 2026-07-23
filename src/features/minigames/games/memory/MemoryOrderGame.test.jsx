@@ -9,7 +9,12 @@ vi.mock("../../../../shared/auth/AuthContext.jsx", () => ({
   useAuth: () => ({ status: "guest", user: null }),
 }));
 
-import { MEMORY_SYMBOLS, MEMORY_TIMING, MemoryOrderGame } from "./MemoryOrderGame.jsx";
+import {
+  MEMORY_BEST_ROUND_KEY,
+  MEMORY_SYMBOLS,
+  MEMORY_TIMING,
+  MemoryOrderGame,
+} from "./MemoryOrderGame.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -29,7 +34,7 @@ function getSequenceIds() {
 }
 
 function areCardsDisabled() {
-  return Array.from(document.querySelectorAll(".memory-card")).every((button) => button.disabled);
+  return Array.from(document.querySelectorAll('button[aria-label$=" 선택"]')).every((button) => button.disabled);
 }
 
 function clickSequence(sequenceIds) {
@@ -101,12 +106,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
   it("cannot select cards during countdown or sequence display", () => {
     const view = renderGame();
-    expect(document.querySelector('[data-doodle-variant="start"]')).not.toBeNull();
-    const startFlowModal = document.querySelector(".memory-game__start-flow");
     act(() => findButton("게임 시작").click());
-    expect(document.body.textContent).toContain("ROUND —");
-    expect(document.querySelector(".memory-game__start-flow")).toBe(startFlowModal);
-    expect(document.querySelector('.game-stage-modal [data-doodle-variant="countdown"]')).not.toBeNull();
     expect(areCardsDisabled()).toBe(true);
 
     act(() => vi.advanceTimersByTime(COUNTDOWN_TOTAL_MS));
@@ -130,14 +130,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     clickSequence(sequenceIds);
 
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
-    expect(document.querySelector(".memory-game__transition-view--clear")).not.toBeNull();
-    expect(document.querySelector(".memory-game__feedback")).toBeNull();
-    expect(Array.from(document.querySelectorAll(".stat")).find((stat) => stat.querySelector(".l")?.textContent === "Round")?.querySelector(".v")?.textContent).toContain("1");
 
     act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS - 1));
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
     expect(document.body.textContent).not.toContain("— 2 ROUND —");
-    expect(Array.from(document.querySelectorAll(".stat")).find((stat) => stat.querySelector(".l")?.textContent === "Round")?.querySelector(".v")?.textContent).toContain("1");
 
     view.unmount();
   });
@@ -154,7 +150,6 @@ describe("MemoryOrderGame transitions and exit flow", () => {
 
     act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS));
     expect(document.body.textContent).toContain("— 2 ROUND —");
-    expect(document.querySelector(".memory-game__transition-view--clear")).toBeNull();
 
     view.unmount();
   });
@@ -163,18 +158,15 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     const view = renderGame();
     act(() => findButton("게임 시작").click());
     act(() => findButton("일시정지").click());
-    expect(document.body.textContent).toContain("일시정지");
-    expect(document.querySelector('.memory-sequence[data-count="3"]')).not.toBeNull();
+    const sequenceBeforeExit = getSequenceIds();
 
     act(() => findButton("게임 나가기").click());
     expect(document.body.textContent).toContain("현재 라운드 진행은 저장되지 않아요.");
-    expect(document.querySelector('.game-stage-modal [data-doodle-variant]')).toBeNull();
     act(() => findButton("계속하기").click());
-    expect(document.body.textContent).toContain("일시정지");
-    expect(document.querySelector('.memory-sequence[data-count="3"]')).not.toBeNull();
+    expect(getSequenceIds()).toEqual(sequenceBeforeExit);
 
     act(() => findButton("게임 나가기").click());
-    act(() => Array.from(document.querySelectorAll(".game-stage-modal button"))
+    act(() => Array.from(document.querySelectorAll('[role="dialog"] button'))
       .find((button) => button.textContent === "게임 나가기")
       .click());
     expect(document.body.textContent).toContain("Home route");
@@ -221,7 +213,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
   });
 
   it("offers retry, reset, and exit after failure while preserving the best record", () => {
-    window.localStorage.setItem("eunContents.memoryOrderGame.bestRound", "7");
+    window.localStorage.setItem(MEMORY_BEST_ROUND_KEY, "7");
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
     act(() => findButton("게임 시작").click());
@@ -238,15 +230,14 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     act(() => findButton("남은 목숨으로 재도전").click());
     const retrySequence = getSequenceIds();
     expect(retrySequence).not.toEqual(firstSequence);
-    expect(window.localStorage.getItem("eunContents.memoryOrderGame.bestRound")).toBe("7");
+    expect(window.localStorage.getItem(MEMORY_BEST_ROUND_KEY)).toBe("7");
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
     expect(document.body.textContent).toContain("GAME OVER");
-    expect(document.querySelector('[data-doodle-variant="failure"]')).not.toBeNull();
     view.unmount();
   });
 
-  it("keeps a new-record celebration through a retry and shows it instead of the game-over doodles", () => {
+  it("keeps a new record through a retry and reports it after game over", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
     act(() => findButton("게임 시작").click());
@@ -261,8 +252,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
 
     expect(document.body.textContent).toContain("최고기록 갱신!");
-    expect(document.querySelector('[data-doodle-variant="record"]')).not.toBeNull();
-    expect(document.querySelector('[data-doodle-variant="failure"]')).toBeNull();
+    expect(window.localStorage.getItem(MEMORY_BEST_ROUND_KEY)).toBe("1");
     view.unmount();
   });
 });

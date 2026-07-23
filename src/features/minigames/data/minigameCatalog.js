@@ -110,9 +110,6 @@ export const MINIGAME_CATALOG = [
 
 export const MINIGAME_CATEGORY_ORDER = ["All", "Number", "Memory", "Puzzle", "Card", "Board", "Arcade", "Reaction"];
 
-export const DEFAULT_MINIGAME_ID =
-  MINIGAME_CATALOG.find((game) => game.status === MINIGAME_STATUS.AVAILABLE)?.id ?? MINIGAME_CATALOG[0]?.id;
-
 export function getMinigameById(id) {
   return MINIGAME_CATALOG.find((game) => game.id === id) ?? null;
 }

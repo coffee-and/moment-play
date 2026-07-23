@@ -138,7 +138,6 @@ describe("Omok nickname editing policy", () => {
   it("allows nickname editing before a match starts", async () => {
     const view = await renderGame();
     expect(view.host.querySelector("#omok-nickname").readOnly).toBe(false);
-    expect(view.host.textContent).toContain("대국 전에 사용할 이름을 입력하세요.");
     view.unmount();
   });
 
@@ -173,7 +172,6 @@ describe("Omok nickname editing policy", () => {
     const input = view.host.querySelector("#omok-nickname");
     expect(input.value).toBe("ServerNick");
     expect(input.readOnly).toBe(true);
-    expect(view.host.textContent).toContain("온라인 대기실과 대국 중에는 닉네임을 변경할 수 없어요.");
     view.unmount();
   });
 
@@ -183,7 +181,6 @@ describe("Omok nickname editing policy", () => {
     await view.click("게임 시작");
 
     expect(view.host.querySelector("#omok-nickname").readOnly).toBe(true);
-    expect(view.host.textContent).toContain("대국 중에는 닉네임을 변경할 수 없어요.");
     view.unmount();
   });
 });

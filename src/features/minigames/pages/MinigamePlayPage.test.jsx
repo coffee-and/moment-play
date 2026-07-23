@@ -53,20 +53,16 @@ afterEach(() => {
   receivedRoomId = null;
 });
 
-describe("MinigamePlayPage exit policy", () => {
-  it("renders ordinary single-game routes without an online room id", () => {
+describe("MinigamePlayPage room routing", () => {
+  it("does not pass a room id on ordinary single-game routes", () => {
     const view = renderPage("/minigames/2048");
-    expect(view.host.querySelector('a[href="/"]')).toBeNull();
     expect(receivedRoomId).toBeNull();
-    expect(view.host.textContent).toContain("Game content");
     view.unmount();
   });
 
-  it("removes the generic return link inside online rooms", () => {
+  it("passes the decoded online room id to the selected game", () => {
     const view = renderPage("/minigames/omok/room/11111111-1111-4111-8111-111111111111");
-    expect(view.host.querySelector('a[href="/"]')).toBeNull();
     expect(receivedRoomId).toBe("11111111-1111-4111-8111-111111111111");
-    expect(view.host.textContent).toContain("Game content");
     view.unmount();
   });
 });

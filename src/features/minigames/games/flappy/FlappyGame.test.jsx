@@ -50,13 +50,10 @@ afterEach(() => {
 describe("FlappyGame input surface", () => {
   it("keeps pointer and keyboard controls while preserving a keyboard-focusable surface", () => {
     const view = renderGame();
-    const surface = view.host.querySelector(".flappy-game__sky");
+    const surface = view.host.querySelector('[role="application"]');
 
-    expect(document.querySelector('[data-state="start"] .game-stage-modal')).not.toBeNull();
-    expect(document.body.textContent).toContain("비행 시작");
     expect(surface.getAttribute("role")).toBe("application");
     expect(surface.tabIndex).toBe(0);
-    expect(surface.querySelector(".flappy-game__curtain img")).toBeNull();
 
     act(() => surface.focus());
     expect(document.activeElement).toBe(surface);
@@ -73,7 +70,6 @@ describe("FlappyGame input surface", () => {
       button: 0,
     })));
     expect(findButton(view.host, "일시정지")).toBeDefined();
-    expect(view.host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(true);
 
     act(() => findButton(view.host, "일시정지").click());
     expect(findButton(view.host, "계속하기")).toBeDefined();

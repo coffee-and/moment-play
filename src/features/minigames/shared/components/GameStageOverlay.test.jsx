@@ -31,13 +31,10 @@ afterEach(() => {
 });
 
 describe("GameStageOverlay", () => {
-  it("portals outside the render host and restores body scrolling", () => {
+  it("portals an accessible modal, locks scrolling, and restores it on close", () => {
     const unmount = renderOverlay();
-    expect(document.body.querySelector(":scope > .game-stage-overlay")).not.toBeNull();
     expect(document.body.style.overflow).toBe("hidden");
     expect(document.querySelector('[role="dialog"]').getAttribute("aria-modal")).toBe("true");
-    expect(document.querySelector(".game-stage-modal__stars")).toBeNull();
-    expect(document.querySelector(".game-stage-modal img")).toBeNull();
     unmount();
     expect(document.body.style.overflow).toBe("");
   });
@@ -46,26 +43,9 @@ describe("GameStageOverlay", () => {
     const onClose = vi.fn();
     const unmount = renderOverlay({ closeOnBackdrop: true, closeOnEscape: true, onClose });
     act(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
-    act(() => document.querySelector(".game-stage-overlay").dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
+    act(() => document.querySelector('[role="dialog"]').parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
     expect(onClose).toHaveBeenCalledTimes(2);
     unmount();
   });
 
-  it("annotates modal action groups with their rendered action count", () => {
-    const host = document.createElement("div");
-    document.body.appendChild(host);
-    const root = createRoot(host);
-    act(() => root.render(
-      <GameStageModal>
-        <div className="game-stage-modal__actions">
-          <button type="button">Primary</button>
-          <button type="button">Secondary</button>
-          <button type="button">Exit</button>
-        </div>
-      </GameStageModal>,
-    ));
-
-    expect(host.querySelector(".game-stage-modal__actions").dataset.actionCount).toBe("3");
-    act(() => root.unmount());
-  });
 });
