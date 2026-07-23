@@ -105,24 +105,38 @@
   .logic-puzzle-stage__board-wrap {
     display: flex;
     min-height: 0;
-    flex: none;
+    flex: 1;
     place-items: initial;
   }
 
   .logic-puzzle-stage__board-wrap > div {
-    display: flex;
     width: 100%;
     min-height: 0;
-    flex-direction: column;
-    justify-content: flex-start;
+    height: 100%;
   }
 
-  .board-viewport {
-    min-height: 0;
-    flex: none;
+  .logic-puzzle-stage__board-wrap > div:has(> .board-viewport) {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    justify-items: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:has(> .board-viewport) > .board-viewport {
+    display: contents;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > .logic-board-status {
+    grid-row: 3;
   }
 
   .board-viewport__scroll {
+    grid-row: 1;
     width: min(100%, calc(100dvh - 198px), var(--logic-board-max-size, 480px));
     flex: none;
     touch-action: pan-x pan-y;
@@ -130,6 +144,7 @@
 
   .board-viewport__controls {
     display: flex;
+    grid-row: 3;
     min-height: 36px;
     align-items: center;
     justify-content: center;
@@ -147,6 +162,7 @@
   }
 
   .logic-board-toolbar {
+    grid-row: 4;
     gap: 6px;
     margin: 6px 0 0;
   }
@@ -165,18 +181,25 @@
   }
 
   .logic-board-status {
+    grid-row: 5;
     min-height: 18px;
     margin-top: 6px;
     font-size: 11px;
   }
 
   .logic-puzzle-stage .game-stage__content {
-    overflow-y: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
     scrollbar-width: none;
   }
 
   .logic-puzzle-stage .game-stage__content::-webkit-scrollbar {
     display: none;
+  }
+
+  .logic-puzzle-stage .game-stage__play {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 }

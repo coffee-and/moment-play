@@ -102,10 +102,15 @@ export function LogicPuzzleStage({
 
       {session.phase === "idle" ? (
         <GameStageOverlay state="start">
-          <GameStageModal role="dialog" aria-modal="true" aria-labelledby={`${game.id}-start-title`}>
+          <GameStageModal
+            className="game-stage-start-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`${game.id}-start-title`}
+          >
             <GameStageDoodle variant="start" />
             <h2 id={`${game.id}-start-title`}>{game.title}</h2>
-            <GameGuideContent guide={game.guide ?? { description: game.howTo }} />
+            <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
             <div className="game-stage-modal__actions">
               <Button autoFocus onClick={onStart}>게임 시작</Button>
             </div>

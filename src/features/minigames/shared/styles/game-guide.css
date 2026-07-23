@@ -114,9 +114,56 @@
   font-style: normal;
 }
 
+.game-stage-start-modal {
+  width: min(380px, 100%);
+  min-height: 0;
+}
+
+.game-guide-content--compact {
+  gap: 10px;
+}
+
+.game-guide-content--compact .game-guide-example {
+  gap: 7px;
+  padding: 10px;
+}
+
+.game-guide-content--compact .game-guide-example__grid {
+  width: min(142px, 48vw);
+}
+
+.game-guide-content--compact .game-guide-example__set-card {
+  width: 52px;
+  min-height: 58px;
+}
+
+.game-guide-content--compact .game-guide-example figcaption {
+  font-size: 10.5px;
+}
+
 @media (max-width: 380px) {
   .game-guide-example__set-card {
     width: 58px;
     min-height: 66px;
+  }
+}
+
+@media (max-width: 620px) {
+  .game-stage-start-modal {
+    gap: 9px;
+    padding: 22px 18px;
+  }
+
+  .game-stage-start-modal .game-stage-doodle[data-doodle-variant="start"] {
+    width: 104px;
+  }
+
+  .game-stage-start-modal .game-guide-content > p {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .game-stage-start-modal .game-stage-modal__actions .button {
+    min-height: 44px;
   }
 }
