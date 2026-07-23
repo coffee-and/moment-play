@@ -8,6 +8,7 @@ import {
   TrophyIcon,
 } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GameIconButton } from "./GameIconButton.jsx";
+import { GameGuideContent } from "./GameGuide.jsx";
 import { GameStage } from "./GameStage.jsx";
 import { GameStageDoodle } from "./GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "./GameStageOverlay.jsx";
@@ -104,7 +105,7 @@ export function LogicPuzzleStage({
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby={`${game.id}-start-title`}>
             <GameStageDoodle variant="start" />
             <h2 id={`${game.id}-start-title`}>{game.title}</h2>
-            <p>{game.howTo}</p>
+            <GameGuideContent guide={game.guide ?? { description: game.howTo }} />
             <div className="game-stage-modal__actions">
               <Button autoFocus onClick={onStart}>게임 시작</Button>
             </div>
