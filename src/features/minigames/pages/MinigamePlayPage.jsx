@@ -46,7 +46,7 @@ export function MinigamePlayPage() {
 
   return (
     <div className="wrap minigame-play-page">
-      <GameGuideProvider guide={{ description: game.howTo }}>
+      <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
         <ActiveGameComponent game={game} roomId={roomId ?? null} />
       </GameGuideProvider>
     </div>

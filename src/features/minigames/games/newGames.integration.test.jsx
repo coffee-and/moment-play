@@ -82,13 +82,18 @@ describe("new playable games", () => {
     view.unmount();
   });
 
-  it("starts Block Blast and places a selected piece", () => {
+  it("shows where a selected Block Blast piece can go and places it there", () => {
     const view = renderGame(BlockBlastGame, "block-blast");
     const firstPiece = view.host.querySelector(".block-piece:not(:disabled)");
-    const firstCell = view.host.querySelector(".block-blast-cell");
     act(() => firstPiece.click());
-    act(() => firstCell.click());
-    expect(firstCell.getAttribute("aria-label")).toContain("채워짐");
+
+    expect(view.host.querySelector('[role="status"]').textContent).toContain("점 표시가 있는 칸");
+    const validCell = [...view.host.querySelectorAll(".block-blast-cell")]
+      .find((cell) => cell.getAttribute("aria-label").includes("놓을 수 있음"));
+    expect(validCell).toBeTruthy();
+
+    act(() => validCell.click());
+    expect(validCell.getAttribute("aria-label")).toContain("채워짐");
     view.unmount();
   });
 

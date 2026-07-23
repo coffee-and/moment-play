@@ -1,3 +1,5 @@
+import { GAME_GUIDES } from "./gameGuides.js";
+
 export const MINIGAME_STATUS = {
   AVAILABLE: "available",
   COMING_SOON: "comingSoon",
@@ -112,6 +114,7 @@ export const MINIGAME_CATALOG = [
     description: "영역마다 L·I·T·S 테트로미노를 만들고 모든 칠한 칸을 하나로 연결해요.",
     cardDescription: "네 칸의 모양을 이어 완성해요.",
     howTo: "각 영역에서 네 칸을 칠해 L, I, T, S 중 하나를 만드세요. 칠한 칸은 모두 이어져야 하고 2×2가 되거나 같은 모양끼리 변으로 닿으면 안 돼요.",
+    guide: GAME_GUIDES.lits,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/lits",
     category: "Puzzle",
@@ -124,6 +127,7 @@ export const MINIGAME_CATALOG = [
     description: "숫자의 넓이에 맞춰 격자 전체를 겹치지 않는 사각형으로 나눠요.",
     cardDescription: "숫자만큼 사각형 영역을 나눠요.",
     howTo: "첫 번째 칸과 반대쪽 모서리를 차례로 선택해 사각형을 만드세요. 각 사각형에는 숫자가 하나만 들어가고 넓이가 그 숫자와 같아야 해요.",
+    guide: GAME_GUIDES.shikaku,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/shikaku",
     category: "Puzzle",
@@ -136,6 +140,7 @@ export const MINIGAME_CATALOG = [
     description: "숫자 단서를 따라 지뢰를 피해 모든 안전한 칸을 찾아요.",
     cardDescription: "지뢰를 피해 안전한 칸을 열어요.",
     howTo: "칸을 눌러 열고 깃발 모드나 길게 누르기로 지뢰를 표시하세요. 키보드에서는 방향키로 이동하고 F로 깃발을 표시할 수 있어요.",
+    guide: GAME_GUIDES.minesweeper,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/minesweeper",
     category: "Puzzle",
@@ -148,6 +153,7 @@ export const MINIGAME_CATALOG = [
     description: "색·모양·채움·개수가 각각 모두 같거나 모두 다른 카드 세 장을 찾아요.",
     cardDescription: "같거나 모두 다른 카드 셋을 찾아요.",
     howTo: "카드 세 장을 선택하세요. 색, 모양, 채움, 개수의 각 속성이 세 장 모두 같거나 세 장 모두 달라야 SET이에요. 다섯 SET을 찾으면 완료됩니다.",
+    guide: GAME_GUIDES.set,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/set",
     category: "Card",
@@ -160,6 +166,7 @@ export const MINIGAME_CATALOG = [
     description: "숫자 주변의 칠해진 칸 수를 맞춰 숨겨진 픽셀 그림을 완성해요.",
     cardDescription: "숫자 단서로 픽셀 그림을 완성해요.",
     howTo: "각 숫자는 자신을 포함한 주변 3×3 영역에서 칠해야 하는 칸 수예요. 칠하기와 제외 표시를 번갈아 사용해 숨은 그림을 완성하세요.",
+    guide: GAME_GUIDES.mosaic,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/mosaic",
     category: "Puzzle",
@@ -172,6 +179,7 @@ export const MINIGAME_CATALOG = [
     description: "세 개씩 주어지는 블록을 배치해 가로와 세로 줄을 지우고 최고 점수에 도전해요.",
     cardDescription: "블록을 놓아 가로·세로 줄을 지워요.",
     howTo: "아래 조각을 선택하거나 드래그한 뒤 보드에 놓으세요. 가로나 세로 한 줄을 채우면 사라지고, 어떤 조각도 놓을 수 없으면 게임이 끝나요.",
+    guide: GAME_GUIDES["block-blast"],
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/block-blast",
     category: "Puzzle",

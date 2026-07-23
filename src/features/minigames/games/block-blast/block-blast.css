@@ -1,5 +1,8 @@
 .block-blast-layout {
+  display: flex;
   width: min(100%, 560px);
+  min-height: 0;
+  flex-direction: column;
 }
 
 .block-blast-session-controls {
@@ -35,11 +38,34 @@
 }
 
 .block-blast-cell {
+  position: relative;
   min-width: 0;
   border: 0;
   border-radius: 6px;
   background: color-mix(in oklab, var(--text) 8%, var(--surface));
   cursor: pointer;
+}
+
+.block-blast-cell.is-valid-origin:not(.is-filled)::after {
+  position: absolute;
+  width: 6px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--game-color-green) 72%, var(--text));
+  content: "";
+  inset: 50% auto auto 50%;
+  opacity: .58;
+  transform: translate(-50%, -50%);
+}
+
+.block-blast-cell.is-preview {
+  background: color-mix(in oklab, currentColor 34%, var(--surface));
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+
+.block-blast-cell.is-invalid-preview {
+  background: color-mix(in oklab, var(--game-color-red) 22%, var(--surface));
+  box-shadow: inset 0 0 0 2px var(--game-color-red);
 }
 
 .block-blast-cell.is-filled,
@@ -63,13 +89,17 @@
 }
 
 .block-piece {
+  position: relative;
   display: grid;
   min-width: 0;
+  min-height: 104px;
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
   cursor: grab;
+  padding: 8px 6px 22px;
+  touch-action: manipulation;
 }
 
 .block-piece:disabled {
@@ -79,6 +109,7 @@
 
 .block-piece.is-selected {
   border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 7%, var(--surface));
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
 }
 
@@ -94,4 +125,57 @@
 
 .block-piece-cell {
   border-radius: 3px;
+}
+
+.block-piece__hint {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  left: 6px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.block-piece.is-selected .block-piece__hint {
+  color: var(--accent);
+}
+
+@media (max-width: 620px) {
+  .block-blast-game .game-stage__content {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .block-blast-game .game-stage__content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .block-blast-layout {
+    justify-content: flex-start;
+  }
+
+  .block-blast-board {
+    width: min(100%, calc(100dvh - 270px), 470px);
+  }
+
+  .block-blast-tray {
+    min-height: 86px;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .block-piece {
+    min-height: 86px;
+  }
+
+  .block-piece-grid {
+    width: 56px;
+    height: 56px;
+    grid-template-columns: repeat(4, 12px);
+    grid-template-rows: repeat(4, 12px);
+  }
 }

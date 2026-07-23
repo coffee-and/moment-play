@@ -103,27 +103,27 @@
 
 @media (max-width: 640px) {
   .logic-puzzle-stage__board-wrap {
+    display: flex;
     min-height: 0;
-    flex: 1;
+    flex: none;
+    place-items: initial;
   }
 
   .logic-puzzle-stage__board-wrap > div {
     display: flex;
     width: 100%;
     min-height: 0;
-    height: 100%;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .board-viewport {
     min-height: 0;
-    flex: 1;
-    justify-content: center;
+    flex: none;
   }
 
   .board-viewport__scroll {
-    width: min(100%, calc(100dvh - 205px), var(--logic-board-max-size, 480px));
+    width: min(100%, calc(100dvh - 198px), var(--logic-board-max-size, 480px));
     flex: none;
     touch-action: pan-x pan-y;
   }
@@ -161,11 +161,22 @@
 
   .logic-puzzle-stage__session-controls {
     flex: none;
+    margin-top: 0;
   }
 
   .logic-board-status {
     min-height: 18px;
     margin-top: 6px;
     font-size: 11px;
+  }
+
+  .logic-puzzle-stage .game-stage__content {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .logic-puzzle-stage .game-stage__content::-webkit-scrollbar {
+    display: none;
   }
 }

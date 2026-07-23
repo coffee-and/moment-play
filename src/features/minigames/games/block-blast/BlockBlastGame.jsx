@@ -10,11 +10,13 @@ import {
   TrophyIcon,
 } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GameIconButton } from "../../shared/components/GameIconButton.jsx";
+import { GameGuideContent } from "../../shared/components/GameGuide.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import {
   BLOCK_BLAST_SIZE,
+  canPlaceBlockPiece,
   createBlockBoard,
   createBlockPieces,
   hasBlockMove,
@@ -53,7 +55,27 @@ export function BlockBlastGame({ game }) {
   const [combo, setCombo] = useState(0);
   const [status, setStatus] = useState("조각을 고른 뒤 보드에 놓아보세요.");
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const [previewOrigin, setPreviewOrigin] = useState(null);
   const dragPieceIndexRef = useRef(null);
+  const selectedPiece = selectedPieceIndex == null ? null : pieces[selectedPieceIndex];
+  const previewIsValid = Boolean(
+    selectedPiece
+    && previewOrigin
+    && canPlaceBlockPiece(board, selectedPiece, previewOrigin.row, previewOrigin.col),
+  );
+  const previewIndexes = new Set(
+    selectedPiece && previewOrigin
+      ? selectedPiece.cells
+        .map(([rowOffset, colOffset]) => {
+          const row = previewOrigin.row + rowOffset;
+          const col = previewOrigin.col + colOffset;
+          return row >= 0 && row < BLOCK_BLAST_SIZE && col >= 0 && col < BLOCK_BLAST_SIZE
+            ? row * BLOCK_BLAST_SIZE + col
+            : null;
+        })
+        .filter((index) => index != null)
+      : [],
+  );
 
   function startGame() {
     setBoard(createBlockBoard());
@@ -63,6 +85,7 @@ export function BlockBlastGame({ game }) {
     setCombo(0);
     setStatus("조각을 고른 뒤 보드에 놓아보세요.");
     setIsExitOpen(false);
+    setPreviewOrigin(null);
     setPhase("playing");
   }
 
@@ -91,6 +114,7 @@ export function BlockBlastGame({ game }) {
     setBoard(result.board);
     setPieces(nextPieces);
     setSelectedPieceIndex(null);
+    setPreviewOrigin(null);
     setScore(nextScore);
     setCombo(nextCombo);
     setStatus(result.clearedLines > 0 ? `${result.clearedLines}줄을 지웠어요!` : "좋아요. 다음 조각을 놓아보세요.");
@@ -120,6 +144,14 @@ export function BlockBlastGame({ game }) {
   function continueGame() {
     setIsExitOpen(false);
     setPhase("playing");
+  }
+
+  function selectPiece(pieceIndex) {
+    const piece = pieces[pieceIndex];
+    if (phase !== "playing" || !piece) return;
+    setSelectedPieceIndex(pieceIndex);
+    setPreviewOrigin(null);
+    setStatus(`${piece.cells.length}칸 블록을 선택했어요. 보드의 점 표시가 있는 칸에 놓아보세요.`);
   }
 
   const sidebar = (
@@ -171,21 +203,32 @@ export function BlockBlastGame({ game }) {
           role="grid"
           aria-label="8×8 블록 보드"
           onDragOver={(event) => event.preventDefault()}
+          onPointerLeave={() => setPreviewOrigin(null)}
         >
           {board.map((value, index) => {
             const row = Math.floor(index / BLOCK_BLAST_SIZE);
             const col = index % BLOCK_BLAST_SIZE;
+            const isValidOrigin = Boolean(selectedPiece && canPlaceBlockPiece(board, selectedPiece, row, col));
+            const isPreview = previewIndexes.has(index);
             return (
               <button
-                aria-label={`${row + 1}행 ${col + 1}열${value ? ", 채워짐" : ", 비어 있음"}`}
-                className={`block-blast-cell${value ? ` is-filled color-${value}` : ""}`}
+                aria-label={`${row + 1}행 ${col + 1}열${value ? ", 채워짐" : ", 비어 있음"}${
+                  selectedPiece ? isValidOrigin ? ", 선택한 블록을 놓을 수 있음" : ", 선택한 블록을 놓을 수 없음" : ""
+                }`}
+                className={`block-blast-cell${value ? ` is-filled color-${value}` : ""}${
+                  isValidOrigin ? " is-valid-origin" : ""
+                }${isPreview ? previewIsValid ? ` is-preview color-${selectedPiece.color}` : " is-invalid-preview" : ""}`}
                 key={index}
                 onClick={() => placeSelected(row, col)}
+                onFocus={() => setPreviewOrigin({ row, col })}
+                onDragEnter={() => setPreviewOrigin({ row, col })}
                 onDrop={(event) => {
                   event.preventDefault();
                   placeSelected(row, col, dragPieceIndexRef.current);
                   dragPieceIndexRef.current = null;
+                  setPreviewOrigin(null);
                 }}
+                onPointerEnter={() => setPreviewOrigin({ row, col })}
                 type="button"
               />
             );
@@ -195,15 +238,20 @@ export function BlockBlastGame({ game }) {
         <div className="block-blast-tray" aria-label="사용할 블록">
           {pieces.map((piece, pieceIndex) => (
             <button
-              aria-label={piece ? `${piece.cells.length}칸 블록` : "사용한 블록"}
+              aria-label={piece ? `${piece.cells.length}칸 블록 선택` : "사용한 블록"}
               aria-pressed={selectedPieceIndex === pieceIndex}
               className={`block-piece${selectedPieceIndex === pieceIndex ? " is-selected" : ""}`}
               disabled={!piece || phase !== "playing"}
               draggable={Boolean(piece)}
               key={piece?.instanceId ?? `used-${pieceIndex}`}
-              onClick={() => setSelectedPieceIndex(pieceIndex)}
+              onClick={() => selectPiece(pieceIndex)}
+              onDragEnd={() => {
+                dragPieceIndexRef.current = null;
+                setPreviewOrigin(null);
+              }}
               onDragStart={(event) => {
                 dragPieceIndexRef.current = pieceIndex;
+                selectPiece(pieceIndex);
                 event.dataTransfer.effectAllowed = "move";
               }}
               type="button"
@@ -217,6 +265,11 @@ export function BlockBlastGame({ game }) {
                       style={{ gridColumn: col + 1, gridRow: row + 1 }}
                     />
                   ))}
+                </span>
+              ) : null}
+              {piece ? (
+                <span className="block-piece__hint">
+                  {selectedPieceIndex === pieceIndex ? "선택됨" : "선택"}
                 </span>
               ) : null}
             </button>
@@ -238,7 +291,7 @@ export function BlockBlastGame({ game }) {
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-start-title">
             <GameStageDoodle variant="start" />
             <h2 id="block-blast-start-title">Block Blast</h2>
-            <p>{game.howTo}</p>
+            <GameGuideContent guide={game.guide ?? { description: game.howTo }} />
             <div className="game-stage-modal__actions"><Button autoFocus onClick={startGame}>게임 시작</Button></div>
           </GameStageModal>
         </GameStageOverlay>
