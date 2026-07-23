@@ -1,0 +1,47 @@
+.shikaku-game {
+  --logic-board-max-size: 460px;
+  width: min(100%, 520px);
+}
+
+.shikaku-board {
+  display: grid;
+  width: min(82vw, 460px);
+  aspect-ratio: 1;
+  grid-template-columns: repeat(var(--shikaku-size), 1fr);
+  border: 2px solid var(--text);
+  background: var(--line);
+  gap: 1px;
+}
+
+.shikaku-cell {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  place-items: center;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: clamp(14px, 4vw, 22px);
+  font-weight: 700;
+}
+
+.shikaku-cell.is-anchor {
+  background: color-mix(in oklab, var(--accent) 24%, var(--surface));
+  box-shadow: inset 0 0 0 3px var(--accent);
+}
+
+.shikaku-cell.is-claimed {
+  background: color-mix(in oklab, var(--game-color-blue) 10%, var(--surface));
+}
+.shikaku-cell.is-claimed.region-1 { background: color-mix(in oklab, var(--game-color-green) 11%, var(--surface)); }
+.shikaku-cell.is-claimed.region-2 { background: color-mix(in oklab, var(--game-color-pink) 11%, var(--surface)); }
+.shikaku-cell.is-claimed.region-3 { background: color-mix(in oklab, var(--game-color-orange) 11%, var(--surface)); }
+.shikaku-cell.is-claimed.region-4 { background: color-mix(in oklab, var(--game-color-purple) 10%, var(--surface)); }
+.shikaku-cell.is-claimed.region-5 { background: color-mix(in oklab, var(--game-color-cyan) 10%, var(--surface)); }
+
+.shikaku-cell.is-top { border-top: 3px solid var(--game-color-blue); }
+.shikaku-cell.is-right { border-right: 3px solid var(--game-color-blue); }
+.shikaku-cell.is-bottom { border-bottom: 3px solid var(--game-color-blue); }
+.shikaku-cell.is-left { border-left: 3px solid var(--game-color-blue); }

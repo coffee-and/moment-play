@@ -1,0 +1,171 @@
+.logic-puzzle-stage__board-wrap {
+  display: grid;
+  width: 100%;
+  min-height: min(58vh, 560px);
+  place-items: center;
+}
+
+.logic-puzzle-stage__stats {
+  display: grid;
+  gap: 12px;
+}
+
+.logic-puzzle-stage__stats .stat .l {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logic-puzzle-stage__stats .stat .l svg {
+  width: 12px;
+  height: 12px;
+}
+
+.logic-puzzle-stage__result-time {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 44px);
+  letter-spacing: -.03em;
+}
+
+.logic-board-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.logic-board-toolbar .button svg,
+.logic-puzzle-stage__session-controls .button svg,
+.game-stage-modal__actions .button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.logic-puzzle-stage__session-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.board-viewport {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 8px;
+}
+
+.board-viewport__scroll {
+  width: min(100%, var(--logic-board-max-size, 480px));
+  aspect-ratio: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.board-viewport__surface {
+  width: calc(100% * var(--board-zoom));
+  aspect-ratio: 1;
+}
+
+.board-viewport__surface > [role="grid"] {
+  width: 100%;
+  max-width: none;
+}
+
+.board-viewport__controls {
+  display: none;
+}
+
+.board-viewport__controls output {
+  min-width: 46px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.minesweeper-cell svg {
+  width: 54%;
+  height: 54%;
+}
+
+.logic-board-status {
+  min-height: 24px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .logic-puzzle-stage__board-wrap {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .logic-puzzle-stage__board-wrap > div {
+    display: flex;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .board-viewport {
+    min-height: 0;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .board-viewport__scroll {
+    width: min(100%, calc(100dvh - 205px), var(--logic-board-max-size, 480px));
+    flex: none;
+    touch-action: pan-x pan-y;
+  }
+
+  .board-viewport__controls {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .board-viewport__controls .game-stage__icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .board-viewport__controls .game-stage__icon-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .logic-board-toolbar {
+    gap: 6px;
+    margin: 6px 0 0;
+  }
+
+  .logic-board-toolbar .button,
+  .logic-puzzle-stage__session-controls .button {
+    width: auto;
+    min-height: 34px;
+    padding-inline: 11px;
+    font-size: 11px;
+  }
+
+  .logic-puzzle-stage__session-controls {
+    flex: none;
+  }
+
+  .logic-board-status {
+    min-height: 18px;
+    margin-top: 6px;
+    font-size: 11px;
+  }
+}

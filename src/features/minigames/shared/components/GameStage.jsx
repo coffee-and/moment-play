@@ -21,8 +21,10 @@ export function GameStage({
   eyebrow,
   isExitConfirmationOpen = false,
   onRequestExit,
+  phase,
   sidebar,
   title,
+  topbarMeta,
 }) {
   const rootRef = useRef(null);
   const touchTimerRef = useRef(null);
@@ -53,16 +55,23 @@ export function GameStage({
   useEffect(() => () => window.clearTimeout(touchTimerRef.current), []);
 
   return (
-    <section ref={rootRef} onPointerDownCapture={handleTouchFeedback} className={joinClassNames(['game-stage', className])} aria-label={ariaLabel ?? title}>
+    <section
+      ref={rootRef}
+      onPointerDownCapture={handleTouchFeedback}
+      className={joinClassNames(['game-stage', className])}
+      aria-label={ariaLabel ?? title}
+      data-phase={phase}
+    >
       <header className="game-stage__topbar">
         <div className="game-stage__topbar-title">
           <strong>{title}</strong>
           {eyebrow ? <span>{eyebrow}</span> : null}
+          {topbarMeta ? <div className="game-stage__topbar-meta">{topbarMeta}</div> : null}
         </div>
         <div className="game-stage__topbar-actions">
-          {actions ? <div className="game-stage__topbar-game-actions">{actions}</div> : null}
           {guide ? <GameGuideIconButton label={`${title} 게임 설명`} onClick={() => setIsGuideOpen(true)} /> : null}
           <SoundToggle compact />
+          {actions ? <div className="game-stage__topbar-game-actions">{actions}</div> : null}
         </div>
       </header>
       <div className="game-stage__inner">

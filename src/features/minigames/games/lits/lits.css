@@ -1,0 +1,46 @@
+.lits-game {
+  --logic-board-max-size: 460px;
+  width: min(100%, 520px);
+}
+
+.lits-board {
+  display: grid;
+  width: min(82vw, 460px);
+  aspect-ratio: 1;
+  grid-template-columns: repeat(6, 1fr);
+  background: var(--line);
+  gap: 1px;
+}
+
+.lits-cell {
+  position: relative;
+  min-width: 0;
+  border: 0;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.lits-cell.region-0,
+.lits-cell.region-3,
+.lits-cell.region-4 {
+  background: color-mix(in oklab, var(--game-color-blue) 5%, var(--surface));
+}
+
+.lits-cell.state-1 {
+  background: var(--text);
+}
+
+.lits-cell.state-2::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  content: "×";
+  font-size: clamp(18px, 5vw, 30px);
+}
+
+.lits-cell.edge-top { border-top: 3px solid var(--game-color-purple); }
+.lits-cell.edge-right { border-right: 3px solid var(--game-color-purple); }
+.lits-cell.edge-bottom { border-bottom: 3px solid var(--game-color-purple); }
+.lits-cell.edge-left { border-left: 3px solid var(--game-color-purple); }

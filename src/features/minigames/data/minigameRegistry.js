@@ -6,6 +6,12 @@ import { SudokuLevelGame } from "../games/sudoku/SudokuLevelGame.jsx";
 import { TimingTapGame } from "../games/timing-tap/TimingTapGame.jsx";
 import { GlowSequenceGame } from "../games/glow-sequence/GlowSequenceGame.jsx";
 import { SolitaireGame } from "../games/solitaire/SolitaireGame.jsx";
+import { LitsGame } from "../games/lits/LitsGame.jsx";
+import { ShikakuGame } from "../games/shikaku/ShikakuGame.jsx";
+import { MinesweeperGame } from "../games/minesweeper/MinesweeperGame.jsx";
+import { SetGame } from "../games/set/SetGame.jsx";
+import { MosaicGame } from "../games/mosaic/MosaicGame.jsx";
+import { BlockBlastGame } from "../games/block-blast/BlockBlastGame.jsx";
 
 export const MINIGAME_COMPONENTS = {
   "2048": Game2048,
@@ -16,6 +22,12 @@ export const MINIGAME_COMPONENTS = {
   "timing-tap": TimingTapGame,
   "glow-sequence": GlowSequenceGame,
   solitaire: SolitaireGame,
+  lits: LitsGame,
+  shikaku: ShikakuGame,
+  minesweeper: MinesweeperGame,
+  set: SetGame,
+  mosaic: MosaicGame,
+  "block-blast": BlockBlastGame,
 };
 
 export function getMinigameComponent(gameId) {

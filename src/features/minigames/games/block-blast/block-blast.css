@@ -1,0 +1,97 @@
+.block-blast-layout {
+  width: min(100%, 560px);
+}
+
+.block-blast-session-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.block-blast-session-controls .button svg,
+.block-blast-game .game-stage-modal__actions .button svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 620px) {
+  .block-blast-session-controls .button {
+    width: auto;
+    min-height: 34px;
+    padding-inline: 11px;
+    font-size: 11px;
+  }
+}
+
+.block-blast-board {
+  display: grid;
+  width: min(82vw, 470px);
+  aspect-ratio: 1;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  margin: 0 auto;
+  border-radius: 18px;
+  padding: 9px;
+  background: color-mix(in oklab, var(--game-color-blue) 10%, var(--surface-2));
+}
+
+.block-blast-cell {
+  min-width: 0;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--text) 8%, var(--surface));
+  cursor: pointer;
+}
+
+.block-blast-cell.is-filled,
+.block-piece-cell {
+  box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--text) 14%, transparent);
+}
+
+.block-blast-cell.color-1,
+.block-piece-cell.color-1 { background: var(--game-color-blue); }
+.block-blast-cell.color-2,
+.block-piece-cell.color-2 { background: var(--game-color-pink); }
+.block-blast-cell.color-3,
+.block-piece-cell.color-3 { background: var(--game-color-orange); }
+
+.block-blast-tray {
+  display: grid;
+  min-height: 104px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.block-piece {
+  display: grid;
+  min-width: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: grab;
+}
+
+.block-piece:disabled {
+  cursor: default;
+  opacity: .25;
+}
+
+.block-piece.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.block-piece-grid {
+  display: grid;
+  width: 66px;
+  height: 66px;
+  grid-template-columns: repeat(4, 14px);
+  grid-template-rows: repeat(4, 14px);
+  place-content: center;
+  gap: 2px;
+}
+
+.block-piece-cell {
+  border-radius: 3px;
+}

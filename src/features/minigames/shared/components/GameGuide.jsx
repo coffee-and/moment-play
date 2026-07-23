@@ -1,7 +1,10 @@
+import { BookOpenTextIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
+import { GameStageModal, GameStageOverlay } from './GameStageOverlay.jsx';
+
 export function GameGuideIconButton({ label, onClick }) {
   return (
     <button type="button" className="game-guide-icon" onClick={onClick} aria-label={label}>
-      ?
+      <BookOpenTextIcon />
     </button>
   );
 }
@@ -17,4 +20,3 @@ export function GameGuideModal({ guide, onClose }) {
     </GameStageOverlay>
   );
 }
-import { GameStageModal, GameStageOverlay } from './GameStageOverlay.jsx';
