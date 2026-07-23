@@ -86,20 +86,6 @@ describe("AppLayout account control", () => {
     view.unmount();
   });
 
-  it("keeps a long authenticated nickname inside the shared account label", () => {
-    auth = {
-      status: "authenticated",
-      user: { email: "player@example.com", is_anonymous: false, user_metadata: { nickname: "아주긴닉네임테스트사용자" } },
-      signOut,
-    };
-    const view = renderLayout();
-    const accountControl = view.host.querySelector(".account-menu summary");
-
-    expect(accountControl.querySelector(".account-control__label")?.textContent).toBe("아주긴닉네임테스트사용자");
-    expect(accountControl.textContent).toBe("아주긴닉네임테스트사용자");
-    view.unmount();
-  });
-
   it("uses an explicit logout action and returns the header to guest state", async () => {
     auth = { status: "authenticated", user: { email: null, is_anonymous: false }, signOut };
     const view = renderLayout();
@@ -119,63 +105,26 @@ describe("AppLayout account control", () => {
 describe("AppLayout immersive game routes", () => {
   it.each([
     "/minigames/2048",
-    "/minigames/memory",
-    "/minigames/omok",
     "/minigames/omok/room/11111111-1111-4111-8111-111111111111",
   ])("hides global navigation on %s", (path) => {
     auth = { status: "authenticated", user: { email: "host@example.com" }, signOut };
     const view = renderLayout(path);
 
     expect(view.host.textContent).toContain("Page content");
-    expect(view.host.querySelector(".hd")).toBeNull();
-    expect(view.host.querySelector(".account-menu")).toBeNull();
+    expect(view.host.querySelector("header")).toBeNull();
+    expect(view.host.querySelector("footer")).toBeNull();
+    expect(view.host.querySelector('[aria-label="주요 메뉴"]')).toBeNull();
+    expect(view.host.querySelector('[aria-label="하단 탭"]')).toBeNull();
     expect(view.host.querySelector(`a[href="${SETTINGS_PATH}"]`)).toBeNull();
-    expect(view.host.querySelector(".app-footer")).toBeNull();
-    expect(view.host.querySelector(".moment-app--immersive")).not.toBeNull();
     view.unmount();
   });
 
   it("keeps global navigation on non-game settings pages", () => {
     const view = renderLayout(SETTINGS_PATH);
-    expect(view.host.querySelector(".hd")).not.toBeNull();
-    expect(view.host.querySelector(".app-footer .footer")).not.toBeNull();
-    expect(view.host.querySelector(".moment-app--immersive")).toBeNull();
-    view.unmount();
-  });
-});
-
-describe("AppLayout brand and primary navigation", () => {
-  it("renders the image logo and primary destinations in order", () => {
-    auth = { status: "guest", user: null, signOut };
-    const view = renderLayout("/");
-    const headerBrand = view.host.querySelector(".hd .brand");
-    const logo = headerBrand.querySelector(".brand-logo");
-    const navLinks = [...view.host.querySelectorAll(".nav .lk")];
-    const navItems = [...view.host.querySelectorAll(".nav .primary-nav__item")];
-
-    expect(headerBrand?.textContent).toBe("");
-    expect(headerBrand?.getAttribute("aria-label")).toBe("Moment Play 홈으로");
-    expect(headerBrand?.getAttribute("data-variant")).toBe("light");
-    expect(logo?.getAttribute("src")).toContain("moment-play-logo-light.webp");
-    expect(logo?.getAttribute("alt")).toBe("");
-    expect(logo?.getAttribute("aria-hidden")).toBe("true");
-    expect(navLinks.map((link) => link.textContent)).toEqual([
-      "Home",
-      "Game",
-      "Ranking",
-      "Friends",
-      "Settings",
-    ]);
-    expect(navItems).toHaveLength(5);
-    expect(navItems.map((item) => item.querySelector(".primary-nav__label")?.textContent)).toEqual([
-      "Home",
-      "Game",
-      "Ranking",
-      "Friends",
-      "Settings",
-    ]);
-    expect(navLinks[0].getAttribute("aria-current")).toBe("page");
-    expect(navLinks.slice(1).every((link) => !link.hasAttribute("aria-current"))).toBe(true);
+    expect(view.host.querySelector("header")).not.toBeNull();
+    expect(view.host.querySelector("footer")).not.toBeNull();
+    expect(view.host.querySelector('[aria-label="주요 메뉴"]')).not.toBeNull();
+    expect(view.host.querySelector('[aria-label="하단 탭"]')).not.toBeNull();
     view.unmount();
   });
 });

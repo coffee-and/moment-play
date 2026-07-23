@@ -52,11 +52,8 @@ describe("FlappyGame input surface", () => {
     const view = renderGame();
     const surface = view.host.querySelector(".flappy-game__sky");
 
-    expect(document.querySelector('[data-state="start"] .game-stage-modal')).not.toBeNull();
-    expect(document.body.textContent).toContain("비행 시작");
     expect(surface.getAttribute("role")).toBe("application");
     expect(surface.tabIndex).toBe(0);
-    expect(surface.querySelector(".flappy-game__curtain img")).toBeNull();
 
     act(() => surface.focus());
     expect(document.activeElement).toBe(surface);

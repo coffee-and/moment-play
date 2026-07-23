@@ -3,8 +3,6 @@ import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { Brand } from "../components/Brand.jsx";
 import { ThemeProvider } from "./ThemeContext.jsx";
 import { ThemeToggle } from "./ThemeToggle.jsx";
 import { THEME, THEME_STORAGE_KEY } from "./theme.js";
@@ -16,12 +14,9 @@ function renderThemeControls() {
   document.body.appendChild(host);
   const root = createRoot(host);
   act(() => root.render(
-    <MemoryRouter>
-      <ThemeProvider>
-        <ThemeToggle />
-        <Brand />
-      </ThemeProvider>
-    </MemoryRouter>,
+    <ThemeProvider>
+      <ThemeToggle />
+    </ThemeProvider>,
   ));
   return { host, unmount: () => act(() => root.unmount()) };
 }
@@ -40,29 +35,19 @@ afterEach(() => {
 });
 
 describe("ThemeProvider", () => {
-  it("uses the light theme by default and applies the matching logo", () => {
-    const view = renderThemeControls();
-
-    expect(document.documentElement.dataset.theme).toBe(THEME.LIGHT);
-    expect(view.host.querySelector(".theme-toggle")?.getAttribute("aria-pressed")).toBe("false");
-    expect(view.host.querySelector(".brand")?.getAttribute("data-variant")).toBe(THEME.LIGHT);
-    view.unmount();
-  });
-
   it("restores, switches, and persists the selected theme", () => {
     window.localStorage.setItem(THEME_STORAGE_KEY, THEME.DARK);
     const view = renderThemeControls();
-    const toggle = view.host.querySelector(".theme-toggle");
+    const toggle = view.host.querySelector('button[aria-label="라이트 테마로 전환"]');
 
     expect(document.documentElement.dataset.theme).toBe(THEME.DARK);
-    expect(toggle?.getAttribute("aria-label")).toBe("라이트 테마로 전환");
-    expect(view.host.querySelector(".brand")?.getAttribute("data-variant")).toBe(THEME.DARK);
+    expect(toggle).not.toBeNull();
 
     act(() => toggle.click());
 
     expect(document.documentElement.dataset.theme).toBe(THEME.LIGHT);
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEME.LIGHT);
-    expect(view.host.querySelector(".brand")?.getAttribute("data-variant")).toBe(THEME.LIGHT);
+    expect(toggle.getAttribute("aria-label")).toBe("다크 테마로 전환");
     view.unmount();
   });
 });

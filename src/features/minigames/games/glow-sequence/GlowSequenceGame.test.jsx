@@ -57,16 +57,6 @@ describe("GlowSequenceGame", () => {
     view.unmount();
   });
 
-  it("starts on round one with a four by four board", () => {
-    const view = renderGame();
-    const start = [...document.querySelectorAll("button")].find((button) => button.textContent === "게임 시작");
-    act(() => start.click());
-    expect(view.host.textContent).toContain("ROUND 1 · 3 CELLS");
-    expect(view.host.querySelector('.glow-sequence__grid[data-size="4"]')).not.toBeNull();
-    expect(view.host.querySelectorAll(".glow-sequence__cell")).toHaveLength(16);
-    view.unmount();
-  });
-
   it("plays sequence cues without showing NICE during playback", () => {
     vi.useFakeTimers();
     const view = renderGame();

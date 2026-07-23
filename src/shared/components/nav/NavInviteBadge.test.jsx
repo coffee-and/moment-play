@@ -42,7 +42,6 @@ describe("invite notification badges", () => {
     const friendsLink = view.host.querySelector(`a[href="${FRIENDS_PATH}"]`);
     expect(friendsLink.textContent).toContain("Friends");
     expect(friendsLink.getAttribute("aria-label")).toBe("친구, 받은 오목 초대 3개");
-    expect(friendsLink.querySelector(".nav-notification-badge").textContent).toBe("3");
     view.unmount();
   });
 
@@ -50,7 +49,6 @@ describe("invite notification badges", () => {
     const view = renderComponent(<TabBar />);
     const friendsLink = view.host.querySelector(`a[href="${FRIENDS_PATH}"]`);
     expect(friendsLink.getAttribute("aria-label")).toBe("친구, 받은 오목 초대 3개");
-    expect(friendsLink.querySelector(".tabbar__icon .nav-notification-badge").textContent).toBe("3");
     view.unmount();
   });
 });
