@@ -34,8 +34,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin: 16px 0 14px;
 }
 
 .logic-board-toolbar .button svg,
@@ -148,7 +148,7 @@
     min-height: 36px;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .board-viewport__controls .game-stage__icon-button {
@@ -163,8 +163,8 @@
 
   .logic-board-toolbar {
     grid-row: 4;
-    gap: 6px;
-    margin: 6px 0 0;
+    gap: 10px;
+    margin: 10px 0 0;
   }
 
   .logic-board-toolbar .button,

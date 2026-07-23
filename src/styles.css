@@ -1354,7 +1354,7 @@ a {
 .game-stage__inner {
   --stage-card-min-height: clamp(520px, 68vh, 760px);
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: var(--gap);
   align-items: stretch;
 }
@@ -1370,10 +1370,12 @@ a {
 .game-stage__copy {
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 .game-stage__title-row {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -1381,8 +1383,11 @@ a {
 }
 
 .game-stage__title-row h2 {
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
-  font-size: clamp(26px, 3vw, 34px);
+  overflow-wrap: anywhere;
+  font-size: clamp(24px, 2vw, 30px);
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0;
@@ -2501,7 +2506,7 @@ a {
   .app-main--immersive .minigame-play-page { padding: 0; }
   .game-stage { border: 0; border-radius: 0; padding: 12px; box-shadow: none; }
   .game-stage__topbar { gap: 8px; padding-bottom: 10px; }
-  .game-stage__topbar-title { flex: none; }
+  .game-stage__topbar-title { flex: 1; }
   .game-stage__topbar-title strong { font-size: 19px; }
   .game-stage__topbar-actions .header-icon-button, .game-stage__topbar-actions .game-guide-icon { width: 40px; height: 40px; }
   .game-stage__inner { --stage-card-min-height: min(68vh, 610px); gap: 12px; }
@@ -2664,14 +2669,15 @@ a {
   }
 
   .omok-game {
-    width: calc(100% + 28px);
-    margin-inline: -14px;
-    padding-inline: 10px;
+    width: 100%;
+    margin-inline: 0;
+    padding-inline: 8px;
   }
 
   .omok-game .game-stage__play {
+    width: 100%;
     min-height: 0;
-    padding: 12px 4px 16px;
+    padding: 12px 8px 16px;
   }
 
   .omok-game .game-stage__sidebar > div:first-child .txt {
@@ -2685,6 +2691,7 @@ a {
   }
 
   .omok-game__content {
+    min-width: 0;
     gap: 10px;
   }
 
@@ -2751,8 +2758,10 @@ a {
   }
 
   .omok-game__board-wrap {
-    width: min(calc(100vw - 20px), 540px);
-    max-width: none;
+    width: min(100%, 540px);
+    max-width: 540px;
+    box-sizing: border-box;
+    padding: 2px;
   }
 
   .omok-game__board {
