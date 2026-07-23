@@ -471,6 +471,36 @@ describe("OmokGame active online game", () => {
     view.unmount();
   });
 
+  it("shows the loss result when an invited guest receives the opponent's winning move", async () => {
+    mockGateway.getCurrentProfileState.mockResolvedValue({ needsNicknameSetup: false, nickname: "Guest", userId: "guest" });
+    mockGateway.joinRoom.mockResolvedValue({
+      inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+      moves: winningMoves.slice(0, -1),
+      room: createRoomFixture({ players: createRoomFixture().players.map((player) => ({ ...player, ready: true })), status: "playing" }),
+      userId: "guest",
+    });
+    mockGateway.refreshRoom.mockResolvedValue({
+      moves: winningMoves,
+      room: createRoomFixture({ players: createRoomFixture().players.map((player) => ({ ...player, ready: true })), status: "playing" }),
+    });
+
+    const view = renderOmokGame({ roomId });
+    await act(async () => {
+      await flushMicrotasks(12);
+    });
+    await view.click(findButtonByExactText(view.container, "시작"));
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+      await flushMicrotasks(12);
+    });
+
+    const resultDialog = document.querySelector('[aria-labelledby="omok-result-title"]');
+    expect(resultDialog).not.toBeNull();
+    expect(resultDialog.textContent).toContain("패배");
+    expect(resultDialog.textContent).toContain("흑이 다섯 돌을 완성했습니다.");
+    view.unmount();
+  });
+
   it("routes result-room leaving through confirmation without reusing resign copy", async () => {
     mockGateway.createRoom.mockResolvedValue({
       inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,

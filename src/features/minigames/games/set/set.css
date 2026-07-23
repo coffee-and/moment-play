@@ -35,6 +35,20 @@
   transform: translateY(-2px);
 }
 
+.set-card.is-answer,
+.set-card.is-answer:disabled {
+  border-color: var(--game-color-green);
+  opacity: 1;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--game-color-green) 26%, transparent),
+    0 8px 18px color-mix(in oklab, var(--game-color-green) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+.set-card:disabled {
+  cursor: default;
+}
+
 .set-card.color-0 { color: var(--game-color-red); }
 .set-card.color-1 { color: var(--game-color-green); }
 .set-card.color-2 { color: var(--game-color-purple); }
@@ -65,6 +79,10 @@
 
 .set-card.shading-2 .set-symbol {
   background: transparent;
+}
+
+.set-game__toolbar {
+  margin-bottom: 0;
 }
 
 @media (max-width: 620px) {

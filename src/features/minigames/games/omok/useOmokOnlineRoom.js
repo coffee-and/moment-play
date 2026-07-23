@@ -20,6 +20,13 @@ import {
 
 const ONLINE_UNAVAILABLE_MESSAGE = "온라인 방 기능을 사용하려면 Supabase 환경 변수가 필요합니다.";
 
+function isOlderRoomSnapshot(previous, snapshot) {
+  if (!previous.room?.id || previous.room.id !== snapshot.room.id) return false;
+  if (snapshot.room.currentRound < previous.room.currentRound) return true;
+  return snapshot.room.currentRound === previous.room.currentRound
+    && snapshot.moves.length < previous.moves.length;
+}
+
 const initialState = {
   status: ONLINE_ROOM_LOAD_STATUS.IDLE,
   actionStatus: ONLINE_ACTION_STATUS.IDLE,
@@ -111,6 +118,7 @@ export function useOmokOnlineRoom({
     if (!snapshot?.room || !Array.isArray(snapshot.moves)) return;
     setState((previous) => {
       if (previous.room?.id && previous.room.id !== snapshot.room.id) return previous;
+      if (isOlderRoomSnapshot(previous, snapshot)) return previous;
       return {
         ...previous,
         status: ONLINE_ROOM_LOAD_STATUS.READY,

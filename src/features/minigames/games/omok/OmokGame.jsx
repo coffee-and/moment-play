@@ -720,7 +720,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
               {isOnlineHost ? (
                 <Button type="button" variant="secondary" onClick={online.startRoom} disabled={!canStartOnlineRoom}>게임 시작</Button>
               ) : (
-                <Button type="button" variant="secondary" disabled>방장 시작 대기</Button>
+                <Button type="button" variant="secondary" aria-label="방장이 게임을 시작하기를 기다리는 중" disabled>시작 대기</Button>
               )}
               <Button type="button" variant="secondary" onClick={requestLeaveOnlineRoom} disabled={onlineBusy}>나가기</Button>
             </div>

@@ -52,6 +52,42 @@ const BLOCK_BLAST_CELLS = [
   {}, {}, {}, {}, {},
 ];
 
+const GAME_2048_CELLS = [
+  { state: "tile", label: "2" },
+  { state: "tile", label: "2" },
+  { state: "hint", label: "→" },
+  { state: "tile-strong", label: "4" },
+];
+
+const MEMORY_CELLS = [
+  { state: "sequence-one", label: "1" },
+  { state: "sequence-two", label: "2" },
+  { state: "sequence-three", label: "3" },
+  { state: "sequence-four", label: "4" },
+];
+
+const SUDOKU_CELLS = [
+  { state: "number", label: "5" }, { state: "number", label: "3" }, { state: "number", label: "4" },
+  { state: "number", label: "6" }, { state: "number-focus", label: "7" }, { state: "number", label: "2" },
+  { state: "number", label: "1" }, { state: "number", label: "9" }, { state: "number", label: "8" },
+];
+
+const OMOK_CELLS = [
+  {}, {}, {}, {}, {}, {}, {},
+  {}, { state: "white-stone", label: "●" }, {}, {}, {}, {}, {},
+  {}, {}, { state: "black-stone", label: "●" }, {}, {}, {}, {},
+  {}, {}, { state: "white-stone", label: "●" }, { state: "black-stone", label: "●" }, {}, {}, {},
+  {}, {}, {}, {}, { state: "black-stone", label: "●" }, {}, {},
+  {}, {}, {}, {}, {}, { state: "black-stone", label: "●" }, {},
+  {}, {}, {}, {}, {}, {}, { state: "black-stone", label: "●" },
+];
+
+const GLOW_SEQUENCE_CELLS = [
+  { state: "glow-one", label: "1" }, {}, {},
+  {}, {}, { state: "glow-two", label: "2" },
+  {}, { state: "glow-three", label: "3" }, {},
+];
+
 function SetExample() {
   const cards = [
     { color: "red", count: 1 },
@@ -70,8 +106,71 @@ function SetExample() {
   );
 }
 
+function FlappyExample() {
+  return (
+    <div className="game-guide-example__flight" role="img" aria-label="별이 위아래 기둥 사이의 빈 공간을 통과하는 성공 예시">
+      <span className="game-guide-example__pillar is-top" aria-hidden="true" />
+      <span className="game-guide-example__flight-star" aria-hidden="true">★</span>
+      <span className="game-guide-example__flight-path" aria-hidden="true">→</span>
+      <span className="game-guide-example__pillar is-bottom" aria-hidden="true" />
+    </div>
+  );
+}
+
+function TimingTapExample() {
+  return (
+    <div className="game-guide-example__timing" role="img" aria-label="움직이는 표시가 목표 구간 중앙에 멈춘 성공 예시">
+      <span className="game-guide-example__timing-target" aria-hidden="true" />
+      <span className="game-guide-example__timing-marker" aria-hidden="true" />
+    </div>
+  );
+}
+
+function SolitaireExample() {
+  return (
+    <div className="game-guide-example__solitaire" role="img" aria-label="검정 8 아래에 빨강 7을 놓고 완성 칸에는 스페이드 A를 놓는 예시">
+      <span className="game-guide-example__playing-card is-black" aria-hidden="true"><b>8</b><i>♣</i></span>
+      <span className="game-guide-example__playing-card is-red is-lower" aria-hidden="true"><b>7</b><i>♥</i></span>
+      <span className="game-guide-example__solitaire-arrow" aria-hidden="true">→</span>
+      <span className="game-guide-example__playing-card is-black is-foundation" aria-hidden="true"><b>A</b><i>♠</i></span>
+    </div>
+  );
+}
+
 export function GameGuideExample({ type }) {
   const examples = {
+    "2048": {
+      caption: "플레이 예시 · 같은 숫자 2 두 개를 한쪽으로 밀면 4로 합쳐져요.",
+      visual: <GuideGrid cells={GAME_2048_CELLS} columns={4} label="숫자 2 두 개가 숫자 4로 합쳐지는 예시" />,
+    },
+    memory: {
+      caption: "플레이 예시 · 빛난 아이콘을 1번부터 4번까지 같은 순서로 눌러요.",
+      visual: <GuideGrid cells={MEMORY_CELLS} columns={4} label="네 아이콘을 순서대로 기억하는 예시" />,
+    },
+    sudoku: {
+      caption: "성공 예시 · 한 3×3 영역에는 1부터 9까지 숫자가 한 번씩만 들어가요.",
+      visual: <GuideGrid cells={SUDOKU_CELLS} columns={3} label="1부터 9까지 중복 없이 채운 스도쿠 영역 예시" />,
+    },
+    omok: {
+      caption: "성공 예시 · 흑돌 다섯 개가 대각선으로 이어졌어요.",
+      visual: <GuideGrid cells={OMOK_CELLS} columns={7} label="흑돌 다섯 개가 대각선으로 연결된 오목 승리 예시" />,
+    },
+    flappy: {
+      caption: "플레이 예시 · 탭 높이를 조절해 위아래 기둥 사이를 통과해요.",
+      visual: <FlappyExample />,
+    },
+    "timing-tap": {
+      caption: "성공 예시 · 움직이는 표시를 밝은 목표 구간 중앙에서 멈춰요.",
+      visual: <TimingTapExample />,
+    },
+    "glow-sequence": {
+      caption: "플레이 예시 · 빛난 위치를 1 → 2 → 3 순서로 다시 눌러요.",
+      visual: <GuideGrid cells={GLOW_SEQUENCE_CELLS} columns={3} label="세 위치가 차례로 빛난 순서 기억 예시" />,
+    },
+    solitaire: {
+      caption: "플레이 예시 · 검정 8 아래에는 빨강 7, 완성 칸에는 같은 문양의 A부터 놓아요.",
+      visual: <SolitaireExample />,
+    },
     lits: {
       caption: "성공 예시 · 한 영역의 네 칸이 L 모양으로 이어져요.",
       visual: <GuideGrid cells={LITS_CELLS} columns={4} label="네 칸이 L 모양으로 연결된 성공 예시" />,

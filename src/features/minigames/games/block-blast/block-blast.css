@@ -157,8 +157,8 @@
   .block-blast-layout {
     display: grid;
     height: 100%;
-    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-    align-items: start;
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
+    align-items: center;
   }
 
   .block-blast-game .game-stage__play {
@@ -170,10 +170,11 @@
   .block-blast-board {
     grid-row: 1;
     width: min(100%, calc(100dvh - 270px), 470px);
+    align-self: center;
   }
 
   .block-blast-tray {
-    grid-row: 3;
+    grid-row: 2;
     min-height: 86px;
     gap: 7px;
     margin-top: 10px;
@@ -184,11 +185,11 @@
   }
 
   .block-blast-layout > .logic-board-status {
-    grid-row: 4;
+    grid-row: 3;
   }
 
   .block-blast-session-controls {
-    grid-row: 5;
+    grid-row: 4;
   }
 
   .block-piece-grid {

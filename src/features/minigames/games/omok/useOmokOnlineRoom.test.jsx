@@ -10,6 +10,17 @@ import { useOmokOnlineRoom } from "./useOmokOnlineRoom.js";
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const roomId = "11111111-1111-4111-8111-111111111111";
+const winningMoves = [
+  { id: "m0", moveNumber: 0, position: { row: 7, col: 3 }, roundNumber: 1, stone: STONE.BLACK },
+  { id: "m1", moveNumber: 1, position: { row: 0, col: 0 }, roundNumber: 1, stone: STONE.WHITE },
+  { id: "m2", moveNumber: 2, position: { row: 7, col: 4 }, roundNumber: 1, stone: STONE.BLACK },
+  { id: "m3", moveNumber: 3, position: { row: 0, col: 1 }, roundNumber: 1, stone: STONE.WHITE },
+  { id: "m4", moveNumber: 4, position: { row: 7, col: 5 }, roundNumber: 1, stone: STONE.BLACK },
+  { id: "m5", moveNumber: 5, position: { row: 0, col: 2 }, roundNumber: 1, stone: STONE.WHITE },
+  { id: "m6", moveNumber: 6, position: { row: 7, col: 6 }, roundNumber: 1, stone: STONE.BLACK },
+  { id: "m7", moveNumber: 7, position: { row: 0, col: 3 }, roundNumber: 1, stone: STONE.WHITE },
+  { id: "m8", moveNumber: 8, position: { row: 7, col: 7 }, roundNumber: 1, stone: STONE.BLACK },
+];
 
 function createRoom(overrides = {}) {
   return {
@@ -408,6 +419,50 @@ describe("useOmokOnlineRoom", () => {
     });
 
     expect(hook.current.room.id).toBe(roomId);
+    hook.unmount();
+  });
+
+  it("keeps the winning move when an older same-room poll finishes after move submission", async () => {
+    let releaseRefresh;
+    const staleRefresh = new Promise((resolve) => {
+      releaseRefresh = () => resolve({
+        moves: winningMoves.slice(0, -1),
+        room: createRoom({ players: fullPlayers(true), status: "playing" }),
+      });
+    });
+    const gateway = createGateway({
+      createRoom: vi.fn(async () => ({
+        inviteUrl: `http://localhost/#/minigames/omok/room/${roomId}`,
+        moves: winningMoves.slice(0, -1),
+        room: createRoom({ players: fullPlayers(true), status: "playing" }),
+        userId: "host",
+      })),
+      refreshRoom: vi.fn(() => staleRefresh),
+      submitMove: vi.fn(async () => ({
+        moves: winningMoves,
+        room: createRoom({ players: fullPlayers(true), status: "playing" }),
+      })),
+    });
+    const hook = renderUseOmokOnlineRoom({ gateway });
+
+    await act(async () => {
+      await hook.current.createRoom({ gameMode: OMOK_MODE.STANDARD, guideSettings: { explainForbiddenReasons: true, showForbiddenPositions: true } });
+    });
+    act(() => {
+      vi.advanceTimersByTime(ONLINE_POLL_INTERVAL_MS);
+    });
+    await act(async () => {
+      expect(await hook.current.submitMove({ row: 7, col: 7 })).toBe(true);
+    });
+    expect(hook.current.derivedGame.winner).toBe(STONE.BLACK);
+
+    await act(async () => {
+      releaseRefresh();
+      await staleRefresh;
+    });
+
+    expect(hook.current.derivedGame.winner).toBe(STONE.BLACK);
+    expect(hook.current.moves).toHaveLength(winningMoves.length);
     hook.unmount();
   });
 

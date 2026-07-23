@@ -13,7 +13,7 @@ import { ShikakuGame } from "./shikaku/ShikakuGame.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-function renderGame(GameComponent, gameId) {
+function renderGame(GameComponent, gameId, { start = true } = {}) {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
@@ -22,9 +22,11 @@ function renderGame(GameComponent, gameId) {
       <GameComponent game={getMinigameById(gameId)} />
     </MemoryRouter>,
   ));
-  const startButton = [...document.body.querySelectorAll("button")]
-    .find((button) => button.textContent === "게임 시작");
-  act(() => startButton.click());
+  if (start) {
+    const startButton = [...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "게임 시작");
+    act(() => startButton.click());
+  }
   return {
     host,
     unmount: () => act(() => root.unmount()),
@@ -38,6 +40,20 @@ afterEach(() => {
 });
 
 describe("new playable games", () => {
+  it("walks through a new game's instructions one step at a time before starting", () => {
+    const view = renderGame(SetGame, "set", { start: false });
+
+    expect(document.body.textContent).toContain("1 / 3");
+    expect(document.body.textContent).toContain("각 속성이 세 장 모두 같거나");
+    const nextButton = [...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음");
+    act(() => nextButton.click());
+
+    expect(document.body.textContent).toContain("2 / 3");
+    expect(document.body.textContent).toContain("한 속성이라도 두 장만 같고");
+    view.unmount();
+  });
+
   it("starts LITS and accepts cell input", () => {
     const view = renderGame(LitsGame, "lits");
     const firstCell = view.host.querySelector('[aria-label^="1행 1열"]');
@@ -71,6 +87,28 @@ describe("new playable games", () => {
     const firstCard = view.host.querySelector(".set-card");
     act(() => firstCard.click());
     expect(firstCard.getAttribute("aria-pressed")).toBe("true");
+    view.unmount();
+  });
+
+  it("reveals one valid SET after the player gives up and then deals fresh cards", () => {
+    const view = renderGame(SetGame, "set");
+    const revealButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "포기");
+
+    act(() => revealButton.click());
+    expect(document.body.textContent).toContain("정말 포기할까요?");
+    const confirmButton = [...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "정답 보기");
+    act(() => confirmButton.click());
+
+    expect(view.host.querySelector('[role="status"]').textContent).toContain("정답 세 장");
+    expect(view.host.querySelectorAll('button[aria-label*="정답 카드"]')).toHaveLength(3);
+    const nextButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음 카드");
+    act(() => nextButton.click());
+
+    expect(view.host.querySelector('[role="status"]').textContent).toContain("새로운 카드");
+    expect(view.host.querySelectorAll('button[aria-label*="정답 카드"]')).toHaveLength(0);
     view.unmount();
   });
 
