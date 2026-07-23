@@ -42,6 +42,7 @@
 
 
 .game-stage {
+  --game-touch-color: var(--game-color-pink);
   position: relative;
 }
 
@@ -51,23 +52,38 @@
   touch-action: manipulation;
 }
 
+.game-stage::before,
 .game-stage::after {
   content: "";
   position: absolute;
   z-index: 20;
   top: var(--game-touch-y, 50%);
   left: var(--game-touch-x, 50%);
-  width: 18px;
-  aspect-ratio: 1;
-  border: 2px solid color-mix(in oklab, var(--game-color-cyan) 58%, transparent);
-  border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.35);
+  transform: translate(-50%, -50%) scale(.35);
 }
 
+.game-stage::before {
+  width: 28px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--palette-ivory) 0 9%, var(--game-touch-color) 10% 18%, color-mix(in oklab, var(--game-touch-color) 42%, transparent) 26%, transparent 66%);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--game-touch-color) 58%, transparent);
+}
+
+.game-stage::after {
+  width: 46px;
+  height: 46px;
+  background:
+    linear-gradient(90deg, transparent 4%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 40%, var(--palette-ivory) 49% 51%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 60%, transparent 96%) center / 100% 2px no-repeat,
+    linear-gradient(180deg, transparent 4%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 40%, var(--palette-ivory) 49% 51%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 60%, transparent 96%) center / 2px 100% no-repeat;
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--game-touch-color) 64%, transparent));
+}
+
+.game-stage.has-touch-feedback::before,
 .game-stage.has-touch-feedback::after {
-  animation: game-touch-feedback 0.4s ease-out;
+  animation: game-touch-feedback .38s cubic-bezier(.16, .78, .22, 1);
 }
 
 .game-stage button:focus-visible,
@@ -78,12 +94,16 @@
 
 @keyframes game-touch-feedback {
   0% {
-    opacity: 0.72;
-    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.25) rotate(-8deg);
+  }
+  28% {
+    opacity: .94;
+    transform: translate(-50%, -50%) scale(1.06) rotate(0);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(3.4);
+    transform: translate(-50%, -50%) scale(1.32) rotate(5deg);
   }
 }
 
@@ -95,7 +115,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .game-stage.has-touch-feedback::before,
   .game-stage.has-touch-feedback::after {
-    animation: none;
+    animation-name: game-touch-feedback-reduced;
+    animation-duration: .14s;
   }
+}
+
+@keyframes game-touch-feedback-reduced {
+  0% { opacity: 0; }
+  50% { opacity: .58; }
+  100% { opacity: 0; }
 }

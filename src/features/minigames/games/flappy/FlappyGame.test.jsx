@@ -73,7 +73,7 @@ describe("FlappyGame input surface", () => {
       button: 0,
     })));
     expect(findButton(view.host, "일시정지")).toBeDefined();
-    expect(view.host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(false);
+    expect(view.host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(true);
 
     act(() => findButton(view.host, "일시정지").click());
     expect(findButton(view.host, "계속하기")).toBeDefined();

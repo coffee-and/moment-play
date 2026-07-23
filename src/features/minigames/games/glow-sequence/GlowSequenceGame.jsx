@@ -92,7 +92,7 @@ export function GlowSequenceGame({ game }) {
       const startAt = timing.leadMs + index * (timing.onMs + timing.gapMs);
       schedule(() => {
         setActiveCell(cell);
-        playSound("correct");
+        playSound("correct", { feedback: false });
       }, startAt);
       schedule(() => setActiveCell(null), startAt + timing.onMs);
     });
@@ -145,13 +145,15 @@ export function GlowSequenceGame({ game }) {
       return;
     }
 
-    playSound("correct");
     setActiveCell(cell);
     schedule(() => setActiveCell(null), 190);
     setInputStep(result.nextStep);
     inputStepRef.current = result.nextStep;
 
-    if (!result.complete) return;
+    if (!result.complete) {
+      playSound("correct", { feedback: false });
+      return;
+    }
     updateBest(round);
     if (round === GLOW_SEQUENCE_MAX_ROUND) {
       playSound("clear");
@@ -160,7 +162,7 @@ export function GlowSequenceGame({ game }) {
       return;
     }
 
-    playSound("success");
+    playSound("correct");
     setPhase("cleared");
     phaseRef.current = "cleared";
     schedule(() => beginRound(round + 1), 820);

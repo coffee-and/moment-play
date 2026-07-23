@@ -47,8 +47,8 @@ export function GameAudioProvider({ children }) {
     setIsUnlocked(unlocked);
   }, [enabled]);
 
-  const playSound = useCallback((sound) => {
-    triggerFeedback(sound);
+  const playSound = useCallback((sound, { feedback = true } = {}) => {
+    if (feedback) triggerFeedback(sound);
     engineRef.current.playSound(sound);
   }, [triggerFeedback]);
 

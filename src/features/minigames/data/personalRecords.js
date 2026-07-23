@@ -2,6 +2,7 @@ import { GAME_2048_BEST_SCORE_KEY } from "../games/game-2048/game2048.constants.
 import { MEMORY_BEST_ROUND_KEY } from "../games/memory/MemoryOrderGame.jsx";
 import { readRecords as readSudokuRecords } from "../games/sudoku/SudokuLevelGame.jsx";
 import { SUDOKU_LEVEL_OPTIONS } from "../games/sudoku/sudoku.constants.js";
+import { readSolitaireRecords } from "../games/solitaire/SolitaireGame.jsx";
 
 function readNumber(key) {
   if (typeof window === "undefined") return null;
@@ -50,11 +51,22 @@ function getOmokRecord() {
   return null;
 }
 
+function getSolitaireRecord() {
+  const records = readSolitaireRecords();
+  const stats = [];
+  const easyBest = records.easy?.bestTimeSeconds;
+  const hardBest = records.hard?.bestTimeSeconds;
+  if (easyBest) stats.push({ label: "쉬움 최고 기록", value: formatSeconds(easyBest) });
+  if (hardBest) stats.push({ label: "어려움 최고 기록", value: formatSeconds(hardBest) });
+  return stats.length ? stats : null;
+}
+
 const RECORD_READERS = {
   "2048": get2048Record,
   memory: getMemoryRecord,
   sudoku: getSudokuRecord,
   omok: getOmokRecord,
+  solitaire: getSolitaireRecord,
 };
 
 export function getGamePersonalRecord(gameId) {

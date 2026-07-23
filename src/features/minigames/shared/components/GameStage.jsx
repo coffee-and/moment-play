@@ -34,7 +34,8 @@ export function GameStage({
 
   function handleTouchFeedback(event) {
     if (event.button != null && event.button !== 0) return;
-    if (event.target.closest?.('[role="application"]')) return;
+    const interactiveTarget = event.target.closest?.('button:not(:disabled), [role="button"], [role="gridcell"], [role="application"]');
+    if (!interactiveTarget) return;
     const rootElement = rootRef.current;
     if (!rootElement) return;
     const bounds = rootElement.getBoundingClientRect();
