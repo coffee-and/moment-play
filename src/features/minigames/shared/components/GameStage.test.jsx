@@ -58,7 +58,7 @@ describe("GameStage", () => {
     act(() => root.unmount());
   });
 
-  it("does not draw shared pointer feedback over an interactive game surface", () => {
+  it("draws shared pointer feedback at the touched point on an interactive game surface", () => {
     const host = document.createElement("div");
     document.body.appendChild(host);
     const root = createRoot(host);
@@ -77,7 +77,10 @@ describe("GameStage", () => {
       clientY: 30,
     })));
 
-    expect(host.querySelector(".game-stage").classList.contains("has-touch-feedback")).toBe(false);
+    const stage = host.querySelector(".game-stage");
+    expect(stage.classList.contains("has-touch-feedback")).toBe(true);
+    expect(stage.style.getPropertyValue("--game-touch-x")).toBe("20px");
+    expect(stage.style.getPropertyValue("--game-touch-y")).toBe("30px");
     act(() => root.unmount());
   });
 

@@ -29,8 +29,10 @@ vi.mock("./audioEngine.js", () => ({
   },
 }));
 
+const triggerFeedback = vi.hoisted(() => vi.fn());
+
 vi.mock("../feedback/GameFeedbackContext.jsx", () => ({
-  useGameFeedback: () => ({ triggerFeedback: vi.fn() }),
+  useGameFeedback: () => ({ triggerFeedback }),
 }));
 
 import { GameAudioProvider, useGameAudio } from "./GameAudioContext.jsx";
@@ -40,9 +42,13 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 function AudioProbe() {
   const audio = useGameAudio();
   return (
-    <button type="button" data-enabled={audio.enabled} onClick={() => void audio.toggleAudio()}>
-      {audio.isAudible ? "audible" : "muted"}
-    </button>
+    <>
+      <button type="button" data-enabled={audio.enabled} onClick={() => void audio.toggleAudio()}>
+        {audio.isAudible ? "audible" : "muted"}
+      </button>
+      <button type="button" data-sound="with-feedback" onClick={() => audio.playSound("correct")}>sound</button>
+      <button type="button" data-sound="without-feedback" onClick={() => audio.playSound("correct", { feedback: false })}>quiet sound</button>
+    </>
   );
 }
 
@@ -103,6 +109,16 @@ describe("GameAudioProvider session defaults", () => {
     const view = renderProvider();
     act(() => window.dispatchEvent(new PageTransitionEvent("pagehide")));
     expect(engine.suspend).toHaveBeenCalledTimes(1);
+    view.unmount();
+  });
+
+  it("can play a cue without triggering a global visual effect", () => {
+    const view = renderProvider();
+    act(() => view.host.querySelector('[data-sound="without-feedback"]').click());
+    expect(engine.playSound).toHaveBeenCalledWith("correct");
+    expect(triggerFeedback).not.toHaveBeenCalled();
+    act(() => view.host.querySelector('[data-sound="with-feedback"]').click());
+    expect(triggerFeedback).toHaveBeenCalledWith("correct");
     view.unmount();
   });
 });

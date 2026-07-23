@@ -8,11 +8,13 @@ import { GlowSequenceGame } from "./GlowSequenceGame.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
+const playSound = vi.hoisted(() => vi.fn());
+
 vi.mock("../../../../shared/audio/GameAudioContext.jsx", () => ({
   useGameAudio: () => ({
     enabled: false,
     isAudible: false,
-    playSound: vi.fn(),
+    playSound,
     popDucking: vi.fn(),
     pushDucking: vi.fn(),
     toggleAudio: vi.fn(),
@@ -42,6 +44,8 @@ function renderGame() {
 afterEach(() => {
   document.body.innerHTML = "";
   window.localStorage.clear();
+  playSound.mockClear();
+  vi.useRealTimers();
 });
 
 describe("GlowSequenceGame", () => {
@@ -60,6 +64,17 @@ describe("GlowSequenceGame", () => {
     expect(view.host.textContent).toContain("ROUND 1 · 3 CELLS");
     expect(view.host.querySelector('.glow-sequence__grid[data-size="4"]')).not.toBeNull();
     expect(view.host.querySelectorAll(".glow-sequence__cell")).toHaveLength(16);
+    view.unmount();
+  });
+
+  it("plays sequence cues without showing NICE during playback", () => {
+    vi.useFakeTimers();
+    const view = renderGame();
+    const start = [...document.querySelectorAll("button")].find((button) => button.textContent === "게임 시작");
+    act(() => start.click());
+    act(() => vi.advanceTimersByTime(1000));
+    expect(playSound).toHaveBeenCalledWith("correct", { feedback: false });
+    expect(playSound).not.toHaveBeenCalledWith("correct");
     view.unmount();
   });
 });

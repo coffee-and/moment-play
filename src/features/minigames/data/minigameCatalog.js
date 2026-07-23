@@ -94,47 +94,21 @@ export const MINIGAME_CATALOG = [
     rankingType: "bestRound",
   },
   {
-    id: "star-trace",
-    title: "Star Trace",
-    description: "별을 순서대로 이어 달빛 별자리를 완성해요.",
-    cardDescription: "별을 이어 별자리를 완성해요.",
-    homeCardDescription: "순서대로 별을 이어 밤하늘의 모양을 찾아보세요.",
-    howTo: "첫 번째 별부터 손가락으로 이어가거나 번호 순서대로 별을 선택하세요. 10라운드마다 같은 난이도를 반복하거나 다음 난이도로 이동할 수 있어요.",
+    id: "solitaire",
+    title: "Solitaire",
+    description: "색을 번갈아 카드를 정리하고 네 문양을 A부터 K까지 완성해요.",
+    cardDescription: "카드를 정리해 네 문양을 완성해요.",
+    homeCardDescription: "카드를 정리하고 가장 빠른 완료 시간에 도전해요.",
+    howTo: "밝은 카드는 색을 번갈아 내림차순으로 쌓으세요. 빈 열에는 K만 놓을 수 있고, 완성 칸에는 같은 문양을 A부터 K까지 올립니다. 쉬움은 스톡에서 1장, 어려움은 3장씩 공개해요.",
     status: MINIGAME_STATUS.AVAILABLE,
-    route: "/minigames/star-trace",
-    category: "Puzzle",
-    recordType: null,
-    rankingType: null,
-  },
-  {
-    id: "moon-mirror",
-    title: "Moonlight Mirror",
-    description: "보이는 무늬를 대칭축 반대편에 비춰 완성해요.",
-    cardDescription: "달빛 무늬를 대칭으로 완성해요.",
-    homeCardDescription: "원본 무늬를 보고 거울처럼 반대편을 채워보세요.",
-    howTo: "밝게 표시된 원본 무늬를 보고 대칭축 반대편의 같은 위치를 선택한 뒤 완성 확인을 누르세요.",
-    status: MINIGAME_STATUS.AVAILABLE,
-    route: "/minigames/moon-mirror",
-    category: "Puzzle",
-    recordType: null,
-    rankingType: null,
-  },
-  {
-    id: "nonogram",
-    title: "Nonogram",
-    description: "가로와 세로 숫자 힌트로 숨은 그림을 완성해요.",
-    cardDescription: "숫자 힌트로 숨은 그림을 찾아요.",
-    homeCardDescription: "가로·세로 숫자를 읽고 칸 속 그림을 완성해보세요.",
-    howTo: "숫자만큼 연속된 칸을 채우세요. 빈칸은 × 표시로 구분하고 완성 확인을 누르세요.",
-    status: MINIGAME_STATUS.AVAILABLE,
-    route: "/minigames/nonogram",
-    category: "Puzzle",
-    recordType: null,
-    rankingType: null,
+    route: "/minigames/solitaire",
+    category: "Card",
+    recordType: "time",
+    rankingType: "bestTime",
   },
 ];
 
-export const MINIGAME_CATEGORY_ORDER = ["All", "Number", "Memory", "Puzzle", "Board", "Arcade", "Reaction"];
+export const MINIGAME_CATEGORY_ORDER = ["All", "Number", "Memory", "Puzzle", "Card", "Board", "Arcade", "Reaction"];
 
 export const DEFAULT_MINIGAME_ID =
   MINIGAME_CATALOG.find((game) => game.status === MINIGAME_STATUS.AVAILABLE)?.id ?? MINIGAME_CATALOG[0]?.id;
