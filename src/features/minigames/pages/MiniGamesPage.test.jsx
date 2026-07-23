@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppLayout } from "../../../layouts/AppLayout.jsx";
 import { HomePage } from "./HomePage.jsx";
 import { MiniGamesPage } from "./MiniGamesPage.jsx";
-import { MINIGAMES_PATH } from "../data/minigameCatalog.js";
+import { MINIGAME_CATALOG, MINIGAMES_PATH, MINIGAME_STATUS } from "../data/minigameCatalog.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 window.scrollTo = vi.fn();
@@ -85,7 +85,9 @@ describe("MiniGamesPage", () => {
     expect([...featuredCats].every((cat) => cat.getAttribute("alt") === "")).toBe(true);
     expect([...featuredCats].every((cat) => cat.getAttribute("aria-hidden") === "true")).toBe(true);
     expect(host.querySelectorAll(".home-games-grid .featured-cat-pattern__cat")).toHaveLength(0);
-    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(8);
+    expect(host.querySelectorAll(".home-games-grid .gcard")).toHaveLength(
+      MINIGAME_CATALOG.filter((game) => game.status === MINIGAME_STATUS.AVAILABLE).length,
+    );
     expect(host.querySelector('.home-games-grid [data-game="omok"]')).not.toBeNull();
     expect(host.querySelector(".games-catalog")).toBeNull();
     act(() => featured.click());

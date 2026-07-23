@@ -7,7 +7,9 @@ import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
+import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
 import {
   DEFAULT_SUDOKU_GAME_META,
   SUDOKU_BOARD_SIZE,
@@ -79,6 +81,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const [selectedIndex, setSelectedIndex] = useState(() => getInitialSelectedIndex(DEFAULT_SUDOKU_PUZZLE.puzzle));
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [records, setRecords] = useState(() => readRecords());
+  const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const phaseRef = useRef(phase);
@@ -139,7 +142,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
 
   function focusCell(index) { window.requestAnimationFrame(() => { cellRefs.current[index]?.focus({ preventScroll: true }); }); }
   function getCurrentElapsedSeconds() { if (!startedAtRef.current) return elapsedSecondsRef.current; return Math.max(0, Math.floor((performance.now() - startedAtRef.current) / 1000)); }
-  function startPuzzle(puzzle) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
+  function startPuzzle(puzzle) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setDidBreakRecordThisAttempt(false); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
   function startLevel(level) { startPuzzle(getFirstPuzzleByLevel(level)); }
   function requestNewGame() { if (phaseRef.current === SUDOKU_PHASE.IDLE) { startLevel(activeLevel); return; } if (phaseRef.current === SUDOKU_PHASE.COMPLETED) { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); return; } if (phaseRef.current !== SUDOKU_PHASE.RESET_CONFIRM) setPhase(SUDOKU_PHASE.RESET_CONFIRM); }
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
@@ -149,7 +152,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function cancelExit() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
   function confirmExit() { startedAtRef.current = null; navigate("/"); }
   function continueAfterComplete() { startLevel(completedCopy.nextLevel); }
-  function completeGame() { playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: currentLevelRecord.bestTimeSeconds === null || finalTimeSeconds < currentLevelRecord.bestTimeSeconds ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: currentRecords.bestTimeSeconds === null || finalTimeSeconds < currentRecords.bestTimeSeconds ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
+  function completeGame() { playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
   function updateSelectedValue(value) {
     if (!canEditSelected) return;
     const index = selectedIndexRef.current;
@@ -231,6 +234,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
           ) : null}
           {phase === SUDOKU_PHASE.COMPLETED && !isExitConfirmOpen ? (
             <GameStageModal className="sudoku-game__modal sudoku-game__modal--complete" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-complete-title">
+              <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.completed.eyebrow}</p>
               <h3 id="sudoku-game-complete-title">{completedCopy.title}</h3>
               <p>{completedCopy.description}</p>

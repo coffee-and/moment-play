@@ -108,8 +108,20 @@ describe("theme tokens", () => {
     expect(GLOBAL_STYLES).toContain("--featured-action-bg: var(--featured-surface);");
     expect(GLOBAL_STYLES).toContain("--featured-action-text: var(--palette-light-text);");
     expect(GLOBAL_STYLES).toContain("--home-card-surface: var(--palette-light-surface);");
+    expect(GLOBAL_STYLES).toContain("--home-card-border: var(--home-card-surface);");
+    expect(GLOBAL_STYLES).toContain("--home-card-hover-border: var(--palette-light-line);");
     expect(GLOBAL_STYLES).toContain("--home-button-surface: var(--home-card-surface);");
-    expect(GLOBAL_STYLES).toContain("--home-button-border: var(--palette-light-line);");
+    expect(GLOBAL_STYLES).toContain("--home-button-border: var(--home-button-surface);");
+    expect(GLOBAL_STYLES).toContain("--home-button-hover-border: var(--palette-light-line);");
+  });
+
+  it("reveals the current neutral border only during card and button interaction", () => {
+    expect(GLOBAL_STYLES.match(/--home-card-border: var\(--home-card-surface\);/g)).toHaveLength(2);
+    expect(GLOBAL_STYLES.match(/--home-button-border: var\(--home-button-surface\);/g)).toHaveLength(2);
+    expect(GLOBAL_STYLES).toContain("border-color: var(--home-card-hover-border);");
+    expect(GLOBAL_STYLES).toContain("border-color: var(--button-hover-border);");
+    expect(GLOBAL_STYLES).toContain("background: var(--button-hover-surface);");
+    expect(GLOBAL_STYLES).toContain("box-shadow: var(--button-hover-shadow);");
   });
 
   it("keeps the dark featured action neutral instead of filling it with the accent", () => {

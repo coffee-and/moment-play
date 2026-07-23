@@ -4,7 +4,9 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
+import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { isNewGameRecord } from "../../shared/gameRecord.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import {
   FLAPPY_CONFIG,
@@ -53,15 +55,18 @@ export function FlappyGame({ game }) {
   const [phase, setPhase] = useState("idle");
   const [world, setWorld] = useState(createInitialFlappyState);
   const [best, setBest] = useState(readBestScore);
+  const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
   const phaseRef = useRef(phase);
   const worldRef = useRef(world);
+  const bestRef = useRef(best);
   const frameRef = useRef(null);
   const lastFrameRef = useRef(0);
   const resumeAfterDialogRef = useRef(false);
 
   phaseRef.current = phase;
   worldRef.current = world;
+  bestRef.current = best;
 
   function finishGame(finalWorld) {
     phaseRef.current = "over";
@@ -69,11 +74,13 @@ export function FlappyGame({ game }) {
     setPhase("over");
     playSound("gameOver");
     vibrate([28, 34, 42]);
-    setBest((currentBest) => {
-      const nextBest = Math.max(currentBest, finalWorld.score);
-      if (nextBest !== currentBest) writeBestScore(nextBest);
-      return nextBest;
-    });
+    const didBreakRecord = isNewGameRecord({ previous: bestRef.current, next: finalWorld.score });
+    setDidBreakRecordThisAttempt(didBreakRecord);
+    if (didBreakRecord) {
+      bestRef.current = finalWorld.score;
+      setBest(finalWorld.score);
+      writeBestScore(finalWorld.score);
+    }
   }
 
   useEffect(() => {
@@ -118,6 +125,7 @@ export function FlappyGame({ game }) {
     worldRef.current = initialWorld;
     phaseRef.current = "playing";
     setWorld(initialWorld);
+    setDidBreakRecordThisAttempt(false);
     setIsExitOpen(false);
     setPhase("playing");
     playSound("countdownFinal");
@@ -262,6 +270,7 @@ export function FlappyGame({ game }) {
 
           {phase !== "playing" && phase !== "idle" ? (
             <div className="flappy-game__curtain">
+              <GameRecordCelebration compact isNewRecord={phase === "over" && didBreakRecordThisAttempt} />
               <span className="flappy-game__curtain-kicker">
                 {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
               </span>

@@ -16,14 +16,6 @@ function addActionCount(child) {
   });
 }
 
-function ModalDecoration() {
-  return (
-    <div className="game-stage-modal__decoration" aria-hidden="true">
-      <span className="game-stage-modal__stars" />
-    </div>
-  );
-}
-
 export function GameStageOverlay({
   children,
   className = '',
@@ -82,7 +74,6 @@ export function GameStageOverlay({
 export function GameStageModal({ children, className = '', style, ...props }) {
   return (
     <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
-      <ModalDecoration />
       {Children.map(children, addActionCount)}
     </div>
   );

@@ -7,7 +7,9 @@ import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
+import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { isNewGameRecord } from "../../shared/gameRecord.js";
 import "./game-2048.css";
 import {
   BOARD_SIZE,
@@ -102,6 +104,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const [bestScore, setBestScore] = useState(() => getBestScore());
   const [targetIndex, setTargetIndex] = useState(0);
   const [phase, setPhase] = useState(GAME_2048_PHASE.IDLE);
+  const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
@@ -165,7 +168,8 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   }
 
   function updateBestScore(nextScore) {
-    if (nextScore <= bestScoreRef.current) return;
+    if (!isNewGameRecord({ previous: bestScoreRef.current, next: nextScore })) return;
+    setDidBreakRecordThisAttempt(true);
     bestScoreRef.current = nextScore;
     setBestScore(nextScore);
     saveBestScore(nextScore);
@@ -177,6 +181,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     const nextBoard = createInitialBoard();
     setBoard(nextBoard);
     setScore(0);
+    setDidBreakRecordThisAttempt(false);
     setTargetIndex(0);
     setIsResetConfirmOpen(false);
     setPhase(GAME_2048_PHASE.PLAYING);
@@ -423,6 +428,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
           ) : null}
           {phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal game-2048__modal--complete" role="dialog" aria-modal="true" aria-labelledby="game-2048-complete-title">
+              <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.completed.eyebrow}</p>
               <h3 id="game-2048-complete-title">{FINAL_TARGET_TILE} {GAME_2048_COPY.completed.title}</h3>
               <p>{GAME_2048_COPY.completed.description}</p>
@@ -436,6 +442,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
           ) : null}
           {phase === GAME_2048_PHASE.GAME_OVER && !isResetConfirmOpen && !isExitConfirmOpen ? (
             <GameStageModal className="game-2048__modal" role="dialog" aria-modal="true" aria-labelledby="game-2048-game-over-title">
+              <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <h3 id="game-2048-game-over-title">{GAME_2048_COPY.gameOver.title}</h3>
               <p>{GAME_2048_COPY.gameOver.scoreLabel}</p>
               <strong>{formatNumber(score)}</strong>

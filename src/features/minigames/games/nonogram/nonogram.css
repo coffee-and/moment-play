@@ -1,0 +1,39 @@
+@import "../star-trace/star-trace.css";
+
+.nonogram__puzzle {
+  --nonogram-clue-size: clamp(52px, 10vw, 76px);
+  display: grid;
+  width: min(100%, 500px);
+  grid-template-columns: var(--nonogram-clue-size) minmax(0, 1fr);
+  grid-template-rows: var(--nonogram-clue-size) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--home-card-border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--home-card-shadow);
+}
+.nonogram__corner { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: color-mix(in oklab, var(--surface-2) 45%, var(--surface)); }
+.nonogram__column-clues { display: grid; grid-template-columns: repeat(var(--nonogram-size), minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+.nonogram__column-clues > span { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px; padding: 3px 0; border-right: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
+.nonogram__row-clues { display: grid; grid-template-rows: repeat(var(--nonogram-size), minmax(0, 1fr)); border-right: 1px solid var(--line); }
+.nonogram__row-clues > span { display: flex; min-height: 0; align-items: center; justify-content: flex-end; gap: 2px; padding: 0 4px; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
+.nonogram__column-clues b,
+.nonogram__row-clues b { color: var(--muted); font-size: clamp(8px, 1.5vw, 11px); font-weight: 700; }
+.nonogram__board { display: grid; aspect-ratio: 1; grid-template-columns: repeat(var(--nonogram-size), minmax(0, 1fr)); }
+.nonogram__cell { position: relative; min-width: 0; aspect-ratio: 1; border: 0; border-right: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-bottom: 1px solid color-mix(in oklab, var(--line) 68%, transparent); background: var(--surface); }
+.nonogram__cell:hover { background: var(--home-button-hover-surface); }
+.nonogram__cell.is-filled { background: var(--text); box-shadow: inset 0 0 0 2px var(--surface); }
+.nonogram__cell.is-marked::before,
+.nonogram__cell.is-marked::after { content: ""; position: absolute; top: 50%; left: 50%; width: 55%; height: 1.5px; border-radius: 99px; background: var(--muted); }
+.nonogram__cell.is-marked::before { transform: translate(-50%, -50%) rotate(45deg); }
+.nonogram__cell.is-marked::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.nonogram__controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.nonogram__tools { display: flex; gap: 8px; }
+
+@media (max-width: 768px) {
+  .nonogram__puzzle { width: min(100%, 370px); --nonogram-clue-size: 58px; border-radius: 18px; }
+  .nonogram__controls { width: 100%; }
+  .nonogram__controls > .button { flex: 1; }
+  .nonogram__tools { display: grid; flex: 1.4; grid-template-columns: repeat(2, 1fr); }
+  .nonogram__tools .button { min-width: 0; padding-inline: 10px; }
+}

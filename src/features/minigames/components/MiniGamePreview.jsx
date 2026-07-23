@@ -4,12 +4,8 @@ const PREVIEW_2048_TILES = [2, 4, 8, 16, 0, 32, 64, 0, 0, 128, 256, 0, 0, 0, 512
 const PREVIEW_SUDOKU_CELLS = [1, "", 5, "", "", 7, "", 3, 4, "", 9, "", "", 2, "", 8];
 const PREVIEW_MEMORY_SYMBOLS = ["circle", "diamond", "heart", "star"];
 const PREVIEW_GLOW_CELLS = Array.from({ length: 16 }, (_, index) => index);
-const PREVIEW_COLOR_TUBES = [
-  ["cyan", "orange", "yellow", "green"],
-  ["pink", "cyan", "orange", "yellow"],
-  ["green", "pink", "cyan", "orange"],
-  [],
-];
+const PREVIEW_TRACE_POINTS = [[14, 66], [36, 26], [58, 68], [78, 34], [88, 72]];
+const PREVIEW_NONOGRAM = [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1];
 
 export function MiniGamePreview({ gameId }) {
   if (gameId === "2048") {
@@ -70,16 +66,21 @@ export function MiniGamePreview({ gameId }) {
     );
   }
 
-  if (gameId === "color-sort") {
+  if (gameId === "star-trace") {
     return (
-      <span className="game-card-preview is-color-sort">
-        {PREVIEW_COLOR_TUBES.map((colors, tubeIndex) => (
-          <span className="preview-color-tube" key={tubeIndex}>
-            {colors.map((color, index) => <span className={`is-${color}`} key={`${color}-${index}`} />)}
-          </span>
-        ))}
+      <span className="game-card-preview is-star-trace">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><polyline points={PREVIEW_TRACE_POINTS.map((point) => point.join(",")).join(" ")} /></svg>
+        {PREVIEW_TRACE_POINTS.map(([x, y], index) => <span key={index} style={{ left: `${x}%`, top: `${y}%` }} />)}
       </span>
     );
+  }
+
+  if (gameId === "moon-mirror") {
+    return <span className="game-card-preview is-moon-mirror">{Array.from({ length: 16 }, (_, index) => <span className={[1, 4, 5, 8, 2, 7, 10, 11].includes(index) ? "is-filled" : ""} key={index} />)}</span>;
+  }
+
+  if (gameId === "nonogram") {
+    return <span className="game-card-preview is-nonogram">{PREVIEW_NONOGRAM.map((filled, index) => <span className={filled ? "is-filled" : ""} key={index} />)}</span>;
   }
 
   return <span className="game-card-preview is-future" aria-label="준비 중">+</span>;

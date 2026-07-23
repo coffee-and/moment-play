@@ -258,6 +258,13 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
     })
     : getResultCopy({ activeMatch, draw, resultReason, winner });
   const resultTitle = resultCopy?.title ?? null;
+  const shouldCelebrateWinner = Boolean(activeWinner && (
+    isOnlinePlaying
+      ? activeWinner === online.playerStone
+      : activeMatch.matchType === MATCH_TYPE.COMPUTER
+        ? activeWinner === activeMatch.playerStone
+        : true
+  ));
   const activeForbiddenMessage = !isOnlinePlaying && forbiddenFeedback && activeMatch.explainForbiddenReasons
     ? FORBIDDEN_REASON_LABEL[forbiddenFeedback.reason]
     : null;
@@ -1000,6 +1007,7 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
           ) : null}
           {resultCopy && !dialog && !needsOnlineStart ? (
             <GameStageModal role="dialog" aria-modal="true" aria-labelledby="omok-result-title">
+              {shouldCelebrateWinner ? <GameStageDoodle variant="record" /> : null}
               <p className="omok-game__modal-eyebrow">Result</p>
               <h3 id="omok-result-title">{resultCopy.title}</h3>
               <p>{resultCopy.description}</p>
