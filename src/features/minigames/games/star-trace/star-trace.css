@@ -1,0 +1,72 @@
+.star-trace__game,
+.moon-mirror__game,
+.nonogram__game {
+  display: flex;
+  min-height: 500px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: clamp(20px, 4vw, 44px);
+}
+
+.endless-game-status { display: grid; gap: 8px; text-align: center; }
+.endless-game-status span { color: var(--muted); font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: .14em; }
+.endless-game-status strong { font-size: clamp(20px, 3vw, 28px); }
+.endless-game-hint { max-width: 42ch; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; text-align: center; }
+
+.star-trace__board {
+  position: relative;
+  width: min(100%, 470px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--home-card-border);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 22% 28%, color-mix(in oklab, var(--game-color-yellow) 45%, transparent) 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 18%, color-mix(in oklab, var(--game-color-cyan) 35%, transparent) 0 1px, transparent 2px),
+    radial-gradient(circle at 68% 76%, color-mix(in oklab, var(--game-color-pink) 36%, transparent) 0 1px, transparent 2px),
+    var(--surface);
+  box-shadow: var(--home-card-shadow);
+  touch-action: none;
+}
+
+.star-trace__board svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.star-trace__guide,
+.star-trace__line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.star-trace__guide { stroke: color-mix(in oklab, var(--line) 72%, transparent); stroke-dasharray: 2 3; stroke-width: .7; }
+.star-trace__line { stroke: var(--game-color-yellow); stroke-width: 1.3; filter: drop-shadow(0 0 5px color-mix(in oklab, var(--game-effect-perfect) 55%, transparent)); }
+
+.star-trace__star {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 42px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--home-button-border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  box-shadow: var(--home-button-shadow);
+  font-size: 11px;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+  transition: transform .18s var(--ease), border-color .18s, background-color .18s, box-shadow .18s;
+}
+.star-trace__star::before { content: ""; position: absolute; width: 10px; aspect-ratio: 1; background: currentColor; clip-path: polygon(50% 0, 61% 36%, 100% 38%, 68% 59%, 78% 100%, 50% 74%, 22% 100%, 32% 59%, 0 38%, 39% 36%); opacity: .24; }
+.star-trace__star span { position: relative; z-index: 1; }
+.star-trace__star.is-next { border-color: var(--game-color-yellow); color: var(--text); box-shadow: 0 0 0 5px color-mix(in oklab, var(--game-color-yellow) 14%, transparent), var(--home-button-hover-shadow); transform: translate(-50%, -50%) scale(1.08); }
+.star-trace__star.is-connected { border-color: var(--game-color-yellow); background: color-mix(in oklab, var(--game-color-yellow) 24%, var(--surface)); color: var(--text); }
+
+@media (max-width: 768px) {
+  .star-trace__game,
+  .moon-mirror__game,
+  .nonogram__game { min-height: 420px; gap: 18px; padding: 18px 14px; }
+  .star-trace__board { width: min(100%, 360px); border-radius: 24px; }
+  .star-trace__star { width: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-trace__star { transition: none; }
+}

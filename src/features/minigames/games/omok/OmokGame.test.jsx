@@ -518,6 +518,7 @@ describe("OmokGame active online game", () => {
     const rematchButton = findButtonByText(view.container, "한 판 더");
     expect(rematchButton).not.toBeNull();
     expect(rematchButton.disabled).toBe(false);
+    expect(document.querySelector('[data-doodle-variant="record"]')).not.toBeNull();
 
     mockGateway.requestRematch.mockResolvedValue({
       moves: winningMoves,

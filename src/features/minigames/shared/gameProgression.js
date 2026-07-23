@@ -33,3 +33,43 @@ export function formatStarRating(rating) {
   const safeRating = Math.round(clampNumber(rating, 1, 3));
   return `${"★".repeat(safeRating)}${"☆".repeat(3 - safeRating)}`;
 }
+
+export const ENDLESS_DIFFICULTIES = ["easy", "normal", "hard"];
+export const ENDLESS_BLOCK_SIZE = 10;
+
+export const ENDLESS_DIFFICULTY_LABELS = {
+  easy: "EASY",
+  normal: "NORMAL",
+  hard: "HARD",
+};
+
+export function normalizeEndlessDifficulty(difficulty) {
+  return ENDLESS_DIFFICULTIES.includes(difficulty) ? difficulty : ENDLESS_DIFFICULTIES[0];
+}
+
+export function getEndlessRoundProgress(round, blockSize = ENDLESS_BLOCK_SIZE) {
+  const safeBlockSize = Math.max(1, Math.floor(Number(blockSize) || ENDLESS_BLOCK_SIZE));
+  const safeRound = Math.max(1, Math.floor(Number(round) || 1));
+  return {
+    block: Math.floor((safeRound - 1) / safeBlockSize) + 1,
+    blockRound: ((safeRound - 1) % safeBlockSize) + 1,
+    isBlockEnd: safeRound % safeBlockSize === 0,
+    round: safeRound,
+  };
+}
+
+export function getNextEndlessDifficulty(difficulty) {
+  const current = normalizeEndlessDifficulty(difficulty);
+  const index = ENDLESS_DIFFICULTIES.indexOf(current);
+  return ENDLESS_DIFFICULTIES[Math.min(index + 1, ENDLESS_DIFFICULTIES.length - 1)];
+}
+
+export function canAdvanceEndlessDifficulty(difficulty) {
+  return normalizeEndlessDifficulty(difficulty) !== ENDLESS_DIFFICULTIES.at(-1);
+}
+
+export function formatEndlessMilestone(difficulty, round) {
+  const normalizedDifficulty = normalizeEndlessDifficulty(difficulty);
+  const progress = getEndlessRoundProgress(round);
+  return `${ENDLESS_DIFFICULTY_LABELS[normalizedDifficulty]} · ${progress.round} ROUND`;
+}

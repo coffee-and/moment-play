@@ -8,6 +8,7 @@ import { useGameResultSubmission } from "../../../ranking/useGameResultSubmissio
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
+import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import {
@@ -821,7 +822,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
 
           {phase === PHASE.COMPLETED && !isExitConfirmOpen ? (
             <GameStageModal className="memory-game__state-view" role="dialog" aria-modal="true">
-              {didBreakRecordThisAttempt ? <GameStageDoodle variant="record" /> : null}
+              <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <h3 className="memory-game__state-title">10 ROUND CLEAR!</h3>
               <p>{formatStarRating(getStarRating(1, { mistakes, maxMistakesForThree: 1 }))} · {score}점</p>
               <ResultSubmissionStatus submission={rankingSubmission} />
@@ -881,7 +882,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               aria-labelledby="memory-game-result-title"
             >
               {didFinishWithNewRecord ? (
-                <GameStageDoodle variant="record" />
+                <GameRecordCelebration isNewRecord />
               ) : isGameOver ? (
                 <GameStageDoodle variant="failure" />
               ) : null}

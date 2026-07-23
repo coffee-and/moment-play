@@ -4,8 +4,10 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
+import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { GAME_COLOR_PALETTE } from "../../shared/gameColorPalette.js";
+import { isNewGameRecord } from "../../shared/gameRecord.js";
 import {
   GLOW_SEQUENCE_MASTER_COUNT,
   GLOW_SEQUENCE_MAX_ROUND,
@@ -51,7 +53,9 @@ export function GlowSequenceGame({ game }) {
   const [inputStep, setInputStep] = useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [bestRound, setBestRound] = useState(readBestRound);
+  const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const bestRoundRef = useRef(bestRound);
 
   const sequenceLength = getGlowSequenceLength(round);
   const gridSize = getGlowGridSize(sequenceLength);
@@ -61,6 +65,7 @@ export function GlowSequenceGame({ game }) {
   phaseRef.current = phase;
   sequenceRef.current = sequence;
   inputStepRef.current = inputStep;
+  bestRoundRef.current = bestRound;
 
   function clearTimers() {
     timersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -115,16 +120,17 @@ export function GlowSequenceGame({ game }) {
   function startGame() {
     clearTimers();
     setMistakes(0);
+    setDidBreakRecordThisAttempt(false);
     setIsExitOpen(false);
     beginRound(1);
   }
 
   function updateBest(completedRound) {
-    setBestRound((current) => {
-      const next = Math.max(current, completedRound);
-      if (next !== current) saveBestRound(next);
-      return next;
-    });
+    if (!isNewGameRecord({ previous: bestRoundRef.current, next: completedRound })) return;
+    bestRoundRef.current = completedRound;
+    setBestRound(completedRound);
+    setDidBreakRecordThisAttempt(true);
+    saveBestRound(completedRound);
   }
 
   function handleCellClick(cell) {
@@ -251,6 +257,7 @@ export function GlowSequenceGame({ game }) {
       {phase === "master" ? (
         <GameStageOverlay state="complete">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="glow-master-title">
+            <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
             <div className="game-stage-modal__eyebrow">60 ROUNDS COMPLETE</div>
             <h3 id="glow-master-title">MASTER 달성!</h3>
             <p>{GLOW_SEQUENCE_MASTER_COUNT}개의 빛 순서를 모두 기억했어요. 실수 {mistakes}회로 최종 단계를 완료했습니다.</p>

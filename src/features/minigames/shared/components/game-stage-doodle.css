@@ -38,6 +38,10 @@
   color: color-mix(in oklab, var(--game-modal-text) 82%, var(--game-modal-highlight));
 }
 
+.game-stage-doodle[data-doodle-variant="record"].game-stage-doodle--compact {
+  width: clamp(112px, 30vw, 146px);
+}
+
 .game-stage-modal .game-stage-doodle[data-doodle-variant="failure"] {
   color: color-mix(in oklab, var(--game-modal-text) 82%, var(--game-modal-muted));
 }
