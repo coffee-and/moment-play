@@ -13,6 +13,7 @@ import { GameGuideContent } from "./GameGuide.jsx";
 import { GameStage } from "./GameStage.jsx";
 import { GameStageDoodle } from "./GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "./GameStageOverlay.jsx";
+import { PuzzleHintButton, PuzzleHintPanel } from "./PuzzleHintPanel.jsx";
 import "../styles/logic-puzzle-stage.css";
 
 function formatPuzzleTime(seconds) {
@@ -24,9 +25,11 @@ function formatPuzzleTime(seconds) {
 export function LogicPuzzleStage({
   children,
   completionText = "퍼즐을 완성했어요.",
+  endOnSurrender = false,
   eyebrow = "LOGIC PUZZLE",
   failureText = "이번 판은 여기까지예요.",
   game,
+  hint,
   onReset,
   onStart,
   onSurrender,
@@ -48,7 +51,8 @@ export function LogicPuzzleStage({
   function confirmSurrender() {
     setIsSurrenderOpen(false);
     onSurrender?.();
-    session.resume();
+    if (endOnSurrender) session.surrender();
+    else session.resume();
   }
 
   const sidebar = (
@@ -111,8 +115,9 @@ export function LogicPuzzleStage({
         {children}
       </div>
 
-      {session.phase !== "idle" ? (
+      {session.phase !== "idle" && session.phase !== "completed" && session.phase !== "failed" ? (
         <div className="logic-puzzle-stage__session-controls">
+          {session.phase === "playing" ? <PuzzleHintButton hint={hint} /> : null}
           {onSurrender && session.phase === "playing" ? (
             <Button size="small" variant="secondary" onClick={requestSurrender}>
               포기
@@ -124,6 +129,8 @@ export function LogicPuzzleStage({
           </Button>
         </div>
       ) : null}
+
+      {session.phase === "playing" ? <PuzzleHintPanel gameId={game.id} hint={hint} /> : null}
 
       {session.phase === "idle" ? (
         <GameStageOverlay state="start">
@@ -150,6 +157,7 @@ export function LogicPuzzleStage({
             <h2 id={`${game.id}-complete-title`}>완성!</h2>
             <p>{completionText}</p>
             <strong className="logic-puzzle-stage__result-time">{formatPuzzleTime(session.elapsedSeconds)}</strong>
+            {hint?.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
             <div className="game-stage-modal__actions">
               <Button onClick={onReset}>다시 플레이</Button>
               <Button variant="secondary" onClick={session.leaveGame}>게임 목록으로</Button>
@@ -191,7 +199,7 @@ export function LogicPuzzleStage({
         <GameStageOverlay state="confirm">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby={`${game.id}-surrender-title`}>
             <h2 id={`${game.id}-surrender-title`}>정말 포기할까요?</h2>
-            <p>정답을 확인하면 이번 카드는 완료 횟수에 포함되지 않아요.</p>
+            <p>정답을 확인하면 이번 판은 완료 횟수에 포함되지 않아요.</p>
             <div className="game-stage-modal__actions">
               <Button onClick={confirmSurrender}>정답 보기</Button>
               <Button variant="secondary" onClick={continuePuzzle}>계속 풀기</Button>

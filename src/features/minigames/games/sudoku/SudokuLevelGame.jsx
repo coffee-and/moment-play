@@ -9,7 +9,9 @@ import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
 import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
+import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import {
   DEFAULT_SUDOKU_GAME_META,
   SUDOKU_BOARD_SIZE,
@@ -83,6 +85,8 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const [records, setRecords] = useState(() => readRecords());
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const [isSurrenderOpen, setIsSurrenderOpen] = useState(false);
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
   const phaseRef = useRef(phase);
   const selectedIndexRef = useRef(selectedIndex);
@@ -101,15 +105,38 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const levelRecords = records.byLevel?.[activeLevel] ?? EMPTY_LEVEL_RECORD;
   const completedCopy = getCompletedCopy(activeLevel);
   const board = useMemo(() => createBoard(activePuzzle.puzzle, userValues), [activePuzzle.puzzle, userValues]);
+  const hintTargetIndex = board.findIndex((value, index) => (
+    !isGivenCell(activePuzzle.puzzle, index) && value !== activePuzzle.solution[index]
+  ));
+  const safeHintTargetIndex = hintTargetIndex >= 0 ? hintTargetIndex : getInitialSelectedIndex(activePuzzle.puzzle);
+  const hintTargetRow = getRowIndex(safeHintTargetIndex) + 1;
+  const hintTargetColumn = getColumnIndex(safeHintTargetIndex) + 1;
+  const hint = usePuzzleHints([
+    {
+      message: `${hintTargetRow}행을 살펴보세요. 아직 들어가지 않은 숫자를 먼저 찾아보세요.`,
+      targetIndexes: getRowIndexes(safeHintTargetIndex),
+    },
+    {
+      message: `${hintTargetColumn}열과 같은 3×3 구역을 함께 비교하면 후보를 하나로 줄일 수 있어요.`,
+      targetIndexes: [...new Set([
+        ...getColumnIndexes(safeHintTargetIndex),
+        ...getBoxIndexes(safeHintTargetIndex),
+      ])],
+    },
+    {
+      message: `${hintTargetRow}행 ${hintTargetColumn}열에는 ${activePuzzle.solution[safeHintTargetIndex]}가 들어가요.`,
+      targetIndexes: [safeHintTargetIndex],
+    },
+  ]);
   const conflictIndexes = useMemo(() => new Set(getConflictIndexes(board)), [board]);
   const selectedValue = selectedIndex === null ? 0 : board[selectedIndex];
   const selectedHighlights = useMemo(() => {
     if (selectedIndex === null) return { row: new Set(), column: new Set(), box: new Set() };
     return { row: new Set(getRowIndexes(selectedIndex)), column: new Set(getColumnIndexes(selectedIndex)), box: new Set(getBoxIndexes(selectedIndex)) };
   }, [selectedIndex]);
-  const canEditSelected = phase === SUDOKU_PHASE.PLAYING && selectedIndex !== null && !isGivenCell(activePuzzle.puzzle, selectedIndex);
-  const isStageCovered = phase === SUDOKU_PHASE.IDLE || phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen;
-  const statusText = SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
+  const canEditSelected = phase === SUDOKU_PHASE.PLAYING && selectedIndex !== null && !isGivenCell(activePuzzle.puzzle, selectedIndex) && !isAnswerRevealed;
+  const isStageCovered = phase === SUDOKU_PHASE.IDLE || phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen || isSurrenderOpen;
+  const statusText = isAnswerRevealed ? "정답을 표시한 연습 판이에요." : SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
   const bestTimeText = levelRecords.bestTimeSeconds === null ? SUDOKU_COPY.meta.emptyBestTime : formatTime(levelRecords.bestTimeSeconds);
   const gameActions = <div className="game-stage__inline-actions">{phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>}<Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button></div>;
   const sidebar = (
@@ -133,16 +160,16 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   useEffect(() => { if (!stageContentRef.current) return; stageContentRef.current.inert = isStageCovered; }, [isStageCovered]);
   useEffect(() => { if (phase === SUDOKU_PHASE.IDLE) startButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.RESET_CONFIRM) resetCancelButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.COMPLETED) completedButtonRef.current?.focus({ preventScroll: true }); }, [phase]);
   useEffect(() => {
-    if (isExitConfirmOpen || (phase !== SUDOKU_PHASE.PLAYING && phase !== SUDOKU_PHASE.RESET_CONFIRM)) return undefined;
+    if (isExitConfirmOpen || isSurrenderOpen || isAnswerRevealed || (phase !== SUDOKU_PHASE.PLAYING && phase !== SUDOKU_PHASE.RESET_CONFIRM)) return undefined;
     function updateElapsedSeconds() { setElapsedSeconds(getCurrentElapsedSeconds()); }
     updateElapsedSeconds();
     const intervalId = window.setInterval(updateElapsedSeconds, 1000);
     return () => window.clearInterval(intervalId);
-  }, [isExitConfirmOpen, phase]);
+  }, [isAnswerRevealed, isExitConfirmOpen, isSurrenderOpen, phase]);
 
   function focusCell(index) { window.requestAnimationFrame(() => { cellRefs.current[index]?.focus({ preventScroll: true }); }); }
   function getCurrentElapsedSeconds() { if (!startedAtRef.current) return elapsedSecondsRef.current; return Math.max(0, Math.floor((performance.now() - startedAtRef.current) / 1000)); }
-  function startPuzzle(puzzle) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setDidBreakRecordThisAttempt(false); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
+  function startPuzzle(puzzle) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); hint.resetHints(); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setDidBreakRecordThisAttempt(false); setIsAnswerRevealed(false); setIsSurrenderOpen(false); setPhase(SUDOKU_PHASE.PLAYING); focusCell(nextSelectedIndex); }
   function startLevel(level) { startPuzzle(getFirstPuzzleByLevel(level)); }
   function requestNewGame() { if (phaseRef.current === SUDOKU_PHASE.IDLE) { startLevel(activeLevel); return; } if (phaseRef.current === SUDOKU_PHASE.COMPLETED) { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); return; } if (phaseRef.current !== SUDOKU_PHASE.RESET_CONFIRM) setPhase(SUDOKU_PHASE.RESET_CONFIRM); }
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
@@ -151,8 +178,11 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function requestExit() { if (phaseRef.current === SUDOKU_PHASE.IDLE || phaseRef.current === SUDOKU_PHASE.COMPLETED) { navigate("/"); return; } const currentElapsed = getCurrentElapsedSeconds(); elapsedSecondsRef.current = currentElapsed; setElapsedSeconds(currentElapsed); startedAtRef.current = null; setIsExitConfirmOpen(true); }
   function cancelExit() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
   function confirmExit() { startedAtRef.current = null; navigate("/"); }
+  function requestSurrender() { const currentElapsed = getCurrentElapsedSeconds(); elapsedSecondsRef.current = currentElapsed; setElapsedSeconds(currentElapsed); startedAtRef.current = null; setIsSurrenderOpen(true); }
+  function cancelSurrender() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsSurrenderOpen(false); focusCell(selectedIndexRef.current); }
+  function revealSolution() { setUserValues([...activePuzzleRef.current.solution]); setIsSurrenderOpen(false); setIsAnswerRevealed(true); }
   function continueAfterComplete() { startLevel(completedCopy.nextLevel); }
-  function completeGame() { playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
+  function completeGame() { playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); if (!hint.hasUsedHint) void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
   function updateSelectedValue(value) {
     if (!canEditSelected) return;
     const index = selectedIndexRef.current;
@@ -175,7 +205,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function selectCell(index) { setSelectedIndex(index); }
   function moveSelectedCell(key) { const move = ARROW_KEY_MOVES[key]; if (!move || selectedIndexRef.current === null) return; const row = getRowIndex(selectedIndexRef.current); const column = getColumnIndex(selectedIndexRef.current); const nextRow = clamp(row + move.row, 0, SUDOKU_BOARD_SIZE - 1); const nextColumn = clamp(column + move.column, 0, SUDOKU_BOARD_SIZE - 1); const nextIndex = nextRow * SUDOKU_BOARD_SIZE + nextColumn; setSelectedIndex(nextIndex); focusCell(nextIndex); }
   function handleGameKeyDown(event) { if (phaseRef.current !== SUDOKU_PHASE.PLAYING) return; const number = getKeyboardNumber(event.key); if (number) { event.preventDefault(); updateSelectedValue(number); return; } if (event.key === "Backspace" || event.key === "Delete") { event.preventDefault(); eraseSelectedValue(); return; } if (ARROW_KEY_MOVES[event.key]) { event.preventDefault(); moveSelectedCell(event.key); } }
-  function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty"]); }
+  function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty", hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""]); }
 
   return (
     <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
@@ -204,6 +234,13 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               ))}
               <button type="button" className="sudoku-game__erase-button" onClick={eraseSelectedValue} disabled={!canEditSelected} aria-label={SUDOKU_COPY.eraseLabel}>Del</button>
             </div>
+            {!isAnswerRevealed ? (
+              <div className="sudoku-game__assist">
+                <PuzzleHintButton hint={hint} />
+                <Button size="small" type="button" variant="secondary" onClick={requestSurrender}>포기</Button>
+              </div>
+            ) : null}
+            {!isAnswerRevealed ? <PuzzleHintPanel gameId={game.id} hint={hint} /> : null}
           </div>
         ) : null}
       </div>
@@ -240,7 +277,9 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <p>{completedCopy.description}</p>
               <strong>{formatTime(elapsedSeconds)}</strong>
               <p>{SUDOKU_COPY.completed.bestTime}</p>
-              <ResultSubmissionStatus submission={rankingSubmission} />
+              {hint.hasUsedHint
+                ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록 · 랭킹 미제출</p>
+                : <ResultSubmissionStatus submission={rankingSubmission} />}
               <div className="game-stage-modal__actions">
                 <Button ref={completedButtonRef} type="button" onClick={continueAfterComplete}>{completedCopy.button}</Button>
                 <Button type="button" variant="secondary" onClick={returnToLevelSelect}>{SUDOKU_COPY.actions.chooseLevel}</Button>
@@ -254,6 +293,16 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <div className="game-stage-modal__actions">
                 <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{SUDOKU_COPY.actions.keepPlaying}</Button>
                 <Button type="button" onClick={confirmNewGame}>{SUDOKU_COPY.reset.confirm}</Button>
+              </div>
+            </GameStageModal>
+          ) : null}
+          {isSurrenderOpen ? (
+            <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-surrender-title">
+              <h3 id="sudoku-game-surrender-title">정말 포기할까요?</h3>
+              <p>정답을 확인하면 이번 판은 완료 기록과 랭킹에 포함되지 않아요.</p>
+              <div className="game-stage-modal__actions">
+                <Button type="button" onClick={revealSolution}>정답 보기</Button>
+                <Button type="button" variant="secondary" onClick={cancelSurrender}>계속 풀기</Button>
               </div>
             </GameStageModal>
           ) : null}

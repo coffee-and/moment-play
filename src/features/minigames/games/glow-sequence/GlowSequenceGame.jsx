@@ -92,7 +92,7 @@ export function GlowSequenceGame({ game }) {
       const startAt = timing.leadMs + index * (timing.onMs + timing.gapMs);
       schedule(() => {
         setActiveCell(cell);
-        playSound("correct", { feedback: false });
+        playSound("correct");
       }, startAt);
       schedule(() => setActiveCell(null), startAt + timing.onMs);
     });
@@ -151,7 +151,7 @@ export function GlowSequenceGame({ game }) {
     inputStepRef.current = result.nextStep;
 
     if (!result.complete) {
-      playSound("correct", { feedback: false });
+      playSound("correct");
       return;
     }
     updateBest(round);

@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { EditorialLabel } from '../../../../shared/components/editorial/EditorialLabel.jsx';
-import { GameFeedbackEffect } from '../../../../shared/feedback/GameFeedbackEffect.jsx';
-import { useGameFeedback } from '../../../../shared/feedback/GameFeedbackContext.jsx';
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
@@ -30,7 +28,6 @@ export function GameStage({
   const touchTimerRef = useRef(null);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const guide = useGameGuide();
-  const { feedback } = useGameFeedback();
 
   useGameBrowserBackGuard({ isExitConfirmationOpen, onRequestExit });
 
@@ -49,7 +46,7 @@ export function GameStage({
     window.clearTimeout(touchTimerRef.current);
     touchTimerRef.current = window.setTimeout(() => {
       rootElement.classList.remove('has-touch-feedback');
-    }, 420);
+    }, 240);
   }
 
   useEffect(() => () => window.clearTimeout(touchTimerRef.current), []);
@@ -90,7 +87,6 @@ export function GameStage({
           <div className="game-stage__content">{children}</div>
         </main>
       </div>
-      <GameFeedbackEffect feedback={feedback} />
       {isGuideOpen ? <GameGuideModal guide={guide} onClose={() => setIsGuideOpen(false)} /> : null}
     </section>
   );

@@ -66,20 +66,22 @@ export const GAME_GUIDES = {
     description: "밝은 카드는 색을 번갈아 내림차순으로 쌓고, 네 문양을 A부터 K까지 완성해요.",
     steps: [
       "검정 8 아래에는 빨강 7처럼 색을 바꿔 한 단계 낮은 카드를 놓아요.",
-      "빈 열에는 K만 놓을 수 있고, 뒤집힌 카드가 드러나면 앞면으로 열려요.",
+      "같은 색이거나 숫자가 한 단계 차이 나지 않으면 그 아래에 놓을 수 없어요.",
       "완성 칸에는 같은 문양을 A부터 K까지 순서대로 올려요.",
     ],
     example: "solitaire",
+    examples: ["solitaire-stack", "solitaire-invalid", "solitaire-foundation"],
     walkthrough: true,
   },
   lits: {
     description: "영역마다 정확히 네 칸을 칠해 L·I·T·S 중 하나를 만들고, 칠한 칸 전체를 하나로 이어 주세요.",
     steps: [
       "칠하기를 고른 뒤 영역 안에서 네 칸을 연결해요.",
-      "완성된 모양끼리는 같은 모양이 변으로 맞닿으면 안 돼요.",
-      "칠한 칸으로 2×2 정사각형이 생기지 않게 해요.",
+      "네 칸이 2×2가 되거나, 같은 모양끼리 변으로 맞닿으면 정답이 아니에요.",
+      "각 영역의 L·I·T·S 모양과 모든 칠한 칸이 하나로 이어지면 성공해요.",
     ],
     example: "lits",
+    examples: ["lits-select", "lits-invalid", "lits-success"],
     walkthrough: true,
   },
   shikaku: {
@@ -90,6 +92,7 @@ export const GAME_GUIDES = {
       "사각형끼리 겹치거나 빈칸이 남으면 완성되지 않아요.",
     ],
     example: "shikaku",
+    examples: ["shikaku-select", "shikaku-invalid", "shikaku-success"],
     walkthrough: true,
   },
   minesweeper: {
@@ -109,16 +112,18 @@ export const GAME_GUIDES = {
       "정답 SET 다섯 개를 찾으면 한 판을 완료해요.",
     ],
     example: "set",
+    examples: ["set-compare", "set-invalid", "set-success"],
     walkthrough: true,
   },
   mosaic: {
     description: "각 숫자를 중심으로 한 주변 3×3 범위에 숫자만큼 칸을 칠해 숨은 그림을 완성해 주세요.",
     steps: [
-      "가장자리 숫자는 보드 밖을 제외한 주변 칸만 세어요.",
-      "칠하지 않을 칸은 비우기 표시로 구분할 수 있어요.",
+      "숫자 칸을 중심으로 보드 안쪽의 주변 3×3 범위를 확인해요.",
+      "숫자보다 많이 칠하면 안 되고, 칠하지 않을 칸은 ×로 표시해요.",
       "모든 숫자의 주변 칸 수가 맞으면 성공해요.",
     ],
     example: "mosaic",
+    examples: ["mosaic-count", "mosaic-invalid", "mosaic-success"],
     walkthrough: true,
   },
   "block-blast": {
@@ -126,9 +131,10 @@ export const GAME_GUIDES = {
     steps: [
       "블록 카드의 빈 공간까지 포함해 카드를 누르면 선택돼요.",
       "보드에 표시되는 점은 선택한 블록을 놓을 수 있는 시작 칸이에요.",
-      "남은 블록을 어디에도 놓을 수 없으면 게임이 끝나요.",
+      "표시된 위치에 놓아 가로나 세로 한 줄을 채우면 그 줄이 사라져요.",
     ],
     example: "block-blast",
+    examples: ["block-blast-select", "block-blast-place", "block-blast-finish"],
     walkthrough: true,
   },
 };

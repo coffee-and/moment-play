@@ -541,10 +541,10 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     button.animate(
       [
         { transform: "scale(1)" },
-        { transform: "scale(1.1)", offset: 0.42 },
+        { transform: "scale(1.04)", offset: 0.42 },
         { transform: "scale(1)" },
       ],
-      { duration: 360, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
+      { duration: 180, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
     );
   }
 

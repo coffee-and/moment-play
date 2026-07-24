@@ -47,8 +47,61 @@
 
 .logic-puzzle-stage__session-controls {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
+}
+
+.puzzle-hint-panel {
+  display: flex;
+  width: min(100%, 560px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px auto 0;
+  border: 1px solid var(--palette-neutral-300);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: color-mix(in oklab, var(--surface) 94%, var(--palette-neutral-200));
+  box-shadow: var(--shadow-soft);
+}
+
+.puzzle-hint-panel__copy {
+  min-width: 0;
+}
+
+.puzzle-hint-panel__copy strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.puzzle-hint-panel__copy p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.puzzle-hint-panel__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.puzzle-hint-result-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.is-hint-target {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid color-mix(in oklab, var(--palette-neutral-900) 70%, transparent);
+  outline-offset: -3px;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--palette-neutral-100) 75%, transparent);
 }
 
 .board-viewport {
@@ -190,6 +243,38 @@
   .logic-puzzle-stage__session-controls {
     flex: none;
     margin-top: 0;
+  }
+
+  .puzzle-hint-panel {
+    display: grid;
+    width: calc(100% - 8px);
+    gap: 8px;
+    margin-top: 8px;
+    border-radius: 12px;
+    padding: 9px 10px;
+  }
+
+  .puzzle-hint-panel__copy strong {
+    font-size: 12px;
+  }
+
+  .puzzle-hint-panel__copy p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 2px;
+    font-size: 14px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .puzzle-hint-panel__actions {
+    flex-wrap: wrap;
+  }
+
+  .puzzle-hint-panel__actions .button {
+    min-height: 32px;
+    padding-inline: 10px;
+    font-size: 11px;
   }
 
   .logic-board-status {

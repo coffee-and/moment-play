@@ -3,6 +3,7 @@ import {
   createRectangle,
   isShikakuComplete,
   SHIKAKU_PUZZLES,
+  solveShikaku,
   validateShikakuRectangle,
 } from "./shikaku.logic.js";
 
@@ -38,5 +39,19 @@ describe("Shikaku rules", () => {
     ];
     expect(isShikakuComplete(5, rectangles)).toBe(true);
     expect(isShikakuComplete(5, rectangles.slice(0, -1))).toBe(false);
+  });
+
+  it("finds a complete valid answer for every published puzzle", () => {
+    SHIKAKU_PUZZLES.forEach((puzzle) => {
+      const solution = solveShikaku(puzzle);
+      expect(isShikakuComplete(puzzle.size, solution)).toBe(true);
+      solution.forEach((rectangle, index) => {
+        expect(validateShikakuRectangle(
+          rectangle,
+          puzzle.clues,
+          solution.slice(0, index),
+        ).valid).toBe(true);
+      });
+    });
   });
 });

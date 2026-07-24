@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getLitsShapeType, validateLits } from "./lits.logic.js";
+import { getLitsShapeType, LITS_SOLUTION, validateLits } from "./lits.logic.js";
 
 describe("LITS rules", () => {
+  it("keeps the published answer valid", () => {
+    expect(validateLits(LITS_SOLUTION).valid).toBe(true);
+  });
+
   it("recognizes rotations of the four allowed tetromino types", () => {
     expect(getLitsShapeType([0, 1, 2, 3])).toBe("I");
     expect(getLitsShapeType([0, 6, 12, 13])).toBe("L");

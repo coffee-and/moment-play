@@ -284,6 +284,17 @@ button.solitaire-card:active {
   text-align: center;
 }
 
+.solitaire-game__assist {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.solitaire-game__assist .puzzle-hint-panel {
+  margin-top: 0;
+}
+
 .solitaire-game__difficulty-list {
   display: grid;
   width: min(100%, 560px);

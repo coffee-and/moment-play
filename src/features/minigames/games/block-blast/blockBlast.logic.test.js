@@ -3,6 +3,7 @@ import {
   BLOCK_BLAST_SIZE,
   canPlaceBlockPiece,
   createBlockBoard,
+  findBestBlockMove,
   hasBlockMove,
   placeBlockPiece,
 } from "./blockBlast.logic.js";
@@ -31,5 +32,15 @@ describe("Block Blast rules", () => {
     expect(hasBlockMove(board, [horizontalThree])).toBe(false);
     board[0] = 0;
     expect(hasBlockMove(board, [{ color: 1, cells: [[0, 0]] }])).toBe(true);
+  });
+
+  it("recommends a placement that clears a line when one is available", () => {
+    const board = createBlockBoard();
+    for (let col = 0; col < 5; col += 1) board[col] = 2;
+    const move = findBestBlockMove(board, [horizontalThree]);
+    const result = placeBlockPiece(board, horizontalThree, move.row, move.col);
+
+    expect(move).toMatchObject({ pieceIndex: 0, row: 0, col: 5 });
+    expect(result.clearedLines).toBe(1);
   });
 });

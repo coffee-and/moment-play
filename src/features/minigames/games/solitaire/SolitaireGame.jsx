@@ -6,11 +6,14 @@ import { GameRecordCelebration } from "../../shared/components/GameRecordCelebra
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
+import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
 import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
 import { formatActiveGameTime, useActiveGameTimer } from "../../shared/hooks/useActiveGameTimer.js";
+import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import {
   dealSolitaire,
   drawSolitaireStock,
+  findSolitaireHint,
   getSolitaireRankLabel,
   getSolitaireSelectionCard,
   isSolitaireWon,
@@ -166,6 +169,36 @@ export function SolitaireGame({ game }) {
   );
   const difficultyRecord = records[difficulty] ?? EMPTY_DIFFICULTY_RECORD;
   const time = formatActiveGameTime(elapsedMs);
+  const suggestedMove = findSolitaireHint(board);
+  const suggestedCardLabel = suggestedMove?.card
+    ? `${getSolitaireRankLabel(suggestedMove.card.rank)} ${suggestedMove.card.symbol}`
+    : null;
+  const destinationLabel = suggestedMove?.destination?.type === "foundation"
+    ? `${suggestedMove.card.symbol} 완성 칸`
+    : suggestedMove?.destination?.type === "tableau"
+      ? `${suggestedMove.destination.column + 1}번째 카드 열`
+      : null;
+  const hint = usePuzzleHints(suggestedMove ? [
+    suggestedMove.type === "draw"
+      ? { message: "지금 바로 옮길 수 있는 카드가 없어요. 스톡을 살펴보세요.", showStock: true }
+      : { message: `${suggestedCardLabel} 카드를 먼저 살펴보세요.`, source: suggestedMove.source },
+    suggestedMove.type === "draw"
+      ? { message: "스톡을 눌러 새 카드를 공개하면 다음 이동이 생길 수 있어요.", showStock: true }
+      : {
+        message: suggestedMove.destination.type === "foundation"
+          ? "같은 문양은 완성 칸에 A부터 숫자 순서대로 올릴 수 있어요."
+          : "카드 열에는 색을 번갈아 한 단계 낮은 숫자를 올릴 수 있어요.",
+        destination: suggestedMove.destination,
+        source: suggestedMove.source,
+      },
+    suggestedMove.type === "draw"
+      ? { message: "표시된 스톡을 눌러 다음 카드를 공개하세요.", showStock: true }
+      : {
+        message: `${suggestedCardLabel} 카드를 ${destinationLabel}(으)로 옮겨보세요.`,
+        destination: suggestedMove.destination,
+        source: suggestedMove.source,
+      },
+  ] : []);
 
   function startGame(nextDifficulty = difficulty) {
     setDifficulty(nextDifficulty);
@@ -176,6 +209,7 @@ export function SolitaireGame({ game }) {
     setIsExitOpen(false);
     setIsNewGameOpen(false);
     setPhase("playing");
+    hint.resetHints();
     resetTimer();
     playSound("countdownFinal");
   }
@@ -300,6 +334,24 @@ export function SolitaireGame({ game }) {
     else setIsExitOpen(true);
   }
 
+  function isHintSource(source) {
+    const hintSource = hint.currentStep?.source;
+    if (!hintSource || !source || hintSource.type !== source.type) return false;
+    if (source.type === "waste") return true;
+    if (source.type === "tableau") {
+      return hintSource.column === source.column && hintSource.index === source.index;
+    }
+    return hintSource.suit === source.suit;
+  }
+
+  function isHintDestination(destination) {
+    const hintDestination = hint.currentStep?.destination;
+    if (!hintDestination || !destination || hintDestination.type !== destination.type) return false;
+    return destination.type === "tableau"
+      ? hintDestination.column === destination.column
+      : hintDestination.suit === destination.suit;
+  }
+
   const actions = (
     <div className="game-stage__inline-actions">
       {phase === "playing" ? <Button variant="secondary" onClick={() => setIsNewGameOpen(true)}>새 게임</Button> : null}
@@ -344,7 +396,7 @@ export function SolitaireGame({ game }) {
           <div className="solitaire-game__draw-piles">
             <button
               aria-label={board.stock.length ? `스톡 ${board.stock.length}장, 카드 공개` : "버린 카드 다시 섞기"}
-              className={`solitaire-pile solitaire-stock${board.stock.length ? " has-cards" : ""}`}
+              className={`solitaire-pile solitaire-stock${board.stock.length ? " has-cards" : ""}${hint.currentStep?.showStock ? " is-hint-target" : ""}`}
               disabled={phase !== "playing" || (!board.stock.length && !board.waste.length)}
               onClick={drawStock}
               type="button"
@@ -357,7 +409,7 @@ export function SolitaireGame({ game }) {
                 return isTop ? (
                   <PlayingCard
                     card={card}
-                    className={`is-waste is-offset-${index}`}
+                    className={`is-waste is-offset-${index}${isHintSource({ type: "waste" }) ? " is-hint-target" : ""}`}
                     key={card.id}
                     onClick={() => chooseSource({ type: "waste" })}
                     onDoubleClick={() => moveToFoundation({ type: "waste" })}
@@ -379,7 +431,7 @@ export function SolitaireGame({ game }) {
               const source = { type: "foundation", suit: suit.id };
               return (
                 <div
-                  className="solitaire-pile solitaire-foundation"
+                  className={`solitaire-pile solitaire-foundation${isHintDestination({ type: "foundation", suit: suit.id }) ? " is-hint-target" : ""}`}
                   data-drop-type="foundation"
                   data-drop-suit={suit.id}
                   key={suit.id}
@@ -410,7 +462,7 @@ export function SolitaireGame({ game }) {
         <div className="solitaire-game__tableau" aria-label="카드 열">
           {board.tableau.map((column, columnIndex) => (
             <div
-              className="solitaire-tableau-column"
+              className={`solitaire-tableau-column${isHintDestination({ type: "tableau", column: columnIndex }) ? " is-hint-target" : ""}`}
               data-drop-type="tableau"
               data-drop-column={columnIndex}
               key={columnIndex}
@@ -433,7 +485,7 @@ export function SolitaireGame({ game }) {
                 return (
                   <PlayingCard
                     card={card}
-                    className={`is-tableau${selected ? " is-selected" : ""}`}
+                    className={`is-tableau${selected ? " is-selected" : ""}${isHintSource(source) ? " is-hint-target" : ""}`}
                     key={card.id}
                     onClick={card.faceUp ? () => chooseSource(source) : undefined}
                     onDoubleClick={card.faceUp && cardIndex === column.length - 1 ? () => moveToFoundation(source) : undefined}
@@ -450,6 +502,13 @@ export function SolitaireGame({ game }) {
           카드를 탭하거나 끌어서 옮기세요. 완성 칸으로 보낼 카드는 두 번 탭할 수 있어요.
         </p>
       </div>
+
+      {phase === "playing" ? (
+        <div className="solitaire-game__assist">
+          <PuzzleHintButton hint={hint} />
+          <PuzzleHintPanel gameId={game.id} hint={hint} />
+        </div>
+      ) : null}
 
       {phase === "idle" ? (
         <GameStageOverlay state="start">
@@ -479,6 +538,7 @@ export function SolitaireGame({ game }) {
             <div className="game-stage-modal__eyebrow">{isNewRecord ? "NEW RECORD" : "SOLITAIRE CLEAR"}</div>
             <h3 id="solitaire-complete-title">카드 정리를 완료했어요!</h3>
             <p>{DIFFICULTY_COPY[difficulty].label} 모드 · {time} · {moves}번 이동</p>
+            {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
             <div className="game-stage-modal__actions">
               <Button onClick={() => startGame(difficulty)}>같은 난이도 다시</Button>
               <Button variant="secondary" onClick={() => setPhase("idle")}>난이도 선택</Button>

@@ -57,14 +57,13 @@ describe("GlowSequenceGame", () => {
     view.unmount();
   });
 
-  it("plays sequence cues without showing NICE during playback", () => {
+  it("plays sequence cues during playback", () => {
     vi.useFakeTimers();
     const view = renderGame();
     const start = [...document.querySelectorAll("button")].find((button) => button.textContent === "게임 시작");
     act(() => start.click());
     act(() => vi.advanceTimersByTime(1000));
-    expect(playSound).toHaveBeenCalledWith("correct", { feedback: false });
-    expect(playSound).not.toHaveBeenCalledWith("correct");
+    expect(playSound).toHaveBeenCalledWith("correct");
     view.unmount();
   });
 });

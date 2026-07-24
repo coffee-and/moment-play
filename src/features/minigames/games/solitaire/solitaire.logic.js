@@ -212,3 +212,37 @@ export function getSolitaireSelectionCard(state, selection) {
   if (selection.type === "tableau") return state.tableau[selection.column]?.[selection.index] ?? null;
   return null;
 }
+
+export function findSolitaireHint(state) {
+  const sources = [];
+  if (state.waste.length > 0) sources.push({ type: "waste" });
+  state.tableau.forEach((column, columnIndex) => {
+    column.forEach((card, cardIndex) => {
+      if (card.faceUp && isValidTableauRun(column, cardIndex)) {
+        sources.push({ type: "tableau", column: columnIndex, index: cardIndex });
+      }
+    });
+  });
+
+  for (const source of sources) {
+    const card = getSolitaireSelectionCard(state, source);
+    if (!card) continue;
+    const destination = { type: "foundation", suit: card.suit };
+    if (moveSolitaireSelection(state, source, destination).moved) {
+      return { type: "move", source, destination, card };
+    }
+  }
+
+  for (const source of sources) {
+    const card = getSolitaireSelectionCard(state, source);
+    for (let column = 0; column < state.tableau.length; column += 1) {
+      const destination = { type: "tableau", column };
+      if (moveSolitaireSelection(state, source, destination).moved) {
+        return { type: "move", source, destination, card };
+      }
+    }
+  }
+
+  if (state.stock.length > 0 || state.waste.length > 0) return { type: "draw" };
+  return null;
+}

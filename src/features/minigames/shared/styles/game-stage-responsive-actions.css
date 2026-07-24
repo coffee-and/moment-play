@@ -42,7 +42,6 @@
 
 
 .game-stage {
-  --game-touch-color: var(--game-color-pink);
   position: relative;
 }
 
@@ -52,8 +51,7 @@
   touch-action: manipulation;
 }
 
-.game-stage::before,
-.game-stage::after {
+.game-stage::before {
   content: "";
   position: absolute;
   z-index: 20;
@@ -61,29 +59,17 @@
   left: var(--game-touch-x, 50%);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(.35);
-}
-
-.game-stage::before {
-  width: 28px;
+  width: 20px;
   aspect-ratio: 1;
+  border: 1.5px solid color-mix(in oklab, var(--text) 44%, transparent);
   border-radius: 50%;
-  background: radial-gradient(circle, var(--palette-ivory) 0 9%, var(--game-touch-color) 10% 18%, color-mix(in oklab, var(--game-touch-color) 42%, transparent) 26%, transparent 66%);
-  box-shadow: 0 0 12px color-mix(in oklab, var(--game-touch-color) 58%, transparent);
+  background: color-mix(in oklab, var(--surface) 18%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--text) 8%, transparent);
+  transform: translate(-50%, -50%) scale(.55);
 }
 
-.game-stage::after {
-  width: 46px;
-  height: 46px;
-  background:
-    linear-gradient(90deg, transparent 4%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 40%, var(--palette-ivory) 49% 51%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 60%, transparent 96%) center / 100% 2px no-repeat,
-    linear-gradient(180deg, transparent 4%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 40%, var(--palette-ivory) 49% 51%, color-mix(in oklab, var(--game-touch-color) 64%, transparent) 60%, transparent 96%) center / 2px 100% no-repeat;
-  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--game-touch-color) 64%, transparent));
-}
-
-.game-stage.has-touch-feedback::before,
-.game-stage.has-touch-feedback::after {
-  animation: game-touch-feedback .38s cubic-bezier(.16, .78, .22, 1);
+.game-stage.has-touch-feedback::before {
+  animation: game-touch-feedback .22s ease-out;
 }
 
 .game-stage button:focus-visible,
@@ -95,15 +81,14 @@
 @keyframes game-touch-feedback {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(.25) rotate(-8deg);
+    transform: translate(-50%, -50%) scale(.55);
   }
-  28% {
-    opacity: .94;
-    transform: translate(-50%, -50%) scale(1.06) rotate(0);
+  30% {
+    opacity: .48;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.32) rotate(5deg);
+    transform: translate(-50%, -50%) scale(1.25);
   }
 }
 
@@ -115,8 +100,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .game-stage.has-touch-feedback::before,
-  .game-stage.has-touch-feedback::after {
+  .game-stage.has-touch-feedback::before {
     animation-name: game-touch-feedback-reduced;
     animation-duration: .14s;
   }
