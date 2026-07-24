@@ -1,0 +1,92 @@
+.game-action-feedback {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  min-width: 92px;
+  pointer-events: none;
+  place-items: center;
+  gap: 3px;
+  color: var(--text);
+  filter: drop-shadow(0 8px 14px color-mix(in oklab, var(--text) 14%, transparent));
+  transform: translate(-50%, -50%);
+  animation: game-action-feedback-in .48s cubic-bezier(.2, .75, .2, 1) both;
+}
+
+.game-action-feedback strong,
+.game-action-feedback__combo {
+  position: relative;
+  z-index: 1;
+  border: 1px solid color-mix(in oklab, var(--text) 20%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 90%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.game-action-feedback strong {
+  padding: 6px 13px 5px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: .08em;
+}
+
+.game-action-feedback__combo {
+  padding: 3px 9px;
+  color: color-mix(in oklab, var(--game-color-yellow) 72%, var(--text));
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.game-action-feedback__stars {
+  position: absolute;
+  inset: -27px -36px;
+}
+
+.game-action-feedback__stars i {
+  position: absolute;
+  color: color-mix(in oklab, var(--game-color-yellow) 78%, var(--text));
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1;
+  opacity: 0;
+  animation: game-action-star .42s ease-out both;
+}
+
+.game-action-feedback__stars i:nth-child(1) { top: 54%; left: 0; animation-delay: 0ms; }
+.game-action-feedback__stars i:nth-child(2) { top: 8%; left: 20%; animation-delay: 35ms; }
+.game-action-feedback__stars i:nth-child(3) { top: 0; left: 50%; animation-delay: 70ms; }
+.game-action-feedback__stars i:nth-child(4) { top: 8%; right: 20%; animation-delay: 105ms; }
+.game-action-feedback__stars i:nth-child(5) { top: 54%; right: 0; animation-delay: 140ms; }
+
+@keyframes game-action-feedback-in {
+  0% { opacity: 0; transform: translate(-50%, -42%) scale(.9); }
+  24% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+  72% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -56%) scale(.98); }
+}
+
+@keyframes game-action-star {
+  0% { opacity: 0; transform: translateY(5px) rotate(-20deg) scale(.25); }
+  38% { opacity: 1; transform: translateY(0) rotate(8deg) scale(1); }
+  100% { opacity: 0; transform: translateY(-7px) rotate(18deg) scale(.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-action-feedback {
+    animation: game-action-feedback-fade .3s ease both;
+  }
+
+  .game-action-feedback__stars i {
+    animation: none;
+    opacity: .72;
+  }
+}
+
+@keyframes game-action-feedback-fade {
+  0%, 100% { opacity: 0; }
+  20%, 78% { opacity: 1; }
+}

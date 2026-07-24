@@ -88,3 +88,61 @@ export function isShikakuComplete(size, rectangles) {
   });
   return covered.size === size * size;
 }
+
+export function solveShikaku(puzzle) {
+  const candidates = puzzle.clues.flatMap((clue) => {
+    const rectangles = [];
+    for (let height = 1; height <= clue.value; height += 1) {
+      if (clue.value % height !== 0) continue;
+      const width = clue.value / height;
+      for (let top = clue.row - height + 1; top <= clue.row; top += 1) {
+        for (let left = clue.col - width + 1; left <= clue.col; left += 1) {
+          const rectangle = {
+            top,
+            bottom: top + height - 1,
+            left,
+            right: left + width - 1,
+          };
+          if (
+            rectangle.top < 0
+            || rectangle.left < 0
+            || rectangle.bottom >= puzzle.size
+            || rectangle.right >= puzzle.size
+          ) continue;
+          if (validateShikakuRectangle(rectangle, puzzle.clues).valid) rectangles.push(rectangle);
+        }
+      }
+    }
+    return rectangles;
+  });
+
+  function search(selected, covered) {
+    if (covered.size === puzzle.size * puzzle.size) return selected;
+    const nextIndex = Array.from({ length: puzzle.size * puzzle.size }, (_, index) => index)
+      .find((index) => !covered.has(index));
+    const row = Math.floor(nextIndex / puzzle.size);
+    const col = nextIndex % puzzle.size;
+    const available = candidates.filter((rectangle) => (
+      rectangleContains(rectangle, row, col)
+      && [...covered].every((index) => !rectangleContains(
+        rectangle,
+        Math.floor(index / puzzle.size),
+        index % puzzle.size,
+      ))
+    ));
+
+    for (const rectangle of available) {
+      const nextCovered = new Set(covered);
+      for (let nextRow = rectangle.top; nextRow <= rectangle.bottom; nextRow += 1) {
+        for (let nextCol = rectangle.left; nextCol <= rectangle.right; nextCol += 1) {
+          nextCovered.add(nextRow * puzzle.size + nextCol);
+        }
+      }
+      const result = search([...selected, rectangle], nextCovered);
+      if (result) return result;
+    }
+    return null;
+  }
+
+  return search([], new Set()) ?? [];
+}

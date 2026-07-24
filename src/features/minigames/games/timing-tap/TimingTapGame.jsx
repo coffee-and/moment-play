@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
@@ -226,6 +227,12 @@ export function TimingTapGame({ game }) {
           />
           <span className="timing-tap__needle" style={{ left: `${needlePosition}%` }} />
           <span className="timing-tap__track-line" />
+          <GameActionFeedback
+            announce={false}
+            feedback={phase === "feedback" && result?.grade === "PERFECT" && perfectCombo >= 2
+              ? { id: round, combo: perfectCombo }
+              : null}
+          />
         </div>
 
         {phase === "playing" ? (

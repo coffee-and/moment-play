@@ -5,6 +5,7 @@ import {
   createSolitaireDeck,
   dealSolitaire,
   drawSolitaireStock,
+  findSolitaireHint,
   isValidTableauRun,
   moveSolitaireSelection,
 } from "./solitaire.logic.js";
@@ -67,5 +68,19 @@ describe("solitaire rules", () => {
     expect(result.moved).toBe(true);
     expect(result.state.tableau[0][0].faceUp).toBe(true);
     expect(result.state.tableau[1].map((value) => value.rank)).toEqual([9, 8, 7]);
+  });
+
+  it("recommends a concrete legal move before asking the player to draw", () => {
+    const redAce = card({ color: "red", rank: 1, suit: "hearts" });
+    const state = stateWith({ tableau: [[redAce], [], [], [], [], [], []] });
+    const hint = findSolitaireHint(state);
+    const result = moveSolitaireSelection(state, hint.source, hint.destination);
+
+    expect(hint).toMatchObject({
+      type: "move",
+      source: { type: "tableau", column: 0 },
+      destination: { type: "foundation", suit: "hearts" },
+    });
+    expect(result.moved).toBe(true);
   });
 });

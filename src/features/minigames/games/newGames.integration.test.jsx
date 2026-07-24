@@ -45,12 +45,14 @@ describe("new playable games", () => {
 
     expect(document.body.textContent).toContain("1 / 3");
     expect(document.body.textContent).toContain("각 속성이 세 장 모두 같거나");
+    expect(document.body.querySelector('[role="img"]').getAttribute("aria-label")).toContain("카드별로 비교");
     const nextButton = [...document.body.querySelectorAll("button")]
       .find((button) => button.textContent === "다음");
     act(() => nextButton.click());
 
     expect(document.body.textContent).toContain("2 / 3");
     expect(document.body.textContent).toContain("한 속성이라도 두 장만 같고");
+    expect(document.body.querySelector('[role="img"]').getAttribute("aria-label")).toContain("SET이 아닌");
     view.unmount();
   });
 
@@ -59,6 +61,24 @@ describe("new playable games", () => {
     const firstCell = view.host.querySelector('[aria-label^="1행 1열"]');
     act(() => firstCell.click());
     expect(firstCell.getAttribute("aria-pressed")).toBe("true");
+    view.unmount();
+  });
+
+  it("marks a puzzle as a practice run only after the player accepts a hint", () => {
+    const view = renderGame(LitsGame, "lits");
+    const hintButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "힌트 보기");
+
+    act(() => hintButton.click());
+    expect(view.host.textContent).toContain("공식 랭킹에는 제출되지 않아요");
+    expect(view.host.querySelectorAll(".is-hint-target")).toHaveLength(0);
+
+    const acceptButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "힌트 사용하기");
+    act(() => acceptButton.click());
+
+    expect(view.host.textContent).toContain("힌트 1 / 3");
+    expect(view.host.querySelectorAll(".is-hint-target").length).toBeGreaterThan(0);
     view.unmount();
   });
 
@@ -109,6 +129,27 @@ describe("new playable games", () => {
 
     expect(view.host.querySelector('[role="status"]').textContent).toContain("새로운 카드");
     expect(view.host.querySelectorAll('button[aria-label*="정답 카드"]')).toHaveLength(0);
+    view.unmount();
+  });
+
+  it("reveals and locks the LITS answer after surrender confirmation", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const view = renderGame(LitsGame, "lits");
+    act(() => vi.advanceTimersByTime(2100));
+    const surrenderButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "포기");
+    act(() => surrenderButton.click());
+    const confirmButton = [...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "정답 보기");
+    act(() => confirmButton.click());
+
+    const cells = [...view.host.querySelectorAll(".lits-cell")];
+    expect(cells.filter((cell) => cell.getAttribute("aria-pressed") === "true")).toHaveLength(24);
+    expect(cells.every((cell) => cell.disabled)).toBe(true);
+    expect(view.host.querySelector('[role="status"]').textContent).toContain("정답을 표시");
+    act(() => vi.advanceTimersByTime(5000));
+    expect(view.host.querySelector('[aria-label^="경과 시간"]').getAttribute("aria-label")).toContain("00:02");
     view.unmount();
   });
 

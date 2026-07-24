@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useGameFeedback } from "../feedback/GameFeedbackContext.jsx";
 import { GameAudioEngine } from "./audioEngine.js";
 import { getAudioTrackForPath } from "./audioCatalog.js";
 import "./audio.css";
@@ -18,7 +17,6 @@ const GameAudioContext = createContext({
 
 export function GameAudioProvider({ children }) {
   const location = useLocation();
-  const { triggerFeedback } = useGameFeedback();
   const engineRef = useRef(null);
   const duckCountRef = useRef(0);
   const [enabled, setEnabled] = useState(false);
@@ -47,10 +45,9 @@ export function GameAudioProvider({ children }) {
     setIsUnlocked(unlocked);
   }, [enabled]);
 
-  const playSound = useCallback((sound, { feedback = true } = {}) => {
-    if (feedback) triggerFeedback(sound);
+  const playSound = useCallback((sound) => {
     engineRef.current.playSound(sound);
-  }, [triggerFeedback]);
+  }, []);
 
   const pushDucking = useCallback(() => {
     duckCountRef.current += 1;

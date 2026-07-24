@@ -83,3 +83,32 @@ export function hasBlockMove(board, pieces) {
     return false;
   });
 }
+
+export function findBestBlockMove(board, pieces) {
+  let bestMove = null;
+  pieces.forEach((piece, pieceIndex) => {
+    if (!piece) return;
+    for (let row = 0; row < BLOCK_BLAST_SIZE; row += 1) {
+      for (let col = 0; col < BLOCK_BLAST_SIZE; col += 1) {
+        const result = placeBlockPiece(board, piece, row, col);
+        if (!result.placed) continue;
+        const candidate = {
+          clearedLines: result.clearedLines,
+          col,
+          pieceIndex,
+          points: result.points,
+          row,
+        };
+        if (
+          !bestMove
+          || candidate.clearedLines > bestMove.clearedLines
+          || (
+            candidate.clearedLines === bestMove.clearedLines
+            && candidate.points > bestMove.points
+          )
+        ) bestMove = candidate;
+      }
+    }
+  });
+  return bestMove;
+}

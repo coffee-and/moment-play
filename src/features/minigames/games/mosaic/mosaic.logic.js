@@ -4,7 +4,7 @@ export const MOSAIC_CELL_STATE = {
   MARKED: 2,
 };
 
-function getMosaicNeighbors(index, size) {
+export function getMosaicNeighbors(index, size) {
   const row = Math.floor(index / size);
   const col = index % size;
   const neighbors = [];

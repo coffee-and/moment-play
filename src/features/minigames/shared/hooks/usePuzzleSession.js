@@ -104,6 +104,11 @@ export function usePuzzleSession(storageKey) {
     setPhase("playing");
   }, [isExitOpen]);
 
+  const surrender = useCallback(() => {
+    if (phaseRef.current !== "paused" && phaseRef.current !== "playing") return;
+    setPhase("surrendered");
+  }, []);
+
   const leaveGame = useCallback(() => navigate("/"), [navigate]);
 
   return {
@@ -119,5 +124,6 @@ export function usePuzzleSession(storageKey) {
     requestExit,
     resume,
     start,
+    surrender,
   };
 }

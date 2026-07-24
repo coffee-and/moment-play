@@ -40,12 +40,12 @@ export function GameGuideContent({ compact = false, guide }) {
             </div>
           </div>
           <p aria-live="polite">{steps[stepIndex]}</p>
+          <GameGuideExample type={guide?.examples?.[stepIndex] ?? guide?.example} />
           <div className="game-guide-walkthrough__actions">
             <button disabled={stepIndex === 0} onClick={() => setStepIndex((current) => current - 1)} type="button">이전</button>
             <button disabled={stepIndex === steps.length - 1} onClick={() => setStepIndex((current) => current + 1)} type="button">다음</button>
           </div>
         </section>
-        <GameGuideExample type={guide?.example} />
       </div>
     );
   }

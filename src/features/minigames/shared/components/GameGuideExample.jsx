@@ -29,10 +29,33 @@ const LITS_CELLS = [
   {}, {}, {}, {},
 ];
 
+const LITS_SELECT_CELLS = [
+  { state: "filled" }, {}, {}, {},
+  { state: "filled" }, {}, {}, {},
+  { state: "filled" }, { state: "focus", label: "+" }, {}, {},
+  {}, {}, {}, {},
+];
+
+const LITS_INVALID_CELLS = [
+  { state: "invalid-filled" }, { state: "invalid-filled" }, {},
+  { state: "invalid-filled" }, { state: "invalid-filled", label: "×" }, {},
+  {}, {}, {},
+];
+
 const SHIKAKU_CELLS = [
   { state: "claimed" }, { state: "claimed", label: "6" }, { state: "claimed" },
   { state: "claimed" }, { state: "claimed" }, { state: "claimed" },
   {}, {}, {},
+];
+
+const SHIKAKU_SELECT_CELLS = [
+  { state: "focus", label: "1" }, { state: "claimed", label: "6" }, { state: "focus", label: "2" },
+  {}, {}, {},
+];
+
+const SHIKAKU_INVALID_CELLS = [
+  { state: "invalid-claimed", label: "2" }, { state: "invalid-claimed" }, { state: "invalid-claimed" },
+  { state: "invalid-claimed" }, { state: "invalid-claimed", label: "4" }, { state: "invalid-claimed", label: "×" },
 ];
 
 const MINESWEEPER_CELLS = [
@@ -47,9 +70,30 @@ const MOSAIC_CELLS = [
   { state: "filled" }, { state: "marked", label: "×" }, { state: "marked", label: "×" },
 ];
 
+const MOSAIC_COUNT_CELLS = [
+  { state: "filled" }, { state: "range" }, { state: "marked", label: "×" },
+  { state: "filled" }, { state: "number-focus", label: "3" }, { state: "range" },
+  { state: "filled" }, { state: "range" }, { state: "marked", label: "×" },
+];
+
+const MOSAIC_INVALID_CELLS = [
+  { state: "invalid-filled" }, { state: "invalid-filled" }, {},
+  { state: "invalid-filled" }, { state: "invalid-number", label: "3" }, {},
+  { state: "invalid-filled" }, {}, {},
+];
+
 const BLOCK_BLAST_CELLS = [
   { state: "block" }, { state: "block" }, { state: "block" }, { state: "preview" }, { state: "preview" },
   {}, {}, {}, {}, {},
+];
+
+const BLOCK_BLAST_SELECT_CELLS = [
+  { state: "block" }, { state: "block" }, { state: "block" }, { state: "focus", label: "선택" },
+];
+
+const BLOCK_BLAST_FINISH_CELLS = [
+  { state: "success-block" }, { state: "success-block" }, { state: "success-block" },
+  { state: "success-block" }, { state: "success-block", label: "✓" },
 ];
 
 const GAME_2048_CELLS = [
@@ -88,17 +132,28 @@ const GLOW_SEQUENCE_CELLS = [
   {}, { state: "glow-three", label: "3" }, {},
 ];
 
-function SetExample() {
-  const cards = [
-    { color: "red", count: 1 },
-    { color: "green", count: 2 },
-    { color: "purple", count: 3 },
-  ];
+function SetExample({ variant = "success" }) {
+  const cards = variant === "invalid"
+    ? [
+      { color: "red", count: 1 },
+      { color: "red", count: 2 },
+      { color: "green", count: 3 },
+    ]
+    : [
+      { color: "red", count: 1 },
+      { color: "green", count: 2 },
+      { color: "purple", count: 3 },
+    ];
+  const label = variant === "invalid"
+    ? "색이 두 장만 같아서 SET이 아닌 카드 세 장"
+    : variant === "compare"
+      ? "색과 개수를 카드별로 비교하는 SET 후보 카드 세 장"
+      : "색과 개수가 모두 다른 올바른 SET 카드 세 장";
 
   return (
-    <div className="game-guide-example__set" role="img" aria-label="색과 개수는 모두 다르고 모양과 채움은 모두 같은 SET 카드 세 장">
-      {cards.map((card) => (
-        <span aria-hidden="true" className={`game-guide-example__set-card is-${card.color}`} key={card.color}>
+    <div className={`game-guide-example__set is-${variant}`} role="img" aria-label={label}>
+      {cards.map((card, cardIndex) => (
+        <span aria-hidden="true" className={`game-guide-example__set-card is-${card.color}`} key={`${card.color}-${cardIndex}`}>
           {Array.from({ length: card.count }, (_, index) => <i key={index}>●</i>)}
         </span>
       ))}
@@ -126,13 +181,27 @@ function TimingTapExample() {
   );
 }
 
-function SolitaireExample() {
+function SolitaireExample({ variant = "stack" }) {
+  if (variant === "foundation") {
+    return (
+      <div className="game-guide-example__solitaire is-foundation-flow" role="img" aria-label="스페이드 완성 칸에 A 다음 2를 순서대로 올리는 예시">
+        <span className="game-guide-example__playing-card is-black" aria-hidden="true"><b>A</b><i>♠</i></span>
+        <span className="game-guide-example__solitaire-arrow" aria-hidden="true">→</span>
+        <span className="game-guide-example__playing-card is-black is-foundation" aria-hidden="true"><b>2</b><i>♠</i></span>
+      </div>
+    );
+  }
+
+  const invalid = variant === "invalid";
   return (
-    <div className="game-guide-example__solitaire" role="img" aria-label="검정 8 아래에 빨강 7을 놓고 완성 칸에는 스페이드 A를 놓는 예시">
+    <div
+      className={`game-guide-example__solitaire${invalid ? " is-invalid" : ""}`}
+      role="img"
+      aria-label={invalid ? "검정 8 아래에 같은 색 검정 7을 놓을 수 없는 예시" : "검정 8 아래에 빨강 7을 놓는 올바른 예시"}
+    >
       <span className="game-guide-example__playing-card is-black" aria-hidden="true"><b>8</b><i>♣</i></span>
-      <span className="game-guide-example__playing-card is-red is-lower" aria-hidden="true"><b>7</b><i>♥</i></span>
-      <span className="game-guide-example__solitaire-arrow" aria-hidden="true">→</span>
-      <span className="game-guide-example__playing-card is-black is-foundation" aria-hidden="true"><b>A</b><i>♠</i></span>
+      <span className={`game-guide-example__playing-card ${invalid ? "is-black" : "is-red"} is-lower`} aria-hidden="true"><b>7</b><i>{invalid ? "♠" : "♥"}</i></span>
+      <span className={`game-guide-example__verdict is-${invalid ? "invalid" : "valid"}`} aria-hidden="true">{invalid ? "×" : "✓"}</span>
     </div>
   );
 }
@@ -169,15 +238,51 @@ export function GameGuideExample({ type }) {
     },
     solitaire: {
       caption: "플레이 예시 · 검정 8 아래에는 빨강 7, 완성 칸에는 같은 문양의 A부터 놓아요.",
-      visual: <SolitaireExample />,
+      visual: <SolitaireExample variant="stack" />,
+    },
+    "solitaire-stack": {
+      caption: "되는 방법 · 검정 8 아래에는 색이 다른 빨강 7을 놓을 수 있어요.",
+      visual: <SolitaireExample variant="stack" />,
+    },
+    "solitaire-invalid": {
+      caption: "안 되는 방법 · 검정 8 아래에 같은 색 검정 7은 놓을 수 없어요.",
+      visual: <SolitaireExample variant="invalid" />,
+    },
+    "solitaire-foundation": {
+      caption: "완성 방법 · 같은 문양을 A부터 숫자 순서대로 올려요.",
+      visual: <SolitaireExample variant="foundation" />,
     },
     lits: {
       caption: "성공 예시 · 한 영역의 네 칸이 L 모양으로 이어져요.",
       visual: <GuideGrid cells={LITS_CELLS} columns={4} label="네 칸이 L 모양으로 연결된 성공 예시" />,
     },
+    "lits-select": {
+      caption: "진행 방법 · 칠하기 모드에서 이어지는 네 번째 칸을 선택해요.",
+      visual: <GuideGrid cells={LITS_SELECT_CELLS} columns={4} label="LITS 영역에서 세 칸을 칠한 뒤 이어지는 네 번째 칸을 선택하는 예시" />,
+    },
+    "lits-invalid": {
+      caption: "안 되는 방법 · 네 칸이 2×2 정사각형이 되면 안 돼요.",
+      visual: <GuideGrid cells={LITS_INVALID_CELLS} columns={3} label="칠한 네 칸이 2 곱하기 2 정사각형이 되어 틀린 LITS 예시" />,
+    },
+    "lits-success": {
+      caption: "되는 방법 · 네 칸을 L·I·T·S 모양 중 하나로 연결해요.",
+      visual: <GuideGrid cells={LITS_CELLS} columns={4} label="네 칸이 L 모양으로 연결된 올바른 LITS 예시" />,
+    },
     shikaku: {
       caption: "성공 예시 · 숫자 6 하나를 포함한 3×2 사각형의 넓이는 6이에요.",
       visual: <GuideGrid cells={SHIKAKU_CELLS} columns={3} label="숫자 6을 포함한 3 곱하기 2 사각형 성공 예시" />,
+    },
+    "shikaku-select": {
+      caption: "진행 방법 · 숫자를 포함하도록 첫 모서리 ①과 반대 모서리 ②를 눌러요.",
+      visual: <GuideGrid cells={SHIKAKU_SELECT_CELLS} columns={3} label="숫자 6을 사이에 두고 사각형의 양쪽 모서리를 차례로 선택하는 예시" />,
+    },
+    "shikaku-invalid": {
+      caption: "안 되는 방법 · 한 사각형 안에 숫자가 두 개 들어가면 안 돼요.",
+      visual: <GuideGrid cells={SHIKAKU_INVALID_CELLS} columns={3} label="숫자 2와 4가 같은 사각형에 들어가 틀린 시카쿠 예시" />,
+    },
+    "shikaku-success": {
+      caption: "되는 방법 · 숫자 6 하나를 포함한 3×2 사각형을 만들어요.",
+      visual: <GuideGrid cells={SHIKAKU_CELLS} columns={3} label="숫자 6 하나만 포함하고 넓이가 6인 시카쿠 성공 예시" />,
     },
     minesweeper: {
       caption: "성공 예시 · 깃발 칸을 피하고 안전한 칸을 모두 열었어요. 깃발 표시는 필수가 아니에요.",
@@ -185,15 +290,51 @@ export function GameGuideExample({ type }) {
     },
     set: {
       caption: "성공 예시 · 색과 개수는 모두 다르고, 모양과 채움은 모두 같아요.",
-      visual: <SetExample />,
+      visual: <SetExample variant="success" />,
+    },
+    "set-compare": {
+      caption: "진행 방법 · 색·모양·채움·개수를 한 속성씩 세 장 모두 비교해요.",
+      visual: <SetExample variant="compare" />,
+    },
+    "set-invalid": {
+      caption: "안 되는 방법 · 색이 두 장만 같고 한 장이 다르면 SET이 아니에요.",
+      visual: <SetExample variant="invalid" />,
+    },
+    "set-success": {
+      caption: "되는 방법 · 색과 개수가 세 장 모두 다르면 조건을 만족해요.",
+      visual: <SetExample variant="success" />,
     },
     mosaic: {
       caption: "성공 예시 · 가운데 숫자 3의 주변에는 칠한 칸이 정확히 세 개 있어요.",
       visual: <GuideGrid cells={MOSAIC_CELLS} columns={3} label="숫자 3 주변에 세 칸을 칠한 모자이크 성공 예시" />,
     },
+    "mosaic-count": {
+      caption: "진행 방법 · 가운데 숫자와 주변 여덟 칸을 한 범위로 함께 봐요.",
+      visual: <GuideGrid cells={MOSAIC_COUNT_CELLS} columns={3} label="가운데 숫자 3을 중심으로 주변 3 곱하기 3 범위를 확인하는 예시" />,
+    },
+    "mosaic-invalid": {
+      caption: "안 되는 방법 · 숫자 3 주변을 네 칸 칠하면 조건을 넘어요.",
+      visual: <GuideGrid cells={MOSAIC_INVALID_CELLS} columns={3} label="숫자 3 주변에 네 칸을 칠해 틀린 모자이크 예시" />,
+    },
+    "mosaic-success": {
+      caption: "되는 방법 · 숫자 3 주변에는 칠한 칸이 정확히 세 개 있어요.",
+      visual: <GuideGrid cells={MOSAIC_CELLS} columns={3} label="숫자 3 주변에 정확히 세 칸을 칠한 모자이크 성공 예시" />,
+    },
     "block-blast": {
       caption: "성공 예시 · 표시된 두 칸에 블록을 놓으면 가로 한 줄이 완성되어 사라져요.",
       visual: <GuideGrid cells={BLOCK_BLAST_CELLS} columns={5} label="두 칸 블록으로 가로 한 줄을 완성하는 배치 예시" />,
+    },
+    "block-blast-select": {
+      caption: "진행 방법 · 조각 주변의 빈 공간을 눌러도 해당 블록이 선택돼요.",
+      visual: <GuideGrid cells={BLOCK_BLAST_SELECT_CELLS} columns={4} label="세 칸 블록의 넓은 선택 영역을 누르는 예시" />,
+    },
+    "block-blast-place": {
+      caption: "되는 위치 · 초록 점선 칸을 시작점으로 블록을 놓을 수 있어요.",
+      visual: <GuideGrid cells={BLOCK_BLAST_CELLS} columns={5} label="채워진 세 칸 옆 점선 두 칸에 블록을 놓을 수 있는 예시" />,
+    },
+    "block-blast-finish": {
+      caption: "성공 방법 · 가로나 세로 한 줄을 모두 채우면 그 줄이 사라져요.",
+      visual: <GuideGrid cells={BLOCK_BLAST_FINISH_CELLS} columns={5} label="블록으로 한 줄을 모두 채워 삭제하는 성공 예시" />,
     },
   };
   const example = examples[type];

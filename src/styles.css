@@ -1897,6 +1897,17 @@ a {
   gap: 8px;
 }
 
+.sudoku-game__assist {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sudoku-game__play > .puzzle-hint-panel {
+  margin-top: 0;
+}
+
 .sudoku-game__number-button,
 .sudoku-game__erase-button {
   aspect-ratio: 1.25;

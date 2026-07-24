@@ -3,8 +3,9 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
+import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
-import { LITS_REGION_MAP, LITS_SIZE, validateLits } from "./lits.logic.js";
+import { LITS_REGION_MAP, LITS_SIZE, LITS_SOLUTION, validateLits } from "./lits.logic.js";
 import "./lits.css";
 
 const LITS_BEST_KEY = "eunContents.lits.bestTime";
@@ -18,16 +19,44 @@ export function LitsGame({ game }) {
   const [board, setBoard] = useState(() => Array(LITS_SIZE * LITS_SIZE).fill(UNKNOWN));
   const [mode, setMode] = useState(FILLED);
   const [status, setStatus] = useState("각 영역에 L·I·T·S 모양 중 하나를 네 칸으로 만드세요.");
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
+  const solutionSet = new Set(LITS_SOLUTION);
+  const targetRegion = [...new Set(LITS_REGION_MAP)].find((regionId) => (
+    board.some((cell, index) => (
+      LITS_REGION_MAP[index] === regionId
+      && (cell === FILLED) !== solutionSet.has(index)
+    ))
+  )) ?? 0;
+  const targetRegionIndexes = LITS_REGION_MAP
+    .map((regionId, index) => regionId === targetRegion ? index : null)
+    .filter((index) => index != null);
+  const targetSolutionIndexes = targetRegionIndexes.filter((index) => solutionSet.has(index));
+  const hint = usePuzzleHints([
+    {
+      message: `${targetRegion + 1}번 영역부터 살펴보세요. 이 영역에서도 정확히 네 칸이 이어져야 해요.`,
+      targetIndexes: targetRegionIndexes,
+    },
+    {
+      message: "네 칸은 L·I·T·S 중 한 모양이며, 이웃 영역의 같은 모양과 변으로 닿으면 안 돼요.",
+      targetIndexes: targetRegionIndexes,
+    },
+    {
+      message: `${targetRegion + 1}번 영역에서 표시한 네 칸을 칠해보세요.`,
+      targetIndexes: targetSolutionIndexes,
+    },
+  ]);
 
   function startGame() {
     setBoard(Array(LITS_SIZE * LITS_SIZE).fill(UNKNOWN));
     setMode(FILLED);
+    setIsAnswerRevealed(false);
     setStatus("각 영역에 L·I·T·S 모양 중 하나를 네 칸으로 만드세요.");
+    hint.resetHints();
     session.start();
   }
 
   function changeCell(index, nextMode = mode) {
-    if (session.phase !== "playing") return;
+    if (session.phase !== "playing" || isAnswerRevealed) return;
     const regionId = LITS_REGION_MAP[index];
     const regionFilled = board.filter((cell, cellIndex) => (
       LITS_REGION_MAP[cellIndex] === regionId && cell === FILLED
@@ -51,7 +80,7 @@ export function LitsGame({ game }) {
     ));
     if (!everyRegionHasFour) {
       setStatus("영역마다 네 칸을 이어서 칠해보세요.");
-      playSound("correct", { feedback: false });
+      playSound("correct");
       return;
     }
     const result = validateLits(filledIndexes);
@@ -65,6 +94,14 @@ export function LitsGame({ game }) {
     session.complete();
   }
 
+  function revealAnswer() {
+    setBoard(Array.from({ length: LITS_SIZE * LITS_SIZE }, (_, index) => (
+      solutionSet.has(index) ? FILLED : MARKED
+    )));
+    setIsAnswerRevealed(true);
+    setStatus("정답을 표시했어요. 영역별 네 칸의 모양과 연결 방식을 확인해보세요.");
+  }
+
   const filledCount = board.filter((cell) => cell === FILLED).length;
   const completedRegions = [...new Set(LITS_REGION_MAP)].filter((regionId) => (
     board.filter((cell, index) => LITS_REGION_MAP[index] === regionId && cell === FILLED).length === 4
@@ -73,9 +110,12 @@ export function LitsGame({ game }) {
   return (
     <LogicPuzzleStage
       completionText="모든 영역의 테트로미노를 하나로 연결했어요."
+      endOnSurrender
       game={game}
+      hint={hint}
       onReset={startGame}
       onStart={startGame}
+      onSurrender={revealAnswer}
       session={session}
       stats={[
         { label: "Cells", value: `${filledCount}/24` },
@@ -97,7 +137,8 @@ export function LitsGame({ game }) {
                 <button
                   aria-label={`${row + 1}행 ${col + 1}열, 영역 ${region + 1}`}
                   aria-pressed={cell === FILLED}
-                  className={`lits-cell state-${cell} region-${region} ${topEdge ? "edge-top" : ""} ${rightEdge ? "edge-right" : ""} ${bottomEdge ? "edge-bottom" : ""} ${leftEdge ? "edge-left" : ""}`}
+                  className={`lits-cell state-${cell} region-${region} ${topEdge ? "edge-top" : ""} ${rightEdge ? "edge-right" : ""} ${bottomEdge ? "edge-bottom" : ""} ${leftEdge ? "edge-left" : ""} ${hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""}`}
+                  disabled={isAnswerRevealed}
                   key={index}
                   onClick={() => changeCell(index)}
                   onContextMenu={(event) => {
