@@ -1,0 +1,257 @@
+.friend-invite-dashboard {
+  margin: clamp(24px, 4vw, 40px) 0 var(--gap);
+}
+
+.friend-invite-dashboard__header {
+  margin-bottom: 14px;
+}
+
+.friend-invite-dashboard__header .eyebrow,
+.friend-invite-form__header .eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.friend-invite-dashboard__header h2,
+.friend-invite-form__header h2 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  letter-spacing: -0.03em;
+}
+
+.friend-invite-dashboard__header p:last-child,
+.friend-invite-form__header p:last-child {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.friend-invite-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.friend-invite-section {
+  padding: clamp(20px, 3vw, 26px);
+}
+
+.friend-invite-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.friend-invite-section__header h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.025em;
+}
+
+.friend-invite-section__header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.friend-invite-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style: none;
+}
+
+.friend-invite-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.friend-invite-list__item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.friend-invite-list__item:last-child {
+  padding-bottom: 0;
+}
+
+.friend-invite-list__details {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.friend-invite-list__details time {
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.friend-invite-list__details .button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.friend-invite-overlay {
+  padding: 18px;
+}
+
+.friend-invite-modal {
+  width: min(680px, 100%);
+  max-height: min(760px, calc(100vh - 36px));
+  overflow-y: auto;
+}
+
+.friend-invite-form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  padding: clamp(22px, 4vw, 34px);
+  flex-direction: column;
+  gap: 20px;
+}
+
+.friend-invite-form__header {
+  padding-right: 42px;
+}
+
+.friend-invite-form__group {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 16px;
+  background: color-mix(in oklab, var(--surface-2) 72%, transparent);
+}
+
+.friend-invite-form__group legend {
+  padding: 0 7px;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.friend-invite-form__chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.friend-invite-form__chip {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.friend-invite-form__chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  color: var(--text);
+}
+
+.friend-invite-form__chip.is-selected {
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--line));
+  background: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  color: var(--accent-2);
+}
+
+.friend-invite-form__chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.friend-invite-form__settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.friend-invite-form__toggle {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.friend-invite-form__toggle:first-of-type {
+  border-top: 0;
+}
+
+.friend-invite-form__toggle input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.friend-invite-form__note {
+  margin: -8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.friend-invite-form__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .friend-invite-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .friend-invite-list__item,
+  .friend-invite-list__details {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .friend-invite-list__details .friend-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .friend-invite-list__details .button {
+    width: 100%;
+  }
+
+  .friend-invite-form__settings-grid,
+  .friend-invite-form__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .friend-invite-form__actions .button {
+    width: 100%;
+  }
+}

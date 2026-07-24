@@ -1,0 +1,543 @@
+.game-guide-content {
+  display: grid;
+  gap: 14px;
+  text-align: left;
+}
+
+.game-guide-content > p {
+  text-align: center;
+}
+
+.game-guide-content ol {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 22px;
+  color: var(--game-modal-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.game-guide-walkthrough {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--game-modal-action-bg);
+}
+
+.game-guide-walkthrough__header,
+.game-guide-walkthrough__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.game-guide-walkthrough__header > strong {
+  color: var(--game-modal-muted);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: .05em;
+}
+
+.game-guide-walkthrough__steps {
+  display: flex;
+  gap: 6px;
+}
+
+.game-guide-walkthrough__steps button,
+.game-guide-walkthrough__actions button {
+  display: inline-grid;
+  min-width: 30px;
+  min-height: 30px;
+  place-items: center;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: var(--game-modal-bg);
+  color: var(--game-modal-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-guide-walkthrough__steps button[aria-current="step"] {
+  border-color: var(--game-modal-text);
+  background: var(--game-modal-text);
+  color: var(--game-modal-bg);
+}
+
+.game-guide-walkthrough__actions button {
+  min-width: 72px;
+  border-radius: 10px;
+}
+
+.game-guide-walkthrough__steps button:disabled,
+.game-guide-walkthrough__actions button:disabled {
+  cursor: default;
+  opacity: .35;
+}
+
+.game-guide-walkthrough > p {
+  min-height: 42px;
+  margin: 0;
+  color: var(--game-modal-text);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.game-guide-example {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: 16px;
+  padding: 14px;
+  background: color-mix(in oklab, var(--game-modal-action-bg) 76%, transparent);
+}
+
+.game-guide-example figcaption {
+  color: var(--game-modal-muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.game-guide-example__grid {
+  display: grid;
+  width: min(190px, 62vw);
+  aspect-ratio: var(--guide-grid-columns) / var(--guide-grid-rows);
+  grid-template-columns: repeat(var(--guide-grid-columns), 1fr);
+  gap: 3px;
+  margin-inline: auto;
+}
+
+.game-guide-example__cell {
+  display: grid;
+  min-width: 0;
+  min-height: 28px;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--game-modal-text) 18%, transparent);
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--game-modal-text) 5%, var(--game-modal-bg));
+  color: var(--game-modal-text);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.game-guide-example__cell.is-filled,
+.game-guide-example__cell.is-block {
+  background: var(--game-modal-text);
+}
+
+.game-guide-example__cell.is-claimed {
+  border-color: var(--game-color-blue);
+  background: color-mix(in oklab, var(--game-color-blue) 24%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-revealed {
+  background: var(--game-modal-bg);
+}
+
+.game-guide-example__cell.is-flag {
+  background: color-mix(in oklab, var(--game-color-red) 16%, var(--game-modal-bg));
+  color: var(--game-color-red);
+}
+
+.game-guide-example__cell.is-marked {
+  color: var(--game-modal-muted);
+}
+
+.game-guide-example__cell.is-preview {
+  border: 2px dashed var(--game-color-green);
+  background: color-mix(in oklab, var(--game-color-green) 20%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-focus {
+  border: 2px dashed var(--game-color-blue);
+  background: color-mix(in oklab, var(--game-color-blue) 18%, var(--game-modal-bg));
+  color: var(--game-color-blue);
+  font-size: 10px;
+}
+
+.game-guide-example__cell.is-invalid-filled,
+.game-guide-example__cell.is-invalid-claimed,
+.game-guide-example__cell.is-invalid-number {
+  border-color: var(--game-color-red);
+  background: color-mix(in oklab, var(--game-color-red) 22%, var(--game-modal-bg));
+  color: var(--game-color-red);
+}
+
+.game-guide-example__cell.is-invalid-filled {
+  background: color-mix(in oklab, var(--game-color-red) 72%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-range {
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--game-color-blue) 56%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-blue) 8%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-success-block {
+  border-color: color-mix(in oklab, var(--game-color-green) 72%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-green) 58%, var(--game-modal-bg));
+  color: var(--palette-neutral-900);
+}
+
+.game-guide-example__cell.is-tile,
+.game-guide-example__cell.is-tile-strong {
+  border-color: color-mix(in oklab, var(--palette-terracotta) 46%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--palette-terracotta) 18%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-tile-strong {
+  background: color-mix(in oklab, var(--palette-terracotta) 34%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-hint {
+  border-color: transparent;
+  background: transparent;
+  color: var(--game-modal-muted);
+}
+
+.game-guide-example__cell.is-sequence-one,
+.game-guide-example__cell.is-glow-one {
+  border-color: color-mix(in oklab, var(--game-color-yellow) 58%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-yellow) 26%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-sequence-two,
+.game-guide-example__cell.is-glow-two {
+  border-color: color-mix(in oklab, var(--game-color-blue) 58%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-blue) 24%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-sequence-three,
+.game-guide-example__cell.is-glow-three {
+  border-color: color-mix(in oklab, var(--game-color-pink) 58%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-pink) 24%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-sequence-four {
+  border-color: color-mix(in oklab, var(--game-color-green) 58%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--game-color-green) 22%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-number {
+  border-radius: 1px;
+  background: var(--game-modal-bg);
+}
+
+.game-guide-example__cell.is-number-focus {
+  border: 2px solid var(--game-color-blue);
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--game-color-blue) 18%, var(--game-modal-bg));
+}
+
+.game-guide-example__cell.is-black-stone,
+.game-guide-example__cell.is-white-stone {
+  border-radius: 1px;
+  background:
+    linear-gradient(color-mix(in oklab, var(--game-modal-text) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--game-modal-text) 22%, transparent) 1px, transparent 1px),
+    var(--game-modal-bg);
+  color: var(--palette-neutral-900);
+  font-size: 18px;
+}
+
+.game-guide-example__cell.is-white-stone {
+  color: var(--palette-neutral-300);
+  text-shadow: 0 0 0 var(--palette-neutral-700);
+}
+
+.game-guide-example__flight {
+  position: relative;
+  width: min(220px, 66vw);
+  height: 92px;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--game-color-blue) 8%, var(--game-modal-bg));
+}
+
+.game-guide-example__pillar {
+  position: absolute;
+  right: 20%;
+  width: 26px;
+  border: 1px solid color-mix(in oklab, var(--palette-sage) 62%, var(--game-modal-action-border));
+  background: color-mix(in oklab, var(--palette-sage) 35%, var(--game-modal-bg));
+}
+
+.game-guide-example__pillar.is-top {
+  top: 0;
+  height: 27px;
+  border-radius: 0 0 5px 5px;
+}
+
+.game-guide-example__pillar.is-bottom {
+  bottom: 0;
+  height: 28px;
+  border-radius: 5px 5px 0 0;
+}
+
+.game-guide-example__flight-star,
+.game-guide-example__flight-path {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.game-guide-example__flight-star {
+  left: 29%;
+  color: var(--game-color-yellow);
+  font-size: 24px;
+}
+
+.game-guide-example__flight-path {
+  left: 45%;
+  color: var(--game-modal-muted);
+  font-size: 20px;
+}
+
+.game-guide-example__timing {
+  position: relative;
+  width: min(230px, 68vw);
+  height: 28px;
+  margin: 22px auto 14px;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--game-modal-text) 8%, var(--game-modal-bg));
+}
+
+.game-guide-example__timing-target {
+  position: absolute;
+  inset: 3px 34%;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--game-color-green) 46%, var(--game-modal-bg));
+}
+
+.game-guide-example__timing-marker {
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: 50%;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--game-modal-text);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--game-modal-text) 10%, transparent);
+  transform: translateX(-50%);
+}
+
+.game-guide-example__solitaire {
+  display: flex;
+  min-height: 104px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.game-guide-example__playing-card {
+  position: relative;
+  display: grid;
+  width: 58px;
+  min-height: 82px;
+  align-content: start;
+  justify-items: center;
+  border: 1px solid var(--palette-neutral-300);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--palette-ivory);
+  box-shadow: 0 4px 10px color-mix(in oklab, var(--palette-neutral-900) 14%, transparent);
+  color: var(--palette-neutral-900);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.game-guide-example__playing-card::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+  border-radius: 5px;
+}
+
+.game-guide-example__playing-card.is-red {
+  color: color-mix(in oklab, var(--game-color-red) 82%, var(--palette-neutral-900));
+}
+
+.game-guide-example__playing-card.is-lower {
+  z-index: 1;
+  margin-left: -36px;
+  margin-top: 30px;
+}
+
+.game-guide-example__playing-card.is-foundation {
+  margin-left: 4px;
+}
+
+.game-guide-example__playing-card b,
+.game-guide-example__playing-card i {
+  position: relative;
+  z-index: 1;
+}
+
+.game-guide-example__playing-card b {
+  justify-self: start;
+  font-size: 14px;
+}
+
+.game-guide-example__playing-card i {
+  margin-top: 12px;
+  font-family: serif;
+  font-size: 28px;
+  font-style: normal;
+}
+
+.game-guide-example__solitaire-arrow {
+  color: var(--game-modal-muted);
+}
+
+.game-guide-example__verdict {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.game-guide-example__verdict.is-valid {
+  background: color-mix(in oklab, var(--game-color-green) 22%, var(--game-modal-bg));
+  color: var(--game-color-green);
+}
+
+.game-guide-example__verdict.is-invalid {
+  background: color-mix(in oklab, var(--game-color-red) 18%, var(--game-modal-bg));
+  color: var(--game-color-red);
+}
+
+.game-guide-example__solitaire.is-invalid .game-guide-example__playing-card.is-lower {
+  border-color: var(--game-color-red);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--game-color-red) 24%, transparent);
+}
+
+.game-guide-example__set {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-inline: auto;
+}
+
+.game-guide-example__set-card {
+  display: flex;
+  width: 68px;
+  min-height: 76px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid color-mix(in oklab, currentColor 45%, transparent);
+  border-radius: 9px;
+  background: var(--game-modal-bg);
+  font-size: 12px;
+}
+
+.game-guide-example__set-card.is-red { color: var(--game-color-red); }
+.game-guide-example__set-card.is-green { color: var(--game-color-green); }
+.game-guide-example__set-card.is-purple { color: var(--game-color-purple); }
+
+.game-guide-example__set-card i {
+  font-style: normal;
+}
+
+.game-guide-example__set.is-invalid .game-guide-example__set-card {
+  border-color: color-mix(in oklab, var(--game-color-red) 58%, transparent);
+}
+
+.game-guide-example__set.is-compare .game-guide-example__set-card {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--game-color-blue) 14%, transparent);
+}
+
+.game-stage-start-modal {
+  width: min(380px, 100%);
+  min-height: 0;
+}
+
+.game-guide-content--compact {
+  gap: 10px;
+}
+
+.game-guide-content--compact .game-guide-walkthrough {
+  gap: 8px;
+  padding: 10px;
+}
+
+.game-guide-content--compact .game-guide-walkthrough > p {
+  min-height: 38px;
+  font-size: 11.5px;
+}
+
+.game-guide-content--compact .game-guide-example {
+  gap: 7px;
+  padding: 10px;
+}
+
+.game-guide-content--compact .game-guide-walkthrough .game-guide-example {
+  margin-inline: -2px;
+}
+
+.game-guide-content--compact .game-guide-example__grid {
+  width: min(142px, 48vw);
+}
+
+.game-guide-content--compact .game-guide-example__set-card {
+  width: 52px;
+  min-height: 58px;
+}
+
+.game-guide-content--compact .game-guide-example__playing-card {
+  width: 48px;
+  min-height: 68px;
+  padding: 7px;
+}
+
+.game-guide-content--compact .game-guide-example__solitaire {
+  min-height: 82px;
+}
+
+.game-guide-content--compact .game-guide-example figcaption {
+  font-size: 10.5px;
+}
+
+@media (max-width: 380px) {
+  .game-guide-example__set-card {
+    width: 58px;
+    min-height: 66px;
+  }
+}
+
+@media (max-width: 620px) {
+  .game-stage-start-modal {
+    gap: 9px;
+    padding: 22px 18px;
+  }
+
+  .game-stage-start-modal .game-stage-doodle[data-doodle-variant="start"] {
+    width: 104px;
+  }
+
+  .game-stage-start-modal .game-guide-content > p {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .game-stage-start-modal .game-stage-modal__actions .button {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,541 @@
+.flappy-game__wrap {
+  display: grid;
+  width: min(100%, 760px);
+  justify-items: center;
+  gap: 14px;
+}
+
+.flappy-game__sky {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  outline: none;
+  background:
+    radial-gradient(circle at 74% 18%, color-mix(in oklab, var(--flappy-glow) 28%, transparent), transparent 24%),
+    linear-gradient(180deg, var(--flappy-sky-top) 0%, var(--flappy-sky-center) 56%, var(--flappy-sky-deep) 100%);
+  box-shadow:
+    inset 0 -40px 70px color-mix(in oklab, var(--flappy-glow) 8%, transparent),
+    0 20px 54px color-mix(in oklab, var(--text) 10%, transparent);
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.flappy-game__sky:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--flappy-star-glow) 72%, transparent);
+  outline-offset: 3px;
+}
+
+.flappy-game__moon {
+  position: absolute;
+  top: max(7%, 18px);
+  right: max(7%, 18px);
+  width: clamp(38px, 8vw, 74px);
+  aspect-ratio: 1;
+  overflow: visible;
+  fill: var(--flappy-moon);
+  filter: drop-shadow(0 0 15px color-mix(in oklab, var(--flappy-glow) 42%, transparent));
+}
+
+.flappy-game__stars {
+  position: absolute;
+  inset: -12px;
+  pointer-events: none;
+  animation: flappy-stars-drift 8s linear infinite;
+}
+
+.flappy-game__star {
+  position: absolute;
+  display: block;
+  width: var(--star-size);
+  aspect-ratio: 1;
+  background: color-mix(in oklab, var(--flappy-star-cool) 92%, transparent);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--flappy-star-glow) 46%, transparent));
+  animation: flappy-star-twinkle 2.1s ease-in-out infinite;
+  animation-delay: var(--star-delay);
+}
+
+.flappy-game__star.is-warm {
+  background: var(--flappy-star);
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--flappy-star) 42%, transparent));
+}
+
+.flappy-game__score {
+  position: absolute;
+  z-index: 5;
+  top: 6%;
+  right: 0;
+  left: 0;
+  width: max-content;
+  min-width: 54px;
+  margin-inline: auto;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in oklab, var(--flappy-star) 68%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--flappy-score-surface) 86%, transparent);
+  box-shadow: 0 7px 20px color-mix(in oklab, var(--flappy-score-shadow) 26%, transparent);
+  color: var(--flappy-score-text);
+  font-family: var(--font);
+  font-size: clamp(20px, 4vw, 32px);
+  text-align: center;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(6px);
+}
+
+.flappy-game__gate {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+}
+
+.flappy-game__pillar {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: block;
+  border: 0;
+  background: var(--flappy-pillar);
+  box-shadow: 0 5px 18px color-mix(in oklab, var(--flappy-sky-deep) 14%, transparent);
+}
+
+.flappy-game__pillar::after {
+  content: "";
+  position: absolute;
+  right: -10%;
+  left: -10%;
+  height: 12px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--flappy-pillar);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--flappy-sky-deep) 12%, transparent);
+}
+
+.flappy-game__pillar.is-top {
+  top: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.flappy-game__pillar.is-top::after {
+  bottom: -6px;
+}
+
+.flappy-game__pillar.is-bottom {
+  bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.flappy-game__pillar.is-bottom::after {
+  top: -6px;
+}
+
+.flappy-game__bird {
+  position: absolute;
+  z-index: 4;
+  width: clamp(28px, 5.8vw, 46px);
+  aspect-ratio: 1.75;
+  transform: translate(-50%, -50%) rotate(var(--bird-tilt));
+  transition: transform 0.08s linear;
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--flappy-glow) 50%, transparent));
+}
+
+.flappy-game__bird.is-life {
+  animation: flappy-hit-blink 0.22s steps(2, end) infinite;
+}
+
+.flappy-game__bird.is-shield::after {
+  content: "";
+  position: absolute;
+  inset: -28%;
+  border: 2px solid color-mix(in oklab, var(--flappy-shield) 70%, var(--palette-white));
+  border-radius: 50%;
+  box-shadow: 0 0 16px color-mix(in oklab, var(--flappy-shield) 70%, transparent);
+  animation: flappy-shield-pulse 0.42s ease-in-out infinite alternate;
+}
+
+.flappy-game__bird-core {
+  position: absolute;
+  inset: 24% 10% 22% 36%;
+  border: 0;
+  border-radius: 68% 48% 52% 66%;
+  background: var(--flappy-fish);
+}
+
+.flappy-game__bird-core::after {
+  content: "";
+  position: absolute;
+  top: 34%;
+  right: 18%;
+  width: clamp(2px, 0.45vw, 3px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #08112b;
+  box-shadow: none;
+}
+
+.flappy-game__bird-wing {
+  position: absolute;
+  top: 35%;
+  left: 36%;
+  width: 31%;
+  height: 36%;
+  border-radius: 70% 18% 68% 20%;
+  background: var(--flappy-wing);
+  transform-origin: right center;
+  animation: flappy-wing 0.26s ease-in-out infinite alternate;
+}
+
+.flappy-game__bird-tail {
+  position: absolute;
+  z-index: -1;
+  top: 12%;
+  left: -4%;
+  width: 52%;
+  height: 76%;
+  background: var(--flappy-tail);
+  clip-path: polygon(100% 50%, 30% 0, 0 13%, 15% 50%, 0 87%, 30% 100%);
+}
+
+/*
+ * Star Flight feedback should feel like a brief trail of starlight, not a
+ * centered badge. These contextual overrides keep the shared feedback
+ * component for timing/state cleanup while removing its pill surfaces here.
+ */
+.flappy-game__sky .game-action-feedback {
+  top: 22%;
+  min-width: 0;
+  max-width: min(68%, 260px);
+  gap: 1px;
+  color: var(--flappy-star);
+  filter: none;
+  animation: flappy-feedback-glimmer var(--game-action-feedback-duration, 820ms) cubic-bezier(.2, .75, .2, 1) both;
+}
+
+.flappy-game__sky .game-action-feedback strong,
+.flappy-game__sky .game-action-feedback__combo {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.flappy-game__sky .game-action-feedback strong {
+  color: var(--flappy-star);
+  font-family: var(--font-display);
+  font-size: clamp(15px, 4vw, 20px);
+  font-style: normal;
+  font-weight: 750;
+  letter-spacing: .08em;
+  line-height: 1;
+  text-shadow:
+    0 0 4px color-mix(in oklab, var(--flappy-star) 82%, transparent),
+    0 0 13px color-mix(in oklab, var(--flappy-star-glow) 72%, transparent);
+}
+
+.flappy-game__sky .game-action-feedback__combo {
+  color: color-mix(in oklab, var(--flappy-star) 82%, var(--flappy-star-cool));
+  font-size: clamp(13px, 3.2vw, 17px);
+  line-height: 1;
+  text-shadow:
+    0 0 4px color-mix(in oklab, var(--flappy-star) 76%, transparent),
+    0 0 11px color-mix(in oklab, var(--flappy-star-glow) 66%, transparent);
+}
+
+/* Keep the milestone to one light line instead of stacking a giant title and badge. */
+.flappy-game__sky .game-action-feedback.has-combo strong {
+  display: none;
+}
+
+.flappy-game__sky .game-action-feedback.is-major strong {
+  font-size: clamp(18px, 4.8vw, 23px);
+}
+
+.flappy-game__sky .game-action-feedback.is-compact {
+  top: 16%;
+}
+
+.flappy-game__sky .game-action-feedback.is-compact strong {
+  font-size: clamp(13px, 3.3vw, 16px);
+  font-weight: 700;
+  opacity: .88;
+}
+
+.flappy-game__sky .game-action-feedback.is-standard {
+  top: 27%;
+}
+
+.flappy-game__sky .game-action-feedback.is-neutral strong {
+  color: color-mix(in oklab, var(--flappy-shield) 74%, var(--palette-white));
+  text-shadow:
+    0 0 5px color-mix(in oklab, var(--flappy-shield) 75%, transparent),
+    0 0 14px color-mix(in oklab, var(--flappy-shield) 52%, transparent);
+}
+
+.flappy-game__sky .game-action-feedback.is-negative strong {
+  color: var(--game-effect-negative);
+  text-shadow: 0 0 8px color-mix(in oklab, var(--game-effect-negative) 42%, transparent);
+}
+
+.flappy-game__sky .game-action-feedback__stars {
+  inset: -28px -48px;
+}
+
+.flappy-game__sky .game-action-feedback__stars i {
+  color: var(--flappy-star);
+  font-size: 11px;
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--flappy-star-glow) 82%, transparent));
+  animation: flappy-feedback-sparkle calc(var(--game-action-feedback-duration, 820ms) * .82) ease-out both;
+}
+
+.flappy-game__sky .game-action-feedback__stars i:nth-child(1) {
+  top: 52%;
+  left: 0;
+  --flappy-spark-x: -18px;
+  --flappy-spark-y: 4px;
+}
+
+.flappy-game__sky .game-action-feedback__stars i:nth-child(2) {
+  top: 4%;
+  left: 22%;
+  font-size: 14px;
+  --flappy-spark-x: -8px;
+  --flappy-spark-y: -16px;
+}
+
+.flappy-game__sky .game-action-feedback__stars i:nth-child(3) {
+  top: -5%;
+  left: 50%;
+  font-size: 8px;
+  --flappy-spark-x: 0;
+  --flappy-spark-y: -19px;
+}
+
+.flappy-game__sky .game-action-feedback__stars i:nth-child(4) {
+  top: 7%;
+  right: 18%;
+  font-size: 13px;
+  --flappy-spark-x: 10px;
+  --flappy-spark-y: -15px;
+}
+
+.flappy-game__sky .game-action-feedback__stars i:nth-child(5) {
+  top: 54%;
+  right: 0;
+  font-size: 9px;
+  --flappy-spark-x: 19px;
+  --flappy-spark-y: 5px;
+}
+
+.flappy-game__sky .game-action-feedback.is-combo::before,
+.flappy-game__sky .game-action-feedback.is-combo::after,
+.flappy-game__sky .game-action-feedback.is-major::before,
+.flappy-game__sky .game-action-feedback.is-major::after {
+  content: "✦";
+  position: absolute;
+  color: color-mix(in oklab, var(--flappy-star-cool) 82%, var(--flappy-star));
+  font-size: 8px;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--flappy-star-glow) 74%, transparent));
+  animation: flappy-feedback-extra-sparkle var(--game-action-feedback-duration, 820ms) ease-out both;
+}
+
+.flappy-game__sky .game-action-feedback.is-combo::before,
+.flappy-game__sky .game-action-feedback.is-major::before {
+  top: -19px;
+  left: 8%;
+  --flappy-extra-x: -13px;
+  --flappy-extra-y: -9px;
+}
+
+.flappy-game__sky .game-action-feedback.is-combo::after,
+.flappy-game__sky .game-action-feedback.is-major::after {
+  right: 8%;
+  bottom: -18px;
+  font-size: 11px;
+  --flappy-extra-x: 14px;
+  --flappy-extra-y: 9px;
+}
+
+.flappy-game__curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(155deg, var(--flappy-curtain-start) 0%, var(--flappy-curtain-center) 58%, var(--flappy-sky-deep) 100%);
+  color: var(--flappy-curtain-text);
+  text-align: center;
+}
+
+.flappy-game__curtain-kicker {
+  color: var(--flappy-star);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.flappy-game__curtain strong {
+  max-width: 460px;
+  font-size: clamp(24px, 5vw, 44px);
+  line-height: 1.12;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+.flappy-game__curtain p {
+  color: var(--flappy-curtain-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+.flappy-game__hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.flappy-game__hint {
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes flappy-stars-drift {
+  50% { transform: translateX(-8px); }
+}
+
+@keyframes flappy-star-twinkle {
+  0%, 100% { opacity: 0.48; transform: scale(0.82); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+@keyframes flappy-wing {
+  from { transform: rotate(18deg) scaleY(0.74); }
+  to { transform: rotate(-18deg) scaleY(1.08); }
+}
+
+@keyframes flappy-hit-blink {
+  0%, 44% { opacity: 1; }
+  45%, 100% { opacity: 0.22; }
+}
+
+@keyframes flappy-shield-pulse {
+  from { opacity: 0.5; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes flappy-feedback-glimmer {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 5px)) scale(.94);
+  }
+  28% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 3px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% - 8px)) scale(.98);
+  }
+}
+
+@keyframes flappy-feedback-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(0, 5px) rotate(-18deg) scale(.2);
+  }
+  38% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(7deg) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--flappy-spark-x), var(--flappy-spark-y)) rotate(28deg) scale(.35);
+  }
+}
+
+@keyframes flappy-feedback-extra-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(0, 4px) scale(.2);
+  }
+  42% {
+    opacity: .95;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--flappy-extra-x), var(--flappy-extra-y)) scale(.3);
+  }
+}
+
+@media (max-width: 620px) {
+  .flappy-game__sky {
+    aspect-ratio: 4 / 5;
+    max-height: 66vh;
+  }
+
+  .flappy-game__curtain {
+    padding: 18px;
+  }
+
+  .flappy-game__curtain p {
+    max-width: 292px;
+  }
+
+  .flappy-game__moon {
+    top: 7%;
+    right: 7%;
+    width: clamp(40px, 12vw, 58px);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flappy-game__stars,
+  .flappy-game__bird-wing {
+    animation: none;
+  }
+
+  .flappy-game__bird {
+    transition: none;
+  }
+
+
+  .flappy-game__bird.is-life,
+  .flappy-game__bird.is-shield::after {
+    animation: none;
+  }
+
+  .flappy-game__sky .game-action-feedback {
+    animation: game-action-feedback-fade min(var(--game-action-feedback-duration, 820ms), 700ms) ease both;
+    transform: translate(-50%, -50%);
+  }
+
+  .flappy-game__sky .game-action-feedback__stars i,
+  .flappy-game__sky .game-action-feedback.is-combo::before,
+  .flappy-game__sky .game-action-feedback.is-combo::after,
+  .flappy-game__sky .game-action-feedback.is-major::before,
+  .flappy-game__sky .game-action-feedback.is-major::after {
+    animation: none;
+    opacity: .68;
+  }
+}

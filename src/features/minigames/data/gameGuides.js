@@ -1,0 +1,140 @@
+export const GAME_GUIDES = {
+  "2048": {
+    description: "같은 숫자 타일을 한쪽으로 밀어 합치고, 더 큰 숫자를 만들어 목표 타일에 도전해요.",
+    steps: [
+      "방향키나 스와이프로 모든 타일을 한 번에 움직여요.",
+      "같은 숫자 두 개가 만나면 두 배 숫자 하나로 합쳐져요.",
+      "빈칸이 없고 더 합칠 타일도 없으면 게임이 끝나요.",
+    ],
+    example: "2048",
+  },
+  memory: {
+    description: "잠깐 나타나는 컬러 아이콘의 순서를 기억한 뒤 똑같은 순서로 선택해요.",
+    steps: [
+      "먼저 빛나는 아이콘과 순서를 끝까지 살펴봐요.",
+      "제시가 끝난 뒤 첫 번째 아이콘부터 차례대로 눌러요.",
+      "라운드가 올라갈수록 기억할 순서가 길어져요.",
+    ],
+    example: "memory",
+  },
+  sudoku: {
+    description: "가로줄·세로줄·굵은 테두리 영역마다 1부터 9까지 숫자가 한 번씩만 오도록 채워요.",
+    steps: [
+      "빈칸을 선택한 뒤 아래 숫자 버튼이나 키보드로 입력해요.",
+      "같은 가로줄, 세로줄, 3×3 영역에는 같은 숫자를 두 번 넣을 수 없어요.",
+      "모든 빈칸을 규칙에 맞게 채우면 성공해요.",
+    ],
+    example: "sudoku",
+  },
+  omok: {
+    description: "격자 교차점에 흑과 백 돌을 번갈아 놓고, 가로·세로·대각선으로 다섯 돌을 먼저 이어요.",
+    steps: [
+      "빈 교차점을 눌러 내 돌을 놓아요.",
+      "상대의 네 돌이 이어지면 다섯 번째 자리를 먼저 막아요.",
+      "Standard Omok에서 흑은 3×3, 4×4, 장목 같은 금수를 피해야 해요.",
+    ],
+    example: "omok",
+  },
+  flappy: {
+    description: "탭할 때마다 위로 날아오르는 별을 조절해 빛 기둥 사이의 빈 공간을 통과해요.",
+    steps: [
+      "화면을 탭하거나 Space·Enter를 눌러 짧게 날아올라요.",
+      "연속으로 너무 많이 누르면 위쪽 경계에 닿을 수 있어요.",
+      "기둥이나 화면 위아래 경계에 닿으면 게임이 끝나요.",
+    ],
+    example: "flappy",
+  },
+  "timing-tap": {
+    description: "움직이는 표시가 목표 구간 안에 들어오는 순간 멈춰 정확도를 높여요.",
+    steps: [
+      "움직이는 표시와 밝게 표시된 목표 구간을 함께 봐요.",
+      "표시가 목표 구간과 겹칠 때 화면이나 Space·Enter를 눌러요.",
+      "목표 중앙에 가까울수록 더 좋은 판정을 받아요.",
+    ],
+    example: "timing-tap",
+  },
+  "glow-sequence": {
+    description: "격자에서 차례대로 빛난 위치를 기억하고 같은 위치를 같은 순서로 다시 눌러요.",
+    steps: [
+      "빛이 나는 동안에는 누르지 말고 위치와 순서를 기억해요.",
+      "제시가 끝나면 첫 번째 위치부터 차례대로 선택해요.",
+      "성공할수록 격자와 기억할 순서가 점점 커져요.",
+    ],
+    example: "glow-sequence",
+  },
+  solitaire: {
+    description: "밝은 카드는 색을 번갈아 내림차순으로 쌓고, 네 문양을 A부터 K까지 완성해요.",
+    steps: [
+      "검정 8 아래에는 빨강 7처럼 색을 바꿔 한 단계 낮은 카드를 놓아요.",
+      "같은 색이거나 숫자가 한 단계 차이 나지 않으면 그 아래에 놓을 수 없어요.",
+      "완성 칸에는 같은 문양을 A부터 K까지 순서대로 올려요.",
+    ],
+    example: "solitaire",
+    examples: ["solitaire-stack", "solitaire-invalid", "solitaire-foundation"],
+    walkthrough: true,
+  },
+  lits: {
+    description: "영역마다 정확히 네 칸을 칠해 L·I·T·S 중 하나를 만들고, 칠한 칸 전체를 하나로 이어 주세요.",
+    steps: [
+      "칠하기를 고른 뒤 영역 안에서 네 칸을 연결해요.",
+      "네 칸이 2×2가 되거나, 같은 모양끼리 변으로 맞닿으면 정답이 아니에요.",
+      "각 영역의 L·I·T·S 모양과 모든 칠한 칸이 하나로 이어지면 성공해요.",
+    ],
+    example: "lits",
+    examples: ["lits-select", "lits-invalid", "lits-success"],
+    walkthrough: true,
+  },
+  shikaku: {
+    description: "숫자 하나를 포함하는 사각형을 만들고, 그 넓이를 숫자와 같게 맞춰 보드 전체를 나눠 주세요.",
+    steps: [
+      "사각형의 첫 모서리와 반대쪽 모서리를 차례로 눌러요.",
+      "사각형 안에는 숫자가 하나만 있어야 해요.",
+      "사각형끼리 겹치거나 빈칸이 남으면 완성되지 않아요.",
+    ],
+    example: "shikaku",
+    examples: ["shikaku-select", "shikaku-invalid", "shikaku-success"],
+    walkthrough: true,
+  },
+  minesweeper: {
+    description: "숫자가 알려 주는 주변 지뢰 수를 이용해 지뢰가 아닌 모든 칸을 열어 주세요.",
+    steps: [
+      "숫자 1은 주변 여덟 칸 안에 지뢰가 한 개 있다는 뜻이에요.",
+      "지뢰로 확신한 칸은 깃발 모드나 길게 누르기로 표시해요.",
+      "지뢰를 누르면 실패하고, 안전한 칸을 모두 열면 성공해요.",
+    ],
+    example: "minesweeper",
+  },
+  set: {
+    description: "색·모양·채움·개수 네 속성을 하나씩 비교해 조건을 만족하는 카드 세 장을 골라 주세요.",
+    steps: [
+      "각 속성이 세 장 모두 같거나 세 장 모두 달라야 해요.",
+      "한 속성이라도 두 장만 같고 한 장이 다르면 SET이 아니에요.",
+      "정답 SET 다섯 개를 찾으면 한 판을 완료해요.",
+    ],
+    example: "set",
+    examples: ["set-compare", "set-invalid", "set-success"],
+    walkthrough: true,
+  },
+  mosaic: {
+    description: "각 숫자를 중심으로 한 주변 3×3 범위에 숫자만큼 칸을 칠해 숨은 그림을 완성해 주세요.",
+    steps: [
+      "숫자 칸을 중심으로 보드 안쪽의 주변 3×3 범위를 확인해요.",
+      "숫자보다 많이 칠하면 안 되고, 칠하지 않을 칸은 ×로 표시해요.",
+      "모든 숫자의 주변 칸 수가 맞으면 성공해요.",
+    ],
+    example: "mosaic",
+    examples: ["mosaic-count", "mosaic-invalid", "mosaic-success"],
+    walkthrough: true,
+  },
+  "block-blast": {
+    description: "아래 블록을 하나 고른 뒤 보드에 놓아 가로나 세로 한 줄을 완성해 지워 주세요.",
+    steps: [
+      "블록 카드의 빈 공간까지 포함해 카드를 누르면 선택돼요.",
+      "보드에 표시되는 점은 선택한 블록을 놓을 수 있는 시작 칸이에요.",
+      "표시된 위치에 놓아 가로나 세로 한 줄을 채우면 그 줄이 사라져요.",
+    ],
+    example: "block-blast",
+    examples: ["block-blast-select", "block-blast-place", "block-blast-finish"],
+    walkthrough: true,
+  },
+};

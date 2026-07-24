@@ -1,0 +1,398 @@
+.memory-game__play-shell {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.memory-game__timer-row {
+  display: flex;
+  min-height: 30px;
+  width: min(560px, 100%);
+  justify-content: flex-end;
+}
+
+.memory-game__clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 18px;
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.memory-game__clock-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.memory-game__clock-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.memory-game__clock.is-urgent {
+  color: var(--game-effect-negative);
+  font-weight: 800;
+  animation: memory-timer-urgent-shake 0.5s ease-in-out infinite;
+}
+
+@keyframes memory-timer-urgent-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-1px);
+  }
+
+  75% {
+    transform: translateX(1px);
+  }
+}
+
+.memory-game__problem-panel,
+.memory-game__selection-panel {
+  display: flex;
+  width: min(720px, 100%);
+  flex-direction: column;
+  padding: 18px 20px;
+  background: var(--surface);
+}
+
+.memory-game__problem-panel .game-item-panel__title-row,
+.memory-game__selection-panel .game-item-panel__title-row {
+  margin-bottom: 12px;
+}
+
+.memory-game__problem-panel .game-item-panel__content,
+.memory-game__selection-panel .game-item-panel__content {
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
+}
+
+.memory-game__problem-panel {
+  min-height: clamp(150px, 18vw, 200px);
+}
+
+.memory-game__selection-panel {
+  min-height: clamp(150px, 17vw, 190px);
+}
+
+.memory-sequence {
+  display: flex;
+  width: min(100%, 360px);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+.memory-sequence__item {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 calc((100% - 16px) / 5);
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.memory-sequence__display {
+  min-height: 48px;
+  font-size: 42px;
+  line-height: 1;
+  animation: memory-bob 2.4s ease-in-out infinite;
+}
+
+.memory-sequence__item:nth-child(2n) .memory-sequence__display {
+  animation-delay: 0.3s;
+}
+
+.memory-sequence__item.is-empty .memory-sequence__display {
+  visibility: hidden;
+}
+
+@keyframes memory-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.memory-pedestal__shadow,
+.memory-pedestal__body,
+.memory-pedestal__top {
+  display: block;
+}
+
+.memory-pedestal__shadow {
+  width: 58px;
+  height: 16px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--text) 12%, var(--surface-2));
+}
+
+.memory-pedestal__body,
+.memory-pedestal__top {
+  display: none;
+}
+
+.memory-card-grid {
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(4, 70px);
+  justify-content: center;
+  justify-items: center;
+  gap: 7px;
+  margin: 0 auto;
+}
+
+.memory-card {
+  position: relative;
+  display: flex;
+  width: 70px;
+  height: 70px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 30px;
+  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.18s;
+}
+
+.memory-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+.memory-card:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.memory-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.memory-card__success {
+  position: absolute;
+  inset: -9px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.memory-card__success-ring {
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--game-effect-positive);
+  border-radius: 50%;
+  box-shadow: 0 0 12px color-mix(in oklab, var(--game-effect-positive) 28%, transparent);
+  animation: memory-goodpop 0.62s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.memory-card__success-label {
+  position: absolute;
+  z-index: 1;
+  right: -5px;
+  bottom: -2px;
+  display: block;
+  border: 1px solid color-mix(in oklab, var(--game-effect-positive) 42%, var(--line));
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  color: var(--game-effect-positive);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  animation: memory-good-label .68s ease both;
+}
+
+.memory-card__success-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--game-effect-perfect);
+  box-shadow: 0 0 5px color-mix(in oklab, var(--game-effect-perfect) 54%, transparent);
+  transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-31px);
+  transform-origin: center;
+  animation: memory-good-particle .66s ease-out both;
+}
+
+@keyframes memory-goodpop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--game-effect-positive) 25%, transparent);
+  }
+
+  40% {
+    transform: scale(1.04);
+    box-shadow:
+      0 0 0 4px color-mix(in oklab, var(--game-effect-positive) 18%, transparent),
+      0 0 8px color-mix(in oklab, var(--game-effect-perfect) 18%, transparent);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes memory-good-particle {
+  0% { opacity: 0; transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-20px) scale(.3); }
+  34% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-42px) scale(.8); }
+}
+
+@keyframes memory-good-label {
+  0%, 100% { opacity: 0; transform: translateY(3px) scale(.86); }
+  24%, 72% { opacity: 1; transform: none; }
+}
+
+.memory-game__state-title {
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 52px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.memory-game__state-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.memory-game__overlay-layer[data-state="turn-ready"],
+.memory-game__overlay-layer[data-state="cleared"] {
+  background: color-mix(in oklab, oklch(0.13 0.008 40) 52%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.memory-game__transition-view {
+  min-height: 0;
+  width: min(360px, 100%);
+  gap: 8px;
+  border: 1px solid var(--game-modal-border);
+  border-radius: calc(var(--r-xl) - 4px);
+  padding: 26px 28px;
+  overflow: hidden;
+  background: var(--game-modal-bg);
+  box-shadow: var(--modal-shadow);
+}
+
+.memory-game__transition-view--turn {
+  animation: memory-turn-ready-in 0.22s ease-out both;
+}
+
+.memory-game__transition-view--clear {
+  animation: memory-round-clear-in 0.28s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+}
+
+.memory-game__transition-view--replay {
+  border-style: dashed;
+  box-shadow: 0 12px 30px color-mix(in oklab, var(--text) 12%, transparent);
+}
+
+.memory-game__transition-title {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: clamp(30px, 6vw, 46px);
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.memory-game__transition-copy {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@keyframes memory-turn-ready-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes memory-round-clear-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  65% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 620px) {
+  .memory-card {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+
+  .memory-card-grid {
+    grid-template-columns: repeat(4, 64px);
+    column-gap: 6px;
+    row-gap: 10px;
+  }
+
+  .memory-game__transition-view {
+    width: min(320px, 100%);
+    padding: 24px 20px;
+  }
+
+  .memory-game__transition-title {
+    font-size: clamp(28px, 10vw, 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-game__clock.is-urgent,
+  .memory-sequence__display,
+  .memory-card__success-ring,
+  .memory-card__success-label,
+  .memory-card__success-particle,
+  .memory-game__transition-view--turn,
+  .memory-game__transition-view--clear {
+    animation: none;
+  }
+}

@@ -1,0 +1,59 @@
+.invite-result-toast {
+  position: fixed;
+  top: 78px;
+  right: max(16px, calc((100vw - var(--layout-max-width)) / 2 + 18px));
+  z-index: 90;
+  display: grid;
+  width: min(360px, calc(100vw - 32px));
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 12px 12px 12px 14px;
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  color: var(--text);
+  box-shadow: var(--sh);
+  backdrop-filter: blur(16px);
+}
+
+.invite-result-toast__copy {
+  min-width: 0;
+}
+
+.invite-result-toast__copy strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.invite-result-toast__action {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--accent-2);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.invite-result-toast__close {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+@media (max-width: 560px) {
+  .invite-result-toast {
+    top: auto;
+    right: 12px;
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    left: 12px;
+    width: auto;
+  }
+}

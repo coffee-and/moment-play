@@ -1,0 +1,136 @@
+.set-game {
+  width: min(100%, 650px);
+}
+
+.set-board-wrap {
+  position: relative;
+}
+
+.set-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.set-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 104px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: pointer;
+  box-shadow: 0 6px 14px color-mix(in oklab, var(--text) 8%, transparent);
+  transition: border-color .16s, transform .16s, box-shadow .16s;
+}
+
+.set-card.is-set-hint-target {
+  border-color: color-mix(in oklab, var(--game-color-yellow) 78%, #b66b17);
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--game-color-yellow) 26%, transparent),
+    0 8px 20px color-mix(in oklab, #d78a25 22%, transparent);
+}
+
+.set-card.is-selected.is-set-hint-target {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklab, var(--game-color-yellow) 74%, #b66b17),
+    0 0 0 4px color-mix(in oklab, var(--accent) 34%, transparent);
+}
+
+.set-card__hint-badge {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  border: 1px solid color-mix(in oklab, #7a4710 72%, transparent);
+  border-radius: 50%;
+  place-items: center;
+  background: color-mix(in oklab, var(--game-color-yellow) 88%, #fff1c8);
+  box-shadow: 0 2px 7px color-mix(in oklab, #7a4710 30%, transparent);
+  color: #442300;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.set-card:hover,
+.set-card:focus-visible {
+  border-color: color-mix(in oklab, currentColor 55%, var(--line));
+  transform: translateY(-1px);
+}
+
+.set-card.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent);
+  transform: translateY(-2px);
+}
+
+.set-card.is-answer,
+.set-card.is-answer:disabled {
+  border-color: var(--game-color-green);
+  opacity: 1;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--game-color-green) 26%, transparent),
+    0 8px 18px color-mix(in oklab, var(--game-color-green) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+.set-card:disabled {
+  cursor: default;
+}
+
+.set-card.color-0 { color: var(--game-color-red); }
+.set-card.color-1 { color: var(--game-color-green); }
+.set-card.color-2 { color: var(--game-color-purple); }
+
+.set-symbol {
+  width: clamp(17px, 4vw, 28px);
+  height: clamp(34px, 7vw, 52px);
+  flex: none;
+  border: 2px solid currentColor;
+  background: currentColor;
+}
+
+.set-symbol.shape-0 { border-radius: 999px; }
+.set-symbol.shape-1 {
+  width: clamp(22px, 4.5vw, 34px);
+  height: clamp(22px, 4.5vw, 34px);
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+.set-symbol.shape-2 {
+  border-radius: 70% 30% 70% 30%;
+  transform: skewY(-12deg);
+}
+
+.set-card.shading-1 .set-symbol {
+  background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 5px);
+}
+
+.set-card.shading-2 .set-symbol {
+  background: transparent;
+}
+
+.set-game__toolbar {
+  margin-bottom: 0;
+}
+
+@media (max-width: 620px) {
+  .set-board {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .set-card {
+    min-height: 82px;
+  }
+}

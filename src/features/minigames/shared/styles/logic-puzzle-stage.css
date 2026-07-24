@@ -1,0 +1,326 @@
+.logic-puzzle-stage__board-wrap {
+  display: grid;
+  width: 100%;
+  min-height: min(58vh, 560px);
+  place-items: center;
+}
+
+.logic-puzzle-stage__stats {
+  display: grid;
+  gap: 12px;
+}
+
+.logic-puzzle-stage__stats .stat .l {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logic-puzzle-stage__stats .stat .l svg {
+  width: 12px;
+  height: 12px;
+}
+
+.logic-puzzle-stage__result-time {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 44px);
+  letter-spacing: -.03em;
+}
+
+.logic-board-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0 14px;
+}
+
+.logic-board-toolbar .button svg,
+.logic-puzzle-stage__session-controls .button svg,
+.game-stage-modal__actions .button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.logic-puzzle-stage__session-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logic-puzzle-stage__answer-summary {
+  display: grid;
+  width: min(100%, 560px);
+  justify-items: center;
+  gap: 5px;
+  margin: 12px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: color-mix(in oklab, var(--surface) 94%, var(--palette-neutral-200));
+  text-align: center;
+}
+
+.logic-puzzle-stage__answer-summary p,
+.logic-puzzle-stage__answer-summary span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.logic-puzzle-stage__answer-summary .button {
+  margin-top: 5px;
+}
+
+.puzzle-hint-panel {
+  display: flex;
+  width: min(100%, 560px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px auto 0;
+  border: 1px solid var(--palette-neutral-300);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: color-mix(in oklab, var(--surface) 94%, var(--palette-neutral-200));
+  box-shadow: var(--shadow-soft);
+}
+
+.puzzle-hint-panel__copy {
+  min-width: 0;
+}
+
+.puzzle-hint-panel__copy strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.puzzle-hint-panel__copy p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.puzzle-hint-panel__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.puzzle-hint-result-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.is-hint-target {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid color-mix(in oklab, var(--palette-neutral-900) 70%, transparent);
+  outline-offset: -3px;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--palette-neutral-100) 75%, transparent);
+}
+
+.board-viewport {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 8px;
+}
+
+.board-viewport__scroll {
+  width: min(100%, var(--logic-board-max-size, 480px));
+  aspect-ratio: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.board-viewport__surface {
+  width: calc(100% * var(--board-zoom));
+  aspect-ratio: 1;
+}
+
+.board-viewport__surface > [role="grid"] {
+  width: 100%;
+  max-width: none;
+}
+
+.board-viewport__controls {
+  display: none;
+}
+
+.board-viewport__controls output {
+  min-width: 46px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.minesweeper-cell svg {
+  width: 54%;
+  height: 54%;
+}
+
+.logic-board-status {
+  min-height: 24px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .logic-puzzle-stage__board-wrap {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    place-items: initial;
+  }
+
+  .logic-puzzle-stage__board-wrap > div {
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:has(> .board-viewport) {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
+    justify-items: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:has(> .board-viewport) > .board-viewport {
+    display: contents;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    align-items: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > :first-child {
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > .logic-board-toolbar {
+    grid-row: 2;
+  }
+
+  .logic-puzzle-stage__board-wrap > div:not(:has(> .board-viewport)) > .logic-board-status {
+    grid-row: 3;
+  }
+
+  .board-viewport__scroll {
+    grid-row: 1;
+    width: min(100%, calc(100dvh - 198px), var(--logic-board-max-size, 480px));
+    flex: none;
+    align-self: center;
+    padding: 2px;
+    touch-action: pan-x pan-y;
+  }
+
+  .board-viewport__controls {
+    display: flex;
+    grid-row: 2;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .board-viewport__controls .game-stage__icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .board-viewport__controls .game-stage__icon-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .logic-board-toolbar {
+    grid-row: 3;
+    gap: 10px;
+    margin: 10px 0 0;
+  }
+
+  .logic-board-toolbar .button,
+  .logic-puzzle-stage__session-controls .button {
+    width: auto;
+    min-height: 34px;
+    padding-inline: 11px;
+    font-size: 11px;
+  }
+
+  .logic-puzzle-stage__session-controls {
+    flex: none;
+    margin-top: 0;
+  }
+
+  .puzzle-hint-panel {
+    display: grid;
+    width: calc(100% - 8px);
+    gap: 8px;
+    margin-top: 8px;
+    border-radius: 12px;
+    padding: 9px 10px;
+  }
+
+  .puzzle-hint-panel__copy strong {
+    font-size: 12px;
+  }
+
+  .puzzle-hint-panel__copy p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 2px;
+    font-size: 14px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .puzzle-hint-panel__actions {
+    flex-wrap: wrap;
+  }
+
+  .puzzle-hint-panel__actions .button {
+    min-height: 32px;
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+
+  .logic-board-status {
+    grid-row: 4;
+    min-height: 18px;
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .logic-puzzle-stage .game-stage__content {
+    overflow: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .logic-puzzle-stage .game-stage__content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .logic-puzzle-stage .game-stage__play {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}

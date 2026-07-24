@@ -1,0 +1,113 @@
+.game-stage__topbar-game-actions .button {
+  min-width: 0;
+  min-height: 42px;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.game-stage__topbar-game-actions .game-stage__inline-actions { display: flex; gap: 12px; }
+
+@media (max-width: 620px) {
+  .game-stage__topbar-game-actions .button {
+    min-height: 40px;
+  }
+
+  .game-stage__topbar-game-actions .game-stage__inline-actions {
+    gap: 8px;
+  }
+}
+
+.game-stage-modal__actions[data-action-count="1"] {
+  grid-template-columns: minmax(0, 180px);
+  justify-content: center;
+}
+
+.game-stage-modal__actions[data-action-count="1"] > .button {
+  width: 100%;
+}
+
+.game-stage-modal__actions[data-action-count="3"] > .button:first-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 420px) {
+  .game-stage-modal__actions[data-action-count="3"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .game-stage-modal__actions[data-action-count="3"] > .button:first-child {
+    grid-column: auto;
+  }
+}
+
+
+.game-stage {
+  position: relative;
+}
+
+.game-stage button,
+.game-stage [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.game-stage::before {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  top: var(--game-touch-y, 50%);
+  left: var(--game-touch-x, 50%);
+  opacity: 0;
+  pointer-events: none;
+  width: 20px;
+  aspect-ratio: 1;
+  border: 1.5px solid color-mix(in oklab, var(--text) 44%, transparent);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--surface) 18%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--text) 8%, transparent);
+  transform: translate(-50%, -50%) scale(.55);
+}
+
+.game-stage.has-touch-feedback::before {
+  animation: game-touch-feedback .22s ease-out;
+}
+
+.game-stage button:focus-visible,
+.game-stage [role="button"]:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+@keyframes game-touch-feedback {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.55);
+  }
+  30% {
+    opacity: .48;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+
+@media (hover: none) {
+  .game-stage button:active:not(:disabled),
+  .game-stage [role="button"]:active {
+    filter: saturate(1.08) brightness(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-stage.has-touch-feedback::before {
+    animation-name: game-touch-feedback-reduced;
+    animation-duration: .14s;
+  }
+}
+
+@keyframes game-touch-feedback-reduced {
+  0% { opacity: 0; }
+  50% { opacity: .58; }
+  100% { opacity: 0; }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "moment-play",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:db:ranking": "npx supabase db query --linked --file supabase/tests/phase3_game_results_test.sql",
+    "test:db:friends": "npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql",
+    "test:db:invites": "npx supabase db query --linked --file supabase/tests/phase5_friend_omok_invites_test.sql && npx supabase db query --linked --file supabase/tests/phase5_omok_nickname_sync_test.sql"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^29.1.1",
+    "vite": "^6.4.3",
+    "vitest": "^4.1.10"
+  }
+}

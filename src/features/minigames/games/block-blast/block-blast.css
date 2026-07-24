@@ -1,0 +1,207 @@
+.block-blast-layout {
+  display: flex;
+  width: min(100%, 560px);
+  min-height: 0;
+  flex-direction: column;
+}
+
+.block-blast-session-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.block-blast-session-controls .button svg,
+.block-blast-game .game-stage-modal__actions .button svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 620px) {
+  .block-blast-session-controls .button {
+    width: auto;
+    min-height: 34px;
+    padding-inline: 11px;
+    font-size: 11px;
+  }
+}
+
+.block-blast-board-wrap {
+  position: relative;
+  width: min(82vw, 470px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.block-blast-board {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  border-radius: 18px;
+  padding: 9px;
+  background: color-mix(in oklab, var(--game-color-blue) 10%, var(--surface-2));
+}
+
+.block-blast-cell {
+  position: relative;
+  min-width: 0;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--text) 8%, var(--surface));
+  cursor: pointer;
+}
+
+.block-blast-cell.is-valid-origin:not(.is-filled)::after {
+  position: absolute;
+  width: 6px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--game-color-green) 72%, var(--text));
+  content: "";
+  inset: 50% auto auto 50%;
+  opacity: .58;
+  transform: translate(-50%, -50%);
+}
+
+.block-blast-cell.is-preview {
+  background: color-mix(in oklab, currentColor 34%, var(--surface));
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+
+.block-blast-cell.is-invalid-preview {
+  background: color-mix(in oklab, var(--game-color-red) 22%, var(--surface));
+  box-shadow: inset 0 0 0 2px var(--game-color-red);
+}
+
+.block-blast-cell.is-filled,
+.block-piece-cell {
+  box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--text) 14%, transparent);
+}
+
+.block-blast-cell.color-1,
+.block-piece-cell.color-1 { background: var(--game-color-blue); }
+.block-blast-cell.color-2,
+.block-piece-cell.color-2 { background: var(--game-color-pink); }
+.block-blast-cell.color-3,
+.block-piece-cell.color-3 { background: var(--game-color-orange); }
+
+.block-blast-tray {
+  display: grid;
+  min-height: 104px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.block-piece {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 104px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: grab;
+  padding: 8px 6px 22px;
+  touch-action: manipulation;
+}
+
+.block-piece:disabled {
+  cursor: default;
+  opacity: .25;
+}
+
+.block-piece.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 7%, var(--surface));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.block-piece-grid {
+  display: grid;
+  width: 66px;
+  height: 66px;
+  grid-template-columns: repeat(4, 14px);
+  grid-template-rows: repeat(4, 14px);
+  place-content: center;
+  gap: 2px;
+}
+
+.block-piece-cell {
+  border-radius: 3px;
+}
+
+.block-piece__hint {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  left: 6px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.block-piece.is-selected .block-piece__hint {
+  color: var(--accent);
+}
+
+@media (max-width: 620px) {
+  .block-blast-game .game-stage__content {
+    overflow: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .block-blast-game .game-stage__content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .block-blast-layout {
+    display: grid;
+    height: 100%;
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
+    align-items: center;
+  }
+
+  .block-blast-game .game-stage__play {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .block-blast-board-wrap {
+    grid-row: 1;
+    width: min(100%, calc(100dvh - 270px), 470px);
+    align-self: center;
+  }
+
+  .block-blast-tray {
+    grid-row: 2;
+    min-height: 86px;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .block-piece {
+    min-height: 86px;
+  }
+
+  .block-blast-layout > .logic-board-status {
+    grid-row: 3;
+  }
+
+  .block-blast-session-controls {
+    grid-row: 4;
+  }
+
+  .block-piece-grid {
+    width: 56px;
+    height: 56px;
+    grid-template-columns: repeat(4, 12px);
+    grid-template-rows: repeat(4, 12px);
+  }
+}
