@@ -1,5 +1,6 @@
 import "../styles/game-action-feedback.css";
 import "../styles/game-action-feedback-effects.css";
+import "../styles/game-action-feedback-placement.css";
 
 const MAX_STAR_COUNT = 9;
 const BURST_RAY_COUNT = 8;
