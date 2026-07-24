@@ -1,5 +1,26 @@
 /* Game-local anchors keep the burst beside the action instead of on top of it. */
 
+.game-action-feedback__rings i {
+  animation-name: game-feedback-ring;
+  animation-duration: var(--game-action-feedback-duration, 820ms);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.game-action-feedback__burst i {
+  animation-name: game-feedback-ray;
+  animation-duration: var(--game-action-feedback-duration, 820ms);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.game-action-feedback__stars i {
+  animation-name: game-action-star-sparkle;
+  animation-duration: var(--game-action-feedback-duration, 820ms);
+  animation-timing-function: cubic-bezier(.2, .72, .2, 1);
+  animation-fill-mode: both;
+}
+
 section.game-stage.flappy-game .flappy-game__sky > .game-action-feedback {
   top: 20%;
   left: 36%;
