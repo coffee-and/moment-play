@@ -1,0 +1,294 @@
+/*
+ * Recovery pass for play screens that had started to read like dashboards.
+ * The reusable GameStage structure stays intact, while status information is
+ * flattened into a compact HUD and the actual board becomes the visual focus.
+ */
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__inner {
+  --stage-card-min-height: 0px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__side {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__copy,
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__side > .board-motif {
+  display: none;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar {
+  width: 100%;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0;
+  background: var(--line);
+  box-shadow: none;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat {
+  min-height: 58px;
+  justify-content: center;
+  gap: 2px;
+  border: 0;
+  border-radius: 0;
+  padding: 8px 13px;
+  background: var(--stage-card-surface);
+  box-shadow: none;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat .l {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat .v {
+  font-size: clamp(17px, 2.2vw, 21px);
+  line-height: 1.15;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat .v small {
+  color: var(--text);
+  font-size: 13px;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__side-note {
+  margin-top: 7px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__play {
+  min-height: 0;
+  border-radius: 20px;
+  padding: clamp(14px, 2vw, 22px);
+  box-shadow: none;
+}
+
+:is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__content {
+  min-height: 0;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+/* Star Flight: one score source, with transient rewards beside the player. */
+.flappy-game .flappy-game__wrap {
+  width: min(100%, 980px);
+  gap: 10px;
+}
+
+.flappy-game .flappy-game__sky {
+  aspect-ratio: 16 / 9;
+}
+
+.flappy-game .flappy-game__score {
+  display: none;
+}
+
+.flappy-game .flappy-game__sky .game-action-feedback {
+  top: 15%;
+  left: 22%;
+  max-width: 42%;
+}
+
+.flappy-game .flappy-game__sky .game-action-feedback.is-compact {
+  top: 15%;
+}
+
+.flappy-game .flappy-game__sky .game-action-feedback.is-standard {
+  top: 20%;
+}
+
+.flappy-game .flappy-game__bird {
+  width: clamp(34px, 5.4vw, 52px);
+}
+
+.flappy-game .flappy-game__pillar {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--flappy-pillar) 86%, var(--flappy-sky-deep)) 0%,
+    var(--flappy-pillar) 32%,
+    var(--palette-white) 70%,
+    color-mix(in oklab, var(--flappy-pillar) 88%, var(--flappy-sky-center)) 100%
+  );
+  box-shadow:
+    inset -5px 0 0 color-mix(in oklab, var(--flappy-sky-deep) 10%, transparent),
+    0 5px 18px color-mix(in oklab, var(--flappy-sky-deep) 18%, transparent);
+}
+
+.flappy-game .flappy-game__pillar::after {
+  background: linear-gradient(
+    180deg,
+    var(--palette-white),
+    color-mix(in oklab, var(--flappy-pillar) 90%, var(--flappy-sky-center))
+  );
+}
+
+/* Sudoku already has the same values in the shared HUD. */
+.sudoku-game .sudoku-game__meta,
+.sudoku-game .game-stage__side-note {
+  display: none;
+}
+
+.sudoku-game .sudoku-game__stage,
+.sudoku-game .sudoku-game__play {
+  gap: 10px;
+}
+
+.sudoku-game .sudoku-game__status {
+  margin: 0;
+}
+
+/* Timing Tap: remove the oversized empty stage and flatten the arcade button. */
+.timing-tap .timing-tap__game {
+  width: min(100%, 760px);
+  min-height: 0;
+  gap: clamp(20px, 3vw, 30px);
+  padding: clamp(20px, 3vw, 34px) 0;
+}
+
+.timing-tap .timing-tap__track {
+  height: 72px;
+  background: var(--stage-control-surface);
+}
+
+.timing-tap .timing-tap__tap-button {
+  width: clamp(116px, 18vw, 148px);
+  background: color-mix(in oklab, var(--game-color-orange) 82%, var(--palette-ivory));
+  box-shadow:
+    0 5px 0 color-mix(in oklab, var(--game-effect-impact) 64%, var(--game-effect-depth)),
+    0 14px 26px color-mix(in oklab, var(--game-color-orange) 22%, transparent);
+}
+
+.timing-tap .timing-tap__tap-button span {
+  font-style: normal;
+}
+
+.timing-tap .timing-tap__tap-button:active {
+  box-shadow:
+    0 2px 0 color-mix(in oklab, var(--game-effect-impact) 64%, var(--game-effect-depth)),
+    0 7px 14px color-mix(in oklab, var(--game-color-orange) 18%, transparent);
+  transform: translateY(4px) scale(.98);
+}
+
+/* Solitaire: the old face gradient referenced an undefined beige token, which
+ * invalidated the complete background declaration and left cards transparent.
+ */
+.solitaire-game .solitaire-card {
+  opacity: 1;
+  backdrop-filter: none;
+}
+
+.solitaire-game .solitaire-card.is-front {
+  background-color: var(--solitaire-card-face);
+  background-image: linear-gradient(
+    180deg,
+    var(--palette-white) 0%,
+    var(--solitaire-card-face) 62%,
+    color-mix(in oklab, var(--solitaire-card-face) 84%, var(--palette-neutral-100)) 100%
+  );
+  box-shadow:
+    0 2px 4px color-mix(in oklab, var(--palette-neutral-900) 16%, transparent),
+    0 8px 18px color-mix(in oklab, var(--palette-neutral-900) 18%, transparent);
+}
+
+.solitaire-game .solitaire-card.is-back {
+  background-color: var(--solitaire-back);
+  background-image:
+    linear-gradient(45deg, transparent 44%, var(--solitaire-back-line) 45% 49%, transparent 50% 94%, var(--solitaire-back-line) 95% 99%, transparent),
+    linear-gradient(-45deg, transparent 44%, var(--solitaire-back-line) 45% 49%, transparent 50% 94%, var(--solitaire-back-line) 95% 99%, transparent);
+}
+
+.solitaire-game .solitaire-card.is-front::after {
+  opacity: .18;
+}
+
+.solitaire-game .solitaire-game__board {
+  min-height: 560px;
+  gap: 20px;
+  padding: 18px;
+  background: var(--stage-card-surface);
+}
+
+.solitaire-game .game-stage__play {
+  padding: 0;
+  overflow: visible;
+}
+
+/* Logic puzzles: bring the board directly under the compact HUD. */
+.logic-puzzle-stage .logic-puzzle-stage__board-wrap {
+  min-height: 0;
+  padding: 14px 0 4px;
+}
+
+.logic-puzzle-stage .logic-board-toolbar {
+  margin-block: 10px;
+}
+
+.logic-puzzle-stage .logic-board-status {
+  margin-top: 8px;
+}
+
+@media (max-width: 620px) {
+  :is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat-row {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  :is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  :is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__sidebar .stat {
+    min-width: 102px;
+    min-height: 52px;
+    flex: 1 0 102px;
+    padding: 7px 10px;
+  }
+
+  :is(.flappy-game, .sudoku-game, .timing-tap, .solitaire-game, .logic-puzzle-stage) .game-stage__play {
+    padding: 12px;
+  }
+
+  .flappy-game .flappy-game__sky {
+    aspect-ratio: 4 / 5;
+  }
+
+  .flappy-game .flappy-game__sky .game-action-feedback {
+    left: 25%;
+    max-width: 48%;
+  }
+
+  .timing-tap .timing-tap__game {
+    padding-block: 18px 24px;
+  }
+
+  .solitaire-game .game-stage__play {
+    padding: 0;
+  }
+
+  .solitaire-game .solitaire-game__board {
+    min-height: 600px;
+    padding: 14px 8px;
+  }
+
+  .logic-puzzle-stage .logic-puzzle-stage__board-wrap {
+    padding-top: 6px;
+  }
+}
