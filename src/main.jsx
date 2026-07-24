@@ -4,6 +4,7 @@ import App from './App';
 import { Router } from './routes/router.jsx';
 import { initializeTheme } from './shared/theme/theme.js';
 import './styles.css';
+import './features/minigames/shared/styles/minigame-ui-recovery.css';
 
 initializeTheme();
 
@@ -12,5 +13,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Router>
       <App />
     </Router>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
