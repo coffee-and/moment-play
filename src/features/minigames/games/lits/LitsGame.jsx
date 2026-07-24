@@ -5,7 +5,7 @@ import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
-import { LITS_REGION_MAP, LITS_SIZE, LITS_SOLUTION, validateLits } from "./lits.logic.js";
+import { LITS_PUZZLES, validateLits } from "./lits.logic.js";
 import "./lits.css";
 
 const LITS_BEST_KEY = "eunContents.lits.bestTime";
@@ -16,18 +16,20 @@ const MARKED = 2;
 export function LitsGame({ game }) {
   const { playSound } = useGameAudio();
   const session = usePuzzleSession(LITS_BEST_KEY);
-  const [board, setBoard] = useState(() => Array(LITS_SIZE * LITS_SIZE).fill(UNKNOWN));
+  const [puzzleIndex, setPuzzleIndex] = useState(0);
+  const puzzle = LITS_PUZZLES[puzzleIndex];
+  const [board, setBoard] = useState(() => Array(LITS_PUZZLES[0].size ** 2).fill(UNKNOWN));
   const [mode, setMode] = useState(FILLED);
   const [status, setStatus] = useState("각 영역에 L·I·T·S 모양 중 하나를 네 칸으로 만드세요.");
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
-  const solutionSet = new Set(LITS_SOLUTION);
-  const targetRegion = [...new Set(LITS_REGION_MAP)].find((regionId) => (
+  const solutionSet = new Set(puzzle.solution);
+  const targetRegion = [...new Set(puzzle.regionMap)].find((regionId) => (
     board.some((cell, index) => (
-      LITS_REGION_MAP[index] === regionId
+      puzzle.regionMap[index] === regionId
       && (cell === FILLED) !== solutionSet.has(index)
     ))
   )) ?? 0;
-  const targetRegionIndexes = LITS_REGION_MAP
+  const targetRegionIndexes = puzzle.regionMap
     .map((regionId, index) => regionId === targetRegion ? index : null)
     .filter((index) => index != null);
   const targetSolutionIndexes = targetRegionIndexes.filter((index) => solutionSet.has(index));
@@ -46,20 +48,23 @@ export function LitsGame({ game }) {
     },
   ]);
 
-  function startGame() {
-    setBoard(Array(LITS_SIZE * LITS_SIZE).fill(UNKNOWN));
+  function startGame(nextPuzzleIndex = puzzleIndex, preserveStreak = false) {
+    const nextPuzzle = LITS_PUZZLES[nextPuzzleIndex];
+    setPuzzleIndex(nextPuzzleIndex);
+    setBoard(Array(nextPuzzle.size ** 2).fill(UNKNOWN));
     setMode(FILLED);
     setIsAnswerRevealed(false);
     setStatus("각 영역에 L·I·T·S 모양 중 하나를 네 칸으로 만드세요.");
     hint.resetHints();
-    session.start();
+    if (preserveStreak) session.startNextRound();
+    else session.start();
   }
 
   function changeCell(index, nextMode = mode) {
     if (session.phase !== "playing" || isAnswerRevealed) return;
-    const regionId = LITS_REGION_MAP[index];
+    const regionId = puzzle.regionMap[index];
     const regionFilled = board.filter((cell, cellIndex) => (
-      LITS_REGION_MAP[cellIndex] === regionId && cell === FILLED
+      puzzle.regionMap[cellIndex] === regionId && cell === FILLED
     )).length;
     if (nextMode === FILLED && board[index] !== FILLED && regionFilled >= 4) {
       setStatus("한 영역에는 네 칸까지만 칠할 수 있어요.");
@@ -75,15 +80,15 @@ export function LitsGame({ game }) {
     const filledIndexes = nextBoard
       .map((cell, cellIndex) => cell === FILLED ? cellIndex : null)
       .filter((cellIndex) => cellIndex != null);
-    const everyRegionHasFour = [...new Set(LITS_REGION_MAP)].every((currentRegion) => (
-      filledIndexes.filter((cellIndex) => LITS_REGION_MAP[cellIndex] === currentRegion).length === 4
+    const everyRegionHasFour = [...new Set(puzzle.regionMap)].every((currentRegion) => (
+      filledIndexes.filter((cellIndex) => puzzle.regionMap[cellIndex] === currentRegion).length === 4
     ));
     if (!everyRegionHasFour) {
       setStatus("영역마다 네 칸을 이어서 칠해보세요.");
       playSound("correct");
       return;
     }
-    const result = validateLits(filledIndexes);
+    const result = validateLits(filledIndexes, puzzle.regionMap, puzzle.size);
     if (!result.valid) {
       setStatus(result.reason);
       playSound("wrong");
@@ -95,7 +100,7 @@ export function LitsGame({ game }) {
   }
 
   function revealAnswer() {
-    setBoard(Array.from({ length: LITS_SIZE * LITS_SIZE }, (_, index) => (
+    setBoard(Array.from({ length: puzzle.size ** 2 }, (_, index) => (
       solutionSet.has(index) ? FILLED : MARKED
     )));
     setIsAnswerRevealed(true);
@@ -103,8 +108,8 @@ export function LitsGame({ game }) {
   }
 
   const filledCount = board.filter((cell) => cell === FILLED).length;
-  const completedRegions = [...new Set(LITS_REGION_MAP)].filter((regionId) => (
-    board.filter((cell, index) => LITS_REGION_MAP[index] === regionId && cell === FILLED).length === 4
+  const completedRegions = [...new Set(puzzle.regionMap)].filter((regionId) => (
+    board.filter((cell, index) => puzzle.regionMap[index] === regionId && cell === FILLED).length === 4
   )).length;
 
   return (
@@ -113,26 +118,33 @@ export function LitsGame({ game }) {
       endOnSurrender
       game={game}
       hint={hint}
-      onReset={startGame}
-      onStart={startGame}
+      onNextRound={() => startGame((puzzleIndex + 1) % LITS_PUZZLES.length, true)}
+      onReset={() => startGame(puzzleIndex)}
+      onStart={() => startGame(puzzleIndex)}
       onSurrender={revealAnswer}
       session={session}
       stats={[
-        { label: "Cells", value: `${filledCount}/24` },
-        { label: "Areas", value: `${completedRegions}/6` },
+        { label: "Puzzle", value: `${puzzleIndex + 1}/${LITS_PUZZLES.length}` },
+        { label: "Cells", value: `${filledCount}/${puzzle.solution.length}` },
+        { label: "Areas", value: `${completedRegions}/${new Set(puzzle.regionMap).size}` },
       ]}
     >
       <div className="lits-game">
         <BoardViewport label="LITS 보드">
-          <div className="lits-board" role="grid" aria-label="6×6 LITS 보드">
+          <div
+            className="lits-board"
+            data-puzzle-id={puzzle.id}
+            role="grid"
+            aria-label={`${puzzle.size}×${puzzle.size} LITS 보드, ${puzzleIndex + 1}번 퍼즐`}
+          >
             {board.map((cell, index) => {
-              const row = Math.floor(index / LITS_SIZE);
-              const col = index % LITS_SIZE;
-              const region = LITS_REGION_MAP[index];
-              const topEdge = row === 0 || LITS_REGION_MAP[index - LITS_SIZE] !== region;
-              const rightEdge = col === LITS_SIZE - 1 || LITS_REGION_MAP[index + 1] !== region;
-              const bottomEdge = row === LITS_SIZE - 1 || LITS_REGION_MAP[index + LITS_SIZE] !== region;
-              const leftEdge = col === 0 || LITS_REGION_MAP[index - 1] !== region;
+              const row = Math.floor(index / puzzle.size);
+              const col = index % puzzle.size;
+              const region = puzzle.regionMap[index];
+              const topEdge = row === 0 || puzzle.regionMap[index - puzzle.size] !== region;
+              const rightEdge = col === puzzle.size - 1 || puzzle.regionMap[index + 1] !== region;
+              const bottomEdge = row === puzzle.size - 1 || puzzle.regionMap[index + puzzle.size] !== region;
+              const leftEdge = col === 0 || puzzle.regionMap[index - 1] !== region;
               return (
                 <button
                   aria-label={`${row + 1}행 ${col + 1}열, 영역 ${region + 1}`}

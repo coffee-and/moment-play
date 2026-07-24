@@ -82,6 +82,9 @@ describe("Sudoku hint ranking policy", () => {
     solveDefaultPuzzle(view);
 
     expect(submitResult).toHaveBeenCalledTimes(1);
+    expect([...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음판!")).toBeDefined();
+    expect(document.body.textContent).toContain("잘했어요");
     view.unmount();
   });
 
@@ -96,6 +99,7 @@ describe("Sudoku hint ranking policy", () => {
 
     expect(submitResult).not.toHaveBeenCalled();
     expect(document.body.textContent).toContain("힌트 사용 · 연습 기록 · 랭킹 미제출");
+    expect(document.body.textContent).toContain("잘했어요");
     view.unmount();
   });
 });

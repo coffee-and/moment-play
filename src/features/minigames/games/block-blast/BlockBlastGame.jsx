@@ -23,6 +23,7 @@ import {
   createBlockBoard,
   createBlockPieces,
   findBestBlockMove,
+  getNextBlockBlastCombo,
   hasBlockMove,
   placeBlockPiece,
 } from "./blockBlast.logic.js";
@@ -126,15 +127,26 @@ export function BlockBlastGame({ game }) {
 
   useEffect(() => () => window.clearTimeout(feedbackTimerRef.current), []);
 
-  function showActionFeedback(nextCombo) {
+  function showActionFeedback(clearedLines, nextCombo) {
     window.clearTimeout(feedbackTimerRef.current);
     feedbackSequenceRef.current += 1;
+    const label = clearedLines >= 3
+      ? "AMAZING!"
+      : clearedLines === 2
+        ? "DOUBLE CLEAR!"
+        : "LINE CLEAR!";
     setActionFeedback({
       id: feedbackSequenceRef.current,
-      label: "NICE",
+      label,
       combo: nextCombo,
+      comboLabel: nextCombo >= 2 ? `${nextCombo} COMBO` : "",
+      durationMs: clearedLines >= 2 || nextCombo >= 2 ? 1120 : 860,
+      variant: clearedLines >= 3 ? "major" : nextCombo >= 2 ? "combo" : "standard",
     });
-    feedbackTimerRef.current = window.setTimeout(() => setActionFeedback(null), 520);
+    feedbackTimerRef.current = window.setTimeout(
+      () => setActionFeedback(null),
+      clearedLines >= 2 || nextCombo >= 2 ? 1140 : 880,
+    );
   }
 
   function finishGame(finalScore) {
@@ -155,7 +167,7 @@ export function BlockBlastGame({ game }) {
       return;
     }
 
-    const nextCombo = result.clearedLines > 0 ? combo + 1 : 0;
+    const nextCombo = getNextBlockBlastCombo(combo, result.clearedLines);
     const nextScore = score + result.points + (result.clearedLines > 0 ? nextCombo * 3 : 0);
     let nextPieces = pieces.map((piece, index) => index === explicitPieceIndex ? null : piece);
     if (nextPieces.every((piece) => piece == null)) nextPieces = createBlockPieces();
@@ -166,7 +178,7 @@ export function BlockBlastGame({ game }) {
     setScore(nextScore);
     setCombo(nextCombo);
     setStatus(result.clearedLines > 0 ? `${result.clearedLines}줄을 지웠어요!` : "좋아요. 다음 조각을 놓아보세요.");
-    if (result.clearedLines > 0) showActionFeedback(nextCombo);
+    if (result.clearedLines > 0) showActionFeedback(result.clearedLines, nextCombo);
     playSound(result.clearedLines > 0 ? "clear" : "correct");
     if (!hasBlockMove(result.board, nextPieces)) finishGame(nextScore);
   }
@@ -366,7 +378,7 @@ export function BlockBlastGame({ game }) {
             <p>이번 점수는 {score}점이에요.</p>
             {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
             <div className="game-stage-modal__actions">
-              <Button onClick={startGame}>다시 플레이</Button>
+              <Button onClick={startGame}>다시 도전</Button>
               <Button variant="secondary" onClick={() => navigate("/")}>게임 목록으로</Button>
             </div>
           </GameStageModal>

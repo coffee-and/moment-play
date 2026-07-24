@@ -1006,7 +1006,13 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
             </GameStageModal>
           ) : null}
           {resultCopy && !dialog && !needsOnlineStart ? (
-            <GameStageModal role="dialog" aria-modal="true" aria-labelledby="omok-result-title">
+            <GameStageModal
+              celebrationStreak={1}
+              showCompletionStars={shouldCelebrateWinner}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="omok-result-title"
+            >
               {shouldCelebrateWinner ? <GameStageDoodle variant="record" /> : null}
               <p className="omok-game__modal-eyebrow">Result</p>
               <h3 id="omok-result-title">{resultCopy.title}</h3>

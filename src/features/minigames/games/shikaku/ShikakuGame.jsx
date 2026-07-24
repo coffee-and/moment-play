@@ -57,14 +57,15 @@ export function ShikakuGame({ game }) {
     [puzzle.size],
   );
 
-  function resetBoard(nextPuzzleIndex = puzzleIndex) {
+  function resetBoard(nextPuzzleIndex = puzzleIndex, preserveStreak = false) {
     setPuzzleIndex(nextPuzzleIndex);
     setRectangles([]);
     setAnchor(null);
     setIsAnswerRevealed(false);
     setStatus("첫 번째 칸과 반대쪽 모서리를 차례로 선택하세요.");
     hint.resetHints();
-    session.start();
+    if (preserveStreak) session.startNextRound();
+    else session.start();
   }
 
   function handleCell(row, col) {
@@ -117,7 +118,8 @@ export function ShikakuGame({ game }) {
       endOnSurrender
       game={game}
       hint={hint}
-      onReset={() => resetBoard((puzzleIndex + 1) % SHIKAKU_PUZZLES.length)}
+      onNextRound={() => resetBoard((puzzleIndex + 1) % SHIKAKU_PUZZLES.length, true)}
+      onReset={() => resetBoard(puzzleIndex)}
       onStart={() => resetBoard(puzzleIndex)}
       onSurrender={revealAnswer}
       session={session}

@@ -384,7 +384,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
                 const column = (index % BOARD_SIZE) + 1;
                 const label = value ? `${row}행 ${column}열, 숫자 ${value}` : `${row}행 ${column}열, 빈칸`;
                 return (
-                  <div className={`game-2048__cell ${value ? `has-value ${getTileSizeClass(value)}` : "is-empty"}`} data-value={value} role="gridcell" aria-label={label} key={`${row}-${column}`}>
+                  <div className={`game-2048__cell ${value ? `has-value ${getTileSizeClass(value)}` : "is-empty"}${phase === GAME_2048_PHASE.MILESTONE_CLEAR && value === currentTarget ? " is-target-reached" : ""}`} data-value={value} role="gridcell" aria-label={label} key={`${row}-${column}`}>
                     {value ? <span>{value}</span> : null}
                   </div>
                 );
@@ -427,7 +427,14 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
             </GameStageModal>
           ) : null}
           {phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen && !isExitConfirmOpen ? (
-            <GameStageModal className="game-2048__modal game-2048__modal--complete" role="dialog" aria-modal="true" aria-labelledby="game-2048-complete-title">
+            <GameStageModal
+              celebrationStreak={5}
+              className="game-2048__modal game-2048__modal--complete"
+              showCompletionStars
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="game-2048-complete-title"
+            >
               <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <p className="game-2048__modal-eyebrow">{GAME_2048_COPY.completed.eyebrow}</p>
               <h3 id="game-2048-complete-title">{FINAL_TARGET_TILE} {GAME_2048_COPY.completed.title}</h3>

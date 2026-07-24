@@ -5,7 +5,7 @@ export function GameRecordCelebration({ isNewRecord, compact = false }) {
 
   return (
     <GameStageDoodle
-      className={compact ? "game-stage-doodle--compact" : ""}
+      className={`game-record-celebration${compact ? " game-stage-doodle--compact" : ""}`}
       variant="record"
     />
   );

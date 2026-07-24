@@ -165,7 +165,7 @@ export function GlowSequenceGame({ game }) {
     playSound("correct");
     setPhase("cleared");
     phaseRef.current = "cleared";
-    schedule(() => beginRound(round + 1), 820);
+    schedule(() => beginRound(round + 1), 1000);
   }
 
   function requestExit() {
@@ -201,7 +201,7 @@ export function GlowSequenceGame({ game }) {
       : phase === "retry"
         ? "한 번 더 보여드릴게요"
         : phase === "cleared"
-          ? `ROUND ${round} CLEAR`
+          ? `ROUND ${round} CLEAR${round % 10 === 0 ? "!" : ""}`
           : `${inputStep + 1}번째 칸을 선택하세요`;
 
   return (
@@ -217,9 +217,13 @@ export function GlowSequenceGame({ game }) {
       title={game.title}
     >
       <div className="glow-sequence__game">
-        <div className="glow-sequence__status" aria-live="polite">
+        <div
+          className={`glow-sequence__status${phase === "cleared" && round % 10 === 0 ? " is-milestone" : ""}`}
+          aria-live="polite"
+        >
           <span>ROUND {round} · {sequenceLength} CELLS</span>
           <strong>{statusText}</strong>
+          {phase === "cleared" && bestRound === round ? <small>NEW BEST</small> : null}
         </div>
 
         <div
@@ -258,7 +262,13 @@ export function GlowSequenceGame({ game }) {
 
       {phase === "master" ? (
         <GameStageOverlay state="complete">
-          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="glow-master-title">
+          <GameStageModal
+            celebrationStreak={10}
+            showCompletionStars
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="glow-master-title"
+          >
             <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
             <div className="game-stage-modal__eyebrow">60 ROUNDS COMPLETE</div>
             <h3 id="glow-master-title">MASTER 달성!</h3>

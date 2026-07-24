@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function usePuzzleHints(steps = []) {
+export function usePuzzleHints(steps = [], { onViewBoard } = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasUsedHint, setHasUsedHint] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -24,10 +24,19 @@ export function usePuzzleHints(steps = []) {
     setStepIndex((current) => Math.max(0, current - 1));
   }
 
-  function resetHints() {
+  function resetHints({ preserveUsage = false } = {}) {
     setIsOpen(false);
-    setHasUsedHint(false);
+    if (!preserveUsage) setHasUsedHint(false);
     setStepIndex(0);
+  }
+
+  function viewOnBoard() {
+    setIsOpen(false);
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(() => onViewBoard?.());
+    } else {
+      onViewBoard?.();
+    }
   }
 
   return {
@@ -38,9 +47,11 @@ export function usePuzzleHints(steps = []) {
     isOpen,
     requestHint,
     resetHints,
+    resetHintSteps: () => resetHints({ preserveUsage: true }),
     showNextHint,
     showPreviousHint,
     stepCount: steps.length,
     stepIndex: safeStepIndex,
+    viewOnBoard,
   };
 }

@@ -190,21 +190,50 @@
 
 .memory-card__success {
   position: absolute;
-  inset: -4px;
+  inset: -9px;
+  z-index: 2;
   pointer-events: none;
 }
 
 .memory-card__success-ring {
   position: absolute;
-  inset: 4px;
-  border: 1px solid var(--game-effect-positive);
+  inset: 3px;
+  border: 2px solid var(--game-effect-positive);
   border-radius: 50%;
-  animation: memory-goodpop 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--game-effect-positive) 28%, transparent);
+  animation: memory-goodpop 0.62s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.memory-card__success-particle,
 .memory-card__success-label {
-  display: none;
+  position: absolute;
+  z-index: 1;
+  right: -5px;
+  bottom: -2px;
+  display: block;
+  border: 1px solid color-mix(in oklab, var(--game-effect-positive) 42%, var(--line));
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  color: var(--game-effect-positive);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  animation: memory-good-label .68s ease both;
+}
+
+.memory-card__success-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--game-effect-perfect);
+  box-shadow: 0 0 5px color-mix(in oklab, var(--game-effect-perfect) 54%, transparent);
+  transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-31px);
+  transform-origin: center;
+  animation: memory-good-particle .66s ease-out both;
 }
 
 @keyframes memory-goodpop {
@@ -224,6 +253,17 @@
     transform: scale(1);
     box-shadow: 0 0 0 0 transparent;
   }
+}
+
+@keyframes memory-good-particle {
+  0% { opacity: 0; transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-20px) scale(.3); }
+  34% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-42px) scale(.8); }
+}
+
+@keyframes memory-good-label {
+  0%, 100% { opacity: 0; transform: translateY(3px) scale(.86); }
+  24%, 72% { opacity: 1; transform: none; }
 }
 
 .memory-game__state-title {
@@ -267,6 +307,11 @@
 
 .memory-game__transition-view--clear {
   animation: memory-round-clear-in 0.28s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+}
+
+.memory-game__transition-view--replay {
+  border-style: dashed;
+  box-shadow: 0 12px 30px color-mix(in oklab, var(--text) 12%, transparent);
 }
 
 .memory-game__transition-title {
@@ -344,6 +389,8 @@
   .memory-game__clock.is-urgent,
   .memory-sequence__display,
   .memory-card__success-ring,
+  .memory-card__success-label,
+  .memory-card__success-particle,
   .memory-game__transition-view--turn,
   .memory-game__transition-view--clear {
     animation: none;

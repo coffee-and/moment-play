@@ -28,6 +28,23 @@
   font-weight: 600;
 }
 
+.glow-sequence__status small {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: color-mix(in oklab, var(--game-effect-perfect) 16%, transparent);
+  color: var(--game-effect-perfect);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.glow-sequence__status.is-milestone strong {
+  color: var(--game-effect-perfect);
+  font-size: clamp(24px, 5vw, 34px);
+  text-shadow: 0 0 18px color-mix(in oklab, var(--game-effect-perfect) 30%, transparent);
+}
+
 .glow-sequence__grid {
   display: grid;
   width: min(100%, 410px);

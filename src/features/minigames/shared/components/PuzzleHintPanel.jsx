@@ -43,7 +43,7 @@ export function PuzzleHintPanel({ gameId, hint }) {
         {hint.stepIndex < hint.stepCount - 1 ? (
           <Button size="small" type="button" onClick={hint.showNextHint}>다음 힌트</Button>
         ) : null}
-        <Button size="small" type="button" variant="secondary" onClick={hint.closeHint}>
+        <Button size="small" type="button" variant="secondary" onClick={hint.viewOnBoard ?? hint.closeHint}>
           보드에서 보기
         </Button>
       </div>

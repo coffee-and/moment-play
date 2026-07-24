@@ -1,5 +1,9 @@
 export const BLOCK_BLAST_SIZE = 8;
 
+export function getNextBlockBlastCombo(currentCombo, clearedLines) {
+  return clearedLines > 0 ? Math.max(0, Math.floor(Number(currentCombo) || 0)) + 1 : 0;
+}
+
 const BLOCK_PIECES = [
   { id: "single", cells: [[0, 0]] },
   { id: "line-2-h", cells: [[0, 0], [0, 1]] },

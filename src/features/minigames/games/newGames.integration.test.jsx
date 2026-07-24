@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { getMinigameById } from "../data/minigameCatalog.js";
 import { BlockBlastGame } from "./block-blast/BlockBlastGame.jsx";
 import { LitsGame } from "./lits/LitsGame.jsx";
+import { LITS_PUZZLES } from "./lits/lits.logic.js";
 import { MinesweeperGame } from "./minesweeper/MinesweeperGame.jsx";
 import { MosaicGame } from "./mosaic/MosaicGame.jsx";
 import { SetGame } from "./set/SetGame.jsx";
@@ -107,6 +108,71 @@ describe("new playable games", () => {
     const firstCard = view.host.querySelector(".set-card");
     act(() => firstCard.click());
     expect(firstCard.getAttribute("aria-pressed")).toBe("true");
+    view.unmount();
+  });
+
+  it("numbers SET hint targets, keeps selection separate, and moves focus back to the board", () => {
+    const view = renderGame(SetGame, "set");
+    const hintButton = [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "힌트 보기");
+    act(() => hintButton.click());
+    act(() => [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "힌트 사용하기").click());
+
+    expect(view.host.textContent).toContain("강조된 두 카드와 함께 SET을 이루는 마지막 카드 한 장을 찾아보세요.");
+    let targets = [...view.host.querySelectorAll(".set-card.is-set-hint-target")];
+    expect(targets).toHaveLength(2);
+    expect(targets.map((card) => card.dataset.hintOrder)).toEqual(["1", "2"]);
+    expect(targets[0].getAttribute("aria-label")).toContain("힌트 카드 1");
+
+    act(() => targets[0].click());
+    expect(targets[0].classList.contains("is-selected")).toBe(true);
+    expect(targets[0].classList.contains("is-set-hint-target")).toBe(true);
+
+    act(() => [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음 힌트").click());
+    expect(view.host.textContent).toContain("색·모양·개수·채움을 하나씩 비교해보세요.");
+    expect(view.host.querySelectorAll(".set-card.is-set-hint-target")).toHaveLength(2);
+
+    act(() => [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음 힌트").click());
+    expect(view.host.textContent).toContain("각 속성은 세 카드가 모두 같거나 모두 달라야 해요.");
+    targets = [...view.host.querySelectorAll(".set-card.is-set-hint-target")];
+    expect(targets.map((card) => card.dataset.hintOrder)).toEqual(["1", "2", "3"]);
+
+    const scrollIntoView = vi.fn();
+    targets[0].scrollIntoView = scrollIntoView;
+    const requestAnimationFrame = vi.spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback) => {
+        callback();
+        return 1;
+      });
+    act(() => [...view.host.querySelectorAll("button")]
+      .find((button) => button.textContent === "보드에서 보기").click());
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center", inline: "nearest" });
+    expect(document.activeElement).toBe(targets[0]);
+    expect(view.host.querySelectorAll(".set-card.is-set-hint-target")).toHaveLength(3);
+    requestAnimationFrame.mockRestore();
+    view.unmount();
+  });
+
+  it("moves LITS to the next validated puzzle after a clear", () => {
+    const view = renderGame(LitsGame, "lits");
+    const firstPuzzleId = view.host.querySelector(".lits-board").dataset.puzzleId;
+
+    LITS_PUZZLES[0].solution.forEach((index) => {
+      act(() => view.host.querySelectorAll(".lits-cell")[index].click());
+    });
+
+    const nextButton = [...document.body.querySelectorAll("button")]
+      .find((button) => button.textContent === "다음판!");
+    expect(nextButton).toBeDefined();
+    expect(document.body.textContent).toContain("잘했어요");
+    act(() => nextButton.click());
+
+    expect(view.host.querySelector(".lits-board").dataset.puzzleId).not.toBe(firstPuzzleId);
+    expect(view.host.querySelector(".lits-board").dataset.puzzleId).toBe(LITS_PUZZLES[1].id);
     view.unmount();
   });
 

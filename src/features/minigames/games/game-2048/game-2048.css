@@ -41,6 +41,20 @@
   cursor: default;
 }
 
+.game-2048__cell.is-target-reached {
+  z-index: 1;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--game-effect-perfect) 52%, transparent),
+    0 0 20px color-mix(in oklab, var(--game-effect-perfect) 42%, transparent);
+  animation: game-2048-target-reached .82s cubic-bezier(.2, .75, .2, 1) both;
+}
+
+@keyframes game-2048-target-reached {
+  0% { transform: scale(.9); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
 .game-2048__cell.is-medium {
   font-size: clamp(18px, 2.9vw, 25px);
 }
@@ -56,6 +70,12 @@
 .game-2048__cell[data-value="2"] {
   background: var(--tile-2-bg);
   color: var(--tile-2-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-2048__cell.is-target-reached {
+    animation: none;
+  }
 }
 
 .game-2048__cell[data-value="4"] {

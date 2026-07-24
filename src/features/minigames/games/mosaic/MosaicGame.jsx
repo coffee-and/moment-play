@@ -54,14 +54,16 @@ export function MosaicGame({ game }) {
     [board, puzzle],
   );
 
-  function resetBoard(nextPuzzleIndex = puzzleIndex) {
+  function resetBoard(nextPuzzleIndex = puzzleIndex, preserveStreak = false) {
+    const nextPuzzle = MOSAIC_PUZZLES[nextPuzzleIndex];
     setPuzzleIndex(nextPuzzleIndex);
-    setBoard(Array(puzzle.size * puzzle.size).fill(MOSAIC_CELL_STATE.UNKNOWN));
+    setBoard(Array(nextPuzzle.size * nextPuzzle.size).fill(MOSAIC_CELL_STATE.UNKNOWN));
     setMode(MOSAIC_CELL_STATE.FILLED);
     setIsAnswerRevealed(false);
     setStatus("숫자는 자신을 포함한 주변 3×3 안의 검은 칸 수예요.");
     hint.resetHints();
-    session.start();
+    if (preserveStreak) session.startNextRound();
+    else session.start();
   }
 
   function changeCell(index, nextMode = mode) {
@@ -106,7 +108,8 @@ export function MosaicGame({ game }) {
       endOnSurrender
       game={game}
       hint={hint}
-      onReset={() => resetBoard((puzzleIndex + 1) % MOSAIC_PUZZLES.length)}
+      onNextRound={() => resetBoard((puzzleIndex + 1) % MOSAIC_PUZZLES.length, true)}
+      onReset={() => resetBoard(puzzleIndex)}
       onStart={() => resetBoard(puzzleIndex)}
       onSurrender={revealAnswer}
       session={session}

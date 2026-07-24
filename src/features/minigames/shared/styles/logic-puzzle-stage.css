@@ -52,6 +52,30 @@
   gap: 8px;
 }
 
+.logic-puzzle-stage__answer-summary {
+  display: grid;
+  width: min(100%, 560px);
+  justify-items: center;
+  gap: 5px;
+  margin: 12px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: color-mix(in oklab, var(--surface) 94%, var(--palette-neutral-200));
+  text-align: center;
+}
+
+.logic-puzzle-stage__answer-summary p,
+.logic-puzzle-stage__answer-summary span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.logic-puzzle-stage__answer-summary .button {
+  margin-top: 5px;
+}
+
 .puzzle-hint-panel {
   display: flex;
   width: min(100%, 560px);

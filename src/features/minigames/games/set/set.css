@@ -13,6 +13,7 @@
 }
 
 .set-card {
+  position: relative;
   display: flex;
   min-width: 0;
   min-height: 104px;
@@ -25,6 +26,40 @@
   cursor: pointer;
   box-shadow: 0 6px 14px color-mix(in oklab, var(--text) 8%, transparent);
   transition: border-color .16s, transform .16s, box-shadow .16s;
+}
+
+.set-card.is-set-hint-target {
+  border-color: color-mix(in oklab, var(--game-color-yellow) 78%, #b66b17);
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--game-color-yellow) 26%, transparent),
+    0 8px 20px color-mix(in oklab, #d78a25 22%, transparent);
+}
+
+.set-card.is-selected.is-set-hint-target {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklab, var(--game-color-yellow) 74%, #b66b17),
+    0 0 0 4px color-mix(in oklab, var(--accent) 34%, transparent);
+}
+
+.set-card__hint-badge {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  border: 1px solid color-mix(in oklab, #7a4710 72%, transparent);
+  border-radius: 50%;
+  place-items: center;
+  background: color-mix(in oklab, var(--game-color-yellow) 88%, #fff1c8);
+  box-shadow: 0 2px 7px color-mix(in oklab, #7a4710 30%, transparent);
+  color: #442300;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .set-card:hover,

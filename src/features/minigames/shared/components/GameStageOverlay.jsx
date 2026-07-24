@@ -2,6 +2,7 @@ import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react
 import { createPortal } from 'react-dom';
 import '../styles/game-stage-responsive-actions.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
+import { CompletionStars } from './CompletionStars.jsx';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -71,9 +72,17 @@ export function GameStageOverlay({
   );
 }
 
-export function GameStageModal({ children, className = '', style, ...props }) {
+export function GameStageModal({
+  celebrationStreak = 0,
+  children,
+  className = '',
+  showCompletionStars = false,
+  style,
+  ...props
+}) {
   return (
     <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
+      {showCompletionStars ? <CompletionStars streak={celebrationStreak} /> : null}
       {Children.map(children, addActionCount)}
     </div>
   );
