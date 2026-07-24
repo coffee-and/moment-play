@@ -1,0 +1,46 @@
+/* Game-local anchors keep the burst beside the action instead of on top of it. */
+
+section.game-stage.flappy-game .flappy-game__sky > .game-action-feedback {
+  top: 20%;
+  left: 36%;
+  max-width: 145px;
+}
+
+.block-blast-game .block-blast-board-wrap > .game-action-feedback {
+  top: -5px;
+  left: 82%;
+  z-index: 8;
+}
+
+.logic-puzzle-stage .set-board-wrap > .game-action-feedback {
+  top: -5px;
+  left: 84%;
+  z-index: 8;
+}
+
+.timing-tap .timing-tap__track {
+  overflow: visible;
+}
+
+.timing-tap .timing-tap__track > .game-action-feedback {
+  top: -10px;
+  left: 50%;
+  max-width: 150px;
+}
+
+@media (max-width: 620px) {
+  section.game-stage.flappy-game .flappy-game__sky > .game-action-feedback {
+    top: 18%;
+    left: 40%;
+  }
+
+  .block-blast-game .block-blast-board-wrap > .game-action-feedback,
+  .logic-puzzle-stage .set-board-wrap > .game-action-feedback {
+    top: 2px;
+    left: 78%;
+  }
+
+  .timing-tap .timing-tap__track > .game-action-feedback {
+    top: -8px;
+  }
+}
