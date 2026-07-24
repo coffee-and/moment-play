@@ -9,6 +9,23 @@ import {
 } from "./flappy.logic.js";
 
 describe("flappy game logic", () => {
+  it("keeps the established collision and gate physics unchanged", () => {
+    expect(FLAPPY_CONFIG).toEqual({
+      birdX: 22,
+      birdRadius: 2.7,
+      gravity: 48,
+      flapVelocity: -18,
+      pipeWidth: 10,
+      gapHeight: 29,
+      pipeSpeed: 20,
+      firstPipeX: 82,
+      pipeSpacing: 48,
+      initialLives: 3,
+      recoverySeconds: 1.2,
+      shieldChargePerGate: 25,
+    });
+  });
+
   it("creates deterministic, safely spaced opening gates", () => {
     const state = createInitialFlappyState(() => 0.5);
     expect(state.pipes).toHaveLength(2);
@@ -57,11 +74,12 @@ describe("flappy game logic", () => {
     const initial = createInitialFlappyState(() => 0.5);
     expect(initial.lives).toBe(3);
 
-    const ready = { ...initial, shieldGauge: 100, shieldReady: true };
+    const ready = { ...initial, combo: 7, shieldGauge: 100, shieldReady: true };
     const recovered = recoverFlappyState(ready);
     expect(recovered.status).toBe("shield");
     expect(recovered.state.lives).toBe(3);
     expect(recovered.state.shieldReady).toBe(false);
+    expect(recovered.state.combo).toBe(0);
     expect(recovered.state.recoverySeconds).toBe(FLAPPY_CONFIG.recoverySeconds);
   });
 

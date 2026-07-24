@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
@@ -22,7 +23,7 @@ const FLAPPY_BEST_KEY = "eunContents.flappy.best";
 const FLAPPY_STAR_FIELD = [
   [8, 13, 4, "warm"], [18, 30, 3, "cool"], [29, 17, 5, "cool"],
   [42, 34, 3, "warm"], [56, 15, 4, "cool"], [70, 29, 3, "warm"],
-  [84, 12, 5, "cool"], [92, 39, 3, "cool"], [12, 55, 3, "warm"],
+  [80, 24, 5, "cool"], [92, 39, 3, "cool"], [12, 55, 3, "warm"],
   [25, 69, 4, "cool"], [39, 51, 3, "cool"], [53, 78, 5, "warm"],
   [66, 60, 3, "cool"], [79, 73, 4, "cool"], [91, 57, 3, "warm"],
   [17, 88, 4, "cool"], [35, 91, 3, "warm"], [72, 92, 3, "cool"],
@@ -57,16 +58,30 @@ export function FlappyGame({ game }) {
   const [best, setBest] = useState(readBestScore);
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const [actionFeedback, setActionFeedback] = useState(null);
   const phaseRef = useRef(phase);
   const worldRef = useRef(world);
   const bestRef = useRef(best);
   const frameRef = useRef(null);
   const lastFrameRef = useRef(0);
   const resumeAfterDialogRef = useRef(false);
+  const feedbackSequenceRef = useRef(0);
+  const feedbackTimerRef = useRef(null);
 
   phaseRef.current = phase;
   worldRef.current = world;
   bestRef.current = best;
+
+  function showFlightFeedback(feedback) {
+    window.clearTimeout(feedbackTimerRef.current);
+    feedbackSequenceRef.current += 1;
+    const durationMs = feedback.durationMs ?? 880;
+    setActionFeedback({ ...feedback, durationMs, id: feedbackSequenceRef.current });
+    feedbackTimerRef.current = window.setTimeout(() => {
+      feedbackTimerRef.current = null;
+      setActionFeedback(null);
+    }, durationMs + 30);
+  }
 
   function finishGame(finalWorld) {
     phaseRef.current = "over";
@@ -97,6 +112,36 @@ export function FlappyGame({ game }) {
       if (result.scored > 0) {
         playSound("correct");
         vibrate(12);
+        const nextCombo = result.state.combo;
+        if (nextCombo === 5) {
+          showFlightFeedback({
+            comboLabel: "COMBO ×5",
+            durationMs: 1180,
+            label: "GREAT FLIGHT!",
+            variant: "major",
+          });
+        } else if (nextCombo === 10 || (nextCombo > 10 && nextCombo % 5 === 0)) {
+          showFlightFeedback({
+            durationMs: 1220,
+            label: `COMBO ×${nextCombo}`,
+            showStars: true,
+            variant: "major",
+          });
+        } else if (nextCombo === 3) {
+          showFlightFeedback({
+            durationMs: 1020,
+            label: "COMBO ×3",
+            showStars: true,
+            variant: "combo",
+          });
+        } else {
+          showFlightFeedback({
+            durationMs: 780,
+            label: `+${result.scoreGain}`,
+            showStars: false,
+            variant: "compact",
+          });
+        }
       }
 
       if (result.status === "collision") {
@@ -107,6 +152,13 @@ export function FlappyGame({ game }) {
           finishGame(recovery.state);
           return;
         }
+        showFlightFeedback({
+          durationMs: 880,
+          label: recovery.status === "shield" ? "SHIELD SAVE!" : "LIFE -1",
+          showStars: recovery.status === "shield",
+          tone: recovery.status === "shield" ? "neutral" : "negative",
+          variant: "standard",
+        });
         playSound(recovery.status === "shield" ? "success" : "wrong");
         vibrate(recovery.status === "shield" ? [10, 20, 10] : [24, 30, 24]);
       }
@@ -118,7 +170,10 @@ export function FlappyGame({ game }) {
     return () => window.cancelAnimationFrame(frameRef.current);
   }, [phase, playSound]);
 
-  useEffect(() => () => window.cancelAnimationFrame(frameRef.current), []);
+  useEffect(() => () => {
+    window.cancelAnimationFrame(frameRef.current);
+    window.clearTimeout(feedbackTimerRef.current);
+  }, []);
 
   function startGame() {
     const initialWorld = flapFlappyState(createInitialFlappyState());
@@ -127,6 +182,8 @@ export function FlappyGame({ game }) {
     setWorld(initialWorld);
     setDidBreakRecordThisAttempt(false);
     setIsExitOpen(false);
+    setActionFeedback(null);
+    window.clearTimeout(feedbackTimerRef.current);
     setPhase("playing");
     playSound("countdownFinal");
     vibrate(8);
@@ -187,7 +244,7 @@ export function FlappyGame({ game }) {
   const sidebar = (
     <div className="stat-row">
       <div className="stat"><div className="l">Score</div><div className="v">{world.score}</div></div>
-      <div className="stat"><div className="l">Combo</div><div className="v">×{Math.min(world.combo, 3)}</div></div>
+      <div className="stat"><div className="l">Combo</div><div className="v">×{world.combo}</div></div>
       <div className="stat"><div className="l">Lives</div><div className="v">{world.lives}</div></div>
       <div className="stat"><div className="l">Shield</div><div className="v">{world.shieldReady ? "READY" : `${world.shieldGauge}%`}</div></div>
     </div>
@@ -226,7 +283,9 @@ export function FlappyGame({ game }) {
             flap();
           }}
         >
-          <span className="flappy-game__moon" aria-hidden="true" />
+          <svg className="flappy-game__moon" aria-hidden="true" viewBox="0 0 64 64">
+            <path d="M41 5C25 7 15 20 16 34c1 17 15 29 31 26 6-1 11-4 15-9-10 5-23 1-29-9-7-12-3-28 8-37Z" />
+          </svg>
           <span className="flappy-game__stars" aria-hidden="true">
             {FLAPPY_STAR_FIELD.map(([left, top, size, tone], index) => (
               <i
@@ -237,6 +296,7 @@ export function FlappyGame({ game }) {
             ))}
           </span>
           <span className="flappy-game__score" aria-hidden="true">{world.score}</span>
+          <GameActionFeedback feedback={actionFeedback} announce={false} />
 
           {world.pipes.map((pipe) => {
             const gapTop = pipe.gapY - FLAPPY_CONFIG.gapHeight / 2;

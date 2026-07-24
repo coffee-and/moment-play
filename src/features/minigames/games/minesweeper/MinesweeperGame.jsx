@@ -79,14 +79,15 @@ export function MinesweeperGame({ game }) {
     },
   ]);
 
-  function startGame() {
+  function startGame({ preserveStreak = false } = {}) {
     setBoard(createHiddenBoard(SIZE));
     setHasPlantedMines(false);
     setFlagMode(false);
     setIsAnswerRevealed(false);
     setStatus("첫 칸은 항상 안전해요.");
     hint.resetHints();
-    session.start();
+    if (preserveStreak) session.startNextRound();
+    else session.start();
   }
 
   function flagCell(index) {
@@ -166,6 +167,7 @@ export function MinesweeperGame({ game }) {
       failureText="지뢰를 밟았어요. 첫 칸은 다음 판에도 안전하게 시작됩니다."
       game={game}
       hint={hint}
+      onNextRound={() => startGame({ preserveStreak: true })}
       onReset={startGame}
       onStart={startGame}
       onSurrender={revealAnswer}

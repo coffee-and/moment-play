@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
@@ -7,6 +7,7 @@ import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
+import { getStreakCelebrationCopy, NEXT_ROUND_LABEL, useGameStreak } from "../../shared/gameStreak.js";
 import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
 import { formatActiveGameTime, useActiveGameTimer } from "../../shared/hooks/useActiveGameTimer.js";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -153,8 +154,11 @@ function PlayingCard({ card, className = "", onClick, onDoubleClick, source, sty
 export function SolitaireGame({ game }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
+  const gameStreak = useGameStreak();
   const dragRef = useRef(null);
   const suppressClickRef = useRef(false);
+  const phaseRef = useRef("idle");
+  const nextRoundPendingRef = useRef(false);
   const [phase, setPhase] = useState("idle");
   const [difficulty, setDifficulty] = useState(SOLITAIRE_DIFFICULTY.EASY);
   const [board, setBoard] = useState(() => dealSolitaire());
@@ -170,6 +174,7 @@ export function SolitaireGame({ game }) {
   const difficultyRecord = records[difficulty] ?? EMPTY_DIFFICULTY_RECORD;
   const time = formatActiveGameTime(elapsedMs);
   const suggestedMove = findSolitaireHint(board);
+  const streakCopy = getStreakCelebrationCopy(gameStreak.completionStreak);
   const suggestedCardLabel = suggestedMove?.card
     ? `${getSolitaireRankLabel(suggestedMove.card.rank)} ${suggestedMove.card.symbol}`
     : null;
@@ -200,7 +205,8 @@ export function SolitaireGame({ game }) {
       },
   ] : []);
 
-  function startGame(nextDifficulty = difficulty) {
+  function startGame(nextDifficulty = difficulty, { preserveStreak = false } = {}) {
+    gameStreak.beginRound({ preserveStreak });
     setDifficulty(nextDifficulty);
     setBoard(dealSolitaire());
     setMoves(0);
@@ -209,12 +215,16 @@ export function SolitaireGame({ game }) {
     setIsExitOpen(false);
     setIsNewGameOpen(false);
     setPhase("playing");
+    phaseRef.current = "playing";
     hint.resetHints();
     resetTimer();
     playSound("countdownFinal");
   }
 
   function completeGame(finalBoard) {
+    if (phaseRef.current !== "playing") return;
+    phaseRef.current = "completed";
+    gameStreak.recordSuccess();
     const finalSeconds = Math.max(1, Math.floor(elapsedMs / 1000));
     const currentRecord = records[difficulty] ?? EMPTY_DIFFICULTY_RECORD;
     const didBreakRecord = isNewGameRecord({
@@ -236,6 +246,18 @@ export function SolitaireGame({ game }) {
     setPhase("completed");
     saveSolitaireRecords(nextRecords);
     playSound("clear");
+  }
+
+  function chooseDifficulty() {
+    gameStreak.disqualifyRound();
+    phaseRef.current = "idle";
+    setPhase("idle");
+  }
+
+  function startNextRound() {
+    if (nextRoundPendingRef.current) return;
+    nextRoundPendingRef.current = true;
+    startGame(difficulty, { preserveStreak: true });
   }
 
   function applyMove(source, destination) {
@@ -333,6 +355,12 @@ export function SolitaireGame({ game }) {
     if (phase === "idle" || phase === "completed") navigate("/");
     else setIsExitOpen(true);
   }
+
+  phaseRef.current = phase;
+
+  useEffect(() => {
+    if (phase === "playing") nextRoundPendingRef.current = false;
+  }, [phase]);
 
   function isHintSource(source) {
     const hintSource = hint.currentStep?.source;
@@ -533,15 +561,23 @@ export function SolitaireGame({ game }) {
 
       {phase === "completed" ? (
         <GameStageOverlay state="completed">
-          <GameStageModal className="solitaire-game__modal" role="dialog" aria-modal="true" aria-labelledby="solitaire-complete-title">
+          <GameStageModal
+            celebrationStreak={gameStreak.completionStreak}
+            className="solitaire-game__modal"
+            showCompletionStars
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="solitaire-complete-title"
+          >
             <GameRecordCelebration isNewRecord={isNewRecord} />
             <div className="game-stage-modal__eyebrow">{isNewRecord ? "NEW RECORD" : "SOLITAIRE CLEAR"}</div>
-            <h3 id="solitaire-complete-title">카드 정리를 완료했어요!</h3>
+            <h3 id="solitaire-complete-title">{streakCopy.title}</h3>
+            <p>{streakCopy.subtitle}</p>
             <p>{DIFFICULTY_COPY[difficulty].label} 모드 · {time} · {moves}번 이동</p>
             {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
             <div className="game-stage-modal__actions">
-              <Button onClick={() => startGame(difficulty)}>같은 난이도 다시</Button>
-              <Button variant="secondary" onClick={() => setPhase("idle")}>난이도 선택</Button>
+              <Button onClick={startNextRound}>{NEXT_ROUND_LABEL}</Button>
+              <Button variant="secondary" onClick={chooseDifficulty}>난이도 선택</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -569,7 +605,10 @@ export function SolitaireGame({ game }) {
             <p>현재 카드 진행은 저장되지 않아요.</p>
             <div className="game-stage-modal__actions">
               <Button onClick={() => setIsExitOpen(false)}>계속하기</Button>
-              <Button variant="secondary" onClick={() => navigate("/")}>게임 나가기</Button>
+              <Button variant="secondary" onClick={() => {
+                gameStreak.disqualifyRound();
+                navigate("/");
+              }}>게임 나가기</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>

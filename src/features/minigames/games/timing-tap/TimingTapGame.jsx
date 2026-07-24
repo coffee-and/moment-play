@@ -194,7 +194,7 @@ export function TimingTapGame({ game }) {
       <div className="stat-row">
       <div className="stat"><div className="l">Round</div><div className="v">{Math.min(round, TIMING_TAP_ROUNDS)}/{TIMING_TAP_ROUNDS}</div></div>
       <div className="stat"><div className="l">Score</div><div className="v">{score}</div></div>
-      <div className="stat"><div className="l">Combo</div><div className="v">×{Math.max(1, perfectCombo)}</div></div>
+      <div className="stat"><div className="l">Combo</div><div className="v">×{perfectCombo}</div></div>
       <div className="stat"><div className="l">Focus</div><div className="v">{focusGauge}%</div></div>
     </div>
   );
@@ -229,8 +229,14 @@ export function TimingTapGame({ game }) {
           <span className="timing-tap__track-line" />
           <GameActionFeedback
             announce={false}
-            feedback={phase === "feedback" && result?.grade === "PERFECT" && perfectCombo >= 2
-              ? { id: round, combo: perfectCombo }
+            feedback={phase === "feedback" && result?.grade === "PERFECT"
+              ? {
+                id: round,
+                label: perfectCombo >= 2 ? `PERFECT ×${perfectCombo}` : "PERFECT!",
+                durationMs: perfectCombo >= 2 ? 1080 : 840,
+                showStars: perfectCombo >= 2,
+                variant: perfectCombo >= 2 ? "combo" : "standard",
+              }
               : null}
           />
         </div>

@@ -4,6 +4,7 @@ import {
   canPlaceBlockPiece,
   createBlockBoard,
   findBestBlockMove,
+  getNextBlockBlastCombo,
   hasBlockMove,
   placeBlockPiece,
 } from "./blockBlast.logic.js";
@@ -42,5 +43,11 @@ describe("Block Blast rules", () => {
 
     expect(move).toMatchObject({ pieceIndex: 0, row: 0, col: 5 });
     expect(result.clearedLines).toBe(1);
+  });
+
+  it("resets a clear combo after a valid placement that removes no line", () => {
+    expect(getNextBlockBlastCombo(3, 0)).toBe(0);
+    expect(getNextBlockBlastCombo(0, 1)).toBe(1);
+    expect(getNextBlockBlastCombo(2, 2)).toBe(3);
   });
 });

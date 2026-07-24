@@ -48,6 +48,18 @@ afterEach(() => {
 });
 
 describe("FlappyGame input surface", () => {
+  it("renders one clean crescent path and keeps the fish built from local CSS parts", () => {
+    const view = renderGame();
+    const moon = view.host.querySelector("svg.flappy-game__moon");
+
+    expect(moon).not.toBeNull();
+    expect(moon.querySelectorAll("path")).toHaveLength(1);
+    expect(moon.querySelectorAll("circle")).toHaveLength(0);
+    expect(view.host.querySelector(".flappy-game__bird-core")).not.toBeNull();
+    expect(view.host.querySelector(".flappy-game__bird-tail")).not.toBeNull();
+    view.unmount();
+  });
+
   it("keeps pointer and keyboard controls while preserving a keyboard-focusable surface", () => {
     const view = renderGame();
     const surface = view.host.querySelector('[role="application"]');

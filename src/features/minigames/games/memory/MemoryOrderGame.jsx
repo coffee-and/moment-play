@@ -39,7 +39,7 @@ export const MEMORY_TIMING = {
   // visible, with card input still disabled, after the sequence preview ends
   // and before the player's turn (PHASE.PLAYING) begins.
   INPUT_GUIDE_DURATION_MS: 1200,
-  CORRECT_FEEDBACK_MS: 520,
+  CORRECT_FEEDBACK_MS: 720,
 };
 
 // PHASE.PREVIEW / PHASE.TURN_READY / PHASE.CLEARED correspond to the
@@ -810,18 +810,25 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
               aria-live="assertive"
             >
               <p className="memory-game__transition-title">ROUND {round} CLEAR!</p>
+              {combo >= 2 ? <p className="memory-game__transition-copy">{combo} COMBO</p> : null}
             </GameStageModal>
           ) : null}
 
           {phase === PHASE.REPLAYING && !isExitConfirmOpen ? (
-            <GameStageModal className="memory-game__transition-view" role="status" aria-live="assertive">
-              <p className="memory-game__transition-title">다시 보기 발동!</p>
+            <GameStageModal className="memory-game__transition-view memory-game__transition-view--replay" role="status" aria-live="assertive">
+              <p className="memory-game__transition-title">REPLAY!</p>
               <p className="memory-game__transition-copy">같은 라운드를 한 번 더 보여드릴게요.</p>
             </GameStageModal>
           ) : null}
 
           {phase === PHASE.COMPLETED && !isExitConfirmOpen ? (
-            <GameStageModal className="memory-game__state-view" role="dialog" aria-modal="true">
+            <GameStageModal
+              celebrationStreak={Math.max(1, combo)}
+              className="memory-game__state-view"
+              showCompletionStars
+              role="dialog"
+              aria-modal="true"
+            >
               <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
               <h3 className="memory-game__state-title">10 ROUND CLEAR!</h3>
               <p>{formatStarRating(getStarRating(1, { mistakes, maxMistakesForThree: 1 }))} · {score}점</p>
