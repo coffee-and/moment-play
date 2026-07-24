@@ -1,0 +1,68 @@
+/*
+ * Keep the existing Star Flight palette while giving the player character a
+ * readable fish silhouette: a long tapered body, a smaller joined tail and a
+ * subtle lower fin. The collision box and gameplay values are unchanged.
+ */
+
+.flappy-game .flappy-game__bird {
+  width: clamp(38px, 5.8vw, 54px);
+  aspect-ratio: 2.12;
+  filter: drop-shadow(0 0 11px color-mix(in oklab, var(--flappy-glow) 48%, transparent));
+}
+
+.flappy-game .flappy-game__bird-core {
+  z-index: 2;
+  inset: 18% 3% 18% 25%;
+  overflow: hidden;
+  border-radius: 62% 88% 88% 62% / 50% 50% 50% 50%;
+  background: var(--flappy-fish);
+  box-shadow:
+    inset -4px -3px 0 color-mix(in oklab, var(--flappy-sky-deep) 9%, transparent),
+    inset 3px 3px 0 color-mix(in oklab, var(--palette-white) 13%, transparent);
+  clip-path: polygon(0 17%, 66% 3%, 100% 50%, 66% 97%, 0 83%, 8% 50%);
+}
+
+.flappy-game .flappy-game__bird-core::after {
+  top: 31%;
+  right: 17%;
+  width: clamp(3px, .46vw, 4px);
+  border: 1px solid color-mix(in oklab, var(--palette-white) 42%, transparent);
+  background: #08112b;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--flappy-sky-deep) 18%, transparent);
+}
+
+.flappy-game .flappy-game__bird-tail {
+  z-index: 1;
+  top: 24%;
+  left: 1%;
+  width: 31%;
+  height: 52%;
+  border-radius: 8px 0 0 8px;
+  background: var(--flappy-tail);
+  clip-path: polygon(100% 50%, 8% 0, 20% 49%, 8% 100%);
+  filter: drop-shadow(-1px 1px 2px color-mix(in oklab, var(--flappy-sky-deep) 18%, transparent));
+}
+
+.flappy-game .flappy-game__bird-wing {
+  z-index: 3;
+  top: 57%;
+  left: 51%;
+  width: 22%;
+  height: 24%;
+  border-radius: 70% 22% 72% 28%;
+  background: var(--flappy-wing);
+  clip-path: polygon(0 0, 100% 25%, 18% 100%);
+  transform-origin: 16% 16%;
+  animation: flappy-fish-fin .48s ease-in-out infinite alternate;
+}
+
+@keyframes flappy-fish-fin {
+  from { transform: rotate(5deg) scaleY(.9); }
+  to { transform: rotate(-6deg) scaleY(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flappy-game .flappy-game__bird-wing {
+    animation: none;
+  }
+}
