@@ -1,0 +1,183 @@
+/*
+ * One shared play-screen shell for every GameStage consumer.
+ *
+ * Previous recovery styles listed a handful of game root class names. That
+ * meant new or omitted games silently fell back to the old dashboard layout.
+ * These rules target the GameStage contract itself so every current and future
+ * minigame receives the same compact HUD and board-first hierarchy.
+ */
+
+section.game-stage .game-stage__inner {
+  --stage-card-min-height: 0px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+section.game-stage .game-stage__side {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+section.game-stage .game-stage__copy,
+section.game-stage .game-stage__side > .board-motif {
+  display: none;
+}
+
+section.game-stage .game-stage__sidebar {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+
+section.game-stage .game-stage__sidebar:empty,
+section.game-stage .game-stage__side:not(:has(.game-stage__sidebar > *)) {
+  display: none;
+}
+
+/* Compact shared HUD — no separate dashboard cards. */
+section.game-stage .game-stage__sidebar .stat-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 0;
+  background: var(--line);
+  box-shadow: none;
+}
+
+section.game-stage .game-stage__sidebar .stat {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  justify-content: center;
+  gap: 2px;
+  border: 0;
+  border-radius: 0;
+  padding: 7px 12px;
+  background: var(--stage-card-surface);
+  box-shadow: none;
+}
+
+section.game-stage .game-stage__sidebar .stat .l {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .085em;
+}
+
+section.game-stage .game-stage__sidebar .stat .v {
+  overflow: hidden;
+  color: var(--text);
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.12;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+section.game-stage .game-stage__sidebar .stat .v small {
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+section.game-stage .game-stage__side-note {
+  margin: 0 2px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+/* The board/play area is the primary surface on every game route. */
+section.game-stage .game-stage__play {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--stage-card-border);
+  border-radius: 20px;
+  padding: clamp(13px, 1.8vw, 22px);
+  background: var(--stage-card-surface);
+  box-shadow: none;
+}
+
+section.game-stage .game-stage__content {
+  min-height: 0;
+  justify-content: flex-start;
+  gap: 11px;
+}
+
+/* These values already exist in the shared HUD and must not be repeated. */
+section.game-stage .game-2048__meta,
+section.game-stage .sudoku-game__meta {
+  display: none;
+}
+
+/* Keep header controls compact and consistent across every game. */
+section.game-stage .game-stage__topbar {
+  min-height: 52px;
+  padding-bottom: 12px;
+}
+
+section.game-stage .game-stage__topbar-actions,
+section.game-stage .game-stage__topbar-game-actions,
+section.game-stage .game-stage__inline-actions {
+  gap: 8px;
+}
+
+section.game-stage .game-stage__topbar-game-actions .button {
+  min-height: 40px;
+  padding-inline: 12px;
+}
+
+@media (max-width: 620px) {
+  section.game-stage .game-stage__inner {
+    gap: 8px;
+  }
+
+  section.game-stage .game-stage__sidebar .stat-row {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  section.game-stage .game-stage__sidebar .stat-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  section.game-stage .game-stage__sidebar .stat {
+    min-width: 96px;
+    min-height: 48px;
+    flex: 1 0 96px;
+    padding: 6px 9px;
+  }
+
+  section.game-stage .game-stage__sidebar .stat .v {
+    font-size: 16px;
+  }
+
+  section.game-stage .game-stage__side-note {
+    display: none;
+  }
+
+  section.game-stage .game-stage__play {
+    border-radius: 16px;
+    padding: 10px;
+  }
+
+  section.game-stage .game-stage__topbar {
+    min-height: 48px;
+    padding-bottom: 9px;
+  }
+}
