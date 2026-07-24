@@ -6,11 +6,15 @@ function readStyle(relativePath) {
 }
 
 describe("motion accessibility styles", () => {
-  it("keeps action feedback non-blocking and provides a reduced-motion fallback", () => {
+  it("keeps action feedback non-blocking, badge-free, and provides a reduced-motion fallback", () => {
     const css = readStyle("./styles/game-action-feedback.css");
     expect(css).toContain("pointer-events: none");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");
     expect(css).toContain("game-action-feedback-fade");
+    expect(css).not.toContain("backdrop-filter");
+    expect(css).not.toContain("border-radius: 999px");
+    expect(css).toContain("background: transparent");
+    expect(css).toContain("game-action-star-sparkle");
   });
 
   it("caps completion decoration motion with a reduced-motion fade", () => {
