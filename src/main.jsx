@@ -5,6 +5,8 @@ import { Router } from './routes/router.jsx';
 import { initializeTheme } from './shared/theme/theme.js';
 import './styles.css';
 import './features/minigames/shared/styles/minigame-ui-recovery.css';
+import './features/minigames/shared/styles/game-action-feedback-tuning.css';
+import './features/minigames/games/flappy/flappy-fish-refresh.css';
 
 initializeTheme();
 
