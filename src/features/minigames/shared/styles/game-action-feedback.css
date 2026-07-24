@@ -367,3 +367,23 @@
     transform: none;
   }
 }
+
+/* Keep the Star Flight tail visible and make the small fin read as a fin, not an insect wing. */
+.flappy-game .flappy-game__bird-tail {
+  z-index: 0;
+}
+
+.flappy-game .flappy-game__bird-core,
+.flappy-game .flappy-game__bird-wing {
+  z-index: 1;
+}
+
+.flappy-game .flappy-game__bird-wing {
+  animation-name: flappy-fin-float;
+  animation-duration: .48s;
+}
+
+@keyframes flappy-fin-float {
+  from { transform: rotate(8deg) scaleY(.88); }
+  to { transform: rotate(-7deg) scaleY(1.02); }
+}
