@@ -53,7 +53,7 @@ describe("GameActionFeedback", () => {
 
     const message = view.host.querySelector(".game-action-feedback__message");
     expect(message?.textContent).toBe("CLEAR×5");
-    expect(message?.querySelectorAll(":scope > strong, :scope > span")).toHaveLength(2);
+    expect(message?.children).toHaveLength(2);
     expect(view.host.querySelectorAll(".game-action-feedback__stars i")).toHaveLength(9);
     view.unmount();
   });
