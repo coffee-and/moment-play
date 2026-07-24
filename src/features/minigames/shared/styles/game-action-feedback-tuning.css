@@ -1,0 +1,81 @@
+/* A small intensity pass: brighter and more tactile without increasing the footprint. */
+
+.game-stage .game-action-feedback__message {
+  animation: game-feedback-message-bounce var(--game-action-feedback-duration, 820ms) cubic-bezier(.18, .78, .22, 1) both;
+  filter:
+    drop-shadow(0 3px 7px color-mix(in oklab, var(--palette-neutral-900) 28%, transparent))
+    drop-shadow(0 0 9px color-mix(in oklab, var(--game-effect-perfect) 25%, transparent));
+}
+
+.game-stage .game-action-feedback strong,
+.game-stage .game-action-feedback__combo {
+  text-shadow:
+    0 1px 0 color-mix(in oklab, var(--palette-white) 94%, transparent),
+    0 0 8px color-mix(in oklab, var(--game-effect-perfect) 82%, transparent),
+    0 0 19px color-mix(in oklab, var(--game-color-yellow) 55%, transparent);
+}
+
+.game-stage .game-action-feedback__rings i {
+  border-width: 2px;
+  box-shadow:
+    0 0 12px color-mix(in oklab, var(--game-effect-perfect) 48%, transparent),
+    0 0 24px color-mix(in oklab, var(--game-color-yellow) 22%, transparent),
+    inset 0 0 10px color-mix(in oklab, var(--game-color-yellow) 24%, transparent);
+}
+
+.game-stage .game-action-feedback__burst i {
+  width: 3px;
+  --ray-length: 22px;
+  box-shadow:
+    0 0 6px color-mix(in oklab, var(--game-effect-perfect) 72%, transparent),
+    0 0 11px color-mix(in oklab, var(--game-color-yellow) 38%, transparent);
+}
+
+.game-stage .game-action-feedback__stars i {
+  font-size: calc(var(--particle-size, 10px) * 1.2);
+  filter:
+    drop-shadow(0 0 5px color-mix(in oklab, var(--game-effect-perfect) 82%, transparent))
+    drop-shadow(0 0 10px color-mix(in oklab, var(--game-color-yellow) 35%, transparent));
+}
+
+.game-stage .game-action-feedback.is-major .game-action-feedback__rings i:first-child {
+  width: 58px;
+  height: 58px;
+}
+
+.game-stage .game-action-feedback.is-major .game-action-feedback__rings i:nth-child(2) {
+  width: 84px;
+  height: 84px;
+}
+
+.game-stage .game-action-feedback.is-major .game-action-feedback__burst i {
+  --ray-length: 29px;
+}
+
+@keyframes game-feedback-message-bounce {
+  0% { opacity: 0; transform: scale(.78); }
+  24% { opacity: 1; transform: scale(1.16); }
+  48% { transform: scale(.97); }
+  68% { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 620px) {
+  .game-stage .game-action-feedback__burst i {
+    --ray-length: 18px;
+  }
+
+  .game-stage .game-action-feedback.is-major .game-action-feedback__burst i {
+    --ray-length: 23px;
+  }
+
+  .game-stage .game-action-feedback__stars i {
+    font-size: calc(var(--particle-size, 10px) * 1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-stage .game-action-feedback__message {
+    animation: none;
+  }
+}
