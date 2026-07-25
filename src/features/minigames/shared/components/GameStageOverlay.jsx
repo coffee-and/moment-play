@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import '../styles/game-stage-responsive-actions.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
 import { CompletionStars } from './CompletionStars.jsx';
-import { BuiltInCelebrationProvider, GameCelebration } from './GameCelebration.jsx';
+import { GameCelebrationProvider } from './GameCelebration.jsx';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -90,10 +90,9 @@ export function GameStageModal({
       {...props}
     >
       {showCompletionStars ? <CompletionStars streak={celebrationStreak} /> : null}
-      {showCelebration ? <GameCelebration /> : null}
-      <BuiltInCelebrationProvider enabled={showCelebration}>
+      <GameCelebrationProvider enabled={showCelebration}>
         {Children.map(children, addActionCount)}
-      </BuiltInCelebrationProvider>
+      </GameCelebrationProvider>
     </div>
   );
 }
