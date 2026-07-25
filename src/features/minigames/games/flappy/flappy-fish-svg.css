@@ -33,28 +33,28 @@
 
 .flappy-fish-svg__tail {
   z-index: 1;
-  top: 18%;
-  left: -10%;
-  width: 50%;
-  height: 55%;
+  top: 11%;
+  left: -2%;
+  width: 44%;
+  height: 76%;
   transform-origin: 91% 50%;
   animation: flappy-fish-tail-sway .56s ease-in-out infinite alternate;
 }
 
 .flappy-fish-svg__body {
   z-index: 2;
-  top: 12%;
-  left: 24%;
-  width: 73%;
+  top: 17%;
+  left: 30%;
+  width: 67%;
   height: auto;
 }
 
 .flappy-fish-svg__wing {
   z-index: 3;
-  top: 22%;
-  left: 34%;
-  width: 48%;
-  height: 50%;
+  top: 14%;
+  left: 35%;
+  width: 53%;
+  height: 70%;
   transform-origin: 90% 50%;
   animation: flappy-fish-fin-float .42s ease-in-out infinite alternate;
 }
