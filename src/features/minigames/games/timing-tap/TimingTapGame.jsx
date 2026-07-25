@@ -5,6 +5,7 @@ import { Button } from "../../../../shared/components/Button.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
+import { GameCelebration } from "../../shared/components/GameCelebration.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
@@ -272,6 +273,7 @@ export function TimingTapGame({ game }) {
             aria-modal="true"
             aria-labelledby="timing-complete-title"
           >
+            <GameCelebration />
             <div className="game-stage-modal__eyebrow">REACTION COMPLETE</div>
             <h3 id="timing-complete-title">{score}점</h3>
             <p>{formatStarRating(starRating)} · 10라운드 평균 {average}점 · 최고 {Math.max(best, score)}점</p>
