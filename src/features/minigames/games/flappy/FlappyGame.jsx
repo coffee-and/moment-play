@@ -260,6 +260,11 @@ export function FlappyGame({ game }) {
     </div>
   );
 
+  const starRating = formatStarRating(getStarRating(Math.min(1, world.score / 1000), {
+    mistakes: FLAPPY_CONFIG.initialLives - world.lives,
+    maxMistakesForThree: 1,
+  }));
+
   return (
     <GameStage
       actions={actions}
@@ -297,7 +302,6 @@ export function FlappyGame({ game }) {
               />
             ))}
           </span>
-          <span className="flappy-game__score" aria-hidden="true">{world.score}</span>
           <GameActionFeedback feedback={actionFeedback} announce={false} />
 
           {world.pipes.map((pipe) => {
@@ -327,28 +331,6 @@ export function FlappyGame({ game }) {
           >
             <FlappyFish />
           </span>
-
-          {phase !== "playing" && phase !== "idle" ? (
-            <div className="flappy-game__curtain">
-              <GameRecordCelebration compact isNewRecord={phase === "over" && didBreakRecordThisAttempt} />
-              <span className="flappy-game__curtain-kicker">
-                {phase === "paused" ? "PAUSED" : phase === "over" ? "FLIGHT ENDED" : "READY TO FLY"}
-              </span>
-              <strong>
-                {phase === "over"
-                  ? `${formatStarRating(getStarRating(Math.min(1, world.score / 1000), { mistakes: FLAPPY_CONFIG.initialLives - world.lives, maxMistakesForThree: 1 }))} ${world.score}점`
-                  : phase === "paused" ? "잠시 쉬어갈까요?" : "별빛 사이를 날아보세요"}
-              </strong>
-              <p>
-                {phase === "over"
-                  ? `최고 기록 ${Math.max(best, world.score)}점`
-                  : "화면을 탭하거나 Space·Enter를 눌러 날개를 펼쳐요."}
-              </p>
-              <Button onClick={phase === "paused" ? resumeGame : startGame}>
-                {phase === "paused" ? "계속하기" : phase === "over" ? "다시 비행" : "비행 시작"}
-              </Button>
-            </div>
-          ) : null}
         </div>
         <p className="flappy-game__hint">탭할 때마다 위로 날아요 · 기둥과 천장·바닥을 피하세요</p>
       </div>
@@ -361,6 +343,36 @@ export function FlappyGame({ game }) {
             <h3 id="flappy-start-title">별빛 사이를 날아보세요</h3>
             <p>화면을 탭하거나 Space·Enter를 눌러 날개를 펼쳐요.</p>
             <Button onClick={startGame}>비행 시작</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
+
+      {phase === "paused" && !isExitOpen ? (
+        <GameStageOverlay state="paused">
+          <GameStageModal role="dialog" aria-modal="true" aria-labelledby="flappy-pause-title">
+            <div className="game-stage-modal__eyebrow">PAUSED</div>
+            <h3 id="flappy-pause-title">잠시 쉬어갈까요?</h3>
+            <p>화면을 탭하거나 Space·Enter를 눌러 다시 날아오를 수 있어요.</p>
+            <Button onClick={resumeGame}>계속하기</Button>
+          </GameStageModal>
+        </GameStageOverlay>
+      ) : null}
+
+      {phase === "over" ? (
+        <GameStageOverlay state="result">
+          <GameStageModal
+            celebrationStreak={didBreakRecordThisAttempt ? 1 : 0}
+            showCelebration={didBreakRecordThisAttempt}
+            showCompletionStars={didBreakRecordThisAttempt}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="flappy-result-title"
+          >
+            <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
+            <div className="game-stage-modal__eyebrow">FLIGHT ENDED</div>
+            <h3 id="flappy-result-title">{starRating} {world.score}점</h3>
+            <p>최고 기록 {Math.max(best, world.score)}점</p>
+            <Button onClick={startGame}>다시 비행</Button>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}
