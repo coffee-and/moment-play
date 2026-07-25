@@ -135,8 +135,7 @@
   transform: translateY(9px) scale(0.97);
 }
 
-.timing-tap__feedback,
-.timing-tap__complete {
+.timing-tap__feedback {
   display: grid;
   justify-items: center;
   gap: 8px;
@@ -145,8 +144,7 @@
   text-align: center;
 }
 
-.timing-tap__feedback strong,
-.timing-tap__complete > strong {
+.timing-tap__feedback strong {
   color: var(--game-effect-perfect);
   font-family: var(--font);
   font-size: clamp(38px, 7vw, 58px);
@@ -155,14 +153,9 @@
   animation: timing-score-pop 0.34s ease-out;
 }
 
-.timing-tap__feedback span,
-.timing-tap__complete span {
+.timing-tap__feedback span {
   color: var(--muted);
   font-size: 13px;
-}
-
-.timing-tap__complete .button {
-  margin-top: 8px;
 }
 
 @keyframes timing-score-pop {
@@ -197,8 +190,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .timing-tap__feedback strong,
-  .timing-tap__complete > strong {
+  .timing-tap__feedback strong {
     animation: none;
   }
 }
