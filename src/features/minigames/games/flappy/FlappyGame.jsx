@@ -9,7 +9,7 @@ import { GameRecordCelebration } from "../../shared/components/GameRecordCelebra
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
-import { FlappyFish, FLAPPY_FISH_SKINS } from "./FlappyFish.jsx";
+import { FlappyFish } from "./FlappyFish.jsx";
 import {
   FLAPPY_CONFIG,
   advanceFlappyState,
@@ -20,7 +20,6 @@ import {
 import "./flappy-game.css";
 
 const FLAPPY_BEST_KEY = "eunContents.flappy.best";
-const FLAPPY_FISH_SKIN_KEY = "eunContents.flappy.fishSkin";
 
 const FLAPPY_STAR_FIELD = [
   [8, 13, 4, "warm"], [18, 30, 3, "cool"], [29, 17, 5, "cool"],
@@ -48,23 +47,6 @@ function writeBestScore(score) {
   }
 }
 
-function readFishSkin() {
-  try {
-    const savedSkin = window.localStorage.getItem(FLAPPY_FISH_SKIN_KEY);
-    return FLAPPY_FISH_SKINS[savedSkin] ? savedSkin : "blue";
-  } catch {
-    return "blue";
-  }
-}
-
-function writeFishSkin(skin) {
-  try {
-    window.localStorage.setItem(FLAPPY_FISH_SKIN_KEY, skin);
-  } catch {
-    return;
-  }
-}
-
 function vibrate(pattern) {
   globalThis.navigator?.vibrate?.(pattern);
 }
@@ -75,7 +57,6 @@ export function FlappyGame({ game }) {
   const [phase, setPhase] = useState("idle");
   const [world, setWorld] = useState(createInitialFlappyState);
   const [best, setBest] = useState(readBestScore);
-  const [fishSkin, setFishSkin] = useState(readFishSkin);
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
   const [actionFeedback, setActionFeedback] = useState(null);
@@ -91,13 +72,6 @@ export function FlappyGame({ game }) {
   phaseRef.current = phase;
   worldRef.current = world;
   bestRef.current = best;
-
-  function selectFishSkin(nextSkin) {
-    if (!FLAPPY_FISH_SKINS[nextSkin]) return;
-    setFishSkin(nextSkin);
-    writeFishSkin(nextSkin);
-    playSound("tap");
-  }
 
   function showFlightFeedback(feedback) {
     window.clearTimeout(feedbackTimerRef.current);
@@ -351,7 +325,7 @@ export function FlappyGame({ game }) {
             }}
             aria-hidden="true"
           >
-            <FlappyFish skin={fishSkin} />
+            <FlappyFish />
           </span>
 
           {phase !== "playing" && phase !== "idle" ? (
@@ -385,22 +359,6 @@ export function FlappyGame({ game }) {
             <GameStageDoodle variant="start" />
             <div className="game-stage-modal__eyebrow">ARCADE / FLIGHT</div>
             <h3 id="flappy-start-title">별빛 사이를 날아보세요</h3>
-            <p>함께 날아갈 물고기를 골라주세요.</p>
-            <div className="flappy-game__skin-picker" role="radiogroup" aria-label="물고기 색상 선택">
-              {Object.entries(FLAPPY_FISH_SKINS).map(([skin, option]) => (
-                <button
-                  aria-checked={fishSkin === skin}
-                  className={`flappy-game__skin-option${fishSkin === skin ? " is-selected" : ""}`}
-                  key={skin}
-                  onClick={() => selectFishSkin(skin)}
-                  role="radio"
-                  type="button"
-                >
-                  <FlappyFish className="flappy-game__skin-preview" skin={skin} />
-                  <span>{option.label}</span>
-                </button>
-              ))}
-            </div>
             <p>화면을 탭하거나 Space·Enter를 눌러 날개를 펼쳐요.</p>
             <Button onClick={startGame}>비행 시작</Button>
           </GameStageModal>
