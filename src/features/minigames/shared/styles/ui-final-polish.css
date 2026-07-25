@@ -52,18 +52,3 @@ a:focus:not(:focus-visible),
 .game-stage-modal button {
   box-shadow: var(--home-button-shadow);
 }
-
-section.game-stage.flappy-game .flappy-game__bird,
-section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
-  width: clamp(28px, 4.4vw, 36px);
-  aspect-ratio: 430 / 220;
-  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-glow) 38%, transparent));
-}
-
-@media (max-width: 700px) {
-  section.game-stage.flappy-game .flappy-game__bird,
-  section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
-    width: clamp(28px, 7.4vw, 32px);
-    aspect-ratio: 430 / 220;
-  }
-}
