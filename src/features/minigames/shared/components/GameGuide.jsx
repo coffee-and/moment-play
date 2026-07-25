@@ -24,20 +24,7 @@ export function GameGuideContent({ compact = false, guide }) {
         <p>{description}</p>
         <section className="game-guide-walkthrough" aria-label="게임 방법 단계">
           <div className="game-guide-walkthrough__header">
-            <strong>{stepIndex + 1} / {steps.length}</strong>
-            <div className="game-guide-walkthrough__steps" role="group" aria-label="설명 단계 선택">
-              {steps.map((step, index) => (
-                <button
-                  aria-current={index === stepIndex ? "step" : undefined}
-                  aria-label={`${index + 1}단계 보기`}
-                  key={step}
-                  onClick={() => setStepIndex(index)}
-                  type="button"
-                >
-                  {index + 1}
-                </button>
-              ))}
-            </div>
+            <strong aria-live="polite">{stepIndex + 1} / {steps.length}</strong>
           </div>
           <p aria-live="polite">{steps[stepIndex]}</p>
           <GameGuideExample type={guide?.examples?.[stepIndex] ?? guide?.example} />
