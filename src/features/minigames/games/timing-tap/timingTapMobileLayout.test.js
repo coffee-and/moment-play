@@ -20,9 +20,10 @@ describe("Timing Tap mobile layout", () => {
     expect(css).toContain("padding-top: 30px");
   });
 
-  it("continues to use the shared start and record modal components", () => {
+  it("uses the shared start and victory celebration components", () => {
     expect(component).toContain('<GameStageDoodle variant="start" />');
-    expect(component).toContain("<GameRecordCelebration compact");
+    expect(component).toContain("<GameCelebration compact />");
+    expect(component).not.toContain("GameRecordCelebration");
     expect(component).toContain("<GameStageModal");
   });
 });
