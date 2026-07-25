@@ -1,8 +1,8 @@
-import { GameCelebration, useHasBuiltInCelebration } from "./GameCelebration.jsx";
+import { GameCelebration, useGameCelebrationState } from "./GameCelebration.jsx";
 
 export function GameRecordCelebration({ isNewRecord, compact = false }) {
-  const hasBuiltInCelebration = useHasBuiltInCelebration();
-  if (!isNewRecord || hasBuiltInCelebration) return null;
+  const isVictory = useGameCelebrationState();
+  if (!isNewRecord && !isVictory) return null;
 
   return (
     <GameCelebration
