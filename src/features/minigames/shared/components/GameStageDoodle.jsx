@@ -1,15 +1,11 @@
-import countdownCheer from "../assets/doodles/countdown-cheer.svg";
 import gameOverFace from "../assets/doodles/game-over-face.svg";
 import gameOverFacepalm from "../assets/doodles/game-over-facepalm.svg";
 import recordCelebration from "../assets/doodles/record-celebration.svg";
 import recordHeart from "../assets/doodles/record-heart.svg";
 import recordYeah from "../assets/doodles/record-yeah.svg";
+import startFace from "../assets/doodles/start-face.svg";
+import startHands from "../assets/doodles/start-hands.svg";
 import "./game-stage-doodle.css";
-
-const SINGLE_DOODLE_ASSETS = {
-  countdown: countdownCheer,
-  start: countdownCheer,
-};
 
 function DoodleArt({ asset, part }) {
   return (
@@ -48,12 +44,14 @@ export function GameStageDoodle({ variant, className = "" }) {
     );
   }
 
-  const asset = SINGLE_DOODLE_ASSETS[variant];
-  if (!asset) return null;
+  if (variant === "start" || variant === "countdown") {
+    return (
+      <span aria-hidden="true" className={classes} data-doodle-variant={variant}>
+        <DoodleArt asset={startHands} part="start-hands" />
+        <DoodleArt asset={startFace} part="start-face" />
+      </span>
+    );
+  }
 
-  return (
-    <span aria-hidden="true" className={classes} data-doodle-variant={variant}>
-      <DoodleArt asset={asset} part={variant} />
-    </span>
-  );
+  return null;
 }
