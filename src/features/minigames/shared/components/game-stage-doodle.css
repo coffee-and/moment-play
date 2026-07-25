@@ -17,10 +17,32 @@
 
 .game-stage-doodle[data-doodle-variant="countdown"],
 .game-stage-doodle[data-doodle-variant="start"] {
-  width: clamp(118px, 32vw, 154px);
+  width: clamp(132px, 35vw, 172px);
   aspect-ratio: 332 / 220;
   margin: 0 auto 2px;
   animation: game-stage-doodle-cheer 0.72s ease-in-out infinite alternate;
+}
+
+.game-stage-doodle[data-doodle-variant="countdown"] .game-stage-doodle__art,
+.game-stage-doodle[data-doodle-variant="start"] .game-stage-doodle__art {
+  position: absolute;
+}
+
+.game-stage-doodle [data-doodle-part="start-hands"] {
+  top: 0;
+  left: 50%;
+  width: 96%;
+  height: 73%;
+  transform: translateX(-50%) scaleX(1.08);
+  transform-origin: center top;
+}
+
+.game-stage-doodle [data-doodle-part="start-face"] {
+  top: 37%;
+  left: 50%;
+  width: 45%;
+  height: 61%;
+  transform: translateX(-50%);
 }
 
 .game-stage-doodle[data-doodle-variant="record"] {
@@ -104,6 +126,11 @@
 }
 
 @media (max-width: 380px) {
+  .game-stage-doodle[data-doodle-variant="countdown"],
+  .game-stage-doodle[data-doodle-variant="start"] {
+    width: 126px;
+  }
+
   .game-stage-doodle[data-doodle-variant="failure"] .game-stage-doodle__art {
     width: 104px;
     height: 96px;
