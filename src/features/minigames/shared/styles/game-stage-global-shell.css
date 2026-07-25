@@ -206,8 +206,8 @@ section.game-stage .game-stage__topbar-game-actions .button {
   }
 }
 
-/* Star Flight mobile recovery: keep the full header, all four HUD values, and
- * the original character silhouettes visible without changing game physics. */
+/* Star Flight mobile recovery: keep the full header and all HUD values visible
+ * without changing gameplay physics or character styling. */
 @media (max-width: 700px) {
   section.game-stage.flappy-game .game-stage__topbar {
     display: grid;
@@ -278,16 +278,5 @@ section.game-stage .game-stage__topbar-game-actions .button {
 
   section.game-stage.flappy-game .game-stage__sidebar .stat .v {
     font-size: 16px;
-  }
-
-  section.game-stage.flappy-game .flappy-game__bird {
-    width: clamp(26px, 7.5vw, 30px);
-    aspect-ratio: 160 / 96;
-    filter: drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-glow) 38%, transparent));
-  }
-
-  section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
-    width: clamp(28px, 8vw, 32px);
-    aspect-ratio: 180 / 112;
   }
 }
