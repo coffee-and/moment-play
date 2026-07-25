@@ -1,4 +1,4 @@
-:root {
+.flappy-game {
   --flappy-character-body: #cdb9ec;
   --flappy-character-tail: var(--flappy-character-body);
   --flappy-character-fin: #6e8fbc;
