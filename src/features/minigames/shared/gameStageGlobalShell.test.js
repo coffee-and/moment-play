@@ -6,6 +6,11 @@ const css = readFileSync(
   "utf8",
 );
 
+const finalPolishCss = readFileSync(
+  new URL("./styles/ui-final-polish.css", import.meta.url),
+  "utf8",
+);
+
 describe("global GameStage shell", () => {
   it("targets the shared GameStage contract instead of a game-name allowlist", () => {
     expect(css).toContain("section.game-stage .game-stage__inner");
@@ -22,9 +27,17 @@ describe("global GameStage shell", () => {
     expect(css).toContain("section.game-stage .sudoku-game__meta");
   });
 
-  it("keeps the compact HUD usable on mobile", () => {
-    expect(css).toContain("overflow-x: auto");
-    expect(css).toContain("flex: 1 0 96px");
-    expect(css).toContain("scrollbar-width: none");
+  it("fits every shared HUD value into one mobile card without horizontal scrolling", () => {
+    expect(css).toContain("grid-template-columns: none");
+    expect(css).toContain("grid-auto-flow: column");
+    expect(css).toContain("grid-auto-columns: minmax(0, 1fr)");
+    expect(css).toContain("section.game-stage .game-stage__sidebar .stat + .stat::before");
+    expect(css).not.toContain("overflow-x: auto");
+    expect(css).not.toContain("flex: 1 0 96px");
+  });
+
+  it("keeps HUD layout ownership out of the final polish layer", () => {
+    expect(finalPolishCss).not.toContain("game-stage__sidebar .stat-row");
+    expect(finalPolishCss).not.toContain("game-stage__sidebar .stat {");
   });
 });
