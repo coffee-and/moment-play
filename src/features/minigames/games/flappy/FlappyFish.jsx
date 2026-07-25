@@ -1,14 +1,14 @@
-import fishBlue from "./assets/fish-blue.svg";
+import whaleBlue from "./assets/whale-blue.svg";
 import fishYellow from "./assets/fish-yellow.svg";
-import wingBlue from "./assets/wing-blue.svg";
+import finWhaleBlue from "./assets/fin-whale-blue.svg";
 import wingYellow from "./assets/wing-yellow.svg";
 import "./flappy-fish-svg.css";
 
 export const FLAPPY_FISH_SKINS = {
   blue: {
-    body: fishBlue,
-    label: "파란 물고기",
-    wing: wingBlue,
+    body: whaleBlue,
+    label: "파란 고래",
+    wing: finWhaleBlue,
   },
   yellow: {
     body: fishYellow,
