@@ -53,48 +53,6 @@ a:focus:not(:focus-visible),
   box-shadow: var(--home-button-shadow);
 }
 
-section.game-stage .game-stage__sidebar .stat-row {
-  display: grid !important;
-  width: 100%;
-  min-width: 0;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
-  border-radius: 16px;
-  padding: 0;
-  background: var(--stage-card-surface);
-  box-shadow: var(--stage-card-shadow);
-  scrollbar-width: none;
-}
-
-section.game-stage .game-stage__sidebar .stat-row::-webkit-scrollbar {
-  display: none;
-}
-
-section.game-stage .game-stage__sidebar .stat {
-  position: relative;
-  min-width: 0 !important;
-  min-height: 52px;
-  flex: none !important;
-  border: 0;
-  border-radius: 0;
-  padding: 7px 8px;
-  background: transparent;
-  box-shadow: none;
-}
-
-section.game-stage .game-stage__sidebar .stat + .stat::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 0;
-  width: 1px;
-  background: color-mix(in oklab, var(--line) 58%, transparent);
-}
-
 section.game-stage.flappy-game .flappy-game__bird,
 section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
   width: clamp(28px, 4.4vw, 36px);
@@ -103,19 +61,6 @@ section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin
 }
 
 @media (max-width: 700px) {
-  section.game-stage .game-stage__sidebar .stat-row {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    overflow: hidden;
-    overscroll-behavior: auto;
-  }
-
-  section.game-stage .game-stage__sidebar .stat {
-    min-width: 0 !important;
-    min-height: 48px;
-    padding: 6px 4px;
-  }
-
   section.game-stage.flappy-game .flappy-game__bird,
   section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
     width: clamp(28px, 7.4vw, 32px);
