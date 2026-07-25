@@ -8,6 +8,7 @@ import './features/minigames/shared/styles/minigame-ui-recovery.css';
 import './features/minigames/shared/styles/game-action-feedback-tuning.css';
 import './features/minigames/games/flappy/flappy-fish-refresh.css';
 import './features/minigames/shared/styles/game-stage-global-shell.css';
+import './features/minigames/games/flappy/flappy-shared-result-modal.css';
 
 initializeTheme();
 
