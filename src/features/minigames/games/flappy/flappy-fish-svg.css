@@ -25,13 +25,26 @@
 
 .flappy-fish-svg__wing {
   z-index: 2;
-  top: 4%;
-  left: 34%;
-  width: 45%;
   height: auto;
-  transform-origin: 8% 54%;
-  animation: flappy-svg-wing-flap .28s cubic-bezier(.42, 0, .2, 1) infinite alternate;
-  filter: drop-shadow(0 2px 3px color-mix(in oklab, var(--flappy-sky-deep) 24%, transparent));
+  filter: drop-shadow(0 2px 3px color-mix(in oklab, var(--flappy-sky-deep) 20%, transparent));
+}
+
+/* 파란 캐릭터는 고래다. 지느러미가 몸 옆에서 뒤쪽을 향하도록 붙인다. */
+.flappy-fish-svg[data-skin="blue"] .flappy-fish-svg__wing {
+  top: 50%;
+  left: 43%;
+  width: 31%;
+  transform-origin: 12% 42%;
+  animation: flappy-whale-fin .42s ease-in-out infinite alternate;
+}
+
+/* 노란 물고기는 날개처럼 솟지 않고 옆지느러미처럼 아래·뒤쪽으로 움직인다. */
+.flappy-fish-svg[data-skin="yellow"] .flappy-fish-svg__wing {
+  top: 48%;
+  left: 39%;
+  width: 34%;
+  transform-origin: 12% 44%;
+  animation: flappy-fish-fin .3s ease-in-out infinite alternate;
 }
 
 .flappy-game__bird > .flappy-fish-svg {
@@ -85,13 +98,14 @@
   font-weight: 700;
 }
 
-@keyframes flappy-svg-wing-flap {
-  from {
-    transform: rotate(-24deg) translateY(-2px) scaleY(.82);
-  }
-  to {
-    transform: rotate(20deg) translateY(3px) scaleY(1.08);
-  }
+@keyframes flappy-whale-fin {
+  from { transform: rotate(8deg) translateY(-1px) scaleY(.92); }
+  to { transform: rotate(-15deg) translateY(2px) scaleY(1.06); }
+}
+
+@keyframes flappy-fish-fin {
+  from { transform: rotate(12deg) translateY(-1px) scaleY(.9); }
+  to { transform: rotate(-18deg) translateY(2px) scaleY(1.05); }
 }
 
 @media (max-width: 420px) {
