@@ -1,11 +1,4 @@
-/*
- * One shared play-screen shell for every GameStage consumer.
- *
- * Previous recovery styles listed a handful of game root class names. That
- * meant new or omitted games silently fell back to the old dashboard layout.
- * These rules target the GameStage contract itself so every current and future
- * minigame receives the same compact HUD and board-first hierarchy.
- */
+/* Shared GameStage layout and compact HUD for every minigame. */
 
 section.game-stage .game-stage__inner {
   --stage-card-min-height: 0px;
@@ -44,11 +37,6 @@ section.game-stage .game-stage__side:not(:has(.game-stage__sidebar > *)) {
   display: none;
 }
 
-/*
- * Shared single-card HUD.
- * Reset the legacy explicit two-column template before creating equal implicit
- * columns, so any number of stats shares the available width without overflow.
- */
 section.game-stage .game-stage__sidebar .stat-row {
   display: grid;
   width: 100%;
@@ -123,7 +111,6 @@ section.game-stage .game-stage__side-note {
   line-height: 1.35;
 }
 
-/* The board/play area is the primary surface on every game route. */
 section.game-stage .game-stage__play {
   position: relative;
   min-width: 0;
@@ -141,13 +128,12 @@ section.game-stage .game-stage__content {
   gap: 11px;
 }
 
-/* These values already exist in the shared HUD and must not be repeated. */
+/* These values already exist in the shared HUD. */
 section.game-stage .game-2048__meta,
 section.game-stage .sudoku-game__meta {
   display: none;
 }
 
-/* Keep header controls compact and consistent across every game. */
 section.game-stage .game-stage__topbar {
   min-height: 52px;
   padding-bottom: 12px;
@@ -203,80 +189,5 @@ section.game-stage .game-stage__topbar-game-actions .button {
   section.game-stage .game-stage__topbar {
     min-height: 48px;
     padding-bottom: 9px;
-  }
-}
-
-/* Star Flight mobile recovery: keep the full header and all HUD values visible
- * without changing gameplay physics or character styling. */
-@media (max-width: 700px) {
-  section.game-stage.flappy-game .game-stage__topbar {
-    display: grid;
-    width: 100%;
-    min-width: 0;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: stretch;
-    gap: 10px;
-    padding-bottom: 10px;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-title {
-    display: block;
-    width: 100%;
-    min-width: 0;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-title > strong,
-  section.game-stage.flappy-game .game-stage__topbar-title > span {
-    display: block;
-    max-width: none;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-actions {
-    display: grid;
-    width: 100%;
-    min-width: 0;
-    grid-template-columns: 44px 44px minmax(0, 1fr);
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-actions > button {
-    width: 44px;
-    min-width: 44px;
-    min-height: 40px;
-    padding-inline: 0;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-game-actions {
-    width: 100%;
-    min-width: 0;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-game-actions .game-stage__inline-actions {
-    display: grid;
-    width: 100%;
-    min-width: 0;
-    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-    gap: 8px;
-  }
-
-  section.game-stage.flappy-game .game-stage__topbar-game-actions .button {
-    width: 100%;
-    min-width: 0;
-    min-height: 40px;
-    padding-inline: 8px;
-    font-size: 13px;
-  }
-
-  section.game-stage.flappy-game .game-stage__sidebar .stat .l {
-    font-size: 8px;
-    letter-spacing: .035em;
-  }
-
-  section.game-stage.flappy-game .game-stage__sidebar .stat .v {
-    font-size: 16px;
   }
 }
