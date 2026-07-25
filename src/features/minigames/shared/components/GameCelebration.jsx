@@ -1,18 +1,18 @@
 import { createContext, useContext } from "react";
 import { GameStageDoodle } from "./GameStageDoodle.jsx";
 
-const BuiltInCelebrationContext = createContext(false);
+const GameCelebrationContext = createContext(false);
 
-export function BuiltInCelebrationProvider({ children, enabled = false }) {
+export function GameCelebrationProvider({ children, enabled = false }) {
   return (
-    <BuiltInCelebrationContext.Provider value={enabled}>
+    <GameCelebrationContext.Provider value={enabled}>
       {children}
-    </BuiltInCelebrationContext.Provider>
+    </GameCelebrationContext.Provider>
   );
 }
 
-export function useHasBuiltInCelebration() {
-  return useContext(BuiltInCelebrationContext);
+export function useGameCelebrationState() {
+  return useContext(GameCelebrationContext);
 }
 
 export function GameCelebration({ className = "", compact = false }) {
