@@ -38,6 +38,7 @@ function renderGame() {
 }
 
 beforeEach(() => {
+  window.localStorage.clear();
   vi.spyOn(window, "requestAnimationFrame").mockImplementation(() => 1);
   vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
 });
@@ -48,15 +49,32 @@ afterEach(() => {
 });
 
 describe("FlappyGame input surface", () => {
-  it("renders one clean crescent path and keeps the fish built from local CSS parts", () => {
+  it("renders one clean crescent path and separate SVG body and wing assets", () => {
     const view = renderGame();
     const moon = view.host.querySelector("svg.flappy-game__moon");
+    const fish = view.host.querySelector(".flappy-game__bird .flappy-fish-svg");
 
     expect(moon).not.toBeNull();
     expect(moon.querySelectorAll("path")).toHaveLength(1);
     expect(moon.querySelectorAll("circle")).toHaveLength(0);
-    expect(view.host.querySelector(".flappy-game__bird-core")).not.toBeNull();
-    expect(view.host.querySelector(".flappy-game__bird-tail")).not.toBeNull();
+    expect(fish?.dataset.skin).toBe("blue");
+    expect(fish?.querySelector("img.flappy-fish-svg__body")).not.toBeNull();
+    expect(fish?.querySelector("img.flappy-fish-svg__wing")).not.toBeNull();
+    view.unmount();
+  });
+
+  it("lets the player choose and persist the yellow fish with its matching wing", () => {
+    const view = renderGame();
+    const yellowOption = findButton(document.body, "노란 물고기");
+
+    expect(yellowOption).toBeDefined();
+    expect(yellowOption.getAttribute("aria-checked")).toBe("false");
+
+    act(() => yellowOption.click());
+
+    expect(yellowOption.getAttribute("aria-checked")).toBe("true");
+    expect(window.localStorage.getItem("eunContents.flappy.fishSkin")).toBe("yellow");
+    expect(view.host.querySelector(".flappy-game__bird .flappy-fish-svg")?.dataset.skin).toBe("yellow");
     view.unmount();
   });
 
