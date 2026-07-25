@@ -49,7 +49,7 @@ afterEach(() => {
 });
 
 describe("FlappyGame input surface", () => {
-  it("renders one clean crescent path and separate SVG body and wing assets", () => {
+  it("renders one clean crescent path and separate body, tail, and fin SVG layers", () => {
     const view = renderGame();
     const moon = view.host.querySelector("svg.flappy-game__moon");
     const fish = view.host.querySelector(".flappy-game__bird .flappy-fish-svg");
@@ -58,12 +58,13 @@ describe("FlappyGame input surface", () => {
     expect(moon.querySelectorAll("path")).toHaveLength(1);
     expect(moon.querySelectorAll("circle")).toHaveLength(0);
     expect(fish?.dataset.skin).toBe("blue");
-    expect(fish?.querySelector("img.flappy-fish-svg__body")).not.toBeNull();
-    expect(fish?.querySelector("img.flappy-fish-svg__wing")).not.toBeNull();
+    expect(fish?.querySelector("svg.flappy-fish-svg__body")).not.toBeNull();
+    expect(fish?.querySelector("svg.flappy-fish-svg__tail")).not.toBeNull();
+    expect(fish?.querySelector("svg.flappy-fish-svg__wing")).not.toBeNull();
     view.unmount();
   });
 
-  it("lets the player choose and persist the yellow fish with its matching wing", () => {
+  it("lets the player choose and persist the yellow fish with its matching fin", () => {
     const view = renderGame();
     const yellowOption = findButton(document.body, "노란 물고기");
 
