@@ -5,7 +5,10 @@
   word-break: keep-all;
 }
 
-.game-stage__topbar-game-actions .game-stage__inline-actions { display: flex; gap: 12px; }
+.game-stage__topbar-game-actions .game-stage__inline-actions {
+  display: flex;
+  gap: 12px;
+}
 
 @media (max-width: 620px) {
   .game-stage__topbar-game-actions .button {
@@ -40,15 +43,28 @@
   }
 }
 
-
 .game-stage {
   position: relative;
 }
 
 .game-stage button,
-.game-stage [role="button"] {
+.game-stage [role="button"],
+.game-stage [role="gridcell"],
+.game-stage [role="application"],
+.game-stage-modal button,
+.game-stage-modal [role="button"] {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+.game-stage button:focus-visible,
+.game-stage [role="button"]:focus-visible,
+.game-stage [role="gridcell"]:focus-visible,
+.game-stage [role="application"]:focus-visible,
+.game-stage-modal button:focus-visible,
+.game-stage-modal [role="button"]:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
 }
 
 .game-stage::before {
@@ -57,10 +73,10 @@
   z-index: 20;
   top: var(--game-touch-y, 50%);
   left: var(--game-touch-x, 50%);
-  opacity: 0;
-  pointer-events: none;
   width: 20px;
   aspect-ratio: 1;
+  opacity: 0;
+  pointer-events: none;
   border: 1.5px solid color-mix(in oklab, var(--text) 44%, transparent);
   border-radius: 50%;
   background: color-mix(in oklab, var(--surface) 18%, transparent);
@@ -70,12 +86,6 @@
 
 .game-stage.has-touch-feedback::before {
   animation: game-touch-feedback .22s ease-out;
-}
-
-.game-stage button:focus-visible,
-.game-stage [role="button"]:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 3px;
 }
 
 @keyframes game-touch-feedback {
@@ -94,8 +104,10 @@
 
 @media (hover: none) {
   .game-stage button:active:not(:disabled),
-  .game-stage [role="button"]:active {
-    filter: saturate(1.08) brightness(0.98);
+  .game-stage [role="button"]:active,
+  .game-stage-modal button:active:not(:disabled),
+  .game-stage-modal [role="button"]:active {
+    filter: saturate(1.08) brightness(.98);
   }
 }
 
