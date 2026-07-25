@@ -16,7 +16,6 @@
 .flappy-fish-svg__wing {
   position: absolute;
   display: block;
-  height: auto;
   overflow: visible;
   pointer-events: none;
   user-select: none;
@@ -24,25 +23,28 @@
 
 .flappy-fish-svg__tail {
   z-index: 1;
-  top: 3%;
-  left: -5%;
-  width: 43%;
+  top: 18%;
+  left: -10%;
+  width: 50%;
+  height: 55%;
   transform-origin: 91% 50%;
   animation: flappy-fish-tail-sway .56s ease-in-out infinite alternate;
 }
 
 .flappy-fish-svg__body {
   z-index: 2;
-  top: 0;
-  left: 19%;
-  width: 81%;
+  top: 12%;
+  left: 24%;
+  width: 73%;
+  height: auto;
 }
 
 .flappy-fish-svg__wing {
   z-index: 3;
-  top: 18%;
-  left: 33%;
-  width: 43%;
+  top: 22%;
+  left: 34%;
+  width: 48%;
+  height: 50%;
   transform-origin: 90% 50%;
   animation: flappy-fish-fin-float .42s ease-in-out infinite alternate;
 }
