@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
 import { act } from "react";
+import { readFileSync } from "node:fs";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,6 +13,9 @@ const game = {
   description: "별빛 사이를 날아 보세요.",
   title: "별빛 비행",
 };
+
+const fishSource = readFileSync(new URL("./FlappyFish.jsx", import.meta.url), "utf8");
+const fishCss = readFileSync(new URL("./flappy-fish-svg.css", import.meta.url), "utf8");
 
 function findButton(host, label) {
   return [...host.querySelectorAll("button")].find((button) => button.textContent === label);
@@ -57,25 +61,27 @@ describe("FlappyGame input surface", () => {
     expect(moon).not.toBeNull();
     expect(moon.querySelectorAll("path")).toHaveLength(1);
     expect(moon.querySelectorAll("circle")).toHaveLength(0);
-    expect(fish?.dataset.skin).toBe("blue");
-    expect(fish?.querySelector("svg.flappy-fish-svg__body")).not.toBeNull();
-    expect(fish?.querySelector("svg.flappy-fish-svg__tail")).not.toBeNull();
-    expect(fish?.querySelector("svg.flappy-fish-svg__wing")).not.toBeNull();
+    expect(fish).not.toBeNull();
+    expect(fish.hasAttribute("data-skin")).toBe(false);
+    expect(fish.querySelector("svg.flappy-fish-svg__body")).not.toBeNull();
+    expect(fish.querySelector("svg.flappy-fish-svg__tail")).not.toBeNull();
+    expect(fish.querySelector("svg.flappy-fish-svg__wing")).not.toBeNull();
     view.unmount();
   });
 
-  it("lets the player choose and persist the yellow fish with its matching fin", () => {
+  it("uses one fixed fish without a hidden picker or persisted skin state", () => {
     const view = renderGame();
-    const yellowOption = findButton(document.body, "노란 물고기");
 
-    expect(yellowOption).toBeDefined();
-    expect(yellowOption.getAttribute("aria-checked")).toBe("false");
-
-    act(() => yellowOption.click());
-
-    expect(yellowOption.getAttribute("aria-checked")).toBe("true");
-    expect(window.localStorage.getItem("eunContents.flappy.fishSkin")).toBe("yellow");
-    expect(view.host.querySelector(".flappy-game__bird .flappy-fish-svg")?.dataset.skin).toBe("yellow");
+    expect(document.body.querySelector('[role="radiogroup"]')).toBeNull();
+    expect(findButton(document.body, "노란 물고기")).toBeUndefined();
+    expect(findButton(document.body, "파란 고래")).toBeUndefined();
+    expect(window.localStorage.getItem("eunContents.flappy.fishSkin")).toBeNull();
+    expect(fishSource).not.toContain("FLAPPY_FISH_SKINS");
+    expect(fishSource).not.toContain("FIXED_FISH_COLORS");
+    expect(fishSource).not.toContain("data-skin");
+    expect(fishCss).toContain("--flappy-character-body: #cdb9ec");
+    expect(fishCss).toContain("--flappy-character-tail: var(--flappy-character-body)");
+    expect(fishCss).toContain("--flappy-character-fin: #6e8fbc");
     view.unmount();
   });
 
