@@ -17,8 +17,8 @@
 
 .game-stage-doodle[data-doodle-variant="countdown"],
 .game-stage-doodle[data-doodle-variant="start"] {
-  width: clamp(142px, 38vw, 184px);
-  aspect-ratio: 287 / 218;
+  width: clamp(118px, 32vw, 154px);
+  aspect-ratio: 332 / 220;
   margin: 0 auto 2px;
   animation: game-stage-doodle-cheer 0.72s ease-in-out infinite alternate;
 }
@@ -118,11 +118,6 @@
 }
 
 @media (max-width: 380px) {
-  .game-stage-doodle[data-doodle-variant="countdown"],
-  .game-stage-doodle[data-doodle-variant="start"] {
-    width: 132px;
-  }
-
   .game-stage-doodle[data-doodle-variant="failure"] .game-stage-doodle__art {
     width: 104px;
     height: 96px;
