@@ -74,7 +74,7 @@ button.solitaire-pile:disabled {
   padding: 0;
   background:
     linear-gradient(145deg, color-mix(in oklab, var(--palette-ivory) 82%, transparent), transparent 42%),
-    linear-gradient(180deg, var(--solitaire-card-face), color-mix(in oklab, var(--solitaire-card-face) 92%, var(--palette-beige)));
+    linear-gradient(180deg, var(--solitaire-card-face), color-mix(in oklab, var(--solitaire-card-face) 92%, var(--palette-neutral-100)));
   color: var(--solitaire-black);
   box-shadow:
     0 2px 3px color-mix(in oklab, var(--palette-neutral-900) 12%, transparent),
