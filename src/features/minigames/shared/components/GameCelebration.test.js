@@ -45,11 +45,12 @@ describe("shared game celebration", () => {
     act(() => normalView.root.unmount());
   });
 
-  it("can show the shared artwork without completion particles", () => {
+  it("can expose victory artwork without completion particles", () => {
     const view = render(
       React.createElement(
         GameStageModal,
         { showCelebration: true },
+        React.createElement(GameRecordCelebration, { isNewRecord: false }),
         React.createElement("h2", null, "승리"),
       ),
     );
