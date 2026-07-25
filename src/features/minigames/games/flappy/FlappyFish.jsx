@@ -1,32 +1,27 @@
 import "./flappy-fish-svg.css";
 
+const FIXED_FISH_COLORS = {
+  body: "#CDB9EC",
+  fin: "#6E8FBC",
+  tail: "#CDB9EC",
+};
+
+// 기존 저장값과 테스트 호환성은 유지하되 실제 렌더링은 하나의 물고기 디자인으로 고정합니다.
 export const FLAPPY_FISH_SKINS = {
-  blue: {
-    body: "#AFC8EC",
-    fin: "#6E8FBC",
-    label: "파란 고래",
-    tail: "#91ACD4",
-  },
-  yellow: {
-    body: "#F5C84E",
-    fin: "#D89325",
-    label: "노란 물고기",
-    tail: "#E9AE30",
-  },
+  blue: { ...FIXED_FISH_COLORS, label: "별빛 물고기" },
+  yellow: { ...FIXED_FISH_COLORS, label: "별빛 물고기" },
 };
 
 export function FlappyFish({ className = "", skin = "blue" }) {
-  const selectedSkin = FLAPPY_FISH_SKINS[skin] ?? FLAPPY_FISH_SKINS.blue;
-
   return (
     <span
       aria-hidden="true"
       className={`flappy-fish-svg ${className}`.trim()}
       data-skin={skin}
       style={{
-        "--fish-body-color": selectedSkin.body,
-        "--fish-fin-color": selectedSkin.fin,
-        "--fish-tail-color": selectedSkin.tail,
+        "--fish-body-color": FIXED_FISH_COLORS.body,
+        "--fish-fin-color": FIXED_FISH_COLORS.fin,
+        "--fish-tail-color": FIXED_FISH_COLORS.tail,
       }}
     >
       <svg className="flappy-fish-svg__tail" focusable="false" viewBox="0 0 160 160">
