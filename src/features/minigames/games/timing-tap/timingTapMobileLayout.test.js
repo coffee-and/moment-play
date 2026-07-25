@@ -17,6 +17,7 @@ describe("Timing Tap mobile layout", () => {
     expect(css).toContain("justify-content: flex-start");
     expect(css).toContain("min-height: 340px");
     expect(css).toContain("gap: 24px");
+    expect(css).toContain("padding-top: 30px");
   });
 
   it("continues to use the shared start and record modal components", () => {
