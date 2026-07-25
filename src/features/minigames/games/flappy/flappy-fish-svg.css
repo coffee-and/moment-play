@@ -1,6 +1,16 @@
+:root {
+  --flappy-character-body: #cdb9ec;
+  --flappy-character-tail: var(--flappy-character-body);
+  --flappy-character-fin: #6e8fbc;
+  --flappy-character-ink: #000000;
+}
+
 .flappy-fish-svg {
-  --fish-outline-color: #000000;
-  --fish-eye-color: #000000;
+  --fish-body-color: var(--flappy-character-body);
+  --fish-tail-color: var(--flappy-character-tail);
+  --fish-fin-color: var(--flappy-character-fin);
+  --fish-outline-color: var(--flappy-character-ink);
+  --fish-eye-color: var(--flappy-character-ink);
   position: relative;
   display: block;
   width: 100%;
@@ -52,17 +62,6 @@
 .flappy-game__bird > .flappy-fish-svg {
   width: 100%;
   height: 100%;
-}
-
-/* 별빛비행은 하나의 고정 물고기를 사용합니다. */
-.flappy-game__skin-picker,
-.flappy-game__skin-option,
-.flappy-game__skin-preview {
-  display: none !important;
-}
-
-.flappy-game .game-stage-overlay[data-state="start"] .game-stage-modal > p:first-of-type {
-  display: none;
 }
 
 @keyframes flappy-fish-tail-sway {
