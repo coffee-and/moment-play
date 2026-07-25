@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 44" role="img" aria-labelledby="title desc">
+  <title id="title">파란 고래 지느러미</title>
+  <desc id="desc">파란 고래 몸에 붙어 부드럽게 움직이는 작은 지느러미</desc>
+  <defs>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B8D6FA"/>
+      <stop offset="1" stop-color="#6F9FDE"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#fin)" d="M8 8c16 3 31 12 47 27-17 2-32-2-45-12C5 19 4 13 8 8Z"/>
+</svg>
