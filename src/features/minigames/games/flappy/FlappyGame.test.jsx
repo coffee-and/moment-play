@@ -85,6 +85,18 @@ describe("FlappyGame input surface", () => {
     view.unmount();
   });
 
+  it("keeps the body smaller while the tail and fin dominate the silhouette", () => {
+    expect(fishSource).toContain('ry="92"');
+    expect(fishCss).toContain(".flappy-fish-svg__body");
+    expect(fishCss).toContain("left: 30%");
+    expect(fishCss).toContain("width: 67%");
+    expect(fishCss).toContain(".flappy-fish-svg__tail");
+    expect(fishCss).toContain("height: 76%");
+    expect(fishCss).toContain(".flappy-fish-svg__wing");
+    expect(fishCss).toContain("width: 53%");
+    expect(fishCss).toContain("height: 70%");
+  });
+
   it("keeps pointer and keyboard controls while preserving a keyboard-focusable surface", () => {
     const view = renderGame();
     const surface = view.host.querySelector('[role="application"]');
