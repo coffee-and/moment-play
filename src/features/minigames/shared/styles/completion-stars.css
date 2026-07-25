@@ -17,8 +17,8 @@
   font-style: normal;
   line-height: 1;
   opacity: 0;
-  transform: translate(-50%, 10px) scale(0.35) rotate(-18deg);
-  animation: completion-star-scatter 1.18s cubic-bezier(0.2, 0.72, 0.2, 1) var(--completion-star-delay) both;
+  transform: translate(-50%, 10px) scale(.35) rotate(-18deg);
+  animation: completion-star-scatter 1.18s cubic-bezier(.2, .72, .2, 1) var(--completion-star-delay) both;
 }
 
 .completion-stars[data-intensity="medium"] {
@@ -36,36 +36,36 @@
   filter: drop-shadow(0 0 7px color-mix(in oklab, var(--game-modal-highlight) 58%, transparent));
 }
 
-.game-stage-modal:has(.game-record-celebration) .completion-stars {
-  opacity: 0.72;
+.game-stage-modal[data-has-celebration="true"] .completion-stars {
+  opacity: .72;
 }
 
 @keyframes completion-star-scatter {
   0% {
     opacity: 0;
-    transform: translate(-50%, 10px) scale(0.35) rotate(-18deg);
+    transform: translate(-50%, 10px) scale(.35) rotate(-18deg);
   }
   24% {
-    opacity: 0.92;
+    opacity: .92;
     transform: translate(-50%, 0) scale(var(--completion-star-scale)) rotate(4deg);
   }
   68% {
-    opacity: 0.76;
+    opacity: .76;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, var(--completion-star-lift)) scale(calc(var(--completion-star-scale) * 0.78)) rotate(20deg);
+    transform: translate(-50%, var(--completion-star-lift)) scale(calc(var(--completion-star-scale) * .78)) rotate(20deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .completion-stars i {
-    animation: completion-star-fade 0.72s ease both;
+    animation: completion-star-fade .72s ease both;
     transform: translate(-50%, 0) scale(var(--completion-star-scale));
   }
 }
 
 @keyframes completion-star-fade {
   0%, 100% { opacity: 0; }
-  18%, 76% { opacity: 0.72; }
+  18%, 76% { opacity: .72; }
 }
