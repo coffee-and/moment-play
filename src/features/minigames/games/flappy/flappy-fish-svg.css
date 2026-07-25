@@ -1,0 +1,111 @@
+.flappy-fish-svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 160 / 96;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flappy-fish-svg__body,
+.flappy-fish-svg__wing {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flappy-fish-svg__body {
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.flappy-fish-svg__wing {
+  z-index: 2;
+  top: 4%;
+  left: 34%;
+  width: 45%;
+  height: auto;
+  transform-origin: 8% 54%;
+  animation: flappy-svg-wing-flap .28s cubic-bezier(.42, 0, .2, 1) infinite alternate;
+  filter: drop-shadow(0 2px 3px color-mix(in oklab, var(--flappy-sky-deep) 24%, transparent));
+}
+
+.flappy-game__bird > .flappy-fish-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.flappy-game__skin-picker {
+  display: grid;
+  width: min(100%, 320px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-inline: auto;
+}
+
+.flappy-game__skin-option {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 6px;
+  border: 1px solid var(--game-modal-action-border);
+  border-radius: var(--r-md);
+  padding: 10px 8px 8px;
+  background: var(--game-modal-action-bg);
+  color: var(--game-modal-text);
+  cursor: pointer;
+  box-shadow: var(--game-modal-action-shadow);
+  font: inherit;
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.flappy-game__skin-option:hover,
+.flappy-game__skin-option:focus-visible {
+  border-color: color-mix(in oklab, var(--game-modal-highlight) 70%, var(--game-modal-border));
+  transform: translateY(-1px);
+}
+
+.flappy-game__skin-option.is-selected {
+  border-color: var(--game-modal-highlight);
+  box-shadow:
+    0 0 0 2px color-mix(in oklab, var(--game-modal-highlight) 22%, transparent),
+    var(--game-modal-action-shadow);
+}
+
+.flappy-game__skin-preview {
+  width: 78px;
+}
+
+.flappy-game__skin-option span:last-child {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@keyframes flappy-svg-wing-flap {
+  from {
+    transform: rotate(-24deg) translateY(-2px) scaleY(.82);
+  }
+  to {
+    transform: rotate(20deg) translateY(3px) scaleY(1.08);
+  }
+}
+
+@media (max-width: 420px) {
+  .flappy-game__skin-picker {
+    width: min(100%, 280px);
+  }
+
+  .flappy-game__skin-preview {
+    width: 66px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flappy-fish-svg__wing {
+    animation-duration: 1.2s;
+  }
+}
