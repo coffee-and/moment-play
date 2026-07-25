@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css';
 import App from './App';
 import { Router } from './routes/router.jsx';
 import { initializeTheme } from './shared/theme/theme.js';
-import './styles.css';
 
 initializeTheme();
 
