@@ -5,8 +5,8 @@ import { Button } from "../../../../shared/components/Button.jsx";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
+import { GameCelebration } from "../../shared/components/GameCelebration.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
-import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
 import "./timing-tap.css";
@@ -54,7 +54,6 @@ export function TimingTapGame({ game }) {
   const [focusGauge, setFocusGauge] = useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [best, setBest] = useState(readBestScore);
-  const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [result, setResult] = useState(null);
   const [isExitOpen, setIsExitOpen] = useState(false);
   const frameRef = useRef(null);
@@ -99,7 +98,6 @@ export function TimingTapGame({ game }) {
     setPerfectCombo(0);
     setFocusGauge(0);
     setMistakes(0);
-    setDidBreakRecordThisAttempt(false);
     setIsExitOpen(false);
     beginRound(1);
   }
@@ -123,7 +121,6 @@ export function TimingTapGame({ game }) {
     playSound("clear");
     setPhase("completed");
     const didBreakRecord = isNewGameRecord({ previous: bestRef.current, next: finalScore });
-    setDidBreakRecordThisAttempt(didBreakRecord);
     if (didBreakRecord) {
       bestRef.current = finalScore;
       setBest(finalScore);
@@ -255,7 +252,7 @@ export function TimingTapGame({ game }) {
         ) : null}
         {phase === "completed" ? (
           <div className="timing-tap__complete">
-            <GameRecordCelebration compact isNewRecord={didBreakRecordThisAttempt} />
+            <GameCelebration compact />
             <strong>{score}점</strong>
             <span>{formatStarRating(starRating)} · 10라운드 평균 {average}점 · 최고 {Math.max(best, score)}점</span>
             <Button onClick={startGame}>다시 도전</Button>
