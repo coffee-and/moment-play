@@ -26,12 +26,12 @@ export function FlappyFish({ className = "" }) {
           cx="215"
           cy="110"
           fill="var(--fish-body-color)"
-          rx="200"
-          ry="82"
+          rx="196"
+          ry="92"
           stroke="var(--fish-outline-color)"
           strokeWidth="8"
         />
-        <circle cx="350" cy="98" fill="var(--fish-eye-color)" r="9" />
+        <circle cx="352" cy="92" fill="var(--fish-eye-color)" r="9" />
       </svg>
 
       <svg
