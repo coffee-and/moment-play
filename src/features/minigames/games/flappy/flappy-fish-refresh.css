@@ -1,17 +1,16 @@
 /*
- * The player character now uses separate SVG body and wing assets. Keep this
- * file limited to the outer gameplay hit-box and visual scale so the SVG files
- * remain reusable in the picker and in future screens.
+ * Gameplay hit-box and visual scale for the single Star Flight character.
+ * Body, tail, fin, colors, and motion stay in flappy-fish-svg.css.
  */
 
 .flappy-game .flappy-game__bird {
-  width: clamp(46px, 8vw, 66px);
-  aspect-ratio: 5 / 3;
-  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--flappy-glow) 52%, transparent));
+  width: clamp(28px, 4.4vw, 36px);
+  aspect-ratio: 430 / 220;
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-glow) 38%, transparent));
 }
 
-@media (max-width: 620px) {
+@media (max-width: 700px) {
   .flappy-game .flappy-game__bird {
-    width: clamp(44px, 11vw, 58px);
+    width: clamp(28px, 7.4vw, 32px);
   }
 }
