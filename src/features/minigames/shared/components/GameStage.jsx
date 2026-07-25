@@ -4,6 +4,7 @@ import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
 import { useGameBrowserBackGuard } from '../hooks/useGameBrowserBackGuard.js';
+import '../styles/game-stage-global-shell.css';
 import '../styles/game-stage-responsive-actions.css';
 
 function joinClassNames(values) {
