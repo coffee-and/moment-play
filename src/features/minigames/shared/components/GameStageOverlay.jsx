@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom';
 import '../styles/game-stage-responsive-actions.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
 import { CompletionStars } from './CompletionStars.jsx';
+import { GameCelebration } from './GameCelebration.jsx';
+import { GameRecordCelebration } from './GameRecordCelebration.jsx';
+import { GameStageDoodle } from './GameStageDoodle.jsx';
 
 function joinClassNames(values) {
   return values.filter(Boolean).join(' ');
@@ -15,6 +18,18 @@ function addActionCount(child) {
   return cloneElement(child, {
     'data-action-count': Children.toArray(child.props.children).length,
   });
+}
+
+function normalizeModalChild(child, hideInlineCelebration) {
+  if (!isValidElement(child)) return child;
+
+  if (hideInlineCelebration) {
+    const isCelebrationComponent = child.type === GameCelebration || child.type === GameRecordCelebration;
+    const isRecordDoodle = child.type === GameStageDoodle && child.props.variant === 'record';
+    if (isCelebrationComponent || isRecordDoodle) return null;
+  }
+
+  return addActionCount(child);
 }
 
 export function GameStageOverlay({
@@ -81,9 +96,15 @@ export function GameStageModal({
   ...props
 }) {
   return (
-    <div className={joinClassNames(['game-stage-modal', className])} style={{ ...style }} {...props}>
+    <div
+      className={joinClassNames(['game-stage-modal', className])}
+      data-has-celebration={showCompletionStars ? 'true' : undefined}
+      style={{ ...style }}
+      {...props}
+    >
       {showCompletionStars ? <CompletionStars streak={celebrationStreak} /> : null}
-      {Children.map(children, addActionCount)}
+      {showCompletionStars ? <GameCelebration className="game-stage-modal__celebration" /> : null}
+      {Children.map(children, (child) => normalizeModalChild(child, showCompletionStars))}
     </div>
   );
 }
