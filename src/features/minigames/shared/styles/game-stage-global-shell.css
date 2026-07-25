@@ -181,3 +181,106 @@ section.game-stage .game-stage__topbar-game-actions .button {
     padding-bottom: 9px;
   }
 }
+
+/* Star Flight mobile recovery: keep the full header, all four HUD values, and
+ * the original character silhouettes visible without changing game physics. */
+@media (max-width: 700px) {
+  section.game-stage.flappy-game .game-stage__topbar {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-title {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-title > strong,
+  section.game-stage.flappy-game .game-stage__topbar-title > span {
+    display: block;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-actions {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 44px 44px minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-actions > button {
+    width: 44px;
+    min-width: 44px;
+    min-height: 40px;
+    padding-inline: 0;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-game-actions {
+    width: 100%;
+    min-width: 0;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-game-actions .game-stage__inline-actions {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+    gap: 8px;
+  }
+
+  section.game-stage.flappy-game .game-stage__topbar-game-actions .button {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+
+  section.game-stage.flappy-game .game-stage__sidebar .stat-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+
+  section.game-stage.flappy-game .game-stage__sidebar .stat {
+    min-width: 0;
+    min-height: 48px;
+    flex: none;
+    padding: 6px 4px;
+  }
+
+  section.game-stage.flappy-game .game-stage__sidebar .stat .l {
+    font-size: 8px;
+    letter-spacing: .06em;
+  }
+
+  section.game-stage.flappy-game .game-stage__sidebar .stat .v {
+    overflow: visible;
+    font-size: 16px;
+    text-overflow: clip;
+  }
+
+  section.game-stage.flappy-game .flappy-game__bird {
+    width: clamp(26px, 7.5vw, 30px);
+    aspect-ratio: 160 / 96;
+    filter: drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-glow) 38%, transparent));
+  }
+
+  section.game-stage.flappy-game .flappy-game__bird:has(.flappy-fish-svg[data-skin="blue"]) {
+    width: clamp(28px, 8vw, 32px);
+    aspect-ratio: 180 / 112;
+  }
+}
