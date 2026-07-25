@@ -2,7 +2,7 @@
   position: relative;
   display: block;
   flex: none;
-  color: var(--text);
+  color: inherit;
   pointer-events: none;
 }
 
@@ -27,7 +27,6 @@
   width: clamp(168px, 44vw, 220px);
   aspect-ratio: 230 / 224;
   margin: 0 auto 2px;
-  color: var(--text);
   animation: game-stage-doodle-record 0.48s cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 
@@ -67,26 +66,13 @@
   transform: rotate(3deg);
 }
 
-.game-stage-modal .game-stage-doodle {
-  color: var(--game-modal-text);
-}
-
-.game-stage-modal .game-stage-doodle[data-doodle-variant="record"] {
-  color: var(--game-modal-text);
-}
-
 .game-stage-doodle[data-doodle-variant="record"].game-stage-doodle--compact {
   width: clamp(128px, 32vw, 158px);
-}
-
-.game-stage-modal .game-stage-doodle[data-doodle-variant="failure"] {
-  color: color-mix(in oklab, var(--game-modal-text) 82%, var(--game-modal-muted));
 }
 
 .game-stage-doodle[data-doodle-variant="failure"] {
   position: absolute;
   inset: 0;
-  color: color-mix(in oklab, var(--text) 76%, var(--muted));
 }
 
 .game-stage-doodle[data-doodle-variant="failure"] .game-stage-doodle__art {
