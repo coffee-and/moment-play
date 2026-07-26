@@ -33,12 +33,12 @@
 
 .flappy-fish-svg__tail {
   z-index: 1;
-  top: 11%;
-  left: -2%;
-  width: 44%;
-  height: 76%;
-  transform-origin: 91% 50%;
-  animation: flappy-fish-tail-sway .56s ease-in-out infinite alternate;
+  top: 16%;
+  left: 1%;
+  width: 40%;
+  height: 68%;
+  transform-origin: 90% 50%;
+  animation: flappy-fish-tail-sway .62s ease-in-out infinite alternate;
 }
 
 .flappy-fish-svg__body {
@@ -51,12 +51,12 @@
 
 .flappy-fish-svg__wing {
   z-index: 3;
-  top: 14%;
-  left: 35%;
-  width: 53%;
-  height: 70%;
-  transform-origin: 90% 50%;
-  animation: flappy-fish-fin-float .42s ease-in-out infinite alternate;
+  top: 27%;
+  left: 40%;
+  width: 36%;
+  height: 45%;
+  transform-origin: 76% 50%;
+  animation: flappy-fish-fin-float .54s ease-in-out infinite alternate;
 }
 
 .flappy-game__bird > .flappy-fish-svg {
@@ -65,13 +65,13 @@
 }
 
 @keyframes flappy-fish-tail-sway {
-  from { transform: rotate(7deg) translateY(-1px) scaleY(.98); }
-  to { transform: rotate(-9deg) translateY(2px) scaleY(1.03); }
+  from { transform: rotate(5deg) translateY(-1px) scaleY(.99); }
+  to { transform: rotate(-7deg) translateY(2px) scaleY(1.02); }
 }
 
 @keyframes flappy-fish-fin-float {
-  from { transform: rotate(8deg) translateY(-1px) scaleY(.96); }
-  to { transform: rotate(-12deg) translateY(2px) scaleY(1.04); }
+  from { transform: rotate(5deg) translateY(-1px) scale(.98); }
+  to { transform: rotate(-7deg) translateY(1px) scale(1.01); }
 }
 
 @media (prefers-reduced-motion: reduce) {
