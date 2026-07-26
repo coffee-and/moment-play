@@ -8,6 +8,9 @@ export const FLAPPY_CONFIG = {
   pipeWidth: 10,
   gapHeight: 29,
   pipeSpeed: 20,
+  speedIncreaseEveryGates: 8,
+  speedIncreaseStep: 0.4,
+  maxPipeSpeed: 23.2,
   firstPipeX: 82,
   pipeSpacing: 48,
   initialLives: 3,
@@ -24,6 +27,16 @@ function createPipe(id, x, random) {
   };
 }
 
+export function getFlappyPipeSpeed(gatesPassed = 0) {
+  const completedSteps = Math.floor(
+    Math.max(0, gatesPassed) / FLAPPY_CONFIG.speedIncreaseEveryGates,
+  );
+  return Math.min(
+    FLAPPY_CONFIG.maxPipeSpeed,
+    FLAPPY_CONFIG.pipeSpeed + completedSteps * FLAPPY_CONFIG.speedIncreaseStep,
+  );
+}
+
 export function createInitialFlappyState(random = Math.random) {
   return {
     birdY: 50,
@@ -31,6 +44,7 @@ export function createInitialFlappyState(random = Math.random) {
     score: 0,
     combo: 0,
     maxCombo: 0,
+    gatesPassed: 0,
     lives: FLAPPY_CONFIG.initialLives,
     shieldGauge: 0,
     shieldReady: false,
@@ -71,11 +85,12 @@ export function advanceFlappyState(state, deltaSeconds, random = Math.random) {
   const delta = Math.min(Math.max(deltaSeconds, 0), 0.05);
   const velocity = state.velocity + FLAPPY_CONFIG.gravity * delta;
   const birdY = state.birdY + velocity * delta;
+  const pipeSpeed = getFlappyPipeSpeed(state.gatesPassed);
   let scored = 0;
 
   let pipes = state.pipes
     .map((pipe) => {
-      const x = pipe.x - FLAPPY_CONFIG.pipeSpeed * delta;
+      const x = pipe.x - pipeSpeed * delta;
       const justPassed = !pipe.passed && x + FLAPPY_CONFIG.pipeWidth < FLAPPY_CONFIG.birdX;
       if (justPassed) scored += 1;
       return {
@@ -114,6 +129,7 @@ export function advanceFlappyState(state, deltaSeconds, random = Math.random) {
     score: state.score + scoreGain,
     combo,
     maxCombo: Math.max(state.maxCombo, combo),
+    gatesPassed: state.gatesPassed + scored,
     shieldGauge,
     shieldReady,
     recoverySeconds: Math.max(0, state.recoverySeconds - delta),
