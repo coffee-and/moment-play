@@ -3,6 +3,7 @@
   --flappy-character-tail: var(--flappy-character-body);
   --flappy-character-fin: #6e8fbc;
   --flappy-character-ink: #000000;
+  --flappy-moon: #fff1b8;
 }
 
 .flappy-fish-svg {
