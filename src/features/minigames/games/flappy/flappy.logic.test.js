@@ -4,26 +4,31 @@ import {
   advanceFlappyState,
   createInitialFlappyState,
   flapFlappyState,
+  getFlappyPipeSpeed,
   hasFlappyCollision,
   recoverFlappyState,
 } from "./flappy.logic.js";
 
 describe("flappy game logic", () => {
-  it("keeps the established collision and gate physics unchanged", () => {
-    expect(FLAPPY_CONFIG).toEqual({
-      birdX: 22,
-      birdRadius: 2.7,
-      gravity: 48,
-      flapVelocity: -18,
-      pipeWidth: 10,
-      gapHeight: 29,
-      pipeSpeed: 20,
-      firstPipeX: 82,
-      pipeSpacing: 48,
-      initialLives: 3,
-      recoverySeconds: 1.2,
-      shieldChargePerGate: 25,
-    });
+  it("keeps the established collision and gate dimensions unchanged", () => {
+    expect(FLAPPY_CONFIG.birdX).toBe(22);
+    expect(FLAPPY_CONFIG.birdRadius).toBe(2.7);
+    expect(FLAPPY_CONFIG.gravity).toBe(48);
+    expect(FLAPPY_CONFIG.flapVelocity).toBe(-18);
+    expect(FLAPPY_CONFIG.pipeWidth).toBe(10);
+    expect(FLAPPY_CONFIG.gapHeight).toBe(29);
+    expect(FLAPPY_CONFIG.pipeSpacing).toBe(48);
+    expect(FLAPPY_CONFIG.initialLives).toBe(3);
+  });
+
+  it("raises speed only after every eight gates and keeps a modest maximum", () => {
+    expect(getFlappyPipeSpeed(0)).toBe(20);
+    expect(getFlappyPipeSpeed(7)).toBe(20);
+    expect(getFlappyPipeSpeed(8)).toBeCloseTo(20.4);
+    expect(getFlappyPipeSpeed(15)).toBeCloseTo(20.4);
+    expect(getFlappyPipeSpeed(16)).toBeCloseTo(20.8);
+    expect(getFlappyPipeSpeed(80)).toBe(FLAPPY_CONFIG.maxPipeSpeed);
+    expect(FLAPPY_CONFIG.maxPipeSpeed).toBe(23.2);
   });
 
   it("creates deterministic, safely spaced opening gates", () => {
@@ -48,6 +53,7 @@ describe("flappy game logic", () => {
     const first = advanceFlappyState(state, 0.01, () => 0.5);
     const second = advanceFlappyState(first.state, 0.01, () => 0.5);
     expect(first.scored).toBe(1);
+    expect(first.state.gatesPassed).toBe(1);
     expect(first.state.score).toBe(10);
     expect(second.scored).toBe(0);
   });
@@ -81,6 +87,14 @@ describe("flappy game logic", () => {
     expect(recovered.state.shieldReady).toBe(false);
     expect(recovered.state.combo).toBe(0);
     expect(recovered.state.recoverySeconds).toBe(FLAPPY_CONFIG.recoverySeconds);
+  });
+
+  it("keeps accumulated speed progress after a shield or life recovery", () => {
+    const initial = { ...createInitialFlappyState(() => 0.5), gatesPassed: 19 };
+    const shieldRecovery = recoverFlappyState({ ...initial, shieldGauge: 100, shieldReady: true });
+    const lifeRecovery = recoverFlappyState(initial);
+    expect(shieldRecovery.state.gatesPassed).toBe(19);
+    expect(lifeRecovery.state.gatesPassed).toBe(19);
   });
 
   it("loses lives before ending the flight", () => {
