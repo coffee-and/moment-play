@@ -71,11 +71,14 @@ the deep-link handler itself belongs to the later Capacitor task.
 
 1. Create or select the Google Cloud OAuth web client and configure its consent
    screen.
-2. Register the Supabase provider callback above as an authorized redirect URI.
-3. Put the Google client ID and client secret in Supabase's Google provider
+2. Register these authorized JavaScript origins as applicable:
+   `http://127.0.0.1:3000`, `https://coffee-and.github.io`, the future
+   production origin. Origins contain no route or trailing path.
+3. Register the Supabase provider callback above as an authorized redirect URI.
+4. Put the Google client ID and client secret in Supabase's Google provider
    configuration and enable it.
-4. Add the application callback URLs to the Supabase redirect allow list.
-5. Set `VITE_AUTH_GOOGLE_ENABLED=true` only for the deployed environment that
+5. Add the application callback URLs to the Supabase redirect allow list.
+6. Set `VITE_AUTH_GOOGLE_ENABLED=true` only for the deployed environment that
    has completed configuration.
 
 References:
@@ -113,13 +116,22 @@ before this flag is enabled.
 
 Required follow-up:
 
-1. Configure a Naver custom provider in Supabase with the official authorize,
-   token, and userinfo endpoints.
-2. Prove the nested userinfo mapping in a non-production project or implement a
+1. Create a Naver Login application and register the Supabase provider callback
+   above as its callback URL.
+2. Request the stable Naver member identifier. Treat email, name, and nickname
+   as optional consent fields; application ownership must use the stable Auth
+   identity, not those optional fields.
+3. Configure the Supabase custom provider with:
+   - authorize: `https://nid.naver.com/oauth2.0/authorize`
+   - token: `https://nid.naver.com/oauth2.0/token`
+   - userinfo: `https://openapi.naver.com/v1/nid/me`
+   - the Naver client ID and secret stored only in Supabase
+   - optional-email handling enabled
+4. Prove the nested userinfo mapping in a non-production project or implement a
    reviewed server-side adapter if the hosted custom provider cannot map it.
-3. Verify new login, repeat login, cancellation, missing email, denied consent,
+5. Verify new login, repeat login, cancellation, missing email, denied consent,
    account collision, logout, and refresh.
-4. Only then set `VITE_AUTH_NAVER_ENABLED=true`.
+6. Only then set `VITE_AUTH_NAVER_ENABLED=true`.
 
 Until those checks pass, keep the Naver flag unset. Do not put the Naver client
 secret in frontend code.
