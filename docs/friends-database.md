@@ -11,7 +11,7 @@ Included:
 - Send, accept, reject, cancel, and remove operations
 - Friend and pending-request overview
 - RLS and privilege boundaries
-- pgTAP coverage for schema, grants, forged actions, anonymous accounts, duplicate pairs, and the full request lifecycle
+- pgTAP coverage for schema, grants, forged actions, guest denial, duplicate pairs, and the full request lifecycle
 
 ## Privacy boundary
 
@@ -38,7 +38,8 @@ The `friendships` table has RLS enabled and gives `anon` and `authenticated` no 
 - `remove_friend(uuid)`
 - `get_friend_overview()`
 
-Anonymous authenticated users are rejected by the internal permanent-account guard.
+Browser guests cannot call friendship RPCs. Release accounts are authorized by
+the internal account guard.
 
 ## Verification
 

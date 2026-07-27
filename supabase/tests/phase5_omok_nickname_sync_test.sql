@@ -28,7 +28,7 @@ select ok(
 
 select ok(
   not has_function_privilege('anon', 'public.omok_join_room(uuid)', 'EXECUTE'),
-  'anonymous browser role cannot execute omok_join_room'
+  'guest browser role cannot execute omok_join_room'
 );
 
 insert into auth.users (

@@ -241,28 +241,23 @@ values
   ('42000000-0000-4000-8000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    'phase5-permanent-b@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
   ('42000000-0000-4000-8000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   'phase5-permanent-c@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
-  ('42000000-0000-4000-8000-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   null, '', now(), '{"provider":"anonymous","providers":["anonymous"]}', '{}', now(), now(), true);
+   'phase5-permanent-c@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false);
 
 update public.profiles
 set nickname = case user_id
   when '42000000-0000-4000-8000-000000000001' then 'InviteAlpha'
   when '42000000-0000-4000-8000-000000000002' then 'InviteBeta'
   when '42000000-0000-4000-8000-000000000003' then 'InviteGamma'
-  else 'InviteAnon'
 end,
 friend_code = case user_id
   when '42000000-0000-4000-8000-000000000001' then 'AAAABBBB01'
   when '42000000-0000-4000-8000-000000000002' then 'AAAABBBB02'
   when '42000000-0000-4000-8000-000000000003' then 'AAAABBBB03'
-  else 'AAAABBBB04'
 end
 where user_id in (
   '42000000-0000-4000-8000-000000000001',
   '42000000-0000-4000-8000-000000000002',
-  '42000000-0000-4000-8000-000000000003',
-  '42000000-0000-4000-8000-000000000004'
+  '42000000-0000-4000-8000-000000000003'
 );
 
 insert into public.friendships (
@@ -282,7 +277,7 @@ values
     'pending', now(), null
   );
 
--- Anonymous and direct-table denial ------------------------------------------
+-- Guest and direct-table denial -----------------------------------------------
 
 select set_config('request.jwt.claims', '{}', true);
 set local role anon;
@@ -291,23 +286,6 @@ select throws_ok(
   'select * from public.get_friend_omok_invites()',
   '42501', 'permission denied for function get_friend_omok_invites',
   'anon cannot read game invites'
-);
-
-reset role;
-select set_config(
-  'request.jwt.claims',
-  '{"sub":"42000000-0000-4000-8000-000000000004","role":"authenticated","is_anonymous":true}',
-  true
-);
-set local role authenticated;
-
-select throws_ok(
-  $$select * from public.create_friend_omok_invite(
-      '43000000-0000-4000-8000-000000000001',
-      'standard', true, true, true, true
-    )$$,
-  '42501', 'Permanent account required',
-  'anonymous authenticated users cannot create friend game invites'
 );
 
 reset role;

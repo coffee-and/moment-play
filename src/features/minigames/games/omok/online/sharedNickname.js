@@ -1,4 +1,4 @@
-import { getExistingSession } from "../../../../../infrastructure/supabase/supabaseAuth.js";
+import { getCurrentSession } from "../../../../../infrastructure/supabase/authGateway.js";
 import { getSupabaseClient, isSupabaseConfigured } from "../../../../../infrastructure/supabase/supabaseClient.js";
 import { getProfileByUserId, saveCurrentProfileNickname } from "../../../../../infrastructure/supabase/omokOnlineRoomGateway.js";
 import {
@@ -30,7 +30,7 @@ export async function resolveSharedNickname() {
   if (isSupabaseConfigured()) {
     try {
       const client = getSupabaseClient();
-      const session = await getExistingSession(client);
+      const session = await getCurrentSession(client);
       if (session) {
         const profile = await getProfileByUserId(session.user.id, client);
         return profile?.nickname && !isFallbackOnlineNickname(profile.nickname)
@@ -75,7 +75,7 @@ export async function saveSharedNickname(rawNickname) {
 
   if (isSupabaseConfigured()) {
     const client = getSupabaseClient();
-    const session = await getExistingSession(client);
+    const session = await getCurrentSession(client);
     if (session) {
       await saveCurrentProfileNickname(normalized, client);
     }

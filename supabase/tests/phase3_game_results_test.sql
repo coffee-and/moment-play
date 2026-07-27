@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = extensions, public, pg_catalog;
 
-select plan(69);
+select plan(65);
 
 -- Schema ---------------------------------------------------------------------
 
@@ -168,14 +168,6 @@ select matches(
   (select pg_get_expr(polwithcheck, polrelid) from pg_catalog.pg_policy
    where polrelid = 'public.game_results'::regclass
      and polname = 'game_results_insert_permanent_own'),
-  'is_anonymous.*false',
-  'ranking policy rejects anonymous JWT users'
-);
-
-select matches(
-  (select pg_get_expr(polwithcheck, polrelid) from pg_catalog.pg_policy
-   where polrelid = 'public.game_results'::regclass
-     and polname = 'game_results_insert_permanent_own'),
   'game_key.*<>.*omok',
   'ranking policy rejects client Omok results'
 );
@@ -278,20 +270,16 @@ values
   ('10000000-0000-4000-8000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    'phase3-permanent-a@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
   ('10000000-0000-4000-8000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   'phase3-permanent-b@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
-  ('10000000-0000-4000-8000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   null, '', now(), '{"provider":"anonymous","providers":["anonymous"]}', '{}', now(), now(), true);
+   'phase3-permanent-b@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false);
 
 update public.profiles
 set nickname = case user_id
   when '10000000-0000-4000-8000-000000000001' then 'TapAlpha'
   when '10000000-0000-4000-8000-000000000002' then 'TapBeta'
-  else 'TapAnon'
 end
 where user_id in (
   '10000000-0000-4000-8000-000000000001',
-  '10000000-0000-4000-8000-000000000002',
-  '10000000-0000-4000-8000-000000000003'
+  '10000000-0000-4000-8000-000000000002'
 );
 
 insert into public.game_results
@@ -323,23 +311,6 @@ select throws_ok(
       ('10000000-0000-4000-8000-000000000001', '2048', 1, '30000000-0000-4000-8000-000000000001')$$,
   '42501', 'permission denied for table game_results',
   'anon INSERT is denied'
-);
-
-reset role;
-select set_config(
-  'request.jwt.claims',
-  '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":true}',
-  true
-);
-set local role authenticated;
-
-select throws_ok(
-  $$insert into public.game_results
-      (user_id, game_key, score_value, client_submission_id)
-    values
-      ('10000000-0000-4000-8000-000000000003', '2048', 1, '30000000-0000-4000-8000-000000000002')$$,
-  '42501', 'new row violates row-level security policy for table "game_results"',
-  'anonymous authenticated users cannot insert ranked results'
 );
 
 reset role;
@@ -522,28 +493,6 @@ select is(
   ),
   array['created_at', 'duration_ms', 'game_key', 'is_current_user', 'match_result', 'mode', 'nickname', 'rank', 'score_value'],
   'leaderboard rows contain only approved public fields'
-);
-
-reset role;
-select set_config(
-  'request.jwt.claims',
-  '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":true}',
-  true
-);
-set local role authenticated;
-
-select lives_ok(
-  $$select * from public.get_game_leaderboard('2048', null, 50)$$,
-  'anonymous authenticated users can read the leaderboard'
-);
-
-select throws_ok(
-  $$insert into public.game_results
-      (user_id, game_key, score_value, client_submission_id)
-    values
-      ('10000000-0000-4000-8000-000000000003', 'memory', 1, '30000000-0000-4000-8000-000000000011')$$,
-  '42501', 'new row violates row-level security policy for table "game_results"',
-  'anonymous authenticated users still cannot insert'
 );
 
 reset role;

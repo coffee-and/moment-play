@@ -1,85 +1,47 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const mockSession = { user: { id: "user-1", is_anonymous: true } };
-
-vi.mock("./supabaseAuth.js", () => ({
-  ensureAnonymousSession: vi.fn(async () => mockSession),
-}));
+const requireAuthenticatedSession = vi.fn(async () => ({ user: { id: "user-1" } }));
+vi.mock("./authGateway.js", () => ({ requireAuthenticatedSession }));
 
 const { saveCurrentProfileNickname } = await import("./omokOnlineRoomGateway.js");
 
-function createClient({ updateError = null, metadataError = null } = {}) {
-  const eq = vi.fn(async () => ({ data: null, error: updateError }));
-  const update = vi.fn(() => ({ eq }));
-  const from = vi.fn(() => ({ update }));
-  const updateUser = vi.fn(async () => ({ data: null, error: metadataError }));
-  return { client: { auth: { updateUser }, from }, eq, from, update, updateUser };
+function createClient({ rpcError = null } = {}) {
+  const rpc = vi.fn(async () => ({ data: "New Name", error: rpcError }));
+  return { client: { rpc }, rpc };
 }
 
 afterEach(() => {
-  mockSession.user.is_anonymous = true;
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
 });
 
 describe("saveCurrentProfileNickname", () => {
-  it("updates only the current user's profile row and synchronizes account metadata", async () => {
-    const { client, eq, from, update, updateUser } = createClient();
+  it("updates the authenticated profile through the authorized server function", async () => {
+    const { client, rpc } = createClient();
 
-    const result = await saveCurrentProfileNickname("New Name", client);
+    const result = await saveCurrentProfileNickname("  New   Name  ", client);
 
-    expect(from).toHaveBeenCalledWith("profiles");
-    expect(update).toHaveBeenCalledTimes(1);
-    const [payload] = update.mock.calls[0];
-    // The bug: an upsert previously re-set user_id via ON CONFLICT DO
-    // UPDATE, which the table's column-scoped UPDATE grant doesn't permit.
-    // A plain update must never include user_id in the SET payload.
-    expect(payload.user_id).toBeUndefined();
-    expect(payload.nickname).toBe("New Name");
-    expect(eq).toHaveBeenCalledWith("user_id", "user-1");
-    expect(updateUser).toHaveBeenCalledWith({ data: { nickname: "New Name" } });
+    expect(requireAuthenticatedSession).toHaveBeenCalledWith(client);
+    expect(rpc).toHaveBeenCalledWith("update_my_profile_nickname", {
+      p_nickname: "New Name",
+    });
     expect(result).toEqual({ userId: "user-1", nickname: "New Name", needsNicknameSetup: false });
+    expect(client.auth).toBeUndefined();
   });
 
-  it("throws a clean Korean message and logs the technical profile error only in dev", async () => {
+  it("does not call the server before nickname validation succeeds", async () => {
+    const { client, rpc } = createClient();
+    await expect(saveCurrentProfileNickname("a", client)).rejects.toThrow();
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("returns a recoverable message when the server rejects the update", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const { client, updateUser } = createClient({
-      updateError: { message: "permission denied for table profiles", code: "42501" },
+    const { client } = createClient({
+      rpcError: { message: "permission denied", code: "42501" },
     });
 
-    let caught = null;
-    try {
-      await saveCurrentProfileNickname("New Name", client);
-    } catch (error) {
-      caught = error;
-    }
-
-    expect(caught).toBeInstanceOf(Error);
-    expect(caught.message).toMatch(/저장하지 못했어요/);
-    expect(caught.message).not.toMatch(/permission denied/);
+    await expect(saveCurrentProfileNickname("New Name", client)).rejects.toThrow(/저장하지 못했어요/);
     expect(consoleError).toHaveBeenCalled();
-    expect(updateUser).not.toHaveBeenCalled();
-  });
-
-  it("keeps the profile save successful when account metadata synchronization fails", async () => {
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const { client } = createClient({ metadataError: { message: "metadata unavailable" } });
-
-    await expect(saveCurrentProfileNickname("New Name", client)).resolves.toMatchObject({
-      nickname: "New Name",
-      needsNicknameSetup: false,
-    });
-    expect(consoleWarn).toHaveBeenCalled();
-  });
-
-  it("uses the identical update flow for an anonymous authenticated session as for a permanent one", async () => {
-    mockSession.user.is_anonymous = true;
-    const anon = createClient();
-    await saveCurrentProfileNickname("Anon Name", anon.client);
-    expect(anon.eq).toHaveBeenCalledWith("user_id", "user-1");
-
-    mockSession.user.is_anonymous = false;
-    const permanent = createClient();
-    await saveCurrentProfileNickname("Real Name", permanent.client);
-    expect(permanent.eq).toHaveBeenCalledWith("user_id", "user-1");
+    consoleError.mockRestore();
   });
 });

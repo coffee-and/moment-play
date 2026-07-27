@@ -5,7 +5,7 @@ export const MINIGAME_STATUS = {
   COMING_SOON: "comingSoon",
 };
 
-export const MINIGAMES_PATH = "/games";
+export const MINIGAMES_PATH = "/minigames";
 
 export const MINIGAME_CATALOG = [
   {

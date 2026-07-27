@@ -1,16 +1,14 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const ensureAnonymousSession = vi.fn();
-const getExistingSession = vi.fn();
+const getCurrentSession = vi.fn();
 const isSupabaseConfigured = vi.fn();
 const getSupabaseClient = vi.fn(() => ({}));
 const getProfileByUserId = vi.fn();
 const saveCurrentProfileNickname = vi.fn();
 
-vi.mock("../../../../../infrastructure/supabase/supabaseAuth.js", () => ({
-  ensureAnonymousSession,
-  getExistingSession,
+vi.mock("../../../../../infrastructure/supabase/authGateway.js", () => ({
+  getCurrentSession,
 }));
 
 vi.mock("../../../../../infrastructure/supabase/supabaseClient.js", () => ({
@@ -43,19 +41,18 @@ afterEach(() => {
 describe("resolveSharedNickname precedence", () => {
   it("uses the profile nickname when a Supabase session already exists", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue({ user: { id: "user-1" } });
+    getCurrentSession.mockResolvedValue({ user: { id: "user-1" } });
     getProfileByUserId.mockResolvedValue({ nickname: "ServerNick" });
 
     const result = await resolveSharedNickname();
 
     expect(result).toBe("ServerNick");
-    expect(ensureAnonymousSession).not.toHaveBeenCalled();
   });
 
   it("does not inherit a previous account's local nickname when the signed-in profile still has a fallback", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue({ user: { id: "user-2" } });
-    getProfileByUserId.mockResolvedValue({ nickname: "Guest-abc123" });
+    getCurrentSession.mockResolvedValue({ user: { id: "user-2" } });
+    getProfileByUserId.mockResolvedValue({ nickname: "Player-abc12" });
     saveLocalSharedNickname("PreviousUser");
 
     const result = await resolveSharedNickname();
@@ -65,14 +62,13 @@ describe("resolveSharedNickname precedence", () => {
 
   it("falls back to the locally stored nickname when no session exists", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue(null);
+    getCurrentSession.mockResolvedValue(null);
     saveLocalSharedNickname("LocalNick");
 
     const result = await resolveSharedNickname();
 
     expect(result).toBe("LocalNick");
     expect(getProfileByUserId).not.toHaveBeenCalled();
-    expect(ensureAnonymousSession).not.toHaveBeenCalled();
   });
 
   it("falls back to Guest when there is no session and no valid local nickname", async () => {
@@ -81,17 +77,17 @@ describe("resolveSharedNickname precedence", () => {
     const result = await resolveSharedNickname();
 
     expect(result).toBe(GUEST_FALLBACK_NICKNAME);
-    expect(ensureAnonymousSession).not.toHaveBeenCalled();
   });
 
-  it("never creates an anonymous Supabase session while resolving or saving locally", async () => {
+  it("keeps local nickname resolution read-only when there is no session", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue(null);
+    getCurrentSession.mockResolvedValue(null);
 
     await resolveSharedNickname();
     saveLocalSharedNickname("LocalOnly");
 
-    expect(ensureAnonymousSession).not.toHaveBeenCalled();
+    expect(getProfileByUserId).not.toHaveBeenCalled();
+    expect(saveCurrentProfileNickname).not.toHaveBeenCalled();
   });
 
   it("starts online account nickname setup empty even when a local nickname exists", () => {
@@ -103,18 +99,17 @@ describe("resolveSharedNickname precedence", () => {
 describe("saveSharedNickname", () => {
   it("saves locally immediately and does not touch Supabase without a session", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue(null);
+    getCurrentSession.mockResolvedValue(null);
 
     const saved = await saveSharedNickname("  Sunny   Day  ");
 
     expect(saved).toBe("Sunny Day");
     expect(saveCurrentProfileNickname).not.toHaveBeenCalled();
-    expect(ensureAnonymousSession).not.toHaveBeenCalled();
   });
 
   it("also saves to profiles when a session already exists", async () => {
     isSupabaseConfigured.mockReturnValue(true);
-    getExistingSession.mockResolvedValue({ user: { id: "user-1" } });
+    getCurrentSession.mockResolvedValue({ user: { id: "user-1" } });
 
     await saveSharedNickname("Sunny");
 

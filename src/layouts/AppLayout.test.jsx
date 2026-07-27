@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
+import { LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -58,21 +58,15 @@ describe("AppLayout account control", () => {
     view.unmount();
   });
 
-  it("shows login for both guest and anonymous sessions", () => {
+  it("shows login for a guest session", () => {
     auth = { status: "guest", user: null, signOut };
     const guestView = renderLayout();
     expect(guestView.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
     guestView.unmount();
-
-    auth = { status: "anonymous", user: { id: "anon-1", is_anonymous: true }, signOut };
-    const anonymousView = renderLayout();
-    expect(anonymousView.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
-    expect(anonymousView.host.querySelector(`a[href="${SIGNUP_PATH}"]`)).toBeNull();
-    anonymousView.unmount();
   });
 
   it("shows an authenticated email fallback and never links the account control to login", () => {
-    auth = { status: "authenticated", user: { email: "sky.player@example.com", is_anonymous: false }, signOut };
+    auth = { status: "authenticated", user: { email: "sky.player@example.com" }, signOut };
     const view = renderLayout();
     const accountControl = view.host.querySelector("summary");
     expect(accountControl.textContent).toBe("sky.player");
@@ -86,7 +80,7 @@ describe("AppLayout account control", () => {
   });
 
   it("uses an explicit logout action and returns the header to guest state", async () => {
-    auth = { status: "authenticated", user: { email: null, is_anonymous: false }, signOut };
+    auth = { status: "authenticated", user: { email: null }, signOut };
     const view = renderLayout();
     expect(view.host.querySelector("summary").textContent).toBe("내 계정");
 

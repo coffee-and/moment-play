@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { LOGIN_PATH, SIGNUP_PATH } from "../../shared/auth/authConstants.js";
+import { LOGIN_PATH } from "../../shared/auth/authConstants.js";
 import { FRIENDS_PATH } from "./friendsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -158,16 +158,6 @@ describe("FriendsPage", () => {
     expect(fetchMyFriendProfile).not.toHaveBeenCalled();
     expect(fetchFriendOverview).not.toHaveBeenCalled();
     expect(fetchFriendOmokInvites).not.toHaveBeenCalled();
-    view.unmount();
-  });
-
-  it("asks anonymous users to log in instead of showing only account creation", async () => {
-    auth = { isConfigured: true, status: "anonymous" };
-    const view = await renderPage();
-    expect(view.host.textContent).toContain("로그인하면 친구와 연결할 수 있어요");
-    expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
-    expect(view.host.querySelector(`a[href="${SIGNUP_PATH}"]`)).toBeNull();
-    expect(fetchMyFriendProfile).not.toHaveBeenCalled();
     view.unmount();
   });
 

@@ -21,12 +21,13 @@ const result = {
 };
 
 describe("gameResultsGateway", () => {
-  it.each([
-    ["guest", null],
-    ["anonymous", { id: "anon-1", is_anonymous: true }],
-  ])("does not submit server results for %s users", async (authStatus, user) => {
+  it("does not submit server results for guests", async () => {
     const client = createClient();
-    await expect(submitGameResult({ authStatus, user, result }, client)).rejects.toBeInstanceOf(ResultSubmissionNotAllowedError);
+    await expect(submitGameResult({
+      authStatus: "guest",
+      user: null,
+      result,
+    }, client)).rejects.toBeInstanceOf(ResultSubmissionNotAllowedError);
     expect(client.from).not.toHaveBeenCalled();
   });
 
@@ -34,7 +35,7 @@ describe("gameResultsGateway", () => {
     const client = createClient();
     await submitGameResult({
       authStatus: "authenticated",
-      user: { id: "user-1", is_anonymous: false },
+      user: { id: "user-1" },
       result: { ...result, userId: "other-user" },
     }, client);
 
@@ -47,7 +48,7 @@ describe("gameResultsGateway", () => {
     const client = createClient({ insertError: { code: "23505", message: "duplicate" } });
     await expect(submitGameResult({
       authStatus: "authenticated",
-      user: { id: "user-1", is_anonymous: false },
+      user: { id: "user-1" },
       result,
     }, client)).resolves.toEqual({ duplicate: true });
   });

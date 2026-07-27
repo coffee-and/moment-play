@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, AUTH_MESSAGES, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
+import { buildAuthRoute, getReturnToFromSearch } from "../../../shared/auth/returnTo.js";
 import "../auth.css";
 
 export function LoginPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { isConfigured, signIn, status } = useAuth();
+  const returnTo = getReturnToFromSearch(location.search);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    if (status === "authenticated") navigate("/", { replace: true });
-  }, [status, navigate]);
+    if (status === "authenticated") navigate(returnTo, { replace: true });
+  }, [navigate, returnTo, status]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -31,6 +34,7 @@ export function LoginPage() {
 
     try {
       await signIn({ email: email.trim(), password });
+      navigate(returnTo, { replace: true });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : AUTH_MESSAGES.signInFailed);
     } finally {
@@ -78,8 +82,10 @@ export function LoginPage() {
           <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
-        <p className="auth-switch">계정이 없으신가요? <Link to={SIGNUP_PATH}>회원가입</Link></p>
-        <p className="auth-switch"><Link to="/">게스트로 계속하기</Link></p>
+        <p className="auth-switch">
+          계정이 없으신가요? <Link to={buildAuthRoute(SIGNUP_PATH, returnTo)}>회원가입</Link>
+        </p>
+        <p className="auth-switch"><Link to={returnTo}>게스트로 계속 둘러보기</Link></p>
       </div>
     </div>
   );

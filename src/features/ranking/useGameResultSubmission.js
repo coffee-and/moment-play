@@ -39,7 +39,7 @@ export function useGameResultSubmission() {
     if (submittedIdsRef.current.has(clientSubmissionId)) return;
     pendingResultRef.current = result;
 
-    if (authStatus !== "authenticated" || !user || user.is_anonymous) {
+    if (authStatus !== "authenticated" || !user) {
       setStatus(RESULT_SUBMISSION_STATUS.UNAUTHENTICATED);
       return;
     }

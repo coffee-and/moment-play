@@ -29,8 +29,8 @@ export async function fetchLeaderboard({ gameKey, mode = null, limit = DEFAULT_L
 }
 
 export async function submitGameResult({ authStatus, user, result }, client = getSupabaseClient()) {
-  if (authStatus !== "authenticated" || !user || user.is_anonymous) {
-    throw new ResultSubmissionNotAllowedError("영구 계정으로 로그인해야 랭킹 기록을 저장할 수 있습니다.");
+  if (authStatus !== "authenticated" || !user) {
+    throw new ResultSubmissionNotAllowedError("로그인해야 랭킹 기록을 저장할 수 있습니다.");
   }
 
   const row = {

@@ -36,11 +36,8 @@ afterEach(() => {
 });
 
 describe("useGameResultSubmission", () => {
-  it.each([
-    ["guest", null],
-    ["anonymous", { id: "anon-1", is_anonymous: true }],
-  ])("keeps the result screen intact and blocks %s submissions", async (status, user) => {
-    auth = { status, user };
+  it("keeps the result screen intact and blocks guest submissions", async () => {
+    auth = { status: "guest", user: null };
     const view = renderHook();
     await act(async () => latest.submitResult({ gameKey: "memory", scoreValue: 3 }));
     expect(latest.status).toBe("unauthenticated");
@@ -50,7 +47,7 @@ describe("useGameResultSubmission", () => {
   });
 
   it("submits an authenticated terminal result only once per attempt", async () => {
-    auth = { status: "authenticated", user: { id: "user-1", is_anonymous: false } };
+    auth = { status: "authenticated", user: { id: "user-1" } };
     submitGameResult.mockResolvedValue({ duplicate: false });
     const view = renderHook();
     const terminalResult = { gameKey: "2048", scoreValue: 4096 };
@@ -63,7 +60,7 @@ describe("useGameResultSubmission", () => {
   });
 
   it("surfaces a failed save without removing the result screen and allows retry", async () => {
-    auth = { status: "authenticated", user: { id: "user-1", is_anonymous: false } };
+    auth = { status: "authenticated", user: { id: "user-1" } };
     submitGameResult.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({ duplicate: false });
     const view = renderHook();
     await act(async () => latest.submitResult({ gameKey: "sudoku", mode: "easy", durationMs: 30000 }));

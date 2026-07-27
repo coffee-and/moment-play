@@ -27,11 +27,11 @@ export function validateOnlineNickname(value) {
 }
 
 export function getFallbackOnlineNickname(userId) {
-  return `Guest-${String(userId ?? "").slice(0, 6)}`;
+  return `Player-${String(userId ?? "").slice(0, 5)}`;
 }
 
 export function isFallbackOnlineNickname(nickname) {
-  return !nickname || /^Guest-[0-9a-f]{6}$/i.test(nickname);
+  return !nickname || /^Player-[0-9a-f]{5}$/i.test(nickname);
 }
 
 export function isValidOnlineRoomId(roomId) {

@@ -1,9 +1,8 @@
-import { ensureAnonymousSession } from "./supabaseAuth.js";
+import { requireAuthenticatedSession } from "./authGateway.js";
 import { getSupabaseClient, isSupabaseConfigured } from "./supabaseClient.js";
 import { ONLINE_NICKNAME_SAVE_FAILED_MESSAGE } from "../../features/minigames/games/omok/online/omokOnline.constants.js";
 import {
   createOmokInviteUrl,
-  getFallbackOnlineNickname,
   isFallbackOnlineNickname,
   mapOmokMoveRow,
   mapOmokRoomRow,
@@ -23,7 +22,7 @@ function throwIfSupabaseError(error, fallbackMessage) {
 }
 
 async function getCurrentUserId(client = getSupabaseClient()) {
-  const session = await ensureAnonymousSession(client);
+  const session = await requireAuthenticatedSession(client);
   return session.user.id;
 }
 
@@ -36,20 +35,6 @@ export async function getProfileByUserId(userId, client = getSupabaseClient()) {
 
   throwIfSupabaseError(error, "프로필을 불러오지 못했습니다.");
   return data;
-}
-
-async function getOrCreateProfileNickname(userId, client = getSupabaseClient()) {
-  const profile = await getProfileByUserId(userId, client);
-  if (profile?.nickname) return profile.nickname;
-
-  const fallbackNickname = getFallbackOnlineNickname(userId);
-  const { error } = await client.from("profiles").insert({
-    user_id: userId,
-    nickname: fallbackNickname,
-  });
-
-  throwIfSupabaseError(error, "임시 닉네임을 만들지 못했습니다.");
-  return fallbackNickname;
 }
 
 export async function getCurrentProfileState(client = getSupabaseClient()) {
@@ -72,36 +57,13 @@ export async function saveCurrentProfileNickname(nickname, client = getSupabaseC
   const userId = await getCurrentUserId(client);
   const normalizedNickname = normalizeOnlineNickname(validation.value);
 
-  // A plain update, not an upsert: the omok_handle_new_auth_user trigger
-  // (see supabase/migrations) already inserts a profiles row for every new
-  // auth.users row, anonymous or not, so there is always an existing row to
-  // update here. Upsert's ON CONFLICT DO UPDATE previously also tried to set
-  // user_id (it re-sets every column in the payload, including the conflict
-  // key), which the table's column-scoped UPDATE grant
-  // (nickname, updated_at only) does not permit - failing with "permission
-  // denied for table profiles" even though the RLS policy itself was fine.
-  const { error } = await client
-    .from("profiles")
-    .update({
-      nickname: normalizedNickname,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
+  const { error } = await client.rpc("update_my_profile_nickname", {
+    p_nickname: normalizedNickname,
+  });
 
   if (error) {
     if (import.meta.env.DEV) console.error("saveCurrentProfileNickname failed:", error);
     throw new Error(ONLINE_NICKNAME_SAVE_FAILED_MESSAGE);
-  }
-
-  // Header/account labels use Supabase user metadata. Keep it aligned with the
-  // public profile nickname so a successful nickname setup does not continue
-  // to show the email prefix until the next login. This is best-effort because
-  // the profile row is the authoritative gameplay identity.
-  const { error: metadataError } = await client.auth.updateUser({
-    data: { nickname: normalizedNickname },
-  });
-  if (metadataError && import.meta.env.DEV) {
-    console.warn("saveCurrentProfileNickname metadata sync failed:", metadataError);
   }
 
   return {
@@ -154,7 +116,6 @@ export async function getOmokOnlineRoomSnapshot(roomId, client = getSupabaseClie
 
 export async function createOmokOnlineRoom({ gameMode, guideSettings, roomGuideSettings }, client = getSupabaseClient()) {
   const userId = await getCurrentUserId(client);
-  await getOrCreateProfileNickname(userId, client);
 
   const { data: roomId, error } = await client.rpc("omok_create_room", {
     p_allow_forbidden_positions: Boolean(roomGuideSettings.allowForbiddenPositions),
@@ -177,7 +138,6 @@ export async function createOmokOnlineRoom({ gameMode, guideSettings, roomGuideS
 
 export async function joinOmokOnlineRoom(roomId, client = getSupabaseClient()) {
   const userId = await getCurrentUserId(client);
-  await getOrCreateProfileNickname(userId, client);
 
   const { error } = await client.rpc("omok_join_room", {
     p_room_id: roomId,

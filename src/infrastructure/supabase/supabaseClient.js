@@ -29,8 +29,8 @@ export function getSupabaseClient() {
         detectSessionInUrl: false,
         // PKCE puts the auth code in a `?code=` query param rather than a
         // `#access_token=...` hash fragment - the latter would collide with
-        // this app's HashRouter (`#/route`). See CompleteSignupPage.jsx,
-        // which exchanges that code for a session explicitly.
+        // this app's HashRouter (`#/route`). AuthCallbackPage exchanges the
+        // shared callback code explicitly.
         flowType: "pkce",
         persistSession: true,
       },

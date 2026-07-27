@@ -35,7 +35,7 @@ describe("omok online nickname utilities", () => {
   });
 
   it("detects fallback nicknames", () => {
-    expect(isFallbackOnlineNickname("Guest-abcdef")).toBe(true);
+    expect(isFallbackOnlineNickname("Player-abcde")).toBe(true);
     expect(isFallbackOnlineNickname("coffee")).toBe(false);
   });
 });

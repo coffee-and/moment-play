@@ -228,22 +228,20 @@ values
   ('41000000-0000-4000-8000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
    'phase4-permanent-b@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
   ('41000000-0000-4000-8000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   'phase4-permanent-c@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false),
-  ('41000000-0000-4000-8000-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-   null, '', now(), '{"provider":"anonymous","providers":["anonymous"]}', '{}', now(), now(), true);
+   'phase4-permanent-c@example.invalid', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), false);
 
 select is(
   (select count(*) from public.profiles
    where user_id::text like '41000000-0000-4000-8000-%'
      and friend_code ~ '^[A-F0-9]{10}$'),
-  4::bigint,
-  'the profile trigger creates valid friend codes for permanent and anonymous users'
+  3::bigint,
+  'the profile trigger creates valid friend codes for authenticated users'
 );
 
 select is(
   (select count(distinct friend_code) from public.profiles
    where user_id::text like '41000000-0000-4000-8000-%'),
-  4::bigint,
+  3::bigint,
   'generated friend codes are unique'
 );
 
@@ -256,22 +254,19 @@ set
     when '41000000-0000-4000-8000-000000000001' then 'FriendAlpha'
     when '41000000-0000-4000-8000-000000000002' then 'FriendBeta'
     when '41000000-0000-4000-8000-000000000003' then 'FriendGamma'
-    else 'FriendAnon'
   end,
   friend_code = case user_id
     when '41000000-0000-4000-8000-000000000001' then 'AAAAAAAA01'
     when '41000000-0000-4000-8000-000000000002' then 'BBBBBBBB02'
     when '41000000-0000-4000-8000-000000000003' then 'CCCCCCCC03'
-    else 'DDDDDDDD04'
   end
 where user_id in (
   '41000000-0000-4000-8000-000000000001',
   '41000000-0000-4000-8000-000000000002',
-  '41000000-0000-4000-8000-000000000003',
-  '41000000-0000-4000-8000-000000000004'
+  '41000000-0000-4000-8000-000000000003'
 );
 
--- Anonymous and direct-access denial ------------------------------------------
+-- Guest and direct-access denial ----------------------------------------------
 
 select set_config('request.jwt.claims', '{}', true);
 set local role anon;
@@ -280,26 +275,6 @@ select throws_ok(
   'select * from public.get_my_friend_profile()',
   '42501', 'permission denied for function get_my_friend_profile',
   'anon cannot read a friend profile'
-);
-
-reset role;
-select set_config(
-  'request.jwt.claims',
-  '{"sub":"41000000-0000-4000-8000-000000000004","role":"authenticated","is_anonymous":true}',
-  true
-);
-set local role authenticated;
-
-select throws_ok(
-  'select * from public.get_my_friend_profile()',
-  '42501', 'Permanent account required',
-  'anonymous authenticated users cannot use friend features'
-);
-
-select throws_ok(
-  $$select public.send_friend_request('BBBBBBBB02')$$,
-  '42501', 'Permanent account required',
-  'anonymous authenticated users cannot send friend requests'
 );
 
 reset role;
@@ -348,12 +323,6 @@ select throws_ok(
   $$select * from public.find_friend_by_code('not-a-code')$$,
   'P0001', 'Invalid friend code',
   'invalid friend-code formats are rejected'
-);
-
-select throws_ok(
-  $$select * from public.find_friend_by_code('DDDDDDDD04')$$,
-  'P0001', 'Friend code not found',
-  'anonymous accounts cannot be found as friend targets'
 );
 
 select lives_ok(
