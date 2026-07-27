@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getCurrentSession,
   signInWithEmail,
+  signInWithProvider,
   signUpWithEmail,
 } from "./authGateway.js";
 
@@ -10,6 +11,7 @@ function createClient(authOverrides = {}) {
     auth: {
       getSession: vi.fn(async () => ({ data: { session: null }, error: null })),
       signInAnonymously: vi.fn(),
+      signInWithOAuth: vi.fn(),
       signOut: vi.fn(async () => ({ error: null })),
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
@@ -17,6 +19,10 @@ function createClient(authOverrides = {}) {
     },
   };
 }
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("authGateway", () => {
   it("creates an email account with PKCE redirect options and never creates an anonymous account", async () => {
@@ -78,5 +84,80 @@ describe("authGateway", () => {
       email: "player@example.com",
       password: "wrong",
     }, client)).rejects.toThrow(/올바르지 않습니다/);
+  });
+
+  it.each([
+    ["google", "VITE_AUTH_GOOGLE_ENABLED", "google"],
+    ["kakao", "VITE_AUTH_KAKAO_ENABLED", "kakao"],
+    ["naver", "VITE_AUTH_NAVER_ENABLED", "custom:naver"],
+  ])("starts %s through the shared OAuth gateway", async (provider, flagName, supabaseProvider) => {
+    vi.stubEnv(flagName, "true");
+    const client = createClient({
+      signInWithOAuth: vi.fn(async () => ({
+        data: { provider: supabaseProvider, url: "https://auth.example/authorize" },
+        error: null,
+      })),
+    });
+
+    await expect(signInWithProvider({
+      provider,
+      redirectTo: "https://moment-play.example/#/auth/callback?returnTo=%2Ffriends",
+    }, client)).resolves.toEqual({
+      provider,
+      redirectUrl: "https://auth.example/authorize",
+    });
+
+    expect(client.auth.signInWithOAuth).toHaveBeenCalledWith({
+      provider: supabaseProvider,
+      options: {
+        redirectTo: "https://moment-play.example/#/auth/callback?returnTo=%2Ffriends",
+      },
+    });
+  });
+
+  it("rejects a disabled provider before starting OAuth", async () => {
+    const client = createClient();
+
+    await expect(signInWithProvider({
+      provider: "google",
+      redirectTo: "https://moment-play.example/#/auth/callback",
+    }, client)).rejects.toThrow(/아직 사용할 수 없습니다/);
+    expect(client.auth.signInWithOAuth).not.toHaveBeenCalled();
+  });
+
+  it("normalizes provider cancellation and dashboard configuration failures", async () => {
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "true");
+    const cancelledClient = createClient({
+      signInWithOAuth: vi.fn(async () => ({
+        data: null,
+        error: { code: "access_denied", message: "provider-specific cancellation" },
+      })),
+    });
+    await expect(signInWithProvider({
+      provider: "google",
+      redirectTo: "https://moment-play.example/#/auth/callback",
+    }, cancelledClient)).rejects.toThrow(/취소/);
+
+    const disabledClient = createClient({
+      signInWithOAuth: vi.fn(async () => ({
+        data: null,
+        error: { code: "provider_disabled", message: "server details" },
+      })),
+    });
+    await expect(signInWithProvider({
+      provider: "google",
+      redirectTo: "https://moment-play.example/#/auth/callback",
+    }, disabledClient)).rejects.toThrow(/아직 사용할 수 없습니다/);
+
+    const networkFailureClient = createClient({
+      signInWithOAuth: vi.fn(async () => ({
+        data: null,
+        error: { code: "network_error", message: "private upstream details" },
+      })),
+    });
+    await expect(signInWithProvider({
+      provider: "google",
+      redirectTo: "https://moment-play.example/#/auth/callback",
+    }, networkFailureClient)).rejects.toThrow(/시작하지 못했습니다/);
   });
 });

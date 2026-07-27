@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import {
   getCurrentSession,
   signInWithEmail,
+  signInWithProvider as startProviderSignIn,
   signOutCurrentSession,
   signUpWithEmail,
   subscribeToAuthChanges,
@@ -9,6 +10,7 @@ import {
 import { isSupabaseConfigured } from "../../infrastructure/supabase/supabaseClient.js";
 import { AUTH_MESSAGES } from "./authConstants.js";
 import { buildAuthCallbackUrl } from "./authRedirect.js";
+import { getEnabledAuthProviders } from "./authProviders.js";
 
 const AuthContext = createContext(null);
 const SESSION_EVENTS = new Set([
@@ -93,6 +95,16 @@ export function AuthProvider({ children }) {
     return result;
   }, [applySession, configured]);
 
+  const signInWithProvider = useCallback(async (provider, { returnTo = "/" } = {}) => {
+    if (!configured) {
+      throw new Error(AUTH_MESSAGES.notConfigured);
+    }
+    return startProviderSignIn({
+      provider,
+      redirectTo: buildAuthCallbackUrl(returnTo),
+    });
+  }, [configured]);
+
   const signOut = useCallback(async () => {
     if (!configured) return;
     await signOutCurrentSession();
@@ -115,15 +127,31 @@ export function AuthProvider({ children }) {
   }, [applySession, configured]);
 
   const status = initialized ? (session ? "authenticated" : "guest") : "loading";
+  const providers = useMemo(
+    () => (configured ? getEnabledAuthProviders() : []),
+    [configured],
+  );
   const value = useMemo(() => ({
     isConfigured: configured,
+    providers,
     refreshSession,
     signIn,
+    signInWithProvider,
     signOut,
     signUp,
     status,
     user: session?.user ?? null,
-  }), [configured, refreshSession, session, signIn, signOut, signUp, status]);
+  }), [
+    configured,
+    providers,
+    refreshSession,
+    session,
+    signIn,
+    signInWithProvider,
+    signOut,
+    signUp,
+    status,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -5,6 +5,7 @@ import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, AUTH_MESSAGES, LOGIN_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
 import { buildAuthRoute, getReturnToFromSearch } from "../../../shared/auth/returnTo.js";
+import { SocialLoginOptions } from "../components/SocialLoginOptions.jsx";
 import "../auth.css";
 
 export function SignupPage() {
@@ -64,46 +65,49 @@ export function SignupPage() {
         <p className="auth-card__subtitle">이메일과 비밀번호로 계정을 만드세요.</p>
 
         {isConfigured ? (
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <div>
-              <label className="f-label" htmlFor="signup-email">이메일</label>
-              <input
-                className="txt"
-                id="signup-email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </div>
-            <div>
-              <label className="f-label" htmlFor="signup-password">비밀번호</label>
-              <input
-                className="txt"
-                id="signup-password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </div>
-            <div>
-              <label className="f-label" htmlFor="signup-confirm-password">비밀번호 확인</label>
-              <input
-                className="txt"
-                id="signup-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-              />
-            </div>
-            {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
-            {successMessage ? <p className="auth-notice is-success" role="status">{successMessage}</p> : null}
-            <Button type="submit" variant="primary" fullWidth disabled={submitting || Boolean(successMessage)}>
-              {submitting ? "가입 처리 중…" : "회원가입"}
-            </Button>
-          </form>
+          <>
+            <SocialLoginOptions returnTo={returnTo} />
+            <form className="auth-form" onSubmit={handleSubmit} noValidate>
+              <div>
+                <label className="f-label" htmlFor="signup-email">이메일</label>
+                <input
+                  className="txt"
+                  id="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
+              <div>
+                <label className="f-label" htmlFor="signup-password">비밀번호</label>
+                <input
+                  className="txt"
+                  id="signup-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+              </div>
+              <div>
+                <label className="f-label" htmlFor="signup-confirm-password">비밀번호 확인</label>
+                <input
+                  className="txt"
+                  id="signup-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                />
+              </div>
+              {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
+              {successMessage ? <p className="auth-notice is-success" role="status">{successMessage}</p> : null}
+              <Button type="submit" variant="primary" fullWidth disabled={submitting || Boolean(successMessage)}>
+                {submitting ? "가입 처리 중…" : "회원가입"}
+              </Button>
+            </form>
+          </>
         ) : (
           <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}

@@ -143,11 +143,14 @@ malformed percent escapes, `javascript:` URLs, and `data:` URLs fall back to
 `/`. Valid paths include `/minigames`, game/room routes, `/ranking`,
 `/friends`, and `/settings`.
 
-## Deferred work
+## Follow-on work
 
-This foundation deliberately does not implement Google, Kakao, Naver, or Apple
-login; account management/deletion; play tickets; referral rewards; or
-Capacitor deep-link handling. Each future provider should enter through the
-same gateway, callback, redirect builder, and `returnTo` validator. Account
-deletion must be a separately authorized server workflow with dependent-row
-and Auth-user deletion in one deliberate operation.
+Google and Kakao now use the shared gateway, callback, redirect builder, and
+`returnTo` validator described in [Social login foundation](social-login.md).
+Naver has the same client boundary but remains disabled until its custom
+provider mapping is proven against the nested Naver userinfo response. Apple
+login; account management/deletion; play tickets; referral rewards; and
+Capacitor deep-link handling remain deferred.
+
+Account deletion must be a separately authorized server workflow with
+dependent-row and Auth-user deletion in one deliberate operation.

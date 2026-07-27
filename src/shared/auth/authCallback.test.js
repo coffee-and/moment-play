@@ -37,11 +37,23 @@ describe("auth callback parsing and exchange", () => {
     });
   });
 
-  it("returns recoverable errors for missing and provider-rejected callbacks", () => {
+  it("returns recoverable errors for missing, cancelled, and expired callbacks", () => {
     expect(parseAuthCallback("https://moment-play.example/#/auth/callback").errorMessage).toMatch(/인증 코드/);
     expect(parseAuthCallback(
       "https://moment-play.example/#/auth/callback?error=access_denied&error_description=Expired",
+    ).errorMessage).toMatch(/취소/);
+    expect(parseAuthCallback(
+      "https://moment-play.example/#/auth/callback?error=access_denied&error_code=user_cancelled",
+    ).errorMessage).toMatch(/취소/);
+    expect(parseAuthCallback(
+      "https://moment-play.example/#/auth/callback?error=access_denied&error_code=otp_expired&error_description=Expired",
     ).errorMessage).toBe("Expired");
+  });
+
+  it("normalizes a disabled provider callback without exposing server details", () => {
+    expect(parseAuthCallback(
+      "https://moment-play.example/#/auth/callback?error=server_error&error_code=provider_disabled&error_description=internal",
+    ).errorMessage).toMatch(/아직 사용할 수 없습니다/);
   });
 
   it("exchanges a code once and prevents reuse", async () => {

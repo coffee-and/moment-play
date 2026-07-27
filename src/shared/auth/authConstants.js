@@ -31,4 +31,8 @@ export const AUTH_MESSAGES = {
   missingCallbackCode: "인증 코드가 없습니다. 이메일의 인증 링크를 다시 열어 주세요.",
   malformedCallback: "인증 응답을 확인할 수 없습니다. 다시 로그인해 주세요.",
   callbackCodeAlreadyUsed: "이미 처리된 인증 링크입니다. 다시 로그인해 주세요.",
+  providerNotConfigured: "이 소셜 로그인은 아직 사용할 수 없습니다.",
+  providerSignInFailed: "소셜 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  providerCancelled: "소셜 로그인이 취소되었습니다. 다시 시도할 수 있습니다.",
+  unsupportedProvider: "지원하지 않는 로그인 방식입니다.",
 };

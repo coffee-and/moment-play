@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = extensions, public, pg_catalog;
 
-select plan(15);
+select plan(20);
 
 select has_function(
   'public', 'update_my_profile_nickname', array['text'],
@@ -99,6 +99,73 @@ values
     'authenticated', 'authenticated', 'release-b@example.invalid', '', now(),
     '{"provider":"email","providers":["email"]}', '{}', now(), now(), false
   );
+
+insert into auth.users (
+  id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at, is_anonymous
+)
+values
+  (
+    '62000000-0000-4000-8000-000000000001',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated', 'social-google@example.invalid', '', now(),
+    '{"provider":"google","providers":["google"]}',
+    '{"name":"Untrusted Google Nickname"}',
+    now(), now(), false
+  ),
+  (
+    '63000000-0000-4000-8000-000000000001',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated', null, '', now(),
+    '{"provider":"kakao","providers":["kakao"]}', '{}',
+    now(), now(), false
+  );
+
+select is(
+  (select count(*)
+   from public.profiles
+   where user_id = '62000000-0000-4000-8000-000000000001'),
+  1::bigint,
+  'Google Auth user creation creates exactly one protected profile'
+);
+
+select is(
+  (select nickname
+   from public.profiles
+   where user_id = '62000000-0000-4000-8000-000000000001'),
+  'Player-62000',
+  'Google provider metadata cannot choose the protected profile nickname'
+);
+
+select is(
+  (select count(*)
+   from public.profiles
+   where user_id = '63000000-0000-4000-8000-000000000001'),
+  1::bigint,
+  'Kakao Auth user creation creates a profile when email is unavailable'
+);
+
+select is(
+  (select nickname
+   from public.profiles
+   where user_id = '63000000-0000-4000-8000-000000000001'),
+  'Player-63000',
+  'Kakao Auth user creation receives the server-owned placeholder nickname'
+);
+
+update auth.users
+set raw_user_meta_data = '{"name":"Changed Provider Nickname"}',
+    last_sign_in_at = now(),
+    updated_at = now()
+where id = '62000000-0000-4000-8000-000000000001';
+
+select ok(
+  (select count(*) = 1
+      and min(nickname) = 'Player-62000'
+   from public.profiles
+   where user_id = '62000000-0000-4000-8000-000000000001'),
+  'returning provider login cannot duplicate or rewrite the protected profile'
+);
 
 select matches(
   (select nickname

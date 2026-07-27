@@ -4,6 +4,15 @@ import { sanitizeReturnTo } from "./returnTo.js";
 
 const consumedCodes = new Set();
 const CALLBACK_PARAM_NAMES = ["code", "error", "error_code", "error_description"];
+const PROVIDER_CONFIGURATION_ERROR_CODES = new Set([
+  "custom_provider_not_found",
+  "oauth_provider_not_supported",
+  "provider_disabled",
+]);
+const PROVIDER_CANCELLATION_ERROR_CODES = new Set([
+  "access_denied",
+  "user_cancelled",
+]);
 
 function getHashParams(hash) {
   const queryIndex = hash.indexOf("?");
@@ -25,19 +34,33 @@ function readParam(searchParams, hashParams, name) {
   return searchParams.get(name) ?? hashParams.get(name);
 }
 
+function getCallbackErrorMessage(searchParams, hashParams) {
+  const error = readParam(searchParams, hashParams, "error");
+  const errorCode = readParam(searchParams, hashParams, "error_code") || error;
+  if (!errorCode) return null;
+
+  if (PROVIDER_CONFIGURATION_ERROR_CODES.has(errorCode)) {
+    return AUTH_MESSAGES.providerNotConfigured;
+  }
+  if (PROVIDER_CANCELLATION_ERROR_CODES.has(errorCode)) {
+    return AUTH_MESSAGES.providerCancelled;
+  }
+
+  return readParam(searchParams, hashParams, "error_description") || AUTH_MESSAGES.verifyCodeFailed;
+}
+
 export function parseAuthCallback(locationLike = window.location) {
   try {
     const { hash, search } = getCallbackParts(locationLike);
     const searchParams = new URLSearchParams(search);
     const hashParams = getHashParams(hash);
     const returnTo = sanitizeReturnTo(readParam(searchParams, hashParams, "returnTo"));
-    const providerError = readParam(searchParams, hashParams, "error")
-      || readParam(searchParams, hashParams, "error_code");
+    const callbackErrorMessage = getCallbackErrorMessage(searchParams, hashParams);
 
-    if (providerError) {
+    if (callbackErrorMessage) {
       return {
         code: null,
-        errorMessage: readParam(searchParams, hashParams, "error_description") || AUTH_MESSAGES.verifyCodeFailed,
+        errorMessage: callbackErrorMessage,
         returnTo,
       };
     }

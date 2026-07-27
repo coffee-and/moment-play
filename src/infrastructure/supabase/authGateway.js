@@ -1,4 +1,8 @@
 import { AUTH_MESSAGES } from "../../shared/auth/authConstants.js";
+import {
+  getAuthProvider,
+  isAuthProviderEnabled,
+} from "../../shared/auth/authProviders.js";
 import { getSupabaseClient } from "./supabaseClient.js";
 
 const EMAIL_CONFLICT_CODES = new Set(["email_exists", "user_already_exists"]);
@@ -7,6 +11,15 @@ const VERIFICATION_ERROR_CODES = new Set([
   "flow_state_expired",
   "flow_state_not_found",
   "otp_expired",
+]);
+const PROVIDER_CONFIGURATION_ERROR_CODES = new Set([
+  "custom_provider_not_found",
+  "oauth_provider_not_supported",
+  "provider_disabled",
+]);
+const PROVIDER_CANCELLATION_ERROR_CODES = new Set([
+  "access_denied",
+  "user_cancelled",
 ]);
 
 export class AuthGatewayError extends Error {
@@ -33,8 +46,25 @@ export function normalizeAuthError(error, fallbackMessage) {
   if (VERIFICATION_ERROR_CODES.has(code)) {
     return new AuthGatewayError(AUTH_MESSAGES.verifyCodeFailed, { cause: error, code });
   }
+  if (PROVIDER_CONFIGURATION_ERROR_CODES.has(code)) {
+    return new AuthGatewayError(AUTH_MESSAGES.providerNotConfigured, { cause: error, code });
+  }
+  if (PROVIDER_CANCELLATION_ERROR_CODES.has(code)) {
+    return new AuthGatewayError(AUTH_MESSAGES.providerCancelled, { cause: error, code });
+  }
 
   return new AuthGatewayError(rawMessage || fallbackMessage, { cause: error, code });
+}
+
+function normalizeProviderAuthError(error) {
+  const code = error?.code || error?.error_code || null;
+  if (PROVIDER_CONFIGURATION_ERROR_CODES.has(code) || code === "validation_failed") {
+    return new AuthGatewayError(AUTH_MESSAGES.providerNotConfigured, { cause: error, code });
+  }
+  if (PROVIDER_CANCELLATION_ERROR_CODES.has(code)) {
+    return new AuthGatewayError(AUTH_MESSAGES.providerCancelled, { cause: error, code });
+  }
+  return new AuthGatewayError(AUTH_MESSAGES.providerSignInFailed, { cause: error, code });
 }
 
 function isReleaseSession(session) {
@@ -82,6 +112,30 @@ export async function signInWithEmail({ email, password }, client = getSupabaseC
   if (error) throw normalizeAuthError(error, AUTH_MESSAGES.signInFailed);
   if (!isReleaseSession(data.session)) throw new AuthGatewayError(AUTH_MESSAGES.signInFailed);
   return { session: data.session, user: data.user ?? data.session.user };
+}
+
+export async function signInWithProvider(
+  { provider, redirectTo },
+  client = getSupabaseClient(),
+) {
+  const providerDefinition = getAuthProvider(provider);
+  if (!providerDefinition) {
+    throw new AuthGatewayError(AUTH_MESSAGES.unsupportedProvider);
+  }
+  if (!isAuthProviderEnabled(provider)) {
+    throw new AuthGatewayError(AUTH_MESSAGES.providerNotConfigured);
+  }
+
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider: providerDefinition.supabaseProvider,
+    options: { redirectTo },
+  });
+  if (error) throw normalizeProviderAuthError(error);
+
+  return {
+    provider,
+    redirectUrl: data?.url ?? null,
+  };
 }
 
 export async function signOutCurrentSession(client = getSupabaseClient()) {

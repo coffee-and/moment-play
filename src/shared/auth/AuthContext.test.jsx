@@ -12,6 +12,7 @@ const unsubscribe = vi.fn();
 const gateway = {
   getCurrentSession: vi.fn(async () => null),
   signInWithEmail: vi.fn(),
+  signInWithProvider: vi.fn(),
   signOutCurrentSession: vi.fn(async () => {}),
   signUpWithEmail: vi.fn(),
   subscribeToAuthChanges: vi.fn((callback) => {
@@ -54,6 +55,7 @@ async function renderAuth({ flush = true } = {}) {
 afterEach(() => {
   document.body.innerHTML = "";
   vi.clearAllMocks();
+  vi.unstubAllEnvs();
   gateway.getCurrentSession.mockResolvedValue(null);
   gateway.signOutCurrentSession.mockResolvedValue(undefined);
   gateway.subscribeToAuthChanges.mockImplementation((callback) => {
@@ -74,8 +76,10 @@ describe("AuthProvider", () => {
     expect(latest.isConfigured).toBe(false);
     await expect(latest.signIn({ email: "a@example.com", password: "secret1" })).rejects.toThrow(/설정되지 않아/);
     await expect(latest.signUp({ email: "a@example.com", password: "secret1" })).rejects.toThrow(/설정되지 않아/);
+    await expect(latest.signInWithProvider("google")).rejects.toThrow(/설정되지 않아/);
     await expect(latest.signOut()).resolves.toBeUndefined();
     expect(gateway.signInWithEmail).not.toHaveBeenCalled();
+    expect(gateway.signInWithProvider).not.toHaveBeenCalled();
     expect(gateway.signUpWithEmail).not.toHaveBeenCalled();
     unmount();
   });
@@ -147,6 +151,27 @@ describe("AuthProvider", () => {
       email: "new@example.com",
       password: "secret1",
       emailRedirectTo: expect.stringMatching(/#\/auth\/callback\?returnTo=%2Fminigames%2Fomok$/),
+    });
+    expect(latest.status).toBe("guest");
+    unmount();
+  });
+
+  it("starts an enabled social provider with the shared safe callback URL", async () => {
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "true");
+    gateway.signInWithProvider.mockResolvedValueOnce({
+      provider: "google",
+      redirectUrl: "https://auth.example/authorize",
+    });
+    const unmount = await renderAuth();
+
+    expect(latest.providers).toEqual(["google"]);
+    await act(async () => latest.signInWithProvider("google", {
+      returnTo: "/minigames/omok",
+    }));
+
+    expect(gateway.signInWithProvider).toHaveBeenCalledWith({
+      provider: "google",
+      redirectTo: expect.stringMatching(/#\/auth\/callback\?returnTo=%2Fminigames%2Fomok$/),
     });
     expect(latest.status).toBe("guest");
     unmount();
