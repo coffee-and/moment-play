@@ -13,7 +13,7 @@ export const FLAPPY_CONFIG = {
   maxPipeSpeed: 23.2,
   firstPipeX: 82,
   pipeSpacing: 48,
-  initialLives: 3,
+  initialLives: 2,
   recoverySeconds: 1.2,
   shieldChargePerGate: 25,
 };
