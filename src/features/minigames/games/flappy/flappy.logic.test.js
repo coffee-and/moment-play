@@ -18,7 +18,7 @@ describe("flappy game logic", () => {
     expect(FLAPPY_CONFIG.pipeWidth).toBe(10);
     expect(FLAPPY_CONFIG.gapHeight).toBe(29);
     expect(FLAPPY_CONFIG.pipeSpacing).toBe(48);
-    expect(FLAPPY_CONFIG.initialLives).toBe(3);
+    expect(FLAPPY_CONFIG.initialLives).toBe(2);
   });
 
   it("raises speed only after every eight gates and keeps a modest maximum", () => {
@@ -76,14 +76,14 @@ describe("flappy game logic", () => {
     expect(state.maxCombo).toBe(4);
   });
 
-  it("starts with three lives and charges an automatic shield", () => {
+  it("starts with two lives and charges an automatic shield", () => {
     const initial = createInitialFlappyState(() => 0.5);
-    expect(initial.lives).toBe(3);
+    expect(initial.lives).toBe(2);
 
     const ready = { ...initial, combo: 7, shieldGauge: 100, shieldReady: true };
     const recovered = recoverFlappyState(ready);
     expect(recovered.status).toBe("shield");
-    expect(recovered.state.lives).toBe(3);
+    expect(recovered.state.lives).toBe(2);
     expect(recovered.state.shieldReady).toBe(false);
     expect(recovered.state.combo).toBe(0);
     expect(recovered.state.recoverySeconds).toBe(FLAPPY_CONFIG.recoverySeconds);
@@ -97,16 +97,14 @@ describe("flappy game logic", () => {
     expect(lifeRecovery.state.gatesPassed).toBe(19);
   });
 
-  it("loses lives before ending the flight", () => {
+  it("uses the final life before ending the flight", () => {
     const initial = createInitialFlappyState(() => 0.5);
     const first = recoverFlappyState(initial);
     const second = recoverFlappyState({ ...first.state, recoverySeconds: 0 });
-    const third = recoverFlappyState({ ...second.state, recoverySeconds: 0 });
     expect(first.status).toBe("life");
-    expect(first.state.lives).toBe(2);
-    expect(second.state.lives).toBe(1);
-    expect(third.status).toBe("over");
-    expect(third.state.lives).toBe(0);
+    expect(first.state.lives).toBe(1);
+    expect(second.status).toBe("over");
+    expect(second.state.lives).toBe(0);
   });
 
   it("detects world bounds and closed parts of a gate", () => {
