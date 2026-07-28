@@ -33,13 +33,15 @@ async function renderPage() {
   const root = createRoot(host);
   await act(async () => {
     root.render(
-      <MemoryRouter initialEntries={["/auth/callback"]}>
-        <Routes>
-          <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/friends" element={<div>Friends screen</div>} />
-        </Routes>
-        <LocationProbe />
-      </MemoryRouter>,
+      <React.StrictMode>
+        <MemoryRouter initialEntries={["/auth/callback"]}>
+          <Routes>
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/friends" element={<div>Friends screen</div>} />
+          </Routes>
+          <LocationProbe />
+        </MemoryRouter>
+      </React.StrictMode>,
     );
   });
   return { host, unmount: () => act(() => root.unmount()) };
@@ -54,7 +56,7 @@ afterEach(() => {
 
 describe("AuthCallbackPage", () => {
   it("restores the session and returns after a successful verification", async () => {
-    parseAuthCallback.mockReturnValueOnce({ returnTo: "/friends" });
+    parseAuthCallback.mockReturnValue({ returnTo: "/friends" });
     completeAuthCallback.mockResolvedValueOnce({
       returnTo: "/friends",
       session: { user: { id: "user-1" } },
@@ -64,13 +66,14 @@ describe("AuthCallbackPage", () => {
     await act(async () => {});
 
     expect(refreshSession).toHaveBeenCalledTimes(1);
+    expect(completeAuthCallback).toHaveBeenCalledTimes(1);
     expect(currentLocation.pathname).toBe("/friends");
     expect(view.host.textContent).toContain("Friends screen");
     view.unmount();
   });
 
   it("shows a recoverable login action when callback verification fails", async () => {
-    parseAuthCallback.mockReturnValueOnce({ returnTo: "/friends" });
+    parseAuthCallback.mockReturnValue({ returnTo: "/friends" });
     completeAuthCallback.mockRejectedValueOnce(new Error("인증 링크가 만료되었습니다."));
 
     const view = await renderPage();

@@ -24,6 +24,9 @@ jobs:
       GITHUB_PAGES: 'true'
       VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
       VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_AUTH_GOOGLE_ENABLED: ${{ vars.VITE_AUTH_GOOGLE_ENABLED || 'false' }}
+      VITE_AUTH_KAKAO_ENABLED: ${{ vars.VITE_AUTH_KAKAO_ENABLED || 'false' }}
+      VITE_AUTH_NAVER_ENABLED: 'false'
 
     steps:
       - name: Checkout repository

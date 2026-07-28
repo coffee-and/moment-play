@@ -7,10 +7,23 @@ providers. Naver is wired to the Supabase custom-provider identifier
 `custom:naver`, but remains deliberately feature-gated until its nested
 userinfo response has been proven compatible in the hosted project.
 
-The hosted project `nshpwruurbbxomduvinj` was inspected on 2026-07-28.
-Google, Kakao, and custom OAuth providers were disabled at that time. No
-provider settings were changed by this implementation and no credentials were
-added to the repository.
+The hosted project `nshpwruurbbxomduvinj` was inspected again on 2026-07-28.
+Its Site URL and application redirect allow list match the GitHub Pages and
+local URLs documented below. Google, Kakao, and custom OAuth providers are
+disabled, and the built-in Google and Kakao provider credentials are absent.
+Provider-console access and credentials were not available for real-login QA.
+
+Anonymous Auth was found enabled during this audit and was disabled through the
+Supabase Management API. A real anonymous sign-in request was rejected with
+`anonymous_provider_disabled`, and `auth.users` remained empty.
+
+Current verification state:
+
+| Provider | Application code | Provider console | Supabase | Build flag | Real account QA |
+| --- | --- | --- | --- | --- | --- |
+| Google | Implemented | Not inspected; access unavailable | Disabled; credentials absent | Local and GitHub variable unset | Not performed |
+| Kakao | Implemented | Not inspected; access unavailable | Disabled; credentials absent | Local and GitHub variable unset | Not performed |
+| Naver | `custom:naver` adapter only | Not configured | Custom provider absent | Unset locally; hard-disabled for Pages | Not performed |
 
 Provider buttons are hidden unless their corresponding build-time flag is
 exactly `true`:
@@ -24,6 +37,13 @@ VITE_AUTH_NAVER_ENABLED
 These flags are public UI configuration, not authorization controls. Supabase
 must also have the provider enabled. OAuth client secrets belong only in the
 provider console and Supabase Dashboard; never put them in a `VITE_` variable.
+
+The GitHub Pages workflow reads `VITE_AUTH_GOOGLE_ENABLED` and
+`VITE_AUTH_KAKAO_ENABLED` from repository Actions variables, defaulting both to
+`false`. Do not create those variables with value `true` until the corresponding
+provider completes real first-login, repeat-login, cancellation, refresh,
+logout, safe-return, and nickname-preservation QA. The workflow deliberately
+sets `VITE_AUTH_NAVER_ENABLED=false`.
 
 ## Shared application flow
 
@@ -160,6 +180,24 @@ Automated tests cover provider mapping and flags, duplicate-click prevention,
 safe `returnTo` propagation, callback success/error normalization, session
 application, and protected profile creation for provider users.
 
+Real Chrome integration checks were run locally with Google and Kakao flags set
+only in the temporary Vite process. At a 390px emulated viewport:
+
+- Google and Kakao buttons rendered, Naver remained hidden, and the email form
+  remained available
+- the page had no horizontal overflow
+- the signup link preserved a safe game `returnTo`, while an external
+  `returnTo` fell back to `/`
+- missing-code, cancellation, and offline callback failures left the loading
+  state and showed a recoverable error
+- the callback authorization code was removed from browser history before the
+  offline exchange failed
+
+These checks found and fixed a React Strict Mode callback defect that could
+leave the development callback page permanently loading. The callback now
+shares one completion promise across the Strict Mode effect restart, so code
+exchange and session refresh still occur once.
+
 The following require real browser and provider accounts after dashboard
 configuration:
 
@@ -168,3 +206,8 @@ configuration:
 - mobile-width provider button appearance
 - popup/blocker and browser back-button recovery
 - Naver's complete compatibility checklist above
+
+Repository tests and builds do not substitute for these provider-console and
+real-account checks. Until Google and Kakao complete them, the correct release
+state is: repository implementation complete; provider configuration and
+real-login verification pending.

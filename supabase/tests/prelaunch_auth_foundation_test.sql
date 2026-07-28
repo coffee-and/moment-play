@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = extensions, public, pg_catalog;
 
-select plan(20);
+select plan(21);
 
 select has_function(
   'public', 'update_my_profile_nickname', array['text'],
@@ -153,6 +153,21 @@ select is(
   'Kakao Auth user creation receives the server-owned placeholder nickname'
 );
 
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"62000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select is(
+  public.update_my_profile_nickname('SocialPlay'),
+  'SocialPlay',
+  'social Auth user can choose an application-owned nickname'
+);
+
+reset role;
+
 update auth.users
 set raw_user_meta_data = '{"name":"Changed Provider Nickname"}',
     last_sign_in_at = now(),
@@ -161,10 +176,10 @@ where id = '62000000-0000-4000-8000-000000000001';
 
 select ok(
   (select count(*) = 1
-      and min(nickname) = 'Player-62000'
+      and min(nickname) = 'SocialPlay'
    from public.profiles
    where user_id = '62000000-0000-4000-8000-000000000001'),
-  'returning provider login cannot duplicate or rewrite the protected profile'
+  'returning provider login cannot duplicate or overwrite the chosen nickname'
 );
 
 select matches(

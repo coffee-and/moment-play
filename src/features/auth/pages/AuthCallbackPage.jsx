@@ -11,7 +11,7 @@ import "../auth.css";
 export function AuthCallbackPage() {
   const navigate = useNavigate();
   const { isConfigured, refreshSession } = useAuth();
-  const startedRef = useRef(false);
+  const completionRef = useRef(null);
   const initialCallback = useRef(parseAuthCallback());
   const [state, setState] = useState(() => ({
     errorMessage: isConfigured ? null : "인증 서비스를 사용할 수 없습니다.",
@@ -19,19 +19,25 @@ export function AuthCallbackPage() {
   }));
 
   useEffect(() => {
-    if (!isConfigured || startedRef.current) return;
-    startedRef.current = true;
-    let cancelled = false;
+    if (!isConfigured) return undefined;
+    let active = true;
 
-    completeAuthCallback()
-      .then(async ({ returnTo }) => {
-        await refreshSession();
-        if (cancelled) return;
+    if (!completionRef.current) {
+      completionRef.current = completeAuthCallback()
+        .then(async ({ returnTo }) => {
+          await refreshSession();
+          return { returnTo };
+        });
+    }
+
+    completionRef.current
+      .then(({ returnTo }) => {
+        if (!active) return;
         setState({ errorMessage: null, status: "success" });
         navigate(returnTo, { replace: true });
       })
       .catch((error) => {
-        if (cancelled) return;
+        if (!active) return;
         setState({
           errorMessage: error instanceof Error ? error.message : "인증을 완료하지 못했습니다.",
           status: "error",
@@ -39,7 +45,7 @@ export function AuthCallbackPage() {
       });
 
     return () => {
-      cancelled = true;
+      active = false;
     };
   }, [isConfigured, navigate, refreshSession]);
 
