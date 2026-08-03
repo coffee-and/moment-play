@@ -290,16 +290,6 @@
   --featured-action-hover-bg: color-mix(in oklab, var(--featured-action-bg) 97%, var(--featured-action-text));
   --featured-action-text: var(--palette-dark-text);
   --featured-action-shadow: 0 5px 15px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
-  --button-surface: var(--home-button-surface);
-  --button-border: var(--home-button-border);
-  --button-text: var(--text);
-  --button-shadow: var(--home-button-shadow);
-  --button-hover-border: var(--home-button-hover-border);
-  --button-hover-surface: var(--home-button-hover-surface);
-  --button-hover-shadow: var(--home-button-hover-shadow);
-  --button-active-shadow: var(--home-button-active-shadow);
-  --button-secondary-border: var(--home-button-border);
-  --button-secondary-shadow: var(--home-button-shadow);
   --game-color-red: color-mix(in oklab, var(--palette-game-red) 88%, var(--palette-dark-bg));
   --game-color-orange: color-mix(in oklab, var(--palette-game-orange) 88%, var(--palette-dark-bg));
   --game-color-yellow: color-mix(in oklab, var(--palette-game-yellow) 90%, var(--palette-dark-bg));
@@ -554,28 +544,28 @@ a {
   margin-left: auto;
 }
 
-.hd .header-icon-button {
-  box-shadow: none;
-}
-
-/* Shared circular header controls. */
-.header-icon-button {
-  display: inline-grid;
-  width: 44px;
+/* Shared application-header control surface and interaction contract. */
+.header-icon-button,
+.account-control {
   height: 44px;
   flex: none;
-  place-items: center;
   border: 1px solid var(--home-button-border);
-  border-radius: 50%;
   background: var(--home-button-surface);
   color: var(--chrome-foreground);
   cursor: pointer;
   box-shadow: var(--home-button-shadow);
-  transition: border-color 0.2s, color 0.2s, transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s var(--ease), background-color 0.2s, box-shadow 0.2s;
+}
+
+.header-icon-button {
+  display: inline-grid;
+  width: 44px;
+  place-items: center;
+  border-radius: 50%;
 }
 
 .header-icon-button:hover,
-.header-icon-button.is-active {
+.account-control:not(.account-control--loading):hover {
   border-color: var(--home-button-hover-border);
   background: var(--home-button-hover-surface);
   color: var(--chrome-foreground);
@@ -583,12 +573,14 @@ a {
   transform: translateY(1px) scale(0.99);
 }
 
-.header-icon-button:active {
+.header-icon-button:active,
+.account-control:not(.account-control--loading):active {
   box-shadow: var(--home-button-active-shadow);
   transform: translateY(2px) scale(0.96);
 }
 
-.header-icon-button:focus-visible {
+.header-icon-button:focus-visible,
+.account-control:focus-visible {
   outline: 2px solid var(--chrome-foreground);
   outline-offset: 3px;
 }
@@ -602,39 +594,15 @@ a {
   display: inline-flex;
   min-width: 76px;
   max-width: 180px;
-  height: 44px;
   min-height: 44px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--home-button-border);
   border-radius: 999px;
   padding: 8px 14px;
   overflow: hidden;
-  background: var(--home-button-surface);
-  color: var(--chrome-foreground);
-  cursor: pointer;
   font-size: 15px;
   font-weight: 400;
-  box-shadow: none;
   white-space: nowrap;
-  transition: border-color 0.2s, transform 0.2s var(--ease), background-color 0.2s, box-shadow 0.2s;
-}
-
-.account-control:not(.account-control--loading):hover {
-  border-color: var(--home-button-hover-border);
-  background: var(--home-button-hover-surface);
-  box-shadow: var(--home-button-hover-shadow);
-  transform: translateY(1px) scale(0.995);
-}
-
-.account-control:not(.account-control--loading):active {
-  box-shadow: var(--home-button-active-shadow);
-  transform: translateY(2px) scale(0.985);
-}
-
-.account-control:focus-visible {
-  outline: 2px solid var(--chrome-foreground);
-  outline-offset: 3px;
 }
 
 .account-control__label {
@@ -844,8 +812,7 @@ a {
   outline: none;
 }
 
-.button,
-.btn {
+.button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -863,60 +830,29 @@ a {
   transition: transform 0.2s var(--ease), border-color 0.2s, background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
-.button:hover:not(:disabled),
-.btn:hover {
+.button:hover:not(:disabled) {
   border-color: var(--button-hover-border);
   background: var(--button-hover-surface);
   box-shadow: var(--button-hover-shadow);
   transform: translateY(1px) scale(0.995);
 }
 
-.button:active:not(:disabled),
-.btn:active {
+.button:active:not(:disabled) {
   box-shadow: var(--button-active-shadow);
   transform: translateY(2px) scale(0.985);
 }
 
-.button--secondary,
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  border: 1px solid var(--button-secondary-border);
-  border-radius: var(--r-md);
-  padding: 0 20px;
-  background: var(--button-surface);
-  color: var(--button-text);
+.button--secondary {
+  border-color: var(--button-secondary-border);
+  padding-inline: 20px;
   font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
   box-shadow: var(--button-secondary-shadow);
-  transition: transform 0.2s var(--ease), border-color 0.2s, background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
 .button--small { min-height: 38px; padding-inline: 16px; border-radius: 11px; font-size: 13px; }
 .button--large { min-height: 52px; padding-inline: 28px; border-radius: 16px; font-size: 16px; }
 
-.button--secondary:hover:not(:disabled),
-.btn-ghost:hover {
-  border-color: var(--button-hover-border);
-  background: var(--button-hover-surface);
-  box-shadow: var(--button-hover-shadow);
-  transform: translateY(1px) scale(0.995);
-}
-
-.button--secondary:active:not(:disabled),
-.btn-ghost:active {
-  box-shadow: var(--button-active-shadow);
-  transform: translateY(2px) scale(0.985);
-}
-
-.button:disabled,
-.btn:disabled,
-.button--secondary:disabled,
-.btn-ghost:disabled {
+.button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
   box-shadow: none;
@@ -1275,8 +1211,6 @@ a {
 }
 
 .app-footer .wrap {
-  width: min(100%, calc(var(--home-content-max-width) + var(--home-frame-gutter) + var(--home-frame-gutter)));
-  padding-inline: var(--home-frame-gutter);
   padding-top: 0;
 }
 
@@ -1432,19 +1366,13 @@ a {
   isolation: isolate;
 }
 
-.game-stage__play .button,
-.game-stage__play .btn,
-.game-stage__play .button--secondary,
-.game-stage__play .btn-ghost {
+.game-stage__play .button {
   border-color: var(--stage-control-border);
   background: var(--stage-control-surface);
   box-shadow: var(--stage-control-shadow);
 }
 
-.game-stage__play .button:hover:not(:disabled),
-.game-stage__play .btn:hover,
-.game-stage__play .button--secondary:hover:not(:disabled),
-.game-stage__play .btn-ghost:hover {
+.game-stage__play .button:hover:not(:disabled) {
   border-color: var(--stage-control-hover-border);
   background: var(--stage-control-hover-surface);
   box-shadow: var(--stage-control-hover-shadow);
@@ -1614,20 +1542,14 @@ a {
   line-height: 1.55;
 }
 
-.game-stage-modal .button--secondary,
-.game-stage-modal .btn-ghost,
-.game-stage-modal .button,
-.game-stage-modal .btn {
+.game-stage-modal .button {
   border-color: var(--game-modal-action-border);
   background: var(--game-modal-action-bg);
   color: var(--game-modal-text);
   box-shadow: var(--game-modal-action-shadow);
 }
 
-.game-stage-modal .button:hover:not(:disabled),
-.game-stage-modal .btn:hover,
-.game-stage-modal .button--secondary:hover:not(:disabled),
-.game-stage-modal .btn-ghost:hover {
+.game-stage-modal .button:hover:not(:disabled) {
   border-color: var(--home-button-hover-border);
   background: var(--home-button-hover-surface);
   box-shadow: var(--home-button-hover-shadow);
@@ -2662,8 +2584,7 @@ a {
     text-align: left;
   }
 
-  .button,
-  .btn {
+  .button {
     width: 100%;
   }
 
@@ -2802,9 +2723,6 @@ a {
   }
 
   .button,
-  .btn,
-  .button--secondary,
-  .btn-ghost,
   .header-icon-button,
   .account-control,
   .featured,

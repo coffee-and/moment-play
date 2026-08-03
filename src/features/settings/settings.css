@@ -1,7 +1,7 @@
 .settings-page {
   --settings-control-height: 38px;
   padding-top: clamp(24px, 4vw, 44px);
-  padding-bottom: clamp(40px, 7vw, 72px);
+  padding-bottom: clamp(28px, 4vw, 44px);
 }
 
 .settings-page__header {
@@ -336,7 +336,6 @@
   min-height: var(--settings-control-height);
   padding: 0 13px;
   font-size: 12px;
-  box-shadow: none;
   white-space: nowrap;
 }
 

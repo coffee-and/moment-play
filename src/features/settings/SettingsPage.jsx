@@ -295,7 +295,7 @@ export function SettingsPage() {
         </section>
 
         <section className="card settings-card settings-card--about" aria-labelledby="about-title">
-          <div className="settings-card__heading settings-card__heading--about">
+          <div className="settings-card__heading">
             <div>
               <p className="eyebrow">About</p>
               <h2 id="about-title">Moment Play 정보</h2>

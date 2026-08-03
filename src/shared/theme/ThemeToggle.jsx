@@ -25,7 +25,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      className={`header-icon-button theme-toggle${isDark ? " is-active" : ""}`}
+      className="header-icon-button"
       type="button"
       aria-label={label}
       aria-pressed={isDark}
