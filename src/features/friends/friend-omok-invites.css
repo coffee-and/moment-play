@@ -108,14 +108,8 @@
   box-shadow: none;
 }
 
-.friend-invite-overlay {
-  padding: 18px;
-}
-
 .friend-invite-modal {
   width: min(680px, 100%);
-  max-height: min(760px, calc(100vh - 36px));
-  overflow-y: auto;
 }
 
 .friend-invite-form {

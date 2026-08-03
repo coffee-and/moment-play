@@ -71,6 +71,8 @@ describe("MinigamePlayPage authentication gate", () => {
   it("lets a guest read instructions but never mounts the game", () => {
     const view = renderPage("/minigames/2048");
     expect(view.host.textContent).toContain("How to play 2048");
+    expect(view.host.querySelectorAll('a[href^="/login?"]')).toHaveLength(1);
+    expect(view.host.querySelector('[role="status"]')).toBeNull();
     expect(view.host.textContent).not.toContain("Game content");
     expect(receivedRoomId).toBeUndefined();
     view.unmount();

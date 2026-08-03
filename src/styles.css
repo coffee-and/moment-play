@@ -147,6 +147,7 @@
   --gap: 18px;
   --layout-max-width: 1460px;
   --content-max-width: 950px;
+  --status-panel-max-width: 560px;
   --home-content-max-width: 880px;
   --home-frame-gutter: 46px;
   --game-stage-max-width: 1400px;
@@ -368,13 +369,17 @@ a {
 .moment-app {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   flex-direction: column;
   background: var(--bg);
   color: var(--text);
 }
 
 .moment-app > main {
+  display: flex;
+  min-width: 0;
   flex: 1 0 auto;
+  flex-direction: column;
 }
 
 .wrap {
@@ -1249,6 +1254,14 @@ a {
   margin-inline: auto;
 }
 
+.minigame-play-page--blocking {
+  display: grid;
+  flex: 1 0 auto;
+  place-items: center;
+  padding-top: max(clamp(24px, 5vh, 48px), env(safe-area-inset-top));
+  padding-bottom: max(clamp(24px, 5vh, 48px), env(safe-area-inset-bottom));
+}
+
 .game-stage {
   position: relative;
   width: min(100%, var(--game-stage-max-width));
@@ -1435,13 +1448,21 @@ a {
 }
 
 .game-stage-overlay {
+  --game-stage-overlay-inset-top: max(20px, env(safe-area-inset-top));
+  --game-stage-overlay-inset-right: max(20px, env(safe-area-inset-right));
+  --game-stage-overlay-inset-bottom: max(20px, env(safe-area-inset-bottom));
+  --game-stage-overlay-inset-left: max(20px, env(safe-area-inset-left));
   position: fixed;
   inset: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding:
+    var(--game-stage-overlay-inset-top)
+    var(--game-stage-overlay-inset-right)
+    var(--game-stage-overlay-inset-bottom)
+    var(--game-stage-overlay-inset-left);
   background: color-mix(in oklab, oklch(0.13 0.008 40) 68%, transparent);
   backdrop-filter: blur(6px);
   overflow-y: auto;
@@ -1453,13 +1474,20 @@ a {
   position: relative;
   display: flex;
   overflow: hidden;
-  min-height: clamp(220px, 32vh, 320px);
+  min-height: min(
+    clamp(220px, 32vh, 320px),
+    calc(100dvh - var(--game-stage-overlay-inset-top) - var(--game-stage-overlay-inset-bottom))
+  );
   width: min(400px, 100%);
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: 12px;
-  max-height: calc(100dvh - 40px);
+  max-height: calc(100vh - 40px);
+  max-height: calc(
+    100dvh - var(--game-stage-overlay-inset-top) - var(--game-stage-overlay-inset-bottom)
+  );
   overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--game-modal-border);
   border-radius: var(--r-xl);
   padding: 32px 28px;
@@ -2436,7 +2464,7 @@ a {
 }
 
 @media (max-width: 620px) {
-  .app-main--immersive .minigame-play-page { padding: 0; }
+  .app-main--immersive .minigame-play-page--active { padding: 0; }
   .game-stage { border: 0; border-radius: 0; padding: 12px; box-shadow: none; }
   .game-stage__topbar { gap: 8px; padding-bottom: 10px; }
   .game-stage__topbar-title { flex: 1; }
@@ -2741,6 +2769,8 @@ a {
 
 /* Shared empty / coming-soon / not-found panel (StatusPanel) */
 .status-panel {
+  width: min(100%, var(--status-panel-max-width));
+  margin-inline: auto;
   padding: var(--gap);
   text-align: center;
 }
@@ -2752,7 +2782,7 @@ a {
 }
 
 .status-panel__description {
-  margin-top: 6px;
+  margin: 6px 0 0;
   color: var(--muted);
   font-size: 13px;
 }
@@ -2761,9 +2791,9 @@ a {
   margin-top: var(--gap);
 }
 
-/* Keep immersive game stages visually balanced after the global header is removed. */
+/* Keep active immersive game stages visually balanced after the global header is removed. */
 @media (min-width: 900px) and (min-height: 720px) {
-  .app-main--immersive .minigame-play-page {
+  .app-main--immersive .minigame-play-page--active {
     padding-top: clamp(38px, 6vh, 64px);
   }
 }

@@ -79,14 +79,12 @@ export function GameStageModal({
   className = '',
   showCompletionStars = false,
   showCelebration = showCompletionStars,
-  style,
   ...props
 }) {
   return (
     <div
       className={joinClassNames(['game-stage-modal', className])}
       data-has-celebration={showCelebration ? 'true' : undefined}
-      style={{ ...style }}
       {...props}
     >
       {showCompletionStars ? <CompletionStars streak={celebrationStreak} /> : null}

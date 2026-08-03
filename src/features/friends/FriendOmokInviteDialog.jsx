@@ -38,7 +38,6 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
 
   return (
     <GameStageOverlay
-      className="friend-invite-overlay"
       closeOnBackdrop={!isSubmitting}
       closeOnEscape={!isSubmitting}
       onClose={onClose}
