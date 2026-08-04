@@ -56,7 +56,6 @@
   --flappy-pillar: #edf4ff;
   --flappy-fish: #79b5e8;
   --flappy-glow: #79a7e8;
-  --flappy-wing: #9ccdf1;
   --flappy-tail: #f08aa0;
   --flappy-star: #f6c85f;
   --flappy-star-cool: #ecf3ff;
@@ -542,6 +541,13 @@ a {
 }
 
 .hd-right {
+  --header-control-border-width: 0;
+  --header-control-surface: var(--home-card-surface);
+  --header-control-shadow: var(--home-card-shadow);
+  --header-control-hover-border: var(--home-card-hover-border);
+  --header-control-hover-surface: var(--home-card-hover-surface);
+  --header-control-hover-shadow: var(--home-card-hover-shadow);
+  --header-control-active-shadow: var(--home-card-active-shadow);
   display: flex;
   flex: none;
   align-items: center;
@@ -554,11 +560,11 @@ a {
 .account-control {
   height: 44px;
   flex: none;
-  border: 1px solid var(--home-button-border);
-  background: var(--home-button-surface);
+  border: var(--header-control-border-width, 1px) solid var(--home-button-border);
+  background: var(--header-control-surface, var(--home-button-surface));
   color: var(--chrome-foreground);
   cursor: pointer;
-  box-shadow: var(--home-button-shadow);
+  box-shadow: var(--header-control-shadow, var(--home-button-shadow));
   transition: border-color 0.2s, color 0.2s, transform 0.2s var(--ease), background-color 0.2s, box-shadow 0.2s;
 }
 
@@ -571,16 +577,16 @@ a {
 
 .header-icon-button:hover,
 .account-control:not(.account-control--loading):hover {
-  border-color: var(--home-button-hover-border);
-  background: var(--home-button-hover-surface);
+  border-color: var(--header-control-hover-border, var(--home-button-hover-border));
+  background: var(--header-control-hover-surface, var(--home-button-hover-surface));
   color: var(--chrome-foreground);
-  box-shadow: var(--home-button-hover-shadow);
+  box-shadow: var(--header-control-hover-shadow, var(--home-button-hover-shadow));
   transform: translateY(1px) scale(0.99);
 }
 
 .header-icon-button:active,
 .account-control:not(.account-control--loading):active {
-  box-shadow: var(--home-button-active-shadow);
+  box-shadow: var(--header-control-active-shadow, var(--home-button-active-shadow));
   transform: translateY(2px) scale(0.96);
 }
 

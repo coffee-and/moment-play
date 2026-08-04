@@ -1,83 +1,34 @@
 .flappy-game {
-  --flappy-character-body: #cdb9ec;
-  --flappy-character-tail: var(--flappy-character-body);
-  --flappy-character-fin: #6e8fbc;
-  --flappy-character-ink: #000000;
   --flappy-moon: #fff1b8;
 }
 
 .flappy-fish-svg {
-  --fish-body-color: var(--flappy-character-body);
-  --fish-tail-color: var(--flappy-character-tail);
-  --fish-fin-color: var(--flappy-character-fin);
-  --fish-outline-color: var(--flappy-character-ink);
-  --fish-eye-color: var(--flappy-character-ink);
-  position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 430 / 220;
+  height: 100%;
   overflow: visible;
   pointer-events: none;
   user-select: none;
   filter: drop-shadow(0 2px 3px color-mix(in oklab, var(--flappy-sky-deep) 18%, transparent));
 }
 
-.flappy-fish-svg__body,
-.flappy-fish-svg__tail,
-.flappy-fish-svg__wing {
-  position: absolute;
-  display: block;
-  overflow: visible;
-  pointer-events: none;
-  user-select: none;
-}
-
 .flappy-fish-svg__tail {
-  z-index: 1;
-  top: 16%;
-  left: 1%;
-  width: 40%;
-  height: 68%;
-  transform-origin: 90% 50%;
-  animation: flappy-fish-tail-sway .62s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: flappy-fish-tail-sway .38s ease-in-out infinite alternate;
 }
 
-.flappy-fish-svg__body {
-  z-index: 2;
-  top: 17%;
-  left: 30%;
-  width: 67%;
-  height: auto;
-}
-
-.flappy-fish-svg__wing {
-  z-index: 3;
-  top: 27%;
-  left: 40%;
-  width: 36%;
-  height: 45%;
-  transform-origin: 76% 50%;
-  animation: flappy-fish-fin-float .54s ease-in-out infinite alternate;
-}
-
-.flappy-game__bird > .flappy-fish-svg {
-  width: 100%;
-  height: 100%;
+.flappy-fish-svg__eye {
+  fill: var(--flappy-sky-deep);
 }
 
 @keyframes flappy-fish-tail-sway {
-  from { transform: rotate(5deg) translateY(-1px) scaleY(.99); }
-  to { transform: rotate(-7deg) translateY(2px) scaleY(1.02); }
-}
-
-@keyframes flappy-fish-fin-float {
-  from { transform: rotate(5deg) translateY(-1px) scale(.98); }
-  to { transform: rotate(-7deg) translateY(1px) scale(1.01); }
+  from { transform: rotate(3deg); }
+  to { transform: rotate(-4deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flappy-fish-svg__tail,
-  .flappy-fish-svg__wing {
+  .flappy-fish-svg__tail {
     animation: none;
   }
 }
