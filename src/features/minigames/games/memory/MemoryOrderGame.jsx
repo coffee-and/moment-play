@@ -27,13 +27,13 @@ export const MEMORY_BEST_ROUND_KEY = "eunContents.memoryOrderGame.bestRound";
 const KEY = MEMORY_BEST_ROUND_KEY;
 const COUNTDOWN_LABELS = ["3", "2", "1", "START!"];
 
-// Single source of truth for every round-transition timing value below, so
-// the sequence (roundClear -> countdown -> showingSequence -> inputGuide ->
-// playerTurn) can be retimed in one place instead of scattered literals.
+// Single source of truth for every round-transition timing value below. The
+// countdown runs only when a new game starts; later rounds move from the clear
+// phase directly into the sequence preview.
 export const MEMORY_TIMING = {
   COUNTDOWN_STEP_MS: 1000,
   // How long the "ROUND {n} CLEAR!" overlay (PHASE.CLEARED) stays visible
-  // before the next round's countdown is allowed to start.
+  // before the next round's sequence preview is allowed to start.
   ROUND_CLEAR_DURATION_MS: 1400,
   // How long the "순서대로 선택하세요" instruction (PHASE.TURN_READY) stays
   // visible, with card input still disabled, after the sequence preview ends
@@ -372,7 +372,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setDidBreakRecordThisAttempt(true);
   }
 
-  function startRound(nextRound, { resetRecord = true } = {}) {
+  function startRound(nextRound, { resetRecord = true, showCountdown = false } = {}) {
     clearGameTimers();
     resolvingRef.current = false;
     const nextData = createMemoryRound(nextRound, MEMORY_SYMBOLS);
@@ -387,7 +387,8 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setCountdownIndex(0);
     countdownIndexRef.current = 0;
     setRemainingMs(nextData.selectionSeconds * 1000);
-    startCountdown(0);
+    if (showCountdown) startCountdown(0);
+    else startPreview();
   }
 
   function resetToIdle() {
@@ -453,7 +454,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     setReplayGauge(0);
     setMistakes(0);
     setFailureStatus(null);
-    startRound(1);
+    startRound(1, { showCountdown: true });
   }
 
   function retryRound() {

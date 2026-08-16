@@ -1226,33 +1226,34 @@ a {
 }
 
 .footer {
+  padding-block: 22px 26px;
+}
+
+.footer__identity {
   display: flex;
-  flex-wrap: wrap;
+  min-width: 0;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 26px clamp(20px, 2.4vw, 32px);
-}
-
-.foot-links {
-  display: flex;
-  flex-wrap: wrap;
   gap: 20px;
-  color: var(--chrome-foreground);
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.foot-links a:hover {
-  color: var(--chrome-foreground);
 }
 
 .foot-copy {
-  width: 100%;
   color: var(--chrome-foreground);
   font-size: 11.5px;
+  line-height: 1;
+}
+
+@media (min-width: 681px) {
+  .foot-copy {
+    transform: translateY(0.25em);
+  }
+}
+
+@media (max-width: 680px) {
+  .footer__identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 .minigame-play-page {
@@ -1462,7 +1463,7 @@ a {
   inset: 0;
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: safe center;
   justify-content: center;
   padding:
     var(--game-stage-overlay-inset-top)
@@ -1488,12 +1489,6 @@ a {
   flex-direction: column;
   justify-content: safe center;
   gap: 12px;
-  max-height: calc(100vh - 40px);
-  max-height: calc(
-    100dvh - var(--game-stage-overlay-inset-top) - var(--game-stage-overlay-inset-bottom)
-  );
-  overflow-y: auto;
-  overscroll-behavior: contain;
   border: 1px solid var(--game-modal-border);
   border-radius: var(--r-xl);
   padding: 32px 28px;

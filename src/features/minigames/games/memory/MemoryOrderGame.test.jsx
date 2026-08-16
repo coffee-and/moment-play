@@ -19,7 +19,7 @@ import {
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Round 1 fixed timings (see memoryOrder.logic.js): count 3, preview 6000ms,
-// selection 6000ms. Countdown is always 4 steps of MEMORY_TIMING.COUNTDOWN_STEP_MS.
+// selection 6000ms. The initial countdown is 4 steps of MEMORY_TIMING.COUNTDOWN_STEP_MS.
 const COUNTDOWN_TOTAL_MS = MEMORY_TIMING.COUNTDOWN_STEP_MS * 4;
 const ROUND_1_PREVIEW_MS = 6000;
 const ROUND_1_SELECTION_MS = 6000;
@@ -138,7 +138,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("begins the next round's countdown only after the clear phase finishes, never overlapping it", () => {
+  it("begins the next round's preview directly after the clear phase finishes", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
     act(() => findButton("게임 시작").click());
@@ -149,7 +149,8 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
 
     act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS));
-    expect(document.body.textContent).toContain("— 2 ROUND —");
+    expect(document.querySelector('.memory-game__play-shell')?.dataset.phase).toBe("preview");
+    expect(document.querySelector('.memory-game__start-flow[data-state="countdown"]')).toBeNull();
 
     view.unmount();
   });

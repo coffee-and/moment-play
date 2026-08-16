@@ -2,7 +2,6 @@ import gameOverFace from "../assets/doodles/game-over-face.svg";
 import gameOverFacepalm from "../assets/doodles/game-over-facepalm.svg";
 import recordCelebration from "../assets/doodles/record-celebration.svg";
 import recordHeart from "../assets/doodles/record-heart.svg";
-import recordYeah from "../assets/doodles/record-yeah.svg";
 import startFace from "../assets/doodles/start-face.svg";
 import startHands from "../assets/doodles/start-hands.svg";
 import "./game-stage-doodle.css";
@@ -39,7 +38,6 @@ export function GameStageDoodle({ variant, className = "" }) {
         <DoodleArt asset={recordCelebration} part="record-face" />
         <DoodleArt asset={recordHeart} part="record-heart-left" />
         <DoodleArt asset={recordHeart} part="record-heart-right" />
-        <DoodleArt asset={recordYeah} part="record-yeah" />
       </span>
     );
   }
