@@ -33,7 +33,7 @@
   left: 50%;
   width: 96%;
   height: 73%;
-  transform: translateX(-50%) scaleX(1.08);
+  transform: translateX(-50%) scaleX(1.16);
   transform-origin: center top;
 }
 
@@ -78,14 +78,6 @@
   width: 16%;
   height: 20%;
   transform: rotate(13deg) scale(.92);
-}
-
-.game-stage-doodle[data-doodle-variant="record"] [data-doodle-part="record-yeah"] {
-  top: 1%;
-  right: -1%;
-  width: 49%;
-  height: 22%;
-  transform: rotate(3deg);
 }
 
 .game-stage-doodle[data-doodle-variant="record"].game-stage-doodle--compact {

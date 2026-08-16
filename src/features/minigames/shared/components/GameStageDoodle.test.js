@@ -27,11 +27,10 @@ describe("GameStageDoodle", () => {
     act(() => view.root.unmount());
   });
 
-  it("composes the celebration from face, hearts, and lettering", () => {
+  it("composes the celebration from face and heart layers", () => {
     const view = renderDoodle("record");
     expect(view.host.querySelector('[data-doodle-part="record-face"]')).not.toBeNull();
     expect(view.host.querySelectorAll('[data-doodle-part^="record-heart"]')).toHaveLength(2);
-    expect(view.host.querySelector('[data-doodle-part="record-yeah"]')).not.toBeNull();
     act(() => view.root.unmount());
   });
 });

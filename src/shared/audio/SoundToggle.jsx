@@ -8,7 +8,7 @@ export function SoundToggle({ compact = false }) {
 
   return (
     <button
-      className={`header-icon-button${compact ? " sound-toggle--compact" : ""}`}
+      className={`header-icon-button${compact ? " game-stage__icon-button sound-toggle--compact" : ""}`}
       type="button"
       aria-label={label}
       aria-pressed={active}
