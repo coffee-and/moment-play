@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { LOGIN_PATH } from "../../../shared/auth/authConstants.js";
@@ -15,6 +15,16 @@ function MinigameBlockingState(props) {
     <div className="wrap minigame-play-page minigame-play-page--blocking">
       <StatusPanel {...props} />
     </div>
+  );
+}
+
+function MinigameLoadingState({ game }) {
+  return (
+    <MinigameBlockingState
+      title={game.title}
+      description="게임을 불러오고 있어요."
+      action={<LoadingIndicator label={`${game.title} 불러오는 중`} />}
+    />
   );
 }
 
@@ -94,11 +104,13 @@ function MinigameRouteSession({ gameId, roomId, returnTo }) {
   }
 
   return (
-    <div className="wrap minigame-play-page minigame-play-page--active">
-      <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
-        <ActiveGameComponent game={game} roomId={roomId ?? null} />
-      </GameGuideProvider>
-    </div>
+    <Suspense fallback={<MinigameLoadingState game={game} />}>
+      <div className="wrap minigame-play-page minigame-play-page--active">
+        <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
+          <ActiveGameComponent game={game} roomId={roomId ?? null} />
+        </GameGuideProvider>
+      </div>
+    </Suspense>
   );
 }
 

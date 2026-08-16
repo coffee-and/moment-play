@@ -1,4 +1,4 @@
-import { getMinigameComponent } from "../data/minigameRegistry.js";
+import { hasMinigameComponent } from "../data/minigameRegistry.js";
 import { MiniGamePreview } from "./MiniGamePreview.jsx";
 
 function joinClassNames(values) {
@@ -6,7 +6,7 @@ function joinClassNames(values) {
 }
 
 export function MiniGameCard({ game, onSelect, showCategory = false, variant = "catalog" }) {
-  const canOpen = Boolean(getMinigameComponent(game.id));
+  const canOpen = hasMinigameComponent(game.id);
 
   return (
     <button

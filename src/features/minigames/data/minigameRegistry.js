@@ -1,34 +1,74 @@
-import { Game2048 } from "../games/game-2048/Game2048.jsx";
-import { FlappyGame } from "../games/flappy/FlappyGame.jsx";
-import { MemoryOrderGame } from "../games/memory/MemoryOrderGame.jsx";
-import { OmokGame } from "../games/omok/OmokGame.jsx";
-import { SudokuLevelGame } from "../games/sudoku/SudokuLevelGame.jsx";
-import { TimingTapGame } from "../games/timing-tap/TimingTapGame.jsx";
-import { GlowSequenceGame } from "../games/glow-sequence/GlowSequenceGame.jsx";
-import { SolitaireGame } from "../games/solitaire/SolitaireGame.jsx";
-import { LitsGame } from "../games/lits/LitsGame.jsx";
-import { ShikakuGame } from "../games/shikaku/ShikakuGame.jsx";
-import { MinesweeperGame } from "../games/minesweeper/MinesweeperGame.jsx";
-import { SetGame } from "../games/set/SetGame.jsx";
-import { MosaicGame } from "../games/mosaic/MosaicGame.jsx";
-import { BlockBlastGame } from "../games/block-blast/BlockBlastGame.jsx";
+import { lazyNamedComponent } from "../../../shared/components/lazyNamedComponent.js";
 
-export const MINIGAME_COMPONENTS = {
-  "2048": Game2048,
-  flappy: FlappyGame,
-  memory: MemoryOrderGame,
-  sudoku: SudokuLevelGame,
-  omok: OmokGame,
-  "timing-tap": TimingTapGame,
-  "glow-sequence": GlowSequenceGame,
-  solitaire: SolitaireGame,
-  lits: LitsGame,
-  shikaku: ShikakuGame,
-  minesweeper: MinesweeperGame,
-  set: SetGame,
-  mosaic: MosaicGame,
-  "block-blast": BlockBlastGame,
+const MINIGAME_MODULES = {
+  "2048": {
+    load: () => import("../games/game-2048/Game2048.jsx"),
+    exportName: "Game2048",
+  },
+  flappy: {
+    load: () => import("../games/flappy/FlappyGame.jsx"),
+    exportName: "FlappyGame",
+  },
+  memory: {
+    load: () => import("../games/memory/MemoryOrderGame.jsx"),
+    exportName: "MemoryOrderGame",
+  },
+  sudoku: {
+    load: () => import("../games/sudoku/SudokuLevelGame.jsx"),
+    exportName: "SudokuLevelGame",
+  },
+  omok: {
+    load: () => import("../games/omok/OmokGame.jsx"),
+    exportName: "OmokGame",
+  },
+  "timing-tap": {
+    load: () => import("../games/timing-tap/TimingTapGame.jsx"),
+    exportName: "TimingTapGame",
+  },
+  "glow-sequence": {
+    load: () => import("../games/glow-sequence/GlowSequenceGame.jsx"),
+    exportName: "GlowSequenceGame",
+  },
+  solitaire: {
+    load: () => import("../games/solitaire/SolitaireGame.jsx"),
+    exportName: "SolitaireGame",
+  },
+  lits: {
+    load: () => import("../games/lits/LitsGame.jsx"),
+    exportName: "LitsGame",
+  },
+  shikaku: {
+    load: () => import("../games/shikaku/ShikakuGame.jsx"),
+    exportName: "ShikakuGame",
+  },
+  minesweeper: {
+    load: () => import("../games/minesweeper/MinesweeperGame.jsx"),
+    exportName: "MinesweeperGame",
+  },
+  set: {
+    load: () => import("../games/set/SetGame.jsx"),
+    exportName: "SetGame",
+  },
+  mosaic: {
+    load: () => import("../games/mosaic/MosaicGame.jsx"),
+    exportName: "MosaicGame",
+  },
+  "block-blast": {
+    load: () => import("../games/block-blast/BlockBlastGame.jsx"),
+    exportName: "BlockBlastGame",
+  },
 };
+
+const MINIGAME_COMPONENTS = Object.fromEntries(
+  Object.entries(MINIGAME_MODULES).map(([gameId, definition]) => [
+    gameId,
+    lazyNamedComponent(definition.load, definition.exportName),
+  ]),
+);
+
+export function hasMinigameComponent(gameId) {
+  return Object.hasOwn(MINIGAME_MODULES, gameId);
+}
 
 export function getMinigameComponent(gameId) {
   return MINIGAME_COMPONENTS[gameId] ?? null;
