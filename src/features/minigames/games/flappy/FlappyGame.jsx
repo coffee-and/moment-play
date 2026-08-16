@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -19,8 +20,6 @@ import {
 } from "./flappy.logic.js";
 import "./flappy-game.css";
 
-const FLAPPY_BEST_KEY = "eunContents.flappy.best";
-
 const FLAPPY_STAR_FIELD = [
   [8, 13, 4, "warm"], [18, 30, 3, "cool"], [29, 17, 5, "cool"],
   [42, 34, 3, "warm"], [56, 15, 4, "cool"], [70, 29, 3, "warm"],
@@ -32,7 +31,7 @@ const FLAPPY_STAR_FIELD = [
 
 function readBestScore() {
   try {
-    const score = Number(window.localStorage.getItem(FLAPPY_BEST_KEY));
+    const score = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.FLAPPY_BEST_SCORE));
     return Number.isFinite(score) ? Math.max(0, score) : 0;
   } catch {
     return 0;
@@ -41,7 +40,7 @@ function readBestScore() {
 
 function writeBestScore(score) {
   try {
-    window.localStorage.setItem(FLAPPY_BEST_KEY, String(score));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.FLAPPY_BEST_SCORE, String(score));
   } catch {
     return;
   }

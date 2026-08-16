@@ -1,9 +1,11 @@
+import { LOCAL_STORAGE_KEYS } from "./localStorageRegistry.js";
+
 const STORAGE_VERSION = 1;
 
 function isStorageAvailable() {
   if (typeof window === "undefined") return false;
   try {
-    const probeKey = "eunContents.storageProbe";
+    const probeKey = LOCAL_STORAGE_KEYS.STORAGE_PROBE;
     window.localStorage.setItem(probeKey, "1");
     window.localStorage.removeItem(probeKey);
     return true;

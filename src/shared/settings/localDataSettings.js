@@ -1,4 +1,9 @@
-const MOMENT_PLAY_STORAGE_PREFIX = "eunContents.";
+import {
+  RESETTABLE_LOCAL_DATA_KEYS,
+  RESETTABLE_LOCAL_DATA_PREFIXES,
+} from "../storage/localStorageRegistry.js";
+
+const RESETTABLE_LOCAL_DATA_KEY_SET = new Set(RESETTABLE_LOCAL_DATA_KEYS);
 
 function getBrowserStorage() {
   if (typeof window === "undefined") return null;
@@ -13,7 +18,11 @@ export function clearMomentPlayLocalData(storage = getBrowserStorage()) {
 
     for (let index = 0; index < storage.length; index += 1) {
       const key = storage.key(index);
-      if (!key || !key.startsWith(MOMENT_PLAY_STORAGE_PREFIX)) continue;
+      if (!key) continue;
+
+      const isRegisteredKey = RESETTABLE_LOCAL_DATA_KEY_SET.has(key);
+      const isLegacyPlayData = RESETTABLE_LOCAL_DATA_PREFIXES.some((prefix) => key.startsWith(prefix));
+      if (!isRegisteredKey && !isLegacyPlayData) continue;
       keysToRemove.push(key);
     }
 

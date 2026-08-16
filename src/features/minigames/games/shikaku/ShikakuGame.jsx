@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -14,11 +15,9 @@ import {
 } from "./shikaku.logic.js";
 import "./shikaku.css";
 
-const SHIKAKU_BEST_KEY = "eunContents.shikaku.bestTime";
-
 export function ShikakuGame({ game }) {
   const { playSound } = useGameAudio();
-  const session = usePuzzleSession(SHIKAKU_BEST_KEY);
+  const session = usePuzzleSession(GAME_RECORD_STORAGE_KEYS.SHIKAKU_BEST_TIME);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [rectangles, setRectangles] = useState([]);
   const [anchor, setAnchor] = useState(null);

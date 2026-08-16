@@ -1,5 +1,3 @@
-export const SUDOKU_RECORDS_KEY = "eunContents.sudoku.records";
-
 export const SUDOKU_BOARD_SIZE = 9;
 export const SUDOKU_BOX_SIZE = 3;
 export const SUDOKU_CELL_COUNT = SUDOKU_BOARD_SIZE * SUDOKU_BOARD_SIZE;

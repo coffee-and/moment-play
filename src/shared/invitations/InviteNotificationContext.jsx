@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { fetchFriendOmokInvites } from "../../infrastructure/supabase/friendOmokInvitesGateway.js";
 import { FRIENDS_PATH } from "../../features/friends/friendsConstants.js";
 import { useAuth } from "../auth/AuthContext.jsx";
+import { LOCAL_STORAGE_PREFIXES } from "../storage/localStorageRegistry.js";
 import {
   getInviteResultKey,
   getInviteResultMessage,
@@ -13,7 +14,6 @@ import "./invite-notifications.css";
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const MAX_STORED_RESULT_KEYS = 80;
-const SEEN_RESULT_STORAGE_PREFIX = "moment-play.invite-results-seen";
 
 const EMPTY_CONTEXT = Object.freeze({
   isRefreshing: false,
@@ -34,7 +34,7 @@ function isActiveIncomingInvite(invite, now = Date.now()) {
 }
 
 function resultStorageKey(userId) {
-  return `${SEEN_RESULT_STORAGE_PREFIX}.${userId}`;
+  return `${LOCAL_STORAGE_PREFIXES.INVITE_RESULTS_SEEN}.${userId}`;
 }
 
 function readSeenResultKeys(userId) {

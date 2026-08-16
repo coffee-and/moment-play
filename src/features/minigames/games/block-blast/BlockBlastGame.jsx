@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import {
   CloseIcon,
   PauseIcon,
@@ -29,11 +30,9 @@ import {
 } from "./blockBlast.logic.js";
 import "./block-blast.css";
 
-const BLOCK_BLAST_BEST_KEY = "eunContents.blockBlast.bestScore";
-
 function readBestScore() {
   try {
-    const value = Number(window.localStorage.getItem(BLOCK_BLAST_BEST_KEY));
+    const value = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.BLOCK_BLAST_BEST_SCORE));
     return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
   } catch {
     return 0;
@@ -42,7 +41,7 @@ function readBestScore() {
 
 function saveBestScore(score) {
   try {
-    window.localStorage.setItem(BLOCK_BLAST_BEST_KEY, String(score));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.BLOCK_BLAST_BEST_SCORE, String(score));
   } catch {
     // Local records are optional.
   }

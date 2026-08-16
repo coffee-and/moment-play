@@ -1,5 +1,3 @@
-export const GAME_2048_BEST_SCORE_KEY = "eunContents.game2048.bestScore";
-
 export const BOARD_SIZE = 4;
 export const BOARD_CELLS = BOARD_SIZE * BOARD_SIZE;
 export const TARGET_TILES = [128, 256, 512, 1024, 2048];

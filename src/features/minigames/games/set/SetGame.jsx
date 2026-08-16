@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -9,14 +10,13 @@ import { dealSetBoard, findSets, isSet } from "./set.logic.js";
 import "./set.css";
 
 const SET_TARGET = 5;
-const SET_BEST_KEY = "eunContents.set.bestTime";
 const COLOR_NAMES = ["코랄", "그린", "퍼플"];
 const SHAPE_NAMES = ["타원", "다이아몬드", "물결"];
 const SHADING_NAMES = ["채움", "줄무늬", "윤곽"];
 
 export function SetGame({ game }) {
   const { playSound } = useGameAudio();
-  const session = usePuzzleSession(SET_BEST_KEY);
+  const session = usePuzzleSession(GAME_RECORD_STORAGE_KEYS.SET_BEST_TIME);
   const [board, setBoard] = useState(() => dealSetBoard());
   const [selected, setSelected] = useState([]);
   const [revealedSet, setRevealedSet] = useState([]);

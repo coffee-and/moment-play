@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -8,14 +9,13 @@ import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
 import { LITS_PUZZLES, validateLits } from "./lits.logic.js";
 import "./lits.css";
 
-const LITS_BEST_KEY = "eunContents.lits.bestTime";
 const UNKNOWN = 0;
 const FILLED = 1;
 const MARKED = 2;
 
 export function LitsGame({ game }) {
   const { playSound } = useGameAudio();
-  const session = usePuzzleSession(LITS_BEST_KEY);
+  const session = usePuzzleSession(GAME_RECORD_STORAGE_KEYS.LITS_BEST_TIME);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const puzzle = LITS_PUZZLES[puzzleIndex];
   const [board, setBoard] = useState(() => Array(LITS_PUZZLES[0].size ** 2).fill(UNKNOWN));

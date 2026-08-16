@@ -4,13 +4,13 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 
 vi.mock("../../../../shared/auth/AuthContext.jsx", () => ({
   useAuth: () => ({ status: "guest", user: null }),
 }));
 
 import {
-  MEMORY_BEST_ROUND_KEY,
   MEMORY_SYMBOLS,
   MEMORY_TIMING,
   MemoryOrderGame,
@@ -218,7 +218,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
   });
 
   it("offers retry, reset, and exit after failure while preserving the best record", async () => {
-    window.localStorage.setItem(MEMORY_BEST_ROUND_KEY, "7");
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.MEMORY_BEST_ROUND, "7");
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
     await startGame();
@@ -235,7 +235,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     act(() => findButton("남은 목숨으로 재도전").click());
     const retrySequence = getSequenceIds();
     expect(retrySequence).not.toEqual(firstSequence);
-    expect(window.localStorage.getItem(MEMORY_BEST_ROUND_KEY)).toBe("7");
+    expect(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.MEMORY_BEST_ROUND)).toBe("7");
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
     expect(document.body.textContent).toContain("GAME OVER");
@@ -257,7 +257,7 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
 
     expect(document.body.textContent).toContain("최고기록 갱신!");
-    expect(window.localStorage.getItem(MEMORY_BEST_ROUND_KEY)).toBe("1");
+    expect(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.MEMORY_BEST_ROUND)).toBe("1");
     view.unmount();
   });
 });

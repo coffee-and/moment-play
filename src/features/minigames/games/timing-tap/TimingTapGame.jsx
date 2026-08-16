@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
@@ -19,11 +20,9 @@ import {
   scoreTimingResult,
 } from "./timingTap.logic.js";
 
-const TIMING_BEST_KEY = "eunContents.timingTap.best";
-
 function readBestScore() {
   try {
-    const score = Number(window.localStorage.getItem(TIMING_BEST_KEY));
+    const score = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.TIMING_TAP_BEST_SCORE));
     return Number.isFinite(score) ? Math.max(0, score) : 0;
   } catch {
     return 0;
@@ -32,7 +31,7 @@ function readBestScore() {
 
 function saveBestScore(score) {
   try {
-    window.localStorage.setItem(TIMING_BEST_KEY, String(score));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.TIMING_TAP_BEST_SCORE, String(score));
   } catch {
     return;
   }

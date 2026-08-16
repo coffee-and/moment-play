@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  GAME_RECORD_STORAGE_KEYS,
+  LOCAL_STORAGE_KEYS,
+  RESETTABLE_LOCAL_DATA_KEYS,
+} from "../storage/localStorageRegistry.js";
 import { clearMomentPlayLocalData } from "./localDataSettings.js";
 
 afterEach(() => {
@@ -7,22 +12,22 @@ afterEach(() => {
 });
 
 describe("clearMomentPlayLocalData", () => {
-  it("removes all Moment Play data, including legacy theme preferences", () => {
-    window.localStorage.setItem("eunContents.settings.preferences", "legacy-theme-preferences");
-    window.localStorage.setItem("eunContents.game.2048", "record");
-    window.localStorage.setItem("eunContents.omok.nickname", "nickname");
+  it("removes every registered game record and legacy play-data key", () => {
+    RESETTABLE_LOCAL_DATA_KEYS.forEach((key) => window.localStorage.setItem(key, "stored-data"));
+    window.localStorage.setItem("eunContents.legacy.playData", "legacy-data");
+    window.localStorage.setItem(LOCAL_STORAGE_KEYS.THEME, "dark");
     window.localStorage.setItem("unrelated.key", "keep");
 
-    expect(clearMomentPlayLocalData()).toBe(3);
-    expect(window.localStorage.getItem("eunContents.settings.preferences")).toBeNull();
-    expect(window.localStorage.getItem("eunContents.game.2048")).toBeNull();
-    expect(window.localStorage.getItem("eunContents.omok.nickname")).toBeNull();
+    expect(clearMomentPlayLocalData()).toBe(RESETTABLE_LOCAL_DATA_KEYS.length + 1);
+    RESETTABLE_LOCAL_DATA_KEYS.forEach((key) => expect(window.localStorage.getItem(key)).toBeNull());
+    expect(window.localStorage.getItem("eunContents.legacy.playData")).toBeNull();
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.THEME)).toBe("dark");
     expect(window.localStorage.getItem("unrelated.key")).toBe("keep");
   });
 
-  it("removes a legacy theme preference even when it is the only Moment Play data", () => {
-    window.localStorage.setItem("eunContents.settings.preferences", "legacy-theme-preferences");
+  it("removes the non-namespaced Solitaire record through the registry", () => {
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS, "record");
     expect(clearMomentPlayLocalData()).toBe(1);
-    expect(window.localStorage.getItem("eunContents.settings.preferences")).toBeNull();
+    expect(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS)).toBeNull();
   });
 });

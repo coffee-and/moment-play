@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
@@ -19,12 +20,11 @@ import {
 } from "./glowSequence.logic.js";
 import "./glow-sequence.css";
 
-const BEST_ROUND_KEY = "eunContents.glowSequence.bestRound";
 const CELL_COLORS = GAME_COLOR_PALETTE.map((color) => color.value);
 
 function readBestRound() {
   try {
-    const value = Number(window.localStorage.getItem(BEST_ROUND_KEY));
+    const value = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.GLOW_SEQUENCE_BEST_ROUND));
     return Number.isFinite(value) ? Math.min(GLOW_SEQUENCE_MAX_ROUND, Math.max(0, Math.floor(value))) : 0;
   } catch {
     return 0;
@@ -33,7 +33,7 @@ function readBestRound() {
 
 function saveBestRound(round) {
   try {
-    window.localStorage.setItem(BEST_ROUND_KEY, String(round));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.GLOW_SEQUENCE_BEST_ROUND, String(round));
   } catch {
     // Local progress is optional.
   }

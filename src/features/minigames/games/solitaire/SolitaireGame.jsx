@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -26,7 +27,6 @@ import {
 } from "./solitaire.logic.js";
 import "./solitaire.css";
 
-const SOLITAIRE_RECORDS_KEY = "moment-play:solitaire-records:v1";
 const EMPTY_DIFFICULTY_RECORD = { bestTimeSeconds: null, completedCount: 0 };
 const DIFFICULTY_COPY = {
   [SOLITAIRE_DIFFICULTY.EASY]: {
@@ -60,7 +60,7 @@ function normalizeDifficultyRecord(value) {
 export function readSolitaireRecords() {
   if (typeof window === "undefined") return createEmptyRecords();
   try {
-    const stored = JSON.parse(window.localStorage.getItem(SOLITAIRE_RECORDS_KEY));
+    const stored = JSON.parse(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS));
     return {
       [SOLITAIRE_DIFFICULTY.EASY]: normalizeDifficultyRecord(stored?.[SOLITAIRE_DIFFICULTY.EASY]),
       [SOLITAIRE_DIFFICULTY.HARD]: normalizeDifficultyRecord(stored?.[SOLITAIRE_DIFFICULTY.HARD]),
@@ -73,7 +73,7 @@ export function readSolitaireRecords() {
 function saveSolitaireRecords(records) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(SOLITAIRE_RECORDS_KEY, JSON.stringify(records));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS, JSON.stringify(records));
   } catch {
     // Storage can be unavailable in privacy mode; gameplay still continues.
   }

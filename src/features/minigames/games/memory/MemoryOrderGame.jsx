@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
@@ -24,8 +25,7 @@ import {
 } from "./memoryOrder.logic.js";
 import "./memory-game.css";
 
-export const MEMORY_BEST_ROUND_KEY = "eunContents.memoryOrderGame.bestRound";
-const KEY = MEMORY_BEST_ROUND_KEY;
+const KEY = GAME_RECORD_STORAGE_KEYS.MEMORY_BEST_ROUND;
 const COUNTDOWN_LABELS = ["3", "2", "1", "START!"];
 
 // Single source of truth for every round-transition timing value below. The

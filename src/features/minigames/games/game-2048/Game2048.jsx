@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
@@ -15,7 +16,6 @@ import "./game-2048.css";
 import {
   BOARD_SIZE,
   FINAL_TARGET_TILE,
-  GAME_2048_BEST_SCORE_KEY,
   GAME_2048_COPY,
   GAME_2048_DIRECTION,
   GAME_2048_PHASE,
@@ -57,7 +57,7 @@ const KEY_TO_DIRECTION = {
 
 function getBestScore() {
   try {
-    const value = Number(window.localStorage.getItem(GAME_2048_BEST_SCORE_KEY));
+    const value = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.GAME_2048_BEST_SCORE));
     return Number.isFinite(value) && value > 0 ? value : 0;
   } catch {
     return 0;
@@ -66,7 +66,7 @@ function getBestScore() {
 
 function saveBestScore(score) {
   try {
-    window.localStorage.setItem(GAME_2048_BEST_SCORE_KEY, String(score));
+    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.GAME_2048_BEST_SCORE, String(score));
   } catch {
     return;
   }

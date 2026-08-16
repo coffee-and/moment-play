@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -14,11 +15,9 @@ import {
 } from "./mosaic.logic.js";
 import "./mosaic.css";
 
-const MOSAIC_BEST_KEY = "eunContents.mosaic.bestTime";
-
 export function MosaicGame({ game }) {
   const { playSound } = useGameAudio();
-  const session = usePuzzleSession(MOSAIC_BEST_KEY);
+  const session = usePuzzleSession(GAME_RECORD_STORAGE_KEYS.MOSAIC_BEST_TIME);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [board, setBoard] = useState(() => Array(64).fill(MOSAIC_CELL_STATE.UNKNOWN));
   const [mode, setMode] = useState(MOSAIC_CELL_STATE.FILLED);

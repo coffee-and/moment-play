@@ -1,9 +1,11 @@
+import { LOCAL_STORAGE_KEYS } from "../storage/localStorageRegistry.js";
+
 export const THEME = Object.freeze({
   LIGHT: "light",
   DARK: "dark",
 });
 
-export const THEME_STORAGE_KEY = "momentPlay.theme";
+export const THEME_STORAGE_KEY = LOCAL_STORAGE_KEYS.THEME;
 
 export function isTheme(value) {
   return value === THEME.LIGHT || value === THEME.DARK;

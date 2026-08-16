@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { FlagIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
+import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -18,7 +19,6 @@ import "./minesweeper.css";
 
 const SIZE = 9;
 const MINE_COUNT = 10;
-const MINESWEEPER_BEST_KEY = "eunContents.minesweeper.bestTime";
 
 function getNeighborIndexes(index) {
   const row = Math.floor(index / SIZE);
@@ -39,7 +39,7 @@ function getNeighborIndexes(index) {
 
 export function MinesweeperGame({ game }) {
   const { playSound } = useGameAudio();
-  const session = usePuzzleSession(MINESWEEPER_BEST_KEY);
+  const session = usePuzzleSession(GAME_RECORD_STORAGE_KEYS.MINESWEEPER_BEST_TIME);
   const [board, setBoard] = useState(() => createHiddenBoard(SIZE));
   const [hasPlantedMines, setHasPlantedMines] = useState(false);
   const [flagMode, setFlagMode] = useState(false);
