@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { LOGIN_PATH } from "../../../shared/auth/authConstants.js";
@@ -18,17 +18,11 @@ function MinigameBlockingState(props) {
   );
 }
 
-export function MinigamePlayPage() {
-  const { gameId, roomId } = useParams();
-  const location = useLocation();
+function MinigameRouteSession({ gameId, roomId, returnTo }) {
   const { status: authStatus } = useAuth();
   const [hasStarted, setHasStarted] = useState(false);
   const game = getMinigameById(gameId);
   const ActiveGameComponent = game ? getMinigameComponent(game.id) : null;
-
-  useEffect(() => {
-    setHasStarted(false);
-  }, [gameId, roomId]);
 
   if (!game) {
     return (
@@ -61,8 +55,6 @@ export function MinigamePlayPage() {
   }
 
   const guideDescription = game.guide?.description ?? game.howTo;
-  const returnTo = `${location.pathname}${location.search}${location.hash}`;
-
   if (authStatus === "loading") {
     return (
       <MinigameBlockingState
@@ -107,5 +99,20 @@ export function MinigamePlayPage() {
         <ActiveGameComponent game={game} roomId={roomId ?? null} />
       </GameGuideProvider>
     </div>
+  );
+}
+
+export function MinigamePlayPage() {
+  const { gameId, roomId } = useParams();
+  const location = useLocation();
+  const returnTo = `${location.pathname}${location.search}${location.hash}`;
+
+  return (
+    <MinigameRouteSession
+      key={location.pathname}
+      gameId={gameId}
+      roomId={roomId}
+      returnTo={returnTo}
+    />
   );
 }

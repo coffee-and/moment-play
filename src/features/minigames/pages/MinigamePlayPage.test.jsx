@@ -2,14 +2,16 @@
 import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let auth = { status: "guest", user: null };
 let receivedRoomId;
+let mountedGameIds = [];
 let currentLocation;
+let navigate;
 
 vi.mock("../../../shared/auth/AuthContext.jsx", () => ({ useAuth: () => auth }));
 vi.mock("../data/minigameCatalog.js", () => ({
@@ -22,7 +24,10 @@ vi.mock("../data/minigameCatalog.js", () => ({
   }),
 }));
 vi.mock("../data/minigameRegistry.js", () => ({
-  getMinigameComponent: () => function GameStub({ roomId }) {
+  getMinigameComponent: () => function GameStub({ game, roomId }) {
+    React.useEffect(() => {
+      mountedGameIds.push(game.id);
+    }, [game.id]);
     receivedRoomId = roomId;
     return <div>Game content</div>;
   },
@@ -32,6 +37,7 @@ const { MinigamePlayPage } = await import("./MinigamePlayPage.jsx");
 
 function LocationProbe() {
   currentLocation = useLocation();
+  navigate = useNavigate();
   return null;
 }
 
@@ -64,7 +70,9 @@ afterEach(() => {
   document.body.innerHTML = "";
   auth = { status: "guest", user: null };
   receivedRoomId = undefined;
+  mountedGameIds = [];
   currentLocation = null;
+  navigate = undefined;
 });
 
 describe("MinigamePlayPage authentication gate", () => {
@@ -110,6 +118,21 @@ describe("MinigamePlayPage authentication gate", () => {
     const view = renderPage("/minigames/2048");
     expect(view.host.textContent).toContain("로그인 상태 확인 중");
     expect(receivedRoomId).toBeUndefined();
+    view.unmount();
+  });
+
+  it("requires a new start confirmation before mounting a different game route", () => {
+    auth = { status: "authenticated", user: { id: "user-1" } };
+    const view = renderPage("/minigames/2048");
+
+    act(() => view.host.querySelector("button").click());
+    expect(mountedGameIds).toEqual(["2048"]);
+
+    act(() => navigate("/minigames/memory"));
+
+    expect(view.host.textContent).toContain("게임 시작하기");
+    expect(view.host.textContent).not.toContain("Game content");
+    expect(mountedGameIds).toEqual(["2048"]);
     view.unmount();
   });
 });
