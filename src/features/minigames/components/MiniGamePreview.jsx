@@ -74,7 +74,7 @@ export function MiniGamePreview({ gameId }) {
     return (
       <span className="game-card-preview is-solitaire">
         <span className="preview-solitaire-back" />
-        {PREVIEW_SOLITAIRE_CARDS.map((card, index) => (
+        {PREVIEW_SOLITAIRE_CARDS.map((card) => (
           <span className={`preview-solitaire-card is-${card.color}`} key={`${card.rank}-${card.suit}`}>
             <b>{card.rank}</b>
             <i>{card.suit}</i>

@@ -2,10 +2,17 @@ import { LOGIN_PATH, SIGNUP_PATH } from "./authConstants.js";
 
 export const DEFAULT_RETURN_TO = "/";
 
+function containsUnsafePathCharacter(value) {
+  return Array.from(value).some((character) => {
+    const codePoint = character.codePointAt(0);
+    return codePoint <= 0x1f || codePoint === 0x7f || character === "\\";
+  });
+}
+
 export function sanitizeReturnTo(value, fallback = DEFAULT_RETURN_TO) {
   if (typeof value !== "string" || !value || value !== value.trim()) return fallback;
   if (!value.startsWith("/") || value.startsWith("//")) return fallback;
-  if (/[\u0000-\u001f\u007f\\]/.test(value)) return fallback;
+  if (containsUnsafePathCharacter(value)) return fallback;
 
   let decoded;
   try {
@@ -13,7 +20,7 @@ export function sanitizeReturnTo(value, fallback = DEFAULT_RETURN_TO) {
   } catch {
     return fallback;
   }
-  if (!decoded.startsWith("/") || decoded.startsWith("//") || /[\u0000-\u001f\u007f\\]/.test(decoded)) {
+  if (!decoded.startsWith("/") || decoded.startsWith("//") || containsUnsafePathCharacter(decoded)) {
     return fallback;
   }
 

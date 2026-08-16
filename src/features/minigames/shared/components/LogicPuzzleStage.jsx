@@ -168,7 +168,7 @@ export function LogicPuzzleStage({
             <h2 id={`${game.id}-start-title`}>{game.title}</h2>
             <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
             <div className="game-stage-modal__actions">
-              <Button autoFocus onClick={onStart}>게임 시작</Button>
+              <Button data-modal-initial-focus="" onClick={onStart}>게임 시작</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -222,7 +222,7 @@ export function LogicPuzzleStage({
             <h2 id={`${game.id}-paused-title`}>일시정지</h2>
             <p>타이머와 보드 입력이 멈췄어요.</p>
             <div className="game-stage-modal__actions">
-              <Button autoFocus onClick={session.resume}>
+              <Button data-modal-initial-focus="" onClick={session.resume}>
                 <PlayIcon />
                 계속하기
               </Button>

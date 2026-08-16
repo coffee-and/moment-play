@@ -262,6 +262,7 @@ export function BlockBlastGame({ game }) {
           <div
             className="block-blast-board"
             role="grid"
+            tabIndex={-1}
             aria-label="8×8 블록 보드"
             onDragOver={(event) => event.preventDefault()}
             onPointerLeave={() => setPreviewOrigin(null)}
@@ -364,7 +365,7 @@ export function BlockBlastGame({ game }) {
             <GameStageDoodle variant="start" />
             <h2 id="block-blast-start-title">Block Blast</h2>
             <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
-            <div className="game-stage-modal__actions"><Button autoFocus onClick={startGame}>게임 시작</Button></div>
+            <div className="game-stage-modal__actions"><Button data-modal-initial-focus="" onClick={startGame}>게임 시작</Button></div>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}
@@ -390,7 +391,7 @@ export function BlockBlastGame({ game }) {
             <h2 id="block-blast-paused-title">일시정지</h2>
             <p>보드와 점수가 그대로 멈춰 있어요.</p>
             <div className="game-stage-modal__actions">
-              <Button autoFocus onClick={resumeGame}>
+              <Button data-modal-initial-focus="" onClick={resumeGame}>
                 <PlayIcon />
                 계속하기
               </Button>

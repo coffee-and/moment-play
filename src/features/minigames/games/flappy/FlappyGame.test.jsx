@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import React, { act } from "react";
+import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -60,7 +60,7 @@ describe("FlappyGame", () => {
 
   it("supports keyboard and pointer controls and uses the shared pause modal", () => {
     const view = renderGame();
-    const surface = view.host.querySelector('[role="application"]');
+    const surface = view.host.querySelector('[role="button"][aria-label^="별빛 비행"]');
 
     expect(surface.tabIndex).toBe(0);
 

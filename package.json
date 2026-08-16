@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "check:static": "eslint . --max-warnings 0",
+    "lint:styles": "stylelint \"src/**/*.css\"",
+    "quality": "npm run check:static && npm run lint:styles",
     "test": "vitest run",
     "test:db:ranking": "npx supabase db query --linked --file supabase/tests/phase3_game_results_test.sql",
     "test:db:friends": "npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql",
@@ -20,8 +23,15 @@
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.11.0",
     "jsdom": "^29.1.1",
+    "stylelint": "^17.14.1",
     "vite": "^6.4.3",
     "vitest": "^4.1.10"
   }

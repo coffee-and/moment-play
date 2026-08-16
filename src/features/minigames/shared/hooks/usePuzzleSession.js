@@ -21,7 +21,15 @@ function saveBestTime(storageKey, seconds) {
 
 export function usePuzzleSession(storageKey) {
   const navigate = useNavigate();
-  const gameStreak = useGameStreak();
+  const {
+    beginRound,
+    completionStreak,
+    disqualifyRound,
+    hasRevealedAnswer,
+    recordSuccess,
+    streak,
+    streakEligible,
+  } = useGameStreak();
   const [phase, setPhase] = useState("idle");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [bestTime, setBestTime] = useState(() => readBestTime(storageKey));
@@ -51,8 +59,8 @@ export function usePuzzleSession(storageKey) {
     setElapsedSeconds(0);
     setIsExitOpen(false);
     setPhase("playing");
-    gameStreak.beginRound({ preserveStreak });
-  }, [gameStreak.beginRound]);
+    beginRound({ preserveStreak });
+  }, [beginRound]);
 
   const start = useCallback(() => begin(false), [begin]);
   const startNextRound = useCallback(() => begin(true), [begin]);
@@ -63,14 +71,14 @@ export function usePuzzleSession(storageKey) {
     const finalSeconds = Math.max(1, updateElapsed());
     elapsedBeforeStartRef.current = finalSeconds * 1000;
     setPhase("completed");
-    gameStreak.recordSuccess();
+    recordSuccess();
     setBestTime((current) => {
       if (current != null && current <= finalSeconds) return current;
       saveBestTime(storageKey, finalSeconds);
       return finalSeconds;
     });
     return finalSeconds;
-  }, [gameStreak.recordSuccess, storageKey, updateElapsed]);
+  }, [recordSuccess, storageKey, updateElapsed]);
 
   const fail = useCallback(() => {
     if (phaseRef.current !== "playing") return;
@@ -78,8 +86,8 @@ export function usePuzzleSession(storageKey) {
     const finalSeconds = updateElapsed();
     elapsedBeforeStartRef.current = finalSeconds * 1000;
     setPhase("failed");
-    gameStreak.disqualifyRound();
-  }, [gameStreak.disqualifyRound, updateElapsed]);
+    disqualifyRound();
+  }, [disqualifyRound, updateElapsed]);
 
   const requestExit = useCallback(() => {
     if (["idle", "completed", "failed"].includes(phaseRef.current)) {
@@ -119,17 +127,17 @@ export function usePuzzleSession(storageKey) {
     if (phaseRef.current !== "paused" && phaseRef.current !== "playing") return;
     phaseRef.current = "surrendered";
     setPhase("surrendered");
-    gameStreak.disqualifyRound({ answerRevealed: true });
-  }, [gameStreak.disqualifyRound]);
+    disqualifyRound({ answerRevealed: true });
+  }, [disqualifyRound]);
 
   const revealAnswer = useCallback(() => {
-    gameStreak.disqualifyRound({ answerRevealed: true });
-  }, [gameStreak.disqualifyRound]);
+    disqualifyRound({ answerRevealed: true });
+  }, [disqualifyRound]);
 
   const leaveGame = useCallback(() => {
-    gameStreak.disqualifyRound();
+    disqualifyRound();
     navigate("/");
-  }, [gameStreak.disqualifyRound, navigate]);
+  }, [disqualifyRound, navigate]);
 
   return {
     bestTime,
@@ -137,7 +145,7 @@ export function usePuzzleSession(storageKey) {
     continueGame,
     elapsedSeconds,
     fail,
-    hasRevealedAnswer: gameStreak.hasRevealedAnswer,
+    hasRevealedAnswer,
     isExitOpen,
     leaveGame,
     pause,
@@ -147,9 +155,9 @@ export function usePuzzleSession(storageKey) {
     resume,
     start,
     startNextRound,
-    streak: gameStreak.streak,
-    completionStreak: gameStreak.completionStreak,
-    streakEligible: gameStreak.streakEligible,
+    streak,
+    completionStreak,
+    streakEligible,
     surrender,
   };
 }

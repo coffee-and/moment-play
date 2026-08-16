@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import React, { act } from "react";
+import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -52,7 +52,7 @@ function renderGame() {
   return { host, unmount: () => act(() => root.unmount()) };
 }
 
-async function startEasyGame(view) {
+async function startEasyGame() {
   const startButton = document.querySelector('[aria-label="초급 난이도 시작"]');
   await act(async () => startButton.click());
 }
@@ -83,7 +83,7 @@ afterEach(() => {
 describe("Sudoku hint ranking policy", () => {
   it("submits an unassisted completed puzzle to the ranking", async () => {
     const view = renderGame();
-    await startEasyGame(view);
+    await startEasyGame();
     solveDefaultPuzzle(view);
 
     expect(submitResult).toHaveBeenCalledTimes(1);
@@ -95,7 +95,7 @@ describe("Sudoku hint ranking policy", () => {
 
   it("keeps a hinted completion local and does not submit it to the ranking", async () => {
     const view = renderGame();
-    await startEasyGame(view);
+    await startEasyGame();
     act(() => [...view.host.querySelectorAll("button")]
       .find((button) => button.textContent === "힌트 보기").click());
     act(() => [...view.host.querySelectorAll("button")]

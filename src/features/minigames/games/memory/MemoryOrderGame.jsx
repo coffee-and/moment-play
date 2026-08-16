@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
@@ -112,9 +112,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   livesRef.current = lives;
   replayGaugeRef.current = replayGauge;
 
-  useEffect(() => () => clearGameTimers({ updateFeedback: false }), []);
-
-  function clearActiveTimer({ preserve = false } = {}) {
+  const clearActiveTimer = useCallback(({ preserve = false } = {}) => {
     const timer = activeTimerRef.current;
     if (!timer) return;
     window.clearTimeout(timer.timeoutId);
@@ -129,15 +127,15 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       return;
     }
     activeTimerRef.current = null;
-  }
+  }, []);
 
-  function clearRoundTransitionTimer() {
+  const clearRoundTransitionTimer = useCallback(() => {
     if (!roundTransitionTimerRef.current) return;
     window.clearTimeout(roundTransitionTimerRef.current);
     roundTransitionTimerRef.current = null;
-  }
+  }, []);
 
-  function clearCorrectFeedback({ updateState = true } = {}) {
+  const clearCorrectFeedback = useCallback(({ updateState = true } = {}) => {
     if (feedbackTimerRef.current) {
       window.clearTimeout(feedbackTimerRef.current);
       feedbackTimerRef.current = null;
@@ -146,13 +144,15 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       setCorrectFeedback(null);
       setCorrectAnnouncement("");
     }
-  }
+  }, []);
 
-  function clearGameTimers({ updateFeedback = true } = {}) {
+  const clearGameTimers = useCallback(({ updateFeedback = true } = {}) => {
     clearActiveTimer();
     clearRoundTransitionTimer();
     clearCorrectFeedback({ updateState: updateFeedback });
-  }
+  }, [clearActiveTimer, clearCorrectFeedback, clearRoundTransitionTimer]);
+
+  useEffect(() => () => clearGameTimers({ updateFeedback: false }), [clearGameTimers]);
 
   function runTimer(kind, durationMs) {
     clearActiveTimer();

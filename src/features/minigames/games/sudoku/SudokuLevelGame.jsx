@@ -240,7 +240,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
 
   return (
     <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
-      <div className="sudoku-game__stage" onKeyDown={handleGameKeyDown}>
+      <div className="sudoku-game__stage">
         {phase !== SUDOKU_PHASE.IDLE ? (
           <div className="sudoku-game__play">
             <section className="sudoku-game__meta" aria-label={`${activeLevelLabel} 스도쿠 기록`}>
@@ -249,7 +249,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <div><span>{SUDOKU_COPY.meta.currentTime}</span><strong>{formatTime(elapsedSeconds)}</strong></div>
             </section>
             <p className="sudoku-game__status" aria-live="polite">{activeLevelLabel} · {statusText}</p>
-            <div className="sudoku-game__board" role="grid" aria-label={`${activeLevelLabel} 스도쿠 보드`} aria-rowcount={SUDOKU_BOARD_SIZE} aria-colcount={SUDOKU_BOARD_SIZE}>
+            <div className="sudoku-game__board" role="grid" tabIndex={-1} aria-label={`${activeLevelLabel} 스도쿠 보드`} aria-rowcount={SUDOKU_BOARD_SIZE} aria-colcount={SUDOKU_BOARD_SIZE} onKeyDown={handleGameKeyDown}>
               {board.map((value, index) => {
                 const selected = selectedIndex === index;
                 return (
@@ -291,7 +291,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <h3 id="sudoku-game-start-title">{SUDOKU_COPY.start.title}</h3>
               <p>{SUDOKU_COPY.start.description}</p>
               <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
-                {SUDOKU_LEVEL_OPTIONS.map((option, index) => (
+                {SUDOKU_LEVEL_OPTIONS.map((option) => (
                   <button type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
                     <strong>{option.label}</strong>
                     <span>{option.description}</span>

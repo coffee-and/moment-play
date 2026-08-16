@@ -46,9 +46,9 @@ function getFallbackFocusTarget(layerElement) {
 }
 
 function focusLayer(layerElement) {
-  const autoFocusTarget = layerElement.querySelector("[autofocus]");
+  const initialFocusTarget = layerElement.querySelector("[data-modal-initial-focus]");
   const firstTabbable = getTabbableElements(layerElement)[0];
-  focusWithoutScrolling(autoFocusTarget ?? firstTabbable ?? getFallbackFocusTarget(layerElement));
+  focusWithoutScrolling(initialFocusTarget ?? firstTabbable ?? getFallbackFocusTarget(layerElement));
 }
 
 function saveBackgroundState(element) {

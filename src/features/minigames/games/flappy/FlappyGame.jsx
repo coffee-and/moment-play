@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
@@ -73,7 +73,7 @@ export function FlappyGame({ game }) {
   worldRef.current = world;
   bestRef.current = best;
 
-  function showFlightFeedback(feedback) {
+  const showFlightFeedback = useCallback((feedback) => {
     window.clearTimeout(feedbackTimerRef.current);
     feedbackSequenceRef.current += 1;
     const durationMs = feedback.durationMs ?? 880;
@@ -82,9 +82,9 @@ export function FlappyGame({ game }) {
       feedbackTimerRef.current = null;
       setActionFeedback(null);
     }, durationMs + 30);
-  }
+  }, []);
 
-  function finishGame(finalWorld) {
+  const finishGame = useCallback((finalWorld) => {
     phaseRef.current = "over";
     setWorld(finalWorld);
     setPhase("over");
@@ -97,7 +97,7 @@ export function FlappyGame({ game }) {
       setBest(finalWorld.score);
       writeBestScore(finalWorld.score);
     }
-  }
+  }, [playSound]);
 
   useEffect(() => {
     if (phase !== "playing") return undefined;
@@ -169,7 +169,7 @@ export function FlappyGame({ game }) {
 
     frameRef.current = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frameRef.current);
-  }, [phase, playSound]);
+  }, [finishGame, phase, playSound, showFlightFeedback]);
 
   useEffect(() => () => {
     window.cancelAnimationFrame(frameRef.current);
@@ -279,7 +279,7 @@ export function FlappyGame({ game }) {
       <div className="flappy-game__wrap">
         <div
           className={`flappy-game__sky ${feedbackStyles.host}`}
-          role="application"
+          role="button"
           tabIndex={0}
           aria-label={`별빛 비행, 현재 점수 ${world.score}. 화면이나 Space·Enter를 눌러 날아오르세요.`}
           onPointerDown={(event) => {

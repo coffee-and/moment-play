@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
@@ -76,7 +75,6 @@ const winningMoves = [
 
 async function flushMicrotasks(times = 8) {
   for (let index = 0; index < times; index += 1) {
-    // eslint-disable-next-line no-await-in-loop
     await Promise.resolve();
   }
 }

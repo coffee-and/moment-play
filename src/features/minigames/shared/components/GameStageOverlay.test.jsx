@@ -15,7 +15,7 @@ function renderOverlay(props = {}) {
     <GameStageOverlay state="test" {...props}>
       <GameStageModal role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <h2 id="overlay-title">Modal title</h2>
-        <button type="button" autoFocus>Confirm</button>
+        <button type="button" data-modal-initial-focus="">Confirm</button>
         <button type="button">Cancel</button>
       </GameStageModal>
     </GameStageOverlay>,

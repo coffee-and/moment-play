@@ -15,7 +15,7 @@ export function getGlowSequenceLength(round) {
   return Math.min(15, 6 + Math.floor((safeRound - 10) / 5));
 }
 
-export function getGlowGridSize(sequenceLength) {
+export function getGlowGridSize() {
   return 4;
 }
 

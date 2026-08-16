@@ -44,6 +44,7 @@ export function ModalLayer({
       ref={layerRef}
       tabIndex={-1}
       data-modal-layer=""
+      role="presentation"
       onMouseDown={(event) => {
         onMouseDown?.(event);
         if (

@@ -50,6 +50,9 @@ jobs:
             exit 1
           fi
 
+      - name: Run static quality gates
+        run: npm run quality
+
       - name: Run application tests
         run: npm test
 
