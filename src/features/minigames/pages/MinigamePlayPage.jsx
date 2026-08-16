@@ -6,7 +6,14 @@ import { buildAuthRoute } from "../../../shared/auth/returnTo.js";
 import { LoadingIndicator } from "../../../shared/components/LoadingIndicator.jsx";
 import { StatusPanel } from "../../../shared/components/StatusPanel.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
-import { MINIGAME_STATUS, getMinigameById } from "../data/minigameCatalog.js";
+import { ErrorBoundary } from "../../../shared/errors/ErrorBoundary.jsx";
+import { ErrorFallback } from "../../../shared/errors/ErrorFallback.jsx";
+import { reloadDocument } from "../../../shared/errors/errorRecovery.js";
+import {
+  MINIGAMES_PATH,
+  MINIGAME_STATUS,
+  getMinigameById,
+} from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
 import { GameGuideProvider } from "../shared/components/GameGuideContext.jsx";
 
@@ -24,6 +31,26 @@ function MinigameLoadingState({ game }) {
       title={game.title}
       description="게임을 불러오고 있어요."
       action={<LoadingIndicator label={`${game.title} 불러오는 중`} />}
+    />
+  );
+}
+
+function MinigameErrorState() {
+  return (
+    <ErrorFallback
+      mode="viewport"
+      title="게임을 계속할 수 없어요."
+      description="게임을 다시 불러오거나 다른 게임을 선택해 주세요."
+      actions={(
+        <>
+          <Button type="button" onClick={reloadDocument}>
+            게임 다시 불러오기
+          </Button>
+          <Button as={Link} to={MINIGAMES_PATH} variant="secondary">
+            게임 목록으로
+          </Button>
+        </>
+      )}
     />
   );
 }
@@ -104,13 +131,18 @@ function MinigameRouteSession({ gameId, roomId, returnTo }) {
   }
 
   return (
-    <Suspense fallback={<MinigameLoadingState game={game} />}>
-      <div className="wrap minigame-play-page minigame-play-page--active">
-        <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
-          <ActiveGameComponent game={game} roomId={roomId ?? null} />
-        </GameGuideProvider>
-      </div>
-    </Suspense>
+    <ErrorBoundary
+      resetKey={`${game.id}:${roomId ?? "solo"}`}
+      fallback={<MinigameErrorState />}
+    >
+      <Suspense fallback={<MinigameLoadingState game={game} />}>
+        <div className="wrap minigame-play-page minigame-play-page--active">
+          <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
+            <ActiveGameComponent game={game} roomId={roomId ?? null} />
+          </GameGuideProvider>
+        </div>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 

@@ -1,0 +1,42 @@
+.root {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  place-items: center;
+  padding:
+    max(var(--gap), env(safe-area-inset-top))
+    max(var(--gap), env(safe-area-inset-right))
+    max(var(--gap), env(safe-area-inset-bottom))
+    max(var(--gap), env(safe-area-inset-left));
+}
+
+.content {
+  min-height: clamp(360px, 62vh, 720px);
+}
+
+.viewport {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.panel {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap);
+}
+
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}

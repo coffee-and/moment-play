@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Link, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { AppLayout } from "../layouts/AppLayout.jsx";
 import { FRIENDS_PATH } from "../features/friends/friendsConstants.js";
 import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
@@ -10,6 +10,11 @@ import { RANKING_PATH } from "../features/ranking/rankingConstants.js";
 import { LoadingIndicator } from "../shared/components/LoadingIndicator.jsx";
 import { StatusPanel } from "../shared/components/StatusPanel.jsx";
 import { lazyNamedComponent } from "../shared/components/lazyNamedComponent.js";
+import { Button } from "../shared/components/Button.jsx";
+import { ErrorBoundary } from "../shared/errors/ErrorBoundary.jsx";
+import { ErrorFallback } from "../shared/errors/ErrorFallback.jsx";
+import { reloadDocument } from "../shared/errors/errorRecovery.js";
+import { isImmersiveRoute } from "./routePresentation.js";
 
 const AuthCallbackPage = lazyNamedComponent(
   () => import("../features/auth/pages/AuthCallbackPage.jsx"),
@@ -52,20 +57,47 @@ const NotFoundPage = lazyNamedComponent(
   "NotFoundPage",
 );
 
-function RouteLoadingBoundary() {
+function RouteErrorFallback({ isImmersive }) {
   return (
-    <Suspense
-      fallback={(
-        <div className="wrap page-content">
-          <StatusPanel
-            title="화면을 불러오고 있어요."
-            action={<LoadingIndicator label="화면 불러오는 중" />}
-          />
-        </div>
+    <ErrorFallback
+      mode={isImmersive ? "viewport" : "content"}
+      title="화면을 불러오지 못했어요."
+      description="페이지를 다시 불러오거나 홈으로 이동해 주세요."
+      actions={(
+        <>
+          <Button type="button" onClick={reloadDocument}>
+            다시 불러오기
+          </Button>
+          <Button as={Link} to="/" variant="secondary">
+            홈으로
+          </Button>
+        </>
       )}
+    />
+  );
+}
+
+function RouteContentBoundary() {
+  const location = useLocation();
+
+  return (
+    <ErrorBoundary
+      resetKey={location.key}
+      fallback={<RouteErrorFallback isImmersive={isImmersiveRoute(location.pathname)} />}
     >
-      <Outlet />
-    </Suspense>
+      <Suspense
+        fallback={(
+          <div className="wrap page-content">
+            <StatusPanel
+              title="화면을 불러오고 있어요."
+              action={<LoadingIndicator label="화면 불러오는 중" />}
+            />
+          </div>
+        )}
+      >
+        <Outlet />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -73,7 +105,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route element={<RouteLoadingBoundary />}>
+        <Route element={<RouteContentBoundary />}>
           <Route path="/" element={<HomePage />} />
           <Route path={MINIGAMES_PATH} element={<MiniGamesPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />

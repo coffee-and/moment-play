@@ -12,9 +12,11 @@ let receivedRoomId;
 let mountedGameIds = [];
 let currentLocation;
 let navigate;
+let shouldGameThrow = false;
 
 vi.mock("../../../shared/auth/AuthContext.jsx", () => ({ useAuth: () => auth }));
 vi.mock("../data/minigameCatalog.js", () => ({
+  MINIGAMES_PATH: "/minigames",
   MINIGAME_STATUS: { COMING_SOON: "coming-soon" },
   getMinigameById: (gameId) => ({
     guide: { description: `How to play ${gameId}` },
@@ -25,6 +27,10 @@ vi.mock("../data/minigameCatalog.js", () => ({
 }));
 vi.mock("../data/minigameRegistry.js", () => ({
   getMinigameComponent: () => function GameStub({ game, roomId }) {
+    if (shouldGameThrow) {
+      throw new Error("game render failed");
+    }
+
     React.useEffect(() => {
       mountedGameIds.push(game.id);
     }, [game.id]);
@@ -67,12 +73,14 @@ function renderPage(path) {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   document.body.innerHTML = "";
   auth = { status: "guest", user: null };
   receivedRoomId = undefined;
   mountedGameIds = [];
   currentLocation = null;
   navigate = undefined;
+  shouldGameThrow = false;
 });
 
 describe("MinigamePlayPage authentication gate", () => {
@@ -134,5 +142,27 @@ describe("MinigamePlayPage authentication gate", () => {
     expect(view.host.textContent).not.toContain("Game content");
     expect(mountedGameIds).toEqual(["2048"]);
     view.unmount();
+  });
+
+  it("contains a game render failure inside the active game area", () => {
+    auth = { status: "authenticated", user: { id: "user-1" } };
+    shouldGameThrow = true;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const preventExpectedError = (event) => event.preventDefault();
+    window.addEventListener("error", preventExpectedError);
+    const view = renderPage("/minigames/2048");
+
+    try {
+      act(() => view.host.querySelector("button").click());
+
+      expect(view.host.textContent).toContain("게임을 계속할 수 없어요.");
+      expect(view.host.textContent).toContain("게임 다시 불러오기");
+      expect(view.host.textContent).toContain("게임 목록으로");
+      expect(view.host.textContent).not.toContain("Game content");
+    } finally {
+      view.unmount();
+      window.removeEventListener("error", preventExpectedError);
+      consoleError.mockRestore();
+    }
   });
 });

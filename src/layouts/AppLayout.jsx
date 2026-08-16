@@ -8,8 +8,7 @@ import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
 import { ThemeToggle } from "../shared/theme/ThemeToggle.jsx";
-
-const MINIGAME_PLAY_PATH_PATTERN = /^\/minigames\/[^/]+(?:\/room\/[^/]+)?\/?$/;
+import { isImmersiveRoute } from "../routes/routePresentation.js";
 
 function AccountControl() {
   const { signOut, status, user } = useAuth();
@@ -34,7 +33,7 @@ function AccountControl() {
 
 export function AppLayout() {
   const location = useLocation();
-  const isImmersiveGame = MINIGAME_PLAY_PATH_PATTERN.test(location.pathname);
+  const isImmersiveGame = isImmersiveRoute(location.pathname);
 
   // react-router's plain <Routes> (non-data router) doesn't restore scroll on
   // navigation. Scroll to an in-page section when a route carries a hash;
