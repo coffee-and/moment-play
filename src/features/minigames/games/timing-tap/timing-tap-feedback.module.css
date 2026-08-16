@@ -1,0 +1,50 @@
+.host {
+  overflow: visible;
+}
+
+.host[data-feedback-result="perfect"] .target::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in oklab, var(--game-effect-perfect) 76%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: perfect-ring .68s ease-out both;
+}
+
+.feedback {
+  --game-action-feedback-y: -10px;
+  --game-action-feedback-x: 50%;
+  --game-action-feedback-max-width: 150px;
+}
+
+@keyframes perfect-ring {
+  0% {
+    opacity: 0;
+    transform: scale(.84);
+  }
+
+  34% {
+    opacity: .95;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.32);
+  }
+}
+
+@media (max-width: 620px) {
+  .feedback {
+    --game-action-feedback-y: -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .host[data-feedback-result="perfect"] .target::before {
+    animation: none;
+    opacity: .42;
+    transform: none;
+  }
+}

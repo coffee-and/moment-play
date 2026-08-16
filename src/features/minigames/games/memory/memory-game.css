@@ -210,14 +210,14 @@
   right: -5px;
   bottom: -2px;
   display: block;
-  border: 1px solid color-mix(in oklab, var(--game-effect-positive) 42%, var(--line));
-  border-radius: 999px;
-  padding: 2px 6px;
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 0;
+  padding: 0;
+  background: transparent;
   color: var(--game-effect-positive);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .04em;
+  text-shadow: 0 0 7px color-mix(in oklab, var(--game-effect-positive) 42%, transparent);
   animation: memory-good-label .68s ease both;
 }
 
@@ -228,9 +228,9 @@
   display: block;
   width: 4px;
   height: 4px;
-  border-radius: 50%;
   background: var(--game-effect-perfect);
   box-shadow: 0 0 5px color-mix(in oklab, var(--game-effect-perfect) 54%, transparent);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
   transform: rotate(calc(var(--memory-particle-index) * 45deg)) translateY(-31px);
   transform-origin: center;
   animation: memory-good-particle .66s ease-out both;

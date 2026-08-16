@@ -147,162 +147,6 @@
   animation: flappy-shield-pulse .42s ease-in-out infinite alternate;
 }
 
-.flappy-game__sky .game-action-feedback {
-  top: 15%;
-  left: 22%;
-  min-width: 0;
-  max-width: 42%;
-  gap: 1px;
-  color: var(--flappy-star);
-  filter: none;
-  animation: flappy-feedback-glimmer var(--game-action-feedback-duration, 820ms) cubic-bezier(.2, .75, .2, 1) both;
-}
-
-.flappy-game__sky .game-action-feedback strong,
-.flappy-game__sky .game-action-feedback__combo {
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.flappy-game__sky .game-action-feedback strong {
-  color: var(--flappy-star);
-  font-family: var(--font-display);
-  font-size: clamp(15px, 4vw, 20px);
-  font-style: normal;
-  font-weight: 750;
-  letter-spacing: .08em;
-  line-height: 1;
-  text-shadow:
-    0 0 4px color-mix(in oklab, var(--flappy-star) 82%, transparent),
-    0 0 13px color-mix(in oklab, var(--flappy-star-glow) 72%, transparent);
-}
-
-.flappy-game__sky .game-action-feedback__combo {
-  color: color-mix(in oklab, var(--flappy-star) 82%, var(--flappy-star-cool));
-  font-size: clamp(13px, 3.2vw, 17px);
-  line-height: 1;
-  text-shadow:
-    0 0 4px color-mix(in oklab, var(--flappy-star) 76%, transparent),
-    0 0 11px color-mix(in oklab, var(--flappy-star-glow) 66%, transparent);
-}
-
-.flappy-game__sky .game-action-feedback.has-combo strong {
-  display: none;
-}
-
-.flappy-game__sky .game-action-feedback.is-major strong {
-  font-size: clamp(18px, 4.8vw, 23px);
-}
-
-.flappy-game__sky .game-action-feedback.is-compact {
-  top: 15%;
-}
-
-.flappy-game__sky .game-action-feedback.is-compact strong {
-  font-size: clamp(13px, 3.3vw, 16px);
-  font-weight: 700;
-  opacity: .88;
-}
-
-.flappy-game__sky .game-action-feedback.is-standard {
-  top: 20%;
-}
-
-.flappy-game__sky .game-action-feedback.is-neutral strong {
-  color: color-mix(in oklab, var(--flappy-shield) 74%, var(--palette-white));
-  text-shadow:
-    0 0 5px color-mix(in oklab, var(--flappy-shield) 75%, transparent),
-    0 0 14px color-mix(in oklab, var(--flappy-shield) 52%, transparent);
-}
-
-.flappy-game__sky .game-action-feedback.is-negative strong {
-  color: var(--game-effect-negative);
-  text-shadow: 0 0 8px color-mix(in oklab, var(--game-effect-negative) 42%, transparent);
-}
-
-.flappy-game__sky .game-action-feedback__stars {
-  inset: -28px -48px;
-}
-
-.flappy-game__sky .game-action-feedback__stars i {
-  color: var(--flappy-star);
-  font-size: 11px;
-  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--flappy-star-glow) 82%, transparent));
-  animation: flappy-feedback-sparkle calc(var(--game-action-feedback-duration, 820ms) * .82) ease-out both;
-}
-
-.flappy-game__sky .game-action-feedback__stars i:nth-child(1) {
-  top: 52%;
-  left: 0;
-  --flappy-spark-x: -18px;
-  --flappy-spark-y: 4px;
-}
-
-.flappy-game__sky .game-action-feedback__stars i:nth-child(2) {
-  top: 4%;
-  left: 22%;
-  font-size: 14px;
-  --flappy-spark-x: -8px;
-  --flappy-spark-y: -16px;
-}
-
-.flappy-game__sky .game-action-feedback__stars i:nth-child(3) {
-  top: -5%;
-  left: 50%;
-  font-size: 8px;
-  --flappy-spark-x: 0;
-  --flappy-spark-y: -19px;
-}
-
-.flappy-game__sky .game-action-feedback__stars i:nth-child(4) {
-  top: 7%;
-  right: 18%;
-  font-size: 13px;
-  --flappy-spark-x: 10px;
-  --flappy-spark-y: -15px;
-}
-
-.flappy-game__sky .game-action-feedback__stars i:nth-child(5) {
-  top: 54%;
-  right: 0;
-  font-size: 9px;
-  --flappy-spark-x: 19px;
-  --flappy-spark-y: 5px;
-}
-
-.flappy-game__sky .game-action-feedback.is-combo::before,
-.flappy-game__sky .game-action-feedback.is-combo::after,
-.flappy-game__sky .game-action-feedback.is-major::before,
-.flappy-game__sky .game-action-feedback.is-major::after {
-  content: "✦";
-  position: absolute;
-  color: color-mix(in oklab, var(--flappy-star-cool) 82%, var(--flappy-star));
-  font-size: 8px;
-  opacity: 0;
-  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--flappy-star-glow) 74%, transparent));
-  animation: flappy-feedback-extra-sparkle var(--game-action-feedback-duration, 820ms) ease-out both;
-}
-
-.flappy-game__sky .game-action-feedback.is-combo::before,
-.flappy-game__sky .game-action-feedback.is-major::before {
-  top: -19px;
-  left: 8%;
-  --flappy-extra-x: -13px;
-  --flappy-extra-y: -9px;
-}
-
-.flappy-game__sky .game-action-feedback.is-combo::after,
-.flappy-game__sky .game-action-feedback.is-major::after {
-  right: 8%;
-  bottom: -18px;
-  font-size: 11px;
-  --flappy-extra-x: 14px;
-  --flappy-extra-y: 9px;
-}
 
 .flappy-game__hint {
   margin: 0;
@@ -330,54 +174,6 @@
   to { opacity: 1; transform: scale(1.08); }
 }
 
-@keyframes flappy-feedback-glimmer {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, calc(-50% + 5px)) scale(.94);
-  }
-  28% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.03);
-  }
-  70% {
-    opacity: 1;
-    transform: translate(-50%, calc(-50% - 3px)) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, calc(-50% - 8px)) scale(.98);
-  }
-}
-
-@keyframes flappy-feedback-sparkle {
-  0% {
-    opacity: 0;
-    transform: translate(0, 5px) rotate(-18deg) scale(.2);
-  }
-  38% {
-    opacity: 1;
-    transform: translate(0, 0) rotate(7deg) scale(1.12);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--flappy-spark-x), var(--flappy-spark-y)) rotate(28deg) scale(.35);
-  }
-}
-
-@keyframes flappy-feedback-extra-sparkle {
-  0% {
-    opacity: 0;
-    transform: translate(0, 4px) scale(.2);
-  }
-  42% {
-    opacity: .95;
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--flappy-extra-x), var(--flappy-extra-y)) scale(.3);
-  }
-}
 
 @media (max-width: 700px) {
   section.game-stage.flappy-game .game-stage__topbar {
@@ -458,10 +254,6 @@
     width: clamp(40px, 12vw, 58px);
   }
 
-  .flappy-game__sky .game-action-feedback {
-    left: 25%;
-    max-width: 48%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -478,17 +270,4 @@
     animation: none;
   }
 
-  .flappy-game__sky .game-action-feedback {
-    animation: game-action-feedback-fade min(var(--game-action-feedback-duration, 820ms), 700ms) ease both;
-    transform: translate(-50%, -50%);
-  }
-
-  .flappy-game__sky .game-action-feedback__stars i,
-  .flappy-game__sky .game-action-feedback.is-combo::before,
-  .flappy-game__sky .game-action-feedback.is-combo::after,
-  .flappy-game__sky .game-action-feedback.is-major::before,
-  .flappy-game__sky .game-action-feedback.is-major::after {
-    animation: none;
-    opacity: .68;
-  }
 }

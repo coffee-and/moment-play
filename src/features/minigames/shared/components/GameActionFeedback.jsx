@@ -1,6 +1,4 @@
-import "../styles/game-action-feedback.css";
-import "../styles/game-action-feedback-effects.css";
-import "../styles/game-action-feedback-placement.css";
+import styles from "./GameActionFeedback.module.css";
 
 const MAX_STAR_COUNT = 9;
 const BURST_RAY_COUNT = 8;
@@ -12,10 +10,10 @@ function getDefaultStarCount(variant, hasCombo) {
   return 5;
 }
 
-function formatAnchor(value, fallback) {
+function formatAnchor(value) {
   if (typeof value === "number" && Number.isFinite(value)) return `${value}%`;
   if (typeof value === "string" && value.trim()) return value;
-  return fallback;
+  return null;
 }
 
 function getParticleStyle(index, count, variant) {
@@ -35,7 +33,7 @@ function getParticleStyle(index, count, variant) {
   };
 }
 
-export function GameActionFeedback({ feedback, announce = true }) {
+export function GameActionFeedback({ feedback, announce = true, className = "" }) {
   if (!feedback) return null;
 
   const combo = Math.max(0, Number(feedback.combo) || 0);
@@ -49,25 +47,31 @@ export function GameActionFeedback({ feedback, announce = true }) {
     : 0;
   const hasMessage = Boolean(feedback.label || hasCombo);
   const durationMs = feedback.durationMs ?? (hasCombo ? 920 : 760);
+  const anchorX = formatAnchor(feedback.anchorX);
+  const anchorY = formatAnchor(feedback.anchorY);
+  const feedbackStyle = {
+    "--game-action-feedback-duration": `${durationMs}ms`,
+    ...(anchorX ? { "--game-action-feedback-x": anchorX } : {}),
+    ...(anchorY ? { "--game-action-feedback-y": anchorY } : {}),
+  };
 
   return (
     <div
       aria-atomic={announce ? "true" : undefined}
       aria-hidden={announce ? undefined : "true"}
-      className={`game-action-feedback is-${variant} is-${tone}${hasCombo ? " has-combo" : ""}${hasMessage ? " has-message" : " is-sparkle-only"}`}
+      className={`${styles.root}${className ? ` ${className}` : ""}`}
+      data-feedback-has-combo={hasCombo ? "true" : undefined}
+      data-feedback-has-message={hasMessage ? "true" : "false"}
+      data-feedback-tone={tone}
       data-feedback-variant={variant}
       key={feedback.id}
       role={announce ? "status" : undefined}
-      style={{
-        "--game-action-feedback-duration": `${durationMs}ms`,
-        "--game-action-feedback-x": formatAnchor(feedback.anchorX, "50%"),
-        "--game-action-feedback-y": formatAnchor(feedback.anchorY, "12%"),
-      }}
+      style={feedbackStyle}
     >
       {tone !== "negative" ? (
         <>
-          <span className="game-action-feedback__rings" aria-hidden="true"><i /><i /></span>
-          <span className="game-action-feedback__burst" aria-hidden="true">
+          <span className={styles.rings} data-feedback-element="rings" aria-hidden="true"><i /><i /></span>
+          <span className={styles.burst} data-feedback-element="burst" aria-hidden="true">
             {Array.from({ length: BURST_RAY_COUNT }, (_, index) => (
               <i
                 key={index}
@@ -81,13 +85,13 @@ export function GameActionFeedback({ feedback, announce = true }) {
         </>
       ) : null}
       {hasMessage ? (
-        <span className="game-action-feedback__message">
-          {feedback.label ? <strong>{feedback.label}</strong> : null}
-          {hasCombo ? <span className="game-action-feedback__combo">{comboLabel}</span> : null}
+        <span className={styles.message} data-feedback-element="message">
+          {feedback.label ? <strong className={styles.label}>{feedback.label}</strong> : null}
+          {hasCombo ? <span className={styles.combo} data-feedback-element="combo">{comboLabel}</span> : null}
         </span>
       ) : null}
       {starCount > 0 ? (
-        <span className="game-action-feedback__stars" aria-hidden="true">
+        <span className={styles.stars} data-feedback-element="stars" aria-hidden="true">
           {Array.from({ length: starCount }, (_, index) => (
             <i key={index} style={getParticleStyle(index, starCount, variant)}>{STAR_SYMBOLS[index]}</i>
           ))}

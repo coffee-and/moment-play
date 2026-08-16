@@ -1,0 +1,30 @@
+.host:has(> .feedback[data-feedback-tone="positive"]) .bird {
+  filter:
+    drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-star) 82%, transparent))
+    drop-shadow(0 0 18px color-mix(in oklab, var(--flappy-star-glow) 58%, transparent));
+}
+
+.feedback {
+  --game-action-feedback-y: 20%;
+  --game-action-feedback-x: 36%;
+  --game-action-feedback-max-width: 145px;
+  --game-action-feedback-positive: var(--flappy-star);
+  --game-action-feedback-combo: color-mix(in oklab, var(--flappy-star) 82%, var(--flappy-star-cool));
+  --game-action-feedback-neutral: color-mix(in oklab, var(--flappy-shield) 74%, var(--palette-white));
+  --game-action-feedback-particle: var(--flappy-star);
+  --game-action-feedback-positive-shadow:
+    0 0 4px color-mix(in oklab, var(--flappy-star) 82%, transparent),
+    0 0 13px color-mix(in oklab, var(--flappy-star-glow) 72%, transparent);
+  --game-action-feedback-neutral-shadow:
+    0 0 5px color-mix(in oklab, var(--flappy-shield) 75%, transparent),
+    0 0 14px color-mix(in oklab, var(--flappy-shield) 52%, transparent);
+  --game-action-feedback-particle-shadow:
+    drop-shadow(0 0 5px color-mix(in oklab, var(--flappy-star-glow) 82%, transparent));
+}
+
+@media (max-width: 620px) {
+  .feedback {
+    --game-action-feedback-y: 18%;
+    --game-action-feedback-x: 40%;
+  }
+}

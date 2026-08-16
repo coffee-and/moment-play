@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './shared/styles/foundation.css';
 import './styles.css';
 import App from './App';
 import { Router } from './routes/router.jsx';

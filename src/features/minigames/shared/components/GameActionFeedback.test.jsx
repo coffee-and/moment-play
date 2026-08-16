@@ -35,9 +35,9 @@ describe("GameActionFeedback", () => {
       feedback: { id: 1, label: "NICE!" },
     });
 
-    expect(view.host.querySelector(".game-action-feedback__message")?.textContent).toBe("NICE!");
-    expect(view.host.querySelectorAll(".game-action-feedback__stars i")).toHaveLength(5);
-    expect(view.host.querySelector(".game-action-feedback")?.classList.contains("has-message")).toBe(true);
+    expect(view.host.querySelector('[data-feedback-element="message"]')?.textContent).toBe("NICE!");
+    expect(view.host.querySelectorAll('[data-feedback-element="stars"] i')).toHaveLength(5);
+    expect(view.host.querySelector('[data-feedback-has-message="true"]')).not.toBeNull();
     view.unmount();
   });
 
@@ -51,10 +51,10 @@ describe("GameActionFeedback", () => {
       },
     });
 
-    const message = view.host.querySelector(".game-action-feedback__message");
+    const message = view.host.querySelector('[data-feedback-element="message"]');
     expect(message?.textContent).toBe("CLEAR×5");
     expect(message?.children).toHaveLength(2);
-    expect(view.host.querySelectorAll(".game-action-feedback__stars i")).toHaveLength(9);
+    expect(view.host.querySelectorAll('[data-feedback-element="stars"] i')).toHaveLength(9);
     view.unmount();
   });
 
@@ -64,10 +64,10 @@ describe("GameActionFeedback", () => {
       feedback: { id: 3, label: "−1", tone: "negative" },
     });
 
-    const feedback = view.host.querySelector(".game-action-feedback");
+    const feedback = view.host.querySelector('[data-feedback-tone="negative"]');
     expect(feedback?.getAttribute("aria-hidden")).toBe("true");
     expect(feedback?.getAttribute("role")).toBeNull();
-    expect(view.host.querySelectorAll(".game-action-feedback__stars i")).toHaveLength(0);
+    expect(view.host.querySelectorAll('[data-feedback-element="stars"] i')).toHaveLength(0);
     view.unmount();
   });
 });

@@ -7,6 +7,7 @@ import { GameActionFeedback } from "../../shared/components/GameActionFeedback.j
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
 import { dealSetBoard, findSets, isSet } from "./set.logic.js";
+import feedbackStyles from "./set-feedback.module.css";
 import "./set.css";
 
 const SET_TARGET = 5;
@@ -170,7 +171,7 @@ export function SetGame({ game }) {
       ]}
     >
       <div className="set-game">
-        <div className="set-board-wrap">
+        <div className={`set-board-wrap ${feedbackStyles.host}`}>
           <div className="set-board" role="grid" aria-label="SET 카드 12장">
             {board.map((card, index) => {
               const hintOrder = hint.currentStep?.targetIndexes?.indexOf(index) ?? -1;
@@ -195,7 +196,7 @@ export function SetGame({ game }) {
               );
             })}
           </div>
-          <GameActionFeedback feedback={actionFeedback} />
+          <GameActionFeedback className={feedbackStyles.feedback} feedback={actionFeedback} />
         </div>
         <p className="logic-board-status" role="status">{status}</p>
         {session.phase === "playing" && revealedSet.length > 0 ? (

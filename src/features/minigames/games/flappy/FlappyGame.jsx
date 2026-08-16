@@ -18,6 +18,7 @@ import {
   flapFlappyState,
   recoverFlappyState,
 } from "./flappy.logic.js";
+import feedbackStyles from "./flappy-feedback.module.css";
 import "./flappy-game.css";
 
 const FLAPPY_STAR_FIELD = [
@@ -278,7 +279,7 @@ export function FlappyGame({ game }) {
     >
       <div className="flappy-game__wrap">
         <div
-          className="flappy-game__sky"
+          className={`flappy-game__sky ${feedbackStyles.host}`}
           role="application"
           tabIndex={0}
           aria-label={`별빛 비행, 현재 점수 ${world.score}. 화면이나 Space·Enter를 눌러 날아오르세요.`}
@@ -301,7 +302,11 @@ export function FlappyGame({ game }) {
               />
             ))}
           </span>
-          <GameActionFeedback feedback={actionFeedback} announce={false} />
+          <GameActionFeedback
+            announce={false}
+            className={feedbackStyles.feedback}
+            feedback={actionFeedback}
+          />
 
           {world.pipes.map((pipe) => {
             const gapTop = pipe.gapY - FLAPPY_CONFIG.gapHeight / 2;
@@ -320,7 +325,7 @@ export function FlappyGame({ game }) {
           })}
 
           <span
-            className={`flappy-game__bird${world.recoveryKind ? ` is-recovering is-${world.recoveryKind}` : ""}`}
+            className={`flappy-game__bird ${feedbackStyles.bird}${world.recoveryKind ? ` is-recovering is-${world.recoveryKind}` : ""}`}
             style={{
               left: `${FLAPPY_CONFIG.birdX}%`,
               top: `${world.birdY}%`,

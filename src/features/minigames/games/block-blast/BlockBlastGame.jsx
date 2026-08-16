@@ -28,6 +28,7 @@ import {
   hasBlockMove,
   placeBlockPiece,
 } from "./blockBlast.logic.js";
+import feedbackStyles from "./block-blast-feedback.module.css";
 import "./block-blast.css";
 
 function readBestScore() {
@@ -258,7 +259,7 @@ export function BlockBlastGame({ game }) {
       )}
     >
       <div className="block-blast-layout">
-        <div className="block-blast-board-wrap">
+        <div className={`block-blast-board-wrap ${feedbackStyles.host}`}>
           <div
             className="block-blast-board"
             role="grid"
@@ -297,7 +298,7 @@ export function BlockBlastGame({ game }) {
               );
             })}
           </div>
-          <GameActionFeedback feedback={actionFeedback} />
+          <GameActionFeedback className={feedbackStyles.feedback} feedback={actionFeedback} />
         </div>
 
         <div className="block-blast-tray" aria-label="사용할 블록">

@@ -10,6 +10,7 @@ import { GameCelebration } from "../../shared/components/GameCelebration.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
+import feedbackStyles from "./timing-tap-feedback.module.css";
 import "./timing-tap.css";
 import {
   TIMING_TAP_ROUNDS,
@@ -213,9 +214,13 @@ export function TimingTapGame({ game }) {
           <strong>{result?.grade ?? (phase === "completed" ? "COMPLETE" : "목표 구간에 맞춰 탭!")}</strong>
         </div>
 
-        <div className={`timing-tap__track ${result ? `is-${result.grade.toLowerCase()}` : ""}`} aria-label="타이밍 게이지">
+        <div
+          aria-label="타이밍 게이지"
+          className={`timing-tap__track ${feedbackStyles.host}${result ? ` is-${result.grade.toLowerCase()}` : ""}`}
+          data-feedback-result={result?.grade.toLowerCase()}
+        >
           <span
-            className="timing-tap__target"
+            className={`timing-tap__target ${feedbackStyles.target}`}
             style={{
               left: `${roundConfig.targetCenter - roundConfig.targetWidth / 2}%`,
               width: `${roundConfig.targetWidth}%`,
@@ -225,6 +230,7 @@ export function TimingTapGame({ game }) {
           <span className="timing-tap__track-line" />
           <GameActionFeedback
             announce={false}
+            className={feedbackStyles.feedback}
             feedback={phase === "feedback" && result?.grade === "PERFECT"
               ? {
                 id: round,

@@ -1,0 +1,55 @@
+.host:has(> .feedback)::after {
+  content: "";
+  position: absolute;
+  z-index: var(--layer-raised);
+  inset: 9px;
+  border-radius: var(--r-sm);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 18%,
+    color-mix(in oklab, var(--game-effect-perfect) 18%, transparent) 42%,
+    color-mix(in oklab, var(--game-effect-perfect) 48%, transparent) 50%,
+    color-mix(in oklab, var(--game-effect-perfect) 18%, transparent) 58%,
+    transparent 82%
+  );
+  transform: translateX(-110%);
+  animation: board-light-sweep .72s ease-out both;
+}
+
+.feedback {
+  --game-action-feedback-y: -5px;
+  --game-action-feedback-x: 82%;
+}
+
+@keyframes board-light-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-110%);
+  }
+
+  24% {
+    opacity: .9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+
+@media (max-width: 620px) {
+  .feedback {
+    --game-action-feedback-y: 2px;
+    --game-action-feedback-x: 78%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .host:has(> .feedback)::after {
+    animation: none;
+    opacity: .42;
+    transform: none;
+  }
+}

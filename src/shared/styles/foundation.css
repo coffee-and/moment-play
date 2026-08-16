@@ -1,0 +1,391 @@
+@font-face {
+  font-family: "SUIT Variable";
+  src: url("../../assets/fonts/SUIT-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat Variable";
+  src: url("../../assets/fonts/Montserrat-Variable-Latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  /* Base neutrals. Backgrounds stay theme-specific; type, lines, and quiet surfaces share this scale. */
+  --palette-white: #ffffff;
+  --palette-ivory: #fcfbf7;
+  --palette-neutral-100: #e4e2de;
+  --palette-neutral-300: #c9c7c2;
+  --palette-neutral-500: #a4a29c;
+  --palette-neutral-700: #74726c;
+  --palette-neutral-900: #3a3936;
+
+  /* Point colors remain independent from the neutral base and can be tuned per theme. */
+  --palette-teal: #044f5f;
+  --palette-burgundy: #8b1e24;
+  --palette-terracotta: #bf5036;
+  --palette-sage: #c1d7a0;
+  --palette-yellow: #f2c14e;
+  --palette-soft-yellow: #ffeaac;
+
+  /* Gameplay colors stay separate from the quiet application chrome. */
+  --palette-game-red: #f43545;
+  --palette-game-orange: #ff8901;
+  --palette-game-yellow: #fad717;
+  --palette-game-green: #00ba71;
+  --palette-game-cyan: #00c2de;
+  --palette-game-blue: #00418d;
+  --palette-game-purple: #5f2879;
+  --palette-game-pink: #d91656;
+
+  /* Retro companions are reserved for glow, impact, and completion effects. */
+  --palette-effect-gold: #ffb200;
+  --palette-effect-orange: #eb5b00;
+  --palette-effect-plum: #640d5f;
+
+  /* Star Flight keeps its original cool-night artwork palette in both themes. */
+  --flappy-sky-deep: #172454;
+  --flappy-sky-top: #1b2450;
+  --flappy-sky-center: #2a2f6b;
+  --flappy-moon: #eef4ff;
+  --flappy-moon-cutout: #20295b;
+  --flappy-pillar: #edf4ff;
+  --flappy-fish: #79b5e8;
+  --flappy-glow: #79a7e8;
+  --flappy-tail: #f08aa0;
+  --flappy-star: #f6c85f;
+  --flappy-star-cool: #ecf3ff;
+  --flappy-star-glow: #b9d3ff;
+  --flappy-shield: #b9d3ff;
+  --flappy-score-surface: #111b44;
+  --flappy-score-shadow: #070c22;
+  --flappy-score-text: #fff7dc;
+  --flappy-curtain-start: #141e4b;
+  --flappy-curtain-center: #222e69;
+  --flappy-curtain-text: #ffffff;
+  --flappy-curtain-muted: #dbe5f4;
+
+  --palette-light-bg: var(--palette-white);
+  --palette-light-bg-subtle: color-mix(in oklab, var(--palette-neutral-100) 52%, var(--palette-ivory));
+  --palette-light-surface: var(--palette-ivory);
+  --palette-light-elevated: var(--palette-neutral-100);
+  --palette-light-text: var(--palette-neutral-900);
+  --palette-light-muted: var(--palette-neutral-700);
+  --palette-light-line: var(--palette-neutral-300);
+
+  /* User-selected dark background stack; shared neutrals supply type and borders. */
+  --palette-dark-bg: #101318;
+  --palette-dark-surface: #1f242b;
+  --palette-dark-elevated: #1f242a;
+  --palette-dark-line: var(--palette-neutral-900);
+  --palette-dark-text: var(--palette-neutral-100);
+  --palette-dark-muted: var(--palette-neutral-500);
+  --palette-dark-accent: #7da6e3;
+
+  /* Semantic color roles — components consume only these values. */
+  --bg: var(--palette-light-bg);
+  --surface: var(--palette-light-surface);
+  --surface-2: var(--palette-light-elevated);
+  --text: var(--palette-light-text);
+  --muted: var(--palette-light-muted);
+  --line: var(--palette-light-line);
+  --header-surface: var(--palette-light-bg);
+  --accent: var(--palette-teal);
+  --accent-2: var(--palette-teal);
+  --accent-terracotta: var(--palette-terracotta);
+  --accent-sage: var(--palette-sage);
+  --accent-yellow: var(--palette-yellow);
+  --on-accent: var(--palette-ivory);
+  --game-color-red: var(--palette-game-red);
+  --game-color-orange: var(--palette-game-orange);
+  --game-color-yellow: var(--palette-game-yellow);
+  --game-color-green: var(--palette-game-green);
+  --game-color-cyan: var(--palette-game-cyan);
+  --game-color-blue: var(--palette-game-blue);
+  --game-color-purple: var(--palette-game-purple);
+  --game-color-pink: var(--palette-game-pink);
+  --game-effect-positive: var(--game-color-green);
+  --game-effect-perfect: var(--palette-effect-gold);
+  --game-effect-clear: var(--game-color-cyan);
+  --game-effect-negative: var(--game-color-red);
+  --game-effect-impact: var(--palette-effect-orange);
+  --game-effect-depth: var(--palette-effect-plum);
+  --chip: color-mix(in oklab, var(--palette-sage) 20%, var(--palette-ivory));
+  --catalog-surface: var(--palette-light-bg-subtle);
+  --filter-text: var(--palette-light-muted);
+  --game-card-category: var(--palette-light-muted);
+  --game-card-description: var(--palette-light-muted);
+  --game-action-text: var(--palette-ivory);
+  --loading-surface: color-mix(in oklab, var(--palette-yellow) 18%, var(--surface));
+  --sudoku-grid-line: var(--palette-light-line);
+  --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 52%, var(--line));
+  --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 28%, var(--surface));
+  --sudoku-conflict-bg: color-mix(in oklab, var(--game-color-red) 16%, var(--surface));
+  --game-modal-border: var(--home-card-hover-border);
+  --game-modal-bg: var(--home-card-surface);
+  --game-modal-text: var(--text);
+  --game-modal-muted: var(--muted);
+  --game-modal-highlight: var(--game-effect-perfect);
+  --game-modal-action-border: var(--home-button-border);
+  --game-modal-action-bg: var(--home-button-surface);
+  --game-modal-action-shadow: var(--home-button-shadow);
+  --chrome-foreground: var(--palette-neutral-900);
+  --font-korean: "SUIT Variable", SUIT, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Montserrat Variable", Montserrat, var(--font-korean);
+  --font: var(--font-display);
+  --primary-nav-text: var(--chrome-foreground);
+  --primary-nav-active: var(--chrome-foreground);
+  --r-xl: 28px;
+  --r-lg: 20px;
+  --r-md: 14px;
+  --r-sm: 10px;
+  --gap: 18px;
+  --layout-max-width: 1460px;
+  --content-max-width: 950px;
+  --status-panel-max-width: 560px;
+  --home-content-max-width: 880px;
+  --home-frame-gutter: 46px;
+  --game-stage-max-width: 1400px;
+  --type-page-title-size: 26px;
+  --type-page-title-weight: 600;
+  --type-page-title-color: var(--palette-neutral-900);
+  --type-page-title-line-height: 1.3;
+  --type-page-title-letter-spacing: -0.025em;
+  --ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --sh-sm: 0 7px 18px color-mix(in oklab, var(--palette-neutral-900) 7%, transparent);
+  --sh: 0 14px 34px color-mix(in oklab, var(--palette-teal) 12%, transparent);
+  --home-card-surface: var(--palette-light-surface);
+  --home-card-border: var(--home-card-surface);
+  --home-card-hover-border: var(--palette-light-line);
+  --home-card-hover-surface: color-mix(in oklab, var(--home-card-surface) 97%, var(--text));
+  --home-card-shadow: 0 8px 24px color-mix(in oklab, var(--palette-neutral-900) 8%, transparent);
+  --home-card-hover-shadow: 0 4px 14px color-mix(in oklab, var(--palette-neutral-900) 10%, transparent);
+  --home-card-active-shadow: 0 2px 7px color-mix(in oklab, var(--palette-neutral-900) 9%, transparent);
+  --home-button-surface: var(--home-card-surface);
+  --home-button-border: var(--home-button-surface);
+  --home-button-hover-border: var(--palette-light-line);
+  --home-button-hover-surface: color-mix(in oklab, var(--home-button-surface) 97%, var(--text));
+  --home-button-text: var(--palette-light-text);
+  --home-button-shadow: 0 3px 8px color-mix(in oklab, var(--palette-neutral-900) 8%, transparent);
+  --home-button-hover-shadow: 0 2px 5px color-mix(in oklab, var(--palette-neutral-900) 12%, transparent);
+  --home-button-active-shadow: 0 1px 2px color-mix(in oklab, var(--palette-neutral-900) 10%, transparent);
+  /* Game screens reuse the same quiet surface system as the home cards. */
+  --stage-surface: var(--bg);
+  --stage-card-surface: var(--home-card-surface);
+  --stage-card-border: var(--home-card-border);
+  --stage-card-hover-border: var(--home-card-hover-border);
+  --stage-card-hover-surface: var(--home-card-hover-surface);
+  --stage-card-hover-shadow: var(--home-card-hover-shadow);
+  --stage-card-shadow: var(--home-card-shadow);
+  --stage-control-surface: var(--home-button-surface);
+  --stage-control-border: var(--home-button-border);
+  --stage-control-hover-border: var(--home-button-hover-border);
+  --stage-control-hover-surface: var(--home-button-hover-surface);
+  --stage-control-hover-shadow: var(--home-button-hover-shadow);
+  --stage-control-shadow: var(--home-button-shadow);
+  --stage-control-selected-border: color-mix(in oklab, var(--text) 58%, var(--line));
+  --featured-surface: var(--palette-soft-yellow);
+  --featured-border: var(--featured-surface);
+  --featured-hover-border: var(--palette-light-line);
+  --featured-hover-surface: color-mix(in oklab, var(--featured-surface) 97%, var(--featured-text));
+  --featured-shadow: 0 10px 26px color-mix(in oklab, var(--palette-neutral-900) 9%, transparent);
+  --featured-hover-shadow: 0 5px 16px color-mix(in oklab, var(--palette-neutral-900) 11%, transparent);
+  --featured-text: var(--palette-light-text);
+  --featured-muted: var(--palette-light-muted);
+  --featured-tag: var(--palette-terracotta);
+  --featured-action-bg: var(--featured-surface);
+  --featured-action-border: var(--featured-action-bg);
+  --featured-action-hover-border: var(--palette-light-line);
+  --featured-action-hover-bg: color-mix(in oklab, var(--featured-action-bg) 97%, var(--featured-action-text));
+  --featured-action-text: var(--palette-light-text);
+  --featured-action-shadow: 0 5px 14px color-mix(in oklab, var(--palette-neutral-900) 11%, transparent);
+  --button-surface: var(--home-button-surface);
+  --button-border: var(--home-button-border);
+  --button-text: var(--text);
+  --button-shadow: var(--home-button-shadow);
+  --button-hover-border: var(--home-button-hover-border);
+  --button-hover-surface: var(--home-button-hover-surface);
+  --button-hover-shadow: var(--home-button-hover-shadow);
+  --button-active-shadow: var(--home-button-active-shadow);
+  --button-secondary-border: var(--home-button-border);
+  --button-secondary-shadow: var(--home-button-shadow);
+  --modal-shadow: 0 24px 60px color-mix(in oklab, var(--palette-neutral-900) 18%, transparent);
+  --feedback-positive: var(--game-effect-perfect);
+  --feedback-neutral: color-mix(in oklab, var(--game-color-cyan) 66%, var(--palette-white));
+  --feedback-negative: var(--game-effect-negative);
+  --feedback-particle: color-mix(in oklab, var(--game-color-yellow) 76%, var(--palette-white));
+  --feedback-message-shadow:
+    drop-shadow(0 4px 8px color-mix(in oklab, var(--palette-neutral-900) 24%, transparent));
+  --feedback-positive-text-shadow:
+    0 1px 0 color-mix(in oklab, var(--palette-white) 88%, transparent),
+    0 0 7px color-mix(in oklab, var(--game-effect-perfect) 66%, transparent),
+    0 0 16px color-mix(in oklab, var(--game-color-yellow) 42%, transparent);
+  --feedback-neutral-text-shadow:
+    0 1px 0 color-mix(in oklab, var(--palette-white) 84%, transparent),
+    0 0 9px color-mix(in oklab, var(--game-color-cyan) 54%, transparent);
+  --feedback-negative-text-shadow:
+    0 1px 0 color-mix(in oklab, var(--palette-white) 72%, transparent),
+    0 0 8px color-mix(in oklab, var(--game-effect-negative) 42%, transparent);
+  --feedback-ring-shadow:
+    0 0 10px color-mix(in oklab, var(--game-effect-perfect) 32%, transparent),
+    inset 0 0 8px color-mix(in oklab, var(--game-color-yellow) 18%, transparent);
+  --feedback-ray-shadow:
+    0 0 5px color-mix(in oklab, var(--game-effect-perfect) 55%, transparent);
+  --feedback-particle-shadow:
+    drop-shadow(0 0 5px color-mix(in oklab, var(--game-effect-perfect) 68%, transparent));
+  --layer-base: 0;
+  --layer-raised: 1;
+  --layer-feedback: 10;
+  --layer-navigation: 20;
+  --layer-notification: 30;
+  --layer-modal: 40;
+  --game-2048-board-bg: var(--home-card-surface);
+  --game-2048-empty-cell-bg: var(--home-button-surface);
+  --game-2048-grid-gap: 10px;
+  --game-2048-cell-border: var(--line);
+  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--text) 8%, transparent);
+  --tile-2-bg: color-mix(in oklab, var(--game-color-green) 24%, var(--surface));
+  --tile-2-text: color-mix(in oklab, var(--game-color-green) 72%, var(--text));
+  --tile-4-bg: color-mix(in oklab, var(--game-color-cyan) 34%, var(--surface));
+  --tile-4-text: color-mix(in oklab, var(--game-color-blue) 68%, var(--text));
+  --tile-8-bg: color-mix(in oklab, var(--game-color-yellow) 52%, var(--surface));
+  --tile-8-text: var(--palette-neutral-900);
+  --tile-16-bg: color-mix(in oklab, var(--game-color-orange) 62%, var(--surface));
+  --tile-16-text: var(--palette-neutral-900);
+  --tile-32-bg: var(--game-color-pink);
+  --tile-32-text: var(--palette-ivory);
+  --tile-64-bg: var(--game-color-red);
+  --tile-64-text: var(--palette-ivory);
+  --tile-128-bg: var(--game-color-purple);
+  --tile-128-text: var(--palette-ivory);
+  --tile-256-bg: var(--game-color-blue);
+  --tile-256-text: var(--palette-ivory);
+
+  font-family: var(--font);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--palette-dark-bg);
+  --surface: var(--palette-dark-surface);
+  --surface-2: var(--palette-dark-elevated);
+  --text: var(--palette-dark-text);
+  --muted: var(--palette-dark-muted);
+  --line: var(--palette-dark-line);
+  --header-surface: var(--palette-dark-bg);
+  --accent: var(--palette-dark-accent);
+  --accent-2: var(--palette-dark-accent);
+  --on-accent: var(--palette-dark-bg);
+  --chip: var(--palette-dark-elevated);
+  --chrome-foreground: var(--palette-dark-text);
+  --primary-nav-text: var(--chrome-foreground);
+  --primary-nav-active: var(--chrome-foreground);
+  --type-page-title-color: var(--palette-dark-text);
+  --sh-sm: 0 7px 18px color-mix(in oklab, var(--palette-dark-bg) 72%, transparent);
+  --sh: 0 14px 34px color-mix(in oklab, var(--palette-dark-bg) 78%, transparent);
+  --home-card-surface: var(--palette-dark-surface);
+  --home-card-border: var(--home-card-surface);
+  --home-card-hover-border: var(--palette-dark-line);
+  --home-card-hover-surface: color-mix(in oklab, var(--home-card-surface) 97%, var(--text));
+  --home-card-shadow: 0 10px 28px color-mix(in oklab, var(--palette-dark-bg) 82%, transparent);
+  --home-card-hover-shadow: 0 5px 16px color-mix(in oklab, var(--palette-dark-bg) 88%, transparent);
+  --home-card-active-shadow: 0 2px 8px color-mix(in oklab, var(--palette-dark-bg) 90%, transparent);
+  --home-button-surface: var(--home-card-surface);
+  --home-button-border: var(--home-button-surface);
+  --home-button-hover-border: var(--palette-dark-line);
+  --home-button-hover-surface: color-mix(in oklab, var(--home-button-surface) 97%, var(--text));
+  --home-button-text: var(--palette-dark-text);
+  --home-button-shadow: 0 3px 9px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
+  --home-button-hover-shadow: 0 2px 6px color-mix(in oklab, var(--palette-dark-bg) 92%, transparent);
+  --home-button-active-shadow: 0 1px 3px color-mix(in oklab, var(--palette-dark-bg) 94%, transparent);
+  --featured-surface: var(--palette-dark-elevated);
+  --featured-border: var(--featured-surface);
+  --featured-hover-border: var(--palette-dark-line);
+  --featured-hover-surface: color-mix(in oklab, var(--featured-surface) 97%, var(--featured-text));
+  --featured-shadow: 0 10px 26px color-mix(in oklab, var(--palette-dark-bg) 78%, transparent);
+  --featured-hover-shadow: 0 5px 16px color-mix(in oklab, var(--palette-dark-bg) 88%, transparent);
+  --featured-text: var(--palette-dark-text);
+  --featured-muted: var(--palette-dark-muted);
+  --featured-tag: var(--palette-yellow);
+  --featured-action-bg: var(--featured-surface);
+  --featured-action-border: var(--featured-action-bg);
+  --featured-action-hover-border: var(--palette-dark-line);
+  --featured-action-hover-bg: color-mix(in oklab, var(--featured-action-bg) 97%, var(--featured-action-text));
+  --featured-action-text: var(--palette-dark-text);
+  --featured-action-shadow: 0 5px 15px color-mix(in oklab, var(--palette-dark-bg) 86%, transparent);
+  --game-color-red: color-mix(in oklab, var(--palette-game-red) 88%, var(--palette-dark-bg));
+  --game-color-orange: color-mix(in oklab, var(--palette-game-orange) 88%, var(--palette-dark-bg));
+  --game-color-yellow: color-mix(in oklab, var(--palette-game-yellow) 90%, var(--palette-dark-bg));
+  --game-color-green: color-mix(in oklab, var(--palette-game-green) 88%, var(--palette-dark-bg));
+  --game-color-cyan: color-mix(in oklab, var(--palette-game-cyan) 88%, var(--palette-dark-bg));
+  --game-color-blue: color-mix(in oklab, var(--palette-game-blue) 70%, var(--palette-dark-accent));
+  --game-color-purple: color-mix(in oklab, var(--palette-game-purple) 78%, var(--palette-dark-text));
+  --game-color-pink: color-mix(in oklab, var(--palette-game-pink) 88%, var(--palette-dark-bg));
+  --catalog-surface: var(--palette-dark-bg);
+  --filter-text: var(--palette-dark-muted);
+  --game-card-category: var(--palette-dark-muted);
+  --game-card-description: var(--palette-dark-muted);
+  --game-action-text: var(--palette-ivory);
+  --loading-surface: var(--palette-dark-elevated);
+  --modal-shadow: 0 24px 60px color-mix(in oklab, var(--palette-dark-bg) 84%, transparent);
+  --game-modal-border: var(--home-card-hover-border);
+  --game-modal-bg: var(--home-card-surface);
+  --game-modal-text: var(--text);
+  --game-modal-muted: var(--muted);
+  --game-modal-action-border: var(--home-button-border);
+  --game-modal-action-bg: var(--home-button-surface);
+  --game-modal-action-shadow: var(--home-button-shadow);
+  --sudoku-grid-line: var(--palette-dark-line);
+  --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 54%, var(--line));
+  --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 22%, var(--palette-dark-elevated));
+  --sudoku-conflict-bg: color-mix(in oklab, var(--game-color-red) 22%, var(--palette-dark-elevated));
+  --game-2048-board-bg: var(--home-card-surface);
+  --game-2048-empty-cell-bg: var(--home-button-surface);
+  --game-2048-cell-border: var(--palette-dark-line);
+  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--palette-dark-bg) 76%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  font-family: var(--font);
+  font-synthesis: none;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
