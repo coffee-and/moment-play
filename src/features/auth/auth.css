@@ -117,47 +117,6 @@
   outline-offset: 3px;
 }
 
-.auth-provider-button--kakao {
-  border-color: #fee500;
-  background: #fee500;
-  color: rgb(0 0 0 / 85%);
-}
-
-.auth-card .auth-provider-button--kakao:hover:not(:disabled) {
-  border-color: #f7df00;
-  background: #f7df00;
-  color: rgb(0 0 0 / 85%);
-}
-
-.auth-card .auth-provider-button--kakao:active:not(:disabled) {
-  border-color: #ebd400;
-  background: #ebd400;
-  color: rgb(0 0 0 / 85%);
-}
-
-.auth-provider-button--naver {
-  border-color: #03c75a;
-  background: #03c75a;
-  color: #fff;
-}
-
-.auth-card .auth-provider-button--naver:hover:not(:disabled) {
-  border-color: #02b351;
-  background: #02b351;
-  color: #fff;
-}
-
-.auth-card .auth-provider-button--naver:active:not(:disabled) {
-  border-color: #029f49;
-  background: #029f49;
-  color: #fff;
-}
-
-.auth-provider-button__naver-mark {
-  font-size: 18px;
-  font-weight: 900;
-}
-
 .auth-divider {
   display: flex;
   align-items: center;

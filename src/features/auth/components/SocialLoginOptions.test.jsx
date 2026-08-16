@@ -8,7 +8,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const signInWithProvider = vi.fn();
 let auth = {
-  providers: ["google", "kakao"],
+  providers: ["google"],
   signInWithProvider,
 };
 
@@ -38,19 +38,19 @@ afterEach(() => {
   document.body.innerHTML = "";
   vi.clearAllMocks();
   auth = {
-    providers: ["google", "kakao"],
+    providers: ["google"],
     signInWithProvider,
   };
 });
 
 describe("SocialLoginOptions", () => {
   it("starts the selected provider and preserves the intended return path", async () => {
-    signInWithProvider.mockResolvedValueOnce({ provider: "kakao" });
+    signInWithProvider.mockResolvedValueOnce({ provider: "google" });
     const view = renderOptions("/minigames/omok");
 
-    await act(async () => buttonNamed(view.host, "카카오").click());
+    await act(async () => buttonNamed(view.host, "Google").click());
 
-    expect(signInWithProvider).toHaveBeenCalledWith("kakao", {
+    expect(signInWithProvider).toHaveBeenCalledWith("google", {
       returnTo: "/minigames/omok",
     });
     view.unmount();

@@ -2,16 +2,12 @@
 
 ## Scope and current deployment state
 
-Moment Play supports Google and Kakao through Supabase's built-in OAuth
-providers. Naver is wired to the Supabase custom-provider identifier
-`custom:naver`, but remains deliberately feature-gated until its nested
-userinfo response has been proven compatible in the hosted project.
+Moment Play supports Google through Supabase's built-in OAuth provider.
 
-The hosted project `nshpwruurbbxomduvinj` was inspected again on 2026-07-28.
-Its Site URL and application redirect allow list match the GitHub Pages and
-local URLs documented below. Google, Kakao, and custom OAuth providers are
-disabled, and the built-in Google and Kakao provider credentials are absent.
-Provider-console access and credentials were not available for real-login QA.
+The hosted project `nshpwruurbbxomduvinj` was inspected on 2026-07-28. Its Site
+URL and application redirect allow list match the GitHub Pages and local URLs
+documented below. Google was configured and verified with a real account on
+2026-08-03.
 
 Anonymous Auth was found enabled during this audit and was disabled through the
 Supabase Management API. A real anonymous sign-in request was rejected with
@@ -21,29 +17,21 @@ Current verification state:
 
 | Provider | Application code | Provider console | Supabase | Build flag | Real account QA |
 | --- | --- | --- | --- | --- | --- |
-| Google | Implemented | Not inspected; access unavailable | Disabled; credentials absent | Local and GitHub variable unset | Not performed |
-| Kakao | Implemented | Not inspected; access unavailable | Disabled; credentials absent | Local and GitHub variable unset | Not performed |
-| Naver | `custom:naver` adapter only | Not configured | Custom provider absent | Unset locally; hard-disabled for Pages | Not performed |
+| Google | Implemented | Configured | Enabled | Enabled locally and for Pages | Passed 2026-08-03 |
 
 Provider buttons are hidden unless their corresponding build-time flag is
 exactly `true`:
 
 ```text
 VITE_AUTH_GOOGLE_ENABLED
-VITE_AUTH_KAKAO_ENABLED
-VITE_AUTH_NAVER_ENABLED
 ```
 
 These flags are public UI configuration, not authorization controls. Supabase
 must also have the provider enabled. OAuth client secrets belong only in the
 provider console and Supabase Dashboard; never put them in a `VITE_` variable.
 
-The GitHub Pages workflow reads `VITE_AUTH_GOOGLE_ENABLED` and
-`VITE_AUTH_KAKAO_ENABLED` from repository Actions variables, defaulting both to
-`false`. Do not create those variables with value `true` until the corresponding
-provider completes real first-login, repeat-login, cancellation, refresh,
-logout, safe-return, and nickname-preservation QA. The workflow deliberately
-sets `VITE_AUTH_NAVER_ENABLED=false`.
+The GitHub Pages workflow reads `VITE_AUTH_GOOGLE_ENABLED` from a repository
+Actions variable and defaults it to `false`.
 
 ## Shared application flow
 
@@ -69,8 +57,7 @@ provider metadata as a protected nickname.
 
 Provider consoles and Supabase URL configuration serve different redirects.
 
-The OAuth provider callback, registered with Google, Kakao, or a custom
-provider, is Supabase:
+The OAuth provider callback, registered with Google, is Supabase:
 
 ```text
 https://nshpwruurbbxomduvinj.supabase.co/auth/v1/callback
@@ -106,61 +93,6 @@ References:
 - [Supabase Google login](https://supabase.com/docs/guides/auth/social-login/auth-google)
 - [Google identity branding](https://developers.google.com/identity/branding-guidelines)
 
-## Kakao configuration
-
-1. Create or select the Kakao application, enable Kakao Login, and register the
-   required web domains.
-2. Register the Supabase provider callback above as the Kakao redirect URI.
-3. Configure the Kakao REST API key as the client ID and the Kakao client secret
-   in Supabase, then enable the provider.
-4. Review the Kakao consent items. Email can be unavailable, so application
-   identity and profile ownership must continue to use `auth.users.id`, not
-   email.
-5. Set `VITE_AUTH_KAKAO_ENABLED=true` only after configuration and a real
-   callback test.
-
-References:
-
-- [Supabase Kakao login](https://supabase.com/docs/guides/auth/social-login/auth-kakao)
-- [Kakao Login prerequisites](https://developers.kakao.com/docs/en/kakaologin/prerequisite)
-- [Kakao Login design guide](https://developers.kakao.com/docs/en/kakaologin/design-guide)
-
-## Naver compatibility gate
-
-Naver authorization requires a server-held client secret and a CSRF `state`.
-Supabase custom OAuth can provide the server-side OAuth/PKCE boundary, so the
-client maps the app provider `naver` to `custom:naver`. However, Naver returns
-profile fields inside a nested `response` object. The hosted Supabase custom
-provider must be shown to map a stable subject and any optional email correctly
-before this flag is enabled.
-
-Required follow-up:
-
-1. Create a Naver Login application and register the Supabase provider callback
-   above as its callback URL.
-2. Request the stable Naver member identifier. Treat email, name, and nickname
-   as optional consent fields; application ownership must use the stable Auth
-   identity, not those optional fields.
-3. Configure the Supabase custom provider with:
-   - authorize: `https://nid.naver.com/oauth2.0/authorize`
-   - token: `https://nid.naver.com/oauth2.0/token`
-   - userinfo: `https://openapi.naver.com/v1/nid/me`
-   - the Naver client ID and secret stored only in Supabase
-   - optional-email handling enabled
-4. Prove the nested userinfo mapping in a non-production project or implement a
-   reviewed server-side adapter if the hosted custom provider cannot map it.
-5. Verify new login, repeat login, cancellation, missing email, denied consent,
-   account collision, logout, and refresh.
-6. Only then set `VITE_AUTH_NAVER_ENABLED=true`.
-
-Until those checks pass, keep the Naver flag unset. Do not put the Naver client
-secret in frontend code.
-
-References:
-
-- [Supabase custom OAuth providers](https://supabase.com/docs/guides/auth/custom-oauth-providers)
-- [Naver Login API](https://developers.naver.com/docs/login/api/api.md)
-
 ## Account linking and collision policy
 
 This task adds no client-side account merge or unlink behavior. Supabase owns
@@ -180,11 +112,10 @@ Automated tests cover provider mapping and flags, duplicate-click prevention,
 safe `returnTo` propagation, callback success/error normalization, session
 application, and protected profile creation for provider users.
 
-Real Chrome integration checks were run locally with Google and Kakao flags set
-only in the temporary Vite process. At a 390px emulated viewport:
+Real Chrome integration checks were run locally with the Google flag set in the
+temporary Vite process. At a 390px emulated viewport:
 
-- Google and Kakao buttons rendered, Naver remained hidden, and the email form
-  remained available
+- The Google button and email form rendered
 - the page had no horizontal overflow
 - the signup link preserved a safe game `returnTo`, while an external
   `returnTo` fell back to `/`
@@ -198,16 +129,20 @@ leave the development callback page permanently loading. The callback now
 shares one completion promise across the Strict Mode effect restart, so code
 exchange and session refresh still occur once.
 
-The following require real browser and provider accounts after dashboard
-configuration:
+### Provider verification status
 
-- Google and Kakao consent, cancellation, callback, logout, and refresh
-- repeat login and same-email collision behavior
-- mobile-width provider button appearance
-- popup/blocker and browser back-button recovery
-- Naver's complete compatibility checklist above
+Google real-account verification completed on 2026-08-03 using the existing
+disposable QA user. Repeat login, session restoration after refresh, logout,
+provider-screen cancellation recovery, safe return to the gated 2048 route,
+browser Back recovery, and the explicit post-login Start gate all passed. The
+callback left no authorization code or error parameters in browser history,
+and no uncaught browser errors were observed.
 
-Repository tests and builds do not substitute for these provider-console and
-real-account checks. Until Google and Kakao complete them, the correct release
-state is: repository implementation complete; provider configuration and
-real-login verification pending.
+Post-login database verification remained stable at one non-anonymous Auth
+user, one Google identity, and one matching profile. No anonymous user, orphan
+profile, duplicate profile, or provider-metadata nickname overwrite was
+observed.
+
+The authorized production state is Google enabled. Repository tests and builds
+continue to protect the shared callback, safe-return, session, and
+explicit-start behavior.

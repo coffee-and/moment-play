@@ -117,7 +117,7 @@ values
     '63000000-0000-4000-8000-000000000001',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated', null, '', now(),
-    '{"provider":"kakao","providers":["kakao"]}', '{}',
+    '{"provider":"oauth-test","providers":["oauth-test"]}', '{}',
     now(), now(), false
   );
 
@@ -142,7 +142,7 @@ select is(
    from public.profiles
    where user_id = '63000000-0000-4000-8000-000000000001'),
   1::bigint,
-  'Kakao Auth user creation creates a profile when email is unavailable'
+  'Email-less social Auth user creation creates a profile'
 );
 
 select is(
@@ -150,7 +150,7 @@ select is(
    from public.profiles
    where user_id = '63000000-0000-4000-8000-000000000001'),
   'Player-63000',
-  'Kakao Auth user creation receives the server-owned placeholder nickname'
+  'Email-less social Auth user receives the server-owned placeholder nickname'
 );
 
 select set_config(

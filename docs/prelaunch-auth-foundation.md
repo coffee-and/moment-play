@@ -145,12 +145,10 @@ malformed percent escapes, `javascript:` URLs, and `data:` URLs fall back to
 
 ## Follow-on work
 
-Google and Kakao now use the shared gateway, callback, redirect builder, and
-`returnTo` validator described in [Social login foundation](social-login.md).
-Naver has the same client boundary but remains disabled until its custom
-provider mapping is proven against the nested Naver userinfo response. Apple
-login; account management/deletion; play tickets; referral rewards; and
-Capacitor deep-link handling remain deferred.
+Google now uses the shared gateway, callback, redirect builder, and `returnTo`
+validator described in [Social login foundation](social-login.md). Apple login;
+account management/deletion; play tickets; referral rewards; and Capacitor
+deep-link handling remain deferred.
 
 Account deletion must be a separately authorized server workflow with
 dependent-row and Auth-user deletion in one deliberate operation.
