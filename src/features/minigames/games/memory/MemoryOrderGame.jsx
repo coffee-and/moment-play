@@ -676,7 +676,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       className="memory-game"
       eyebrow={game.eyebrow}
       title={game.title}
-      description={game.description}
       actions={gameActions}
       isExitConfirmationOpen={isExitConfirmOpen}
       onRequestExit={requestExit}

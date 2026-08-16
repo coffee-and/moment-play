@@ -173,6 +173,17 @@
   --home-button-shadow: 0 3px 8px color-mix(in oklab, var(--palette-neutral-900) 8%, transparent);
   --home-button-hover-shadow: 0 2px 5px color-mix(in oklab, var(--palette-neutral-900) 12%, transparent);
   --home-button-active-shadow: 0 1px 2px color-mix(in oklab, var(--palette-neutral-900) 10%, transparent);
+  --header-control-border-width: 0;
+  --header-control-surface: var(--home-card-surface);
+  --header-control-shadow: var(--home-card-shadow);
+  --header-control-hover-border: var(--home-card-hover-border);
+  --header-control-hover-surface: var(--home-card-hover-surface);
+  --header-control-hover-shadow: var(--home-card-hover-shadow);
+  --header-control-active-shadow: var(--home-card-active-shadow);
+  --input-border: transparent;
+  --input-focus-border: var(--accent);
+  --input-surface: var(--surface-2);
+  --input-shadow: none;
   /* Game screens reuse the same quiet surface system as the home cards. */
   --stage-surface: var(--bg);
   --stage-card-surface: var(--home-card-surface);
@@ -341,6 +352,7 @@
   --game-modal-action-border: var(--home-button-border);
   --game-modal-action-bg: var(--home-button-surface);
   --game-modal-action-shadow: var(--home-button-shadow);
+  --game-modal-backdrop: color-mix(in oklab, var(--palette-neutral-900) 68%, transparent);
   --sudoku-grid-line: var(--palette-dark-line);
   --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 54%, var(--line));
   --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 22%, var(--palette-dark-elevated));

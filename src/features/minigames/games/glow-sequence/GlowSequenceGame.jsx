@@ -209,7 +209,6 @@ export function GlowSequenceGame({ game }) {
       actions={<Button variant="secondary" onClick={requestExit}>게임 나가기</Button>}
       ariaLabel="글로우 시퀀스 게임"
       className="glow-sequence"
-      description={game.description}
       eyebrow="MEMORY / LIGHT"
       isExitConfirmationOpen={isExitOpen}
       onRequestExit={requestExit}

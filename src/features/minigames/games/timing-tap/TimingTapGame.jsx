@@ -201,7 +201,6 @@ export function TimingTapGame({ game }) {
       actions={<Button variant="secondary" onClick={requestExit}>게임 나가기</Button>}
       ariaLabel="타이밍 탭 게임"
       className="timing-tap"
-      description={game.description}
       eyebrow="REACTION / TIMING"
       isExitConfirmationOpen={isExitOpen}
       onRequestExit={requestExit}

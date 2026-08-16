@@ -1,5 +1,6 @@
 import { useTheme } from "./useTheme.js";
 import { THEME } from "./theme.js";
+import { IconButton } from "../components/IconButton.jsx";
 
 function ThemeIcon({ theme }) {
   if (theme === THEME.DARK) {
@@ -24,15 +25,12 @@ export function ThemeToggle() {
   const label = isDark ? "라이트 테마로 전환" : "다크 테마로 전환";
 
   return (
-    <button
-      className="header-icon-button"
-      type="button"
-      aria-label={label}
+    <IconButton
+      label={label}
       aria-pressed={isDark}
-      title={label}
       onClick={toggleTheme}
     >
       <ThemeIcon theme={theme} />
-    </button>
+    </IconButton>
   );
 }

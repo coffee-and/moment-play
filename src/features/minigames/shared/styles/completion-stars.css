@@ -36,7 +36,7 @@
   filter: drop-shadow(0 0 7px color-mix(in oklab, var(--game-modal-highlight) 58%, transparent));
 }
 
-.game-stage-modal[data-has-celebration="true"] .completion-stars {
+[data-game-stage-modal][data-has-celebration="true"] .completion-stars {
   opacity: .72;
 }
 

@@ -601,7 +601,6 @@ export function OmokGame({ game = DEFAULT_GAME_META, roomId = null }) {
       className={`omok-game${isGameScreenVisible ? " is-game-screen" : ""}`}
       eyebrow={game.eyebrow}
       title={game.title}
-      description={game.description}
       isExitConfirmationOpen={dialog === DIALOG.LEAVE_CONFIRM}
       onRequestExit={requestGameExit}
       sidebar={sidebar}

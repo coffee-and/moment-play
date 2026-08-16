@@ -244,7 +244,6 @@ export function BlockBlastGame({ game }) {
       )}
       ariaLabel="블록 블라스트 게임"
       className="block-blast-game"
-      description={game.description}
       eyebrow="BLOCK / SCORE"
       isExitConfirmationOpen={isExitOpen}
       onRequestExit={requestExit}

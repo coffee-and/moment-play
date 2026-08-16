@@ -1,6 +1,6 @@
 import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import '../styles/game-stage-responsive-actions.css';
+import styles from './GameStage.module.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
 import { CompletionStars } from './CompletionStars.jsx';
 import { GameCelebrationProvider } from './GameCelebration.jsx';
@@ -60,7 +60,8 @@ export function GameStageOverlay({
   return createPortal(
     <div
       ref={overlayRef}
-      className={joinClassNames(['game-stage-overlay', className])}
+      className={joinClassNames([styles.overlay, className])}
+      data-game-stage-overlay=""
       data-state={state}
       onMouseDown={(event) => {
         if (closeOnBackdrop && event.target === event.currentTarget) onCloseRef.current?.();
@@ -83,7 +84,8 @@ export function GameStageModal({
 }) {
   return (
     <div
-      className={joinClassNames(['game-stage-modal', className])}
+      className={joinClassNames([styles.modal, className])}
+      data-game-stage-modal=""
       data-has-celebration={showCelebration ? 'true' : undefined}
       {...props}
     >

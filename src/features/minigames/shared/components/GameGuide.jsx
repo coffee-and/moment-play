@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { BookOpenTextIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
+import { Button } from "../../../../shared/components/Button.jsx";
+import { IconButton } from "../../../../shared/components/IconButton.jsx";
 import { GameStageModal, GameStageOverlay } from './GameStageOverlay.jsx';
 import { GameGuideExample } from "./GameGuideExample.jsx";
 import "../styles/game-guide.css";
 
 export function GameGuideIconButton({ label, onClick }) {
   return (
-    <button type="button" className="game-guide-icon" onClick={onClick} aria-label={label}>
+    <IconButton label={label} onClick={onClick} variant="stage">
       <BookOpenTextIcon />
-    </button>
+    </IconButton>
   );
 }
 
@@ -56,7 +58,7 @@ export function GameGuideModal({ guide, onClose }) {
       <GameStageModal className="game-guide-modal" role="dialog" aria-modal="true" aria-labelledby="game-guide-title">
         <h3 id="game-guide-title">게임 방법</h3>
         <GameGuideContent guide={guide} />
-        <button className="button button--primary" type="button" onClick={onClose}>확인</button>
+        <Button onClick={onClose}>확인</Button>
       </GameStageModal>
     </GameStageOverlay>
   );

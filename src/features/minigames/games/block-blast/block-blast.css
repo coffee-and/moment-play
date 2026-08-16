@@ -150,13 +150,13 @@
 }
 
 @media (max-width: 620px) {
-  .block-blast-game .game-stage__content {
+  .block-blast-game [data-stage-slot="content"] {
     overflow: hidden;
     overscroll-behavior: contain;
     scrollbar-width: none;
   }
 
-  .block-blast-game .game-stage__content::-webkit-scrollbar {
+  .block-blast-game [data-stage-slot="content"]::-webkit-scrollbar {
     display: none;
   }
 
@@ -167,7 +167,7 @@
     align-items: center;
   }
 
-  .block-blast-game .game-stage__play {
+  .block-blast-game [data-stage-slot="play"] {
     border: 0;
     background: transparent;
     box-shadow: none;

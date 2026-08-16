@@ -289,6 +289,10 @@
   backdrop-filter: blur(3px);
 }
 
+.memory-game__start-flow {
+  --game-stage-modal-min-height: clamp(320px, 42vh, 380px);
+}
+
 .memory-game__transition-view {
   min-height: 0;
   width: min(360px, 100%);

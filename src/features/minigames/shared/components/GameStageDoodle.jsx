@@ -23,8 +23,9 @@ export function GameStageDoodle({ variant, className = "" }) {
     return (
       <span
         aria-hidden="true"
-        className={`${classes} game-stage-modal__decoration`}
+        className={classes}
         data-doodle-variant={variant}
+        data-modal-decoration=""
       >
         <DoodleArt asset={gameOverFace} part="sad-face" />
         <DoodleArt asset={gameOverFacepalm} part="facepalm" />

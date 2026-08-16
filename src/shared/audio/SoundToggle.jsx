@@ -1,5 +1,6 @@
 import { useGameAudio } from "./GameAudioContext.jsx";
 import { SpeakerHighIcon, SpeakerSlashIcon } from "../components/icons/PhosphorIcons.jsx";
+import { IconButton } from "../components/IconButton.jsx";
 
 export function SoundToggle({ compact = false }) {
   const { enabled, isAudible, toggleAudio } = useGameAudio();
@@ -7,15 +8,13 @@ export function SoundToggle({ compact = false }) {
   const label = active ? "음악과 효과음 끄기" : "음악과 효과음 켜기";
 
   return (
-    <button
-      className={`header-icon-button${compact ? " game-stage__icon-button sound-toggle--compact" : ""}`}
-      type="button"
-      aria-label={label}
+    <IconButton
+      label={label}
       aria-pressed={active}
-      title={label}
       onClick={() => void toggleAudio()}
+      variant={compact ? "stage" : "header"}
     >
       {active ? <SpeakerHighIcon /> : <SpeakerSlashIcon />}
-    </button>
+    </IconButton>
   );
 }

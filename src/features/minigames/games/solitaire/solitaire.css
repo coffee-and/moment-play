@@ -1,4 +1,7 @@
 .solitaire-game {
+  --solitaire-card-stack-limit: 52;
+  --solitaire-card-hover-layer: calc(var(--solitaire-card-stack-limit) + 1);
+  --solitaire-card-selected-layer: calc(var(--solitaire-card-stack-limit) + 2);
   --solitaire-card-ratio: 0.7;
   --solitaire-face-up-step: 29px;
   --solitaire-face-down-step: 14px;
@@ -110,7 +113,7 @@ button.solitaire-card {
 
 button.solitaire-card:hover,
 button.solitaire-card:focus-visible {
-  z-index: 30 !important;
+  z-index: var(--solitaire-card-hover-layer);
   box-shadow: 0 6px 14px color-mix(in oklab, var(--palette-neutral-900) 22%, transparent);
   translate: 0 -2px;
 }
@@ -146,8 +149,8 @@ button.solitaire-card:active {
   box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--solitaire-back) 82%, transparent);
 }
 
-.solitaire-card.is-selected {
-  z-index: 40 !important;
+.solitaire-game .solitaire-card.is-selected {
+  z-index: var(--solitaire-card-selected-layer);
   outline: 2px solid var(--game-color-yellow);
   outline-offset: 2px;
   box-shadow: 0 8px 18px color-mix(in oklab, var(--game-color-yellow) 24%, transparent);

@@ -464,6 +464,10 @@
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--game-color-blue) 14%, transparent);
 }
 
+.game-guide-modal {
+  --game-stage-modal-width: min(440px, calc(100vw - 32px));
+}
+
 .game-stage-start-modal {
   width: min(380px, 100%);
   min-height: 0;

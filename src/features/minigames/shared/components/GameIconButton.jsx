@@ -1,3 +1,5 @@
+import { IconButton } from "../../../../shared/components/IconButton.jsx";
+
 export function GameIconButton({
   children,
   className = "",
@@ -6,14 +8,14 @@ export function GameIconButton({
   ...props
 }) {
   return (
-    <button
-      aria-label={label}
-      className={`header-icon-button game-stage__icon-button${className ? ` ${className}` : ""}`}
+    <IconButton
+      className={className}
+      label={label}
       title={title}
-      type="button"
+      variant="stage"
       {...props}
     >
       {children}
-    </button>
+    </IconButton>
   );
 }

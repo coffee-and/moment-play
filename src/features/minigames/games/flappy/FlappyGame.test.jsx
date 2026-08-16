@@ -79,7 +79,7 @@ describe("FlappyGame", () => {
     expect(findButton(view.host, "일시정지")).toBeDefined();
 
     act(() => findButton(view.host, "일시정지").click());
-    expect(document.body.querySelector(".game-stage-modal")).not.toBeNull();
+    expect(document.body.querySelector("[data-game-stage-modal]")).not.toBeNull();
     expect(document.body.textContent).toContain("잠시 쉬어갈까요?");
 
     act(() => findButton(document.body, "계속하기").click());

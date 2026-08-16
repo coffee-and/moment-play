@@ -240,12 +240,12 @@
     gap: 8px;
   }
 
-  .board-viewport__controls .game-stage__icon-button {
+  .board-viewport__controls [data-ui="icon-button"] {
     width: 34px;
     height: 34px;
   }
 
-  .board-viewport__controls .game-stage__icon-button svg {
+  .board-viewport__controls [data-ui="icon-button"] svg {
     width: 17px;
     height: 17px;
   }
@@ -308,17 +308,17 @@
     font-size: 11px;
   }
 
-  .logic-puzzle-stage .game-stage__content {
+  .logic-puzzle-stage [data-stage-slot="content"] {
     overflow: hidden;
     overscroll-behavior: contain;
     scrollbar-width: none;
   }
 
-  .logic-puzzle-stage .game-stage__content::-webkit-scrollbar {
+  .logic-puzzle-stage [data-stage-slot="content"]::-webkit-scrollbar {
     display: none;
   }
 
-  .logic-puzzle-stage .game-stage__play {
+  .logic-puzzle-stage [data-stage-slot="play"] {
     border: 0;
     background: transparent;
     box-shadow: none;

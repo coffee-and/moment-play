@@ -2,7 +2,7 @@
   position: fixed;
   top: 78px;
   right: max(16px, calc((100vw - var(--layout-max-width)) / 2 + 18px));
-  z-index: 90;
+  z-index: var(--layer-notification);
   display: grid;
   width: min(360px, calc(100vw - 32px));
   grid-template-columns: minmax(0, 1fr) auto;

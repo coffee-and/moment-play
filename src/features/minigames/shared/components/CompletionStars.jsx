@@ -23,7 +23,8 @@ export function CompletionStars({ streak = 1 }) {
   return (
     <span
       aria-hidden="true"
-      className="game-stage-modal__decoration completion-stars"
+      className="completion-stars"
+      data-modal-decoration=""
       data-intensity={streak >= 10 ? "maximum" : streak >= 5 ? "strong" : streak >= 3 ? "medium" : "soft"}
     >
       {STAR_POSITIONS.slice(0, count).map(([left, top, scale, lift], index) => (

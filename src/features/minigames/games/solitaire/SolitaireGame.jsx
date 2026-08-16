@@ -405,7 +405,6 @@ export function SolitaireGame({ game }) {
       actions={actions}
       ariaLabel="솔리테어 게임"
       className="solitaire-game"
-      description={game.description}
       eyebrow="CARD / KLONDIKE"
       isExitConfirmationOpen={isExitOpen}
       onRequestExit={requestExit}

@@ -165,11 +165,11 @@
 }
 
 @media (max-width: 620px) {
-  section.game-stage.timing-tap .game-stage__inner {
+  section[data-game-stage].timing-tap [data-stage-slot="inner"] {
     gap: 16px;
   }
 
-  section.game-stage.timing-tap .game-stage__play {
+  section[data-game-stage].timing-tap [data-stage-slot="play"] {
     padding-top: 18px;
   }
 

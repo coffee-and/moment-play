@@ -1,0 +1,73 @@
+.root {
+  display: inline-grid;
+  width: var(--icon-button-size, var(--icon-button-default-size, 44px));
+  height: var(--icon-button-size, var(--icon-button-default-size, 44px));
+  flex: none;
+  border: var(--icon-button-border-width, var(--header-control-border-width)) solid
+    var(--icon-button-border, var(--home-button-border));
+  border-radius: 50%;
+  place-items: center;
+  background: var(--icon-button-surface, var(--header-control-surface));
+  color: var(--icon-button-text, var(--chrome-foreground));
+  cursor: pointer;
+  box-shadow: var(--icon-button-shadow, var(--header-control-shadow));
+  transition:
+    border-color .2s,
+    color .2s,
+    transform .2s var(--ease),
+    background-color .2s,
+    box-shadow .2s;
+}
+
+.root:hover:not(:disabled) {
+  border-color: var(--icon-button-hover-border, var(--header-control-hover-border));
+  background: var(--icon-button-hover-surface, var(--header-control-hover-surface));
+  color: var(--icon-button-text, var(--chrome-foreground));
+  box-shadow: var(--icon-button-hover-shadow, var(--header-control-hover-shadow));
+  transform: translateY(1px) scale(.99);
+}
+
+.root:active:not(:disabled) {
+  box-shadow: var(--icon-button-active-shadow, var(--header-control-active-shadow));
+  transform: translateY(2px) scale(.96);
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--icon-button-focus, var(--chrome-foreground));
+  outline-offset: 3px;
+}
+
+.root:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.root svg {
+  width: var(--icon-button-icon-size, 20px);
+  height: var(--icon-button-icon-size, 20px);
+}
+
+.stage {
+  --icon-button-default-size: 42px;
+  --icon-button-border-width: 1px;
+  --icon-button-border: var(--stage-control-border);
+  --icon-button-surface: var(--stage-control-surface);
+  --icon-button-text: var(--text);
+  --icon-button-shadow: var(--stage-control-shadow);
+  --icon-button-hover-border: var(--stage-control-hover-border);
+  --icon-button-hover-surface: var(--stage-control-hover-surface);
+  --icon-button-hover-shadow: var(--stage-control-hover-shadow);
+  --icon-button-active-shadow: var(--home-button-active-shadow);
+  --icon-button-focus: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+
+  .root:hover:not(:disabled),
+  .root:active:not(:disabled) {
+    transform: none;
+  }
+}

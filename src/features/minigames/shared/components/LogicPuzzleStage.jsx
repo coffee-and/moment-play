@@ -113,7 +113,6 @@ export function LogicPuzzleStage({
       )}
       ariaLabel={`${game.title} 게임`}
       className="logic-puzzle-stage"
-      description={game.description}
       eyebrow={eyebrow}
       isExitConfirmationOpen={session.isExitOpen}
       onRequestExit={session.requestExit}

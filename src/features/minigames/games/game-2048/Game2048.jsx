@@ -388,7 +388,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   );
 
   return (
-    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} description={game.description} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
+    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
       <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
         {phase !== GAME_2048_PHASE.IDLE ? (
           <>

@@ -270,7 +270,6 @@ export function FlappyGame({ game }) {
       actions={actions}
       ariaLabel="별빛 비행 게임"
       className="flappy-game"
-      description={game.description}
       eyebrow="ARCADE / FLIGHT"
       isExitConfirmationOpen={isExitOpen}
       onRequestExit={requestExit}
