@@ -14,7 +14,7 @@ select columns_are(
   'game_results',
   array[
     'id', 'user_id', 'game_key', 'mode', 'score_value', 'duration_ms',
-    'match_result', 'client_submission_id', 'created_at'
+    'match_result', 'client_submission_id', 'created_at', 'attempt_id', 'verified_at'
   ],
   'game_results has exactly the required columns'
 );
@@ -88,14 +88,14 @@ select has_index(
 );
 
 select ok(
-  (select indexdef like '%(game_key, mode, score_value DESC, created_at)%WHERE (game_key = ANY%'
+  (select indexdef like '%(game_key, mode, score_value DESC, created_at)%verified_at IS NOT NULL%'
    from pg_catalog.pg_indexes
    where schemaname = 'public' and indexname = 'game_results_score_leaderboard_idx'),
   'score index has the required descending-score ordering and predicate'
 );
 
 select ok(
-  (select indexdef like '%(game_key, mode, duration_ms, created_at)%WHERE (game_key = ''sudoku''%'
+  (select indexdef like '%(game_key, mode, duration_ms, created_at)%verified_at IS NOT NULL%'
    from pg_catalog.pg_indexes
    where schemaname = 'public' and indexname = 'game_results_duration_leaderboard_idx'),
   'duration index has the required ascending-duration ordering and predicate'
@@ -132,44 +132,34 @@ select ok(
 );
 
 select ok(
-  exists (
+  not exists (
     select 1 from pg_catalog.pg_policy
     where polrelid = 'public.game_results'::regclass
       and polname = 'game_results_insert_permanent_own'
   ),
-  'game_results_insert_permanent_own policy exists'
+  'the former direct-insert policy has been removed'
 );
 
-select is(
-  (select polcmd::text from pg_catalog.pg_policy
-   where polrelid = 'public.game_results'::regclass
-     and polname = 'game_results_insert_permanent_own'),
-  'a'::text,
-  'ranking policy applies only to INSERT'
+select has_function(
+  'public', 'begin_ranked_game', array['text', 'text', 'jsonb'],
+  'begin_ranked_game(text,text,jsonb) exists'
 );
 
-select is(
-  (select polroles from pg_catalog.pg_policy
-   where polrelid = 'public.game_results'::regclass
-     and polname = 'game_results_insert_permanent_own'),
-  array['authenticated'::regrole::oid],
-  'ranking policy applies only to authenticated'
+select has_function(
+  'public', 'complete_ranked_game', array['uuid', 'uuid', 'jsonb'],
+  'complete_ranked_game(uuid,uuid,jsonb) exists'
 );
 
-select matches(
-  (select pg_get_expr(polwithcheck, polrelid) from pg_catalog.pg_policy
-   where polrelid = 'public.game_results'::regclass
-     and polname = 'game_results_insert_permanent_own'),
-  'user_id = auth[.]uid[(][)]',
-  'ranking policy requires user_id = auth.uid()'
+select ok(
+  (select prosecdef from pg_catalog.pg_proc
+   where oid = 'public.begin_ranked_game(text,text,jsonb)'::regprocedure),
+  'attempt creation RPC is SECURITY DEFINER'
 );
 
-select matches(
-  (select pg_get_expr(polwithcheck, polrelid) from pg_catalog.pg_policy
-   where polrelid = 'public.game_results'::regclass
-     and polname = 'game_results_insert_permanent_own'),
-  'game_key.*<>.*omok',
-  'ranking policy rejects client Omok results'
+select ok(
+  (select prosecdef from pg_catalog.pg_proc
+   where oid = 'public.complete_ranked_game(uuid,uuid,jsonb)'::regprocedure),
+  'attempt completion RPC is SECURITY DEFINER'
 );
 
 select is(
@@ -180,12 +170,12 @@ select is(
 );
 
 select is(
-  (select array_agg(column_name::text order by column_name)
+  (select count(*)
    from information_schema.column_privileges
    where table_schema = 'public' and table_name = 'game_results'
      and grantee = 'authenticated' and privilege_type = 'INSERT'),
-  array['client_submission_id', 'duration_ms', 'game_key', 'match_result', 'mode', 'score_value', 'user_id'],
-  'authenticated has only the intended column-level INSERT privileges'
+  0::bigint,
+  'authenticated has no direct INSERT privileges'
 );
 
 select is(
@@ -283,15 +273,15 @@ where user_id in (
 );
 
 insert into public.game_results
-  (user_id, game_key, mode, score_value, duration_ms, match_result, client_submission_id, created_at)
+  (user_id, game_key, mode, score_value, duration_ms, match_result, client_submission_id, created_at, verified_at)
 values
-  ('10000000-0000-4000-8000-000000000001', '2048', null, 9000000000000000, null, null, '20000000-0000-4000-8000-000000000001', '2026-01-01T00:00:01Z'),
-  ('10000000-0000-4000-8000-000000000001', '2048', null, 8999999999999998, null, null, '20000000-0000-4000-8000-000000000002', '2026-01-01T00:00:02Z'),
-  ('10000000-0000-4000-8000-000000000002', '2048', null, 8999999999999999, null, null, '20000000-0000-4000-8000-000000000003', '2026-01-01T00:00:03Z'),
-  ('10000000-0000-4000-8000-000000000001', 'memory', null, 99999, null, null, '20000000-0000-4000-8000-000000000004', '2026-01-01T00:00:04Z'),
-  ('10000000-0000-4000-8000-000000000002', 'memory', null, 100000, null, null, '20000000-0000-4000-8000-000000000005', '2026-01-01T00:00:05Z'),
-  ('10000000-0000-4000-8000-000000000001', 'sudoku', 'easy', null, 1001, null, '20000000-0000-4000-8000-000000000006', '2026-01-01T00:00:06Z'),
-  ('10000000-0000-4000-8000-000000000002', 'sudoku', 'easy', null, 1000, null, '20000000-0000-4000-8000-000000000007', '2026-01-01T00:00:07Z');
+  ('10000000-0000-4000-8000-000000000001', '2048', null, 9000000000000000, null, null, '20000000-0000-4000-8000-000000000001', '2026-01-01T00:00:01Z', '2026-01-01T00:00:01Z'),
+  ('10000000-0000-4000-8000-000000000001', '2048', null, 8999999999999998, null, null, '20000000-0000-4000-8000-000000000002', '2026-01-01T00:00:02Z', '2026-01-01T00:00:02Z'),
+  ('10000000-0000-4000-8000-000000000002', '2048', null, 8999999999999999, null, null, '20000000-0000-4000-8000-000000000003', '2026-01-01T00:00:03Z', '2026-01-01T00:00:03Z'),
+  ('10000000-0000-4000-8000-000000000001', 'memory', null, 99999, null, null, '20000000-0000-4000-8000-000000000004', '2026-01-01T00:00:04Z', '2026-01-01T00:00:04Z'),
+  ('10000000-0000-4000-8000-000000000002', 'memory', null, 100000, null, null, '20000000-0000-4000-8000-000000000005', '2026-01-01T00:00:05Z', '2026-01-01T00:00:05Z'),
+  ('10000000-0000-4000-8000-000000000001', 'sudoku', 'easy', null, 1001, null, '20000000-0000-4000-8000-000000000006', '2026-01-01T00:00:06Z', '2026-01-01T00:00:06Z'),
+  ('10000000-0000-4000-8000-000000000002', 'sudoku', 'easy', null, 1000, null, '20000000-0000-4000-8000-000000000007', '2026-01-01T00:00:07Z', '2026-01-01T00:00:07Z');
 
 -- Behavioral RLS and constraints ---------------------------------------------
 
@@ -321,12 +311,13 @@ select set_config(
 );
 set local role authenticated;
 
-select lives_ok(
+select throws_ok(
   $$insert into public.game_results
       (user_id, game_key, score_value, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', '2048', 111, '30000000-0000-4000-8000-000000000003')$$,
-  'permanent users can insert their own ranked results'
+  '42501', 'permission denied for table game_results',
+  'permanent users cannot directly insert ranked results'
 );
 
 select throws_ok(
@@ -334,8 +325,8 @@ select throws_ok(
       (user_id, game_key, score_value, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000002', '2048', 1, '30000000-0000-4000-8000-000000000004')$$,
-  '42501', 'new row violates row-level security policy for table "game_results"',
-  'forged ownership is rejected'
+  '42501', 'permission denied for table game_results',
+  'direct inserts cannot forge ownership'
 );
 
 select throws_ok(
@@ -363,8 +354,8 @@ select throws_ok(
       (user_id, game_key, score_value, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', 'pong', 1, '30000000-0000-4000-8000-000000000005')$$,
-  '23514', null,
-  'unsupported game key is rejected by a check constraint'
+  '42501', 'permission denied for table game_results',
+  'unsupported client results cannot bypass the RPC'
 );
 
 select throws_ok(
@@ -372,8 +363,8 @@ select throws_ok(
       (user_id, game_key, mode, duration_ms, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', 'sudoku', 'expert', 1000, '30000000-0000-4000-8000-000000000006')$$,
-  '23514', null,
-  'unsupported Sudoku mode is rejected by a check constraint'
+  '42501', 'permission denied for table game_results',
+  'unsupported Sudoku modes cannot bypass the RPC'
 );
 
 select throws_ok(
@@ -381,8 +372,8 @@ select throws_ok(
       (user_id, game_key, score_value, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', '2048', -1, '30000000-0000-4000-8000-000000000007')$$,
-  '23514', null,
-  'negative score is rejected'
+  '42501', 'permission denied for table game_results',
+  'client-supplied negative scores are not accepted'
 );
 
 select throws_ok(
@@ -390,8 +381,8 @@ select throws_ok(
       (user_id, game_key, mode, duration_ms, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', 'sudoku', 'easy', 999, '30000000-0000-4000-8000-000000000008')$$,
-  '23514', null,
-  'invalid duration is rejected'
+  '42501', 'permission denied for table game_results',
+  'client-supplied durations are not accepted'
 );
 
 select throws_ok(
@@ -399,8 +390,8 @@ select throws_ok(
       (user_id, game_key, score_value, match_result, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', 'memory', 10, 'win', '30000000-0000-4000-8000-000000000009')$$,
-  '23514', null,
-  'invalid match-result combination is rejected'
+  '42501', 'permission denied for table game_results',
+  'client-supplied result shapes are not accepted'
 );
 
 select throws_ok(
@@ -408,8 +399,8 @@ select throws_ok(
       (user_id, game_key, mode, match_result, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', 'omok', 'standard', 'win', '30000000-0000-4000-8000-000000000010')$$,
-  '42501', 'new row violates row-level security policy for table "game_results"',
-  'client Omok insert is rejected by RLS'
+  '42501', 'permission denied for table game_results',
+  'client Omok inserts remain denied'
 );
 
 select throws_ok(
@@ -417,8 +408,8 @@ select throws_ok(
       (user_id, game_key, score_value, client_submission_id)
     values
       ('10000000-0000-4000-8000-000000000001', '2048', 112, '30000000-0000-4000-8000-000000000003')$$,
-  '23505', null,
-  'duplicate user and client submission id is rejected'
+  '42501', 'permission denied for table game_results',
+  'duplicate direct inserts are denied before constraints'
 );
 
 -- Leaderboard behavior --------------------------------------------------------

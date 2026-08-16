@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
+import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
@@ -196,6 +197,10 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const comboRef = useRef(combo);
   const livesRef = useRef(lives);
   const replayGaugeRef = useRef(replayGauge);
+  const rankedRandomRef = useRef(Math.random);
+  const rankedRoundsRef = useRef([]);
+  const roundChoicesRef = useRef([]);
+  const isStartingRef = useRef(false);
 
   const canPause = phase === PHASE.COUNTDOWN || phase === PHASE.PREVIEW || phase === PHASE.PLAYING;
   const isStageCovered =
@@ -375,7 +380,8 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function startRound(nextRound, { resetRecord = true, showCountdown = false } = {}) {
     clearGameTimers();
     resolvingRef.current = false;
-    const nextData = createMemoryRound(nextRound, MEMORY_SYMBOLS);
+    const nextData = createMemoryRound(nextRound, MEMORY_SYMBOLS, rankedRandomRef.current);
+    roundChoicesRef.current = [];
     setRound(nextRound);
     roundRef.current = nextRound;
     setData(nextData);
@@ -441,20 +447,30 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     navigate("/");
   }
 
-  function startGame() {
+  async function startGame() {
     if (phaseRef.current !== PHASE.IDLE) return;
-    rankingSubmission.startAttempt();
-    scoreRef.current = 0;
-    comboRef.current = 0;
-    livesRef.current = MEMORY_ORDER_INITIAL_LIVES;
-    replayGaugeRef.current = 0;
-    setScore(0);
-    setCombo(0);
-    setLives(MEMORY_ORDER_INITIAL_LIVES);
-    setReplayGauge(0);
-    setMistakes(0);
-    setFailureStatus(null);
-    startRound(1, { showCountdown: true });
+    if (isStartingRef.current) return;
+    isStartingRef.current = true;
+    try {
+      const attempt = await rankingSubmission.startAttempt({ gameKey: RANKING_GAME.MEMORY });
+      if (!attempt) return;
+      rankedRandomRef.current = attempt?.seed ? createRankedRandom(attempt.seed) : Math.random;
+      rankedRoundsRef.current = [];
+      roundChoicesRef.current = [];
+      scoreRef.current = 0;
+      comboRef.current = 0;
+      livesRef.current = MEMORY_ORDER_INITIAL_LIVES;
+      replayGaugeRef.current = 0;
+      setScore(0);
+      setCombo(0);
+      setLives(MEMORY_ORDER_INITIAL_LIVES);
+      setReplayGauge(0);
+      setMistakes(0);
+      setFailureStatus(null);
+      startRound(1, { showCountdown: true });
+    } finally {
+      isStartingRef.current = false;
+    }
   }
 
   function retryRound() {
@@ -469,6 +485,11 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     clearRoundTransitionTimer();
     clearCorrectFeedback();
     setFailureReason(reason);
+    rankedRoundsRef.current.push({
+      choices: [...roundChoicesRef.current],
+      timedOut: reason === FAILURE_REASON.TIMEOUT,
+    });
+    roundChoicesRef.current = [];
     setMistakes((current) => current + 1);
     comboRef.current = 0;
     setCombo(0);
@@ -499,7 +520,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     if (resolution.status === "over") {
       void rankingSubmission.submitResult({
         gameKey: RANKING_GAME.MEMORY,
-        scoreValue: scoreRef.current,
+        proof: { rounds: [...rankedRoundsRef.current] },
       });
     }
   }
@@ -509,6 +530,11 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     resolvingRef.current = true;
     playSound("clear");
     clearActiveTimer();
+    rankedRoundsRef.current.push({
+      choices: [...roundChoicesRef.current],
+      timedOut: false,
+    });
+    roundChoicesRef.current = [];
     updateBestCompletedRound(roundRef.current);
     const award = getMemoryRoundAward(dataRef.current.count, comboRef.current);
     const nextScore = scoreRef.current + award.points;
@@ -523,7 +549,10 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     if (roundRef.current >= MEMORY_ORDER_ROUNDS) {
       setPhase(PHASE.COMPLETED);
       phaseRef.current = PHASE.COMPLETED;
-      void rankingSubmission.submitResult({ gameKey: RANKING_GAME.MEMORY, scoreValue: nextScore });
+      void rankingSubmission.submitResult({
+        gameKey: RANKING_GAME.MEMORY,
+        proof: { rounds: [...rankedRoundsRef.current] },
+      });
       return;
     }
     setPhase(PHASE.CLEARED);
@@ -565,6 +594,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function choose(symbol, event) {
     if (phaseRef.current !== PHASE.PLAYING || resolvingRef.current) return;
     const currentStep = stepRef.current;
+    roundChoicesRef.current.push(symbol.id);
     const result = evaluateMemoryChoice(dataRef.current.sequence, currentStep, symbol.id);
     if (!result.correct) {
       failRound(FAILURE_REASON.WRONG);
@@ -753,8 +783,8 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
                 <>
                   <h3 id="memory-game-start-title">순서를 기억해 보세요.</h3>
                   <p>3개의 이모지부터 시작해 세 라운드마다 하나씩 늘어나요.</p>
-                  <Button className="memory-game__primary" type="button" onClick={startGame}>
-                    게임 시작
+                  <Button className="memory-game__primary" type="button" onClick={startGame} disabled={rankingSubmission.isStarting}>
+                    {rankingSubmission.isStarting ? "랭킹 게임 준비 중…" : "게임 시작"}
                   </Button>
                 </>
               ) : (

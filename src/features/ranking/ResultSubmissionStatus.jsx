@@ -6,6 +6,10 @@ import { RESULT_SUBMISSION_STATUS } from "./useGameResultSubmission.js";
 export function ResultSubmissionStatus({ submission }) {
   if (!submission || submission.status === RESULT_SUBMISSION_STATUS.IDLE) return null;
 
+  if (submission.status === RESULT_SUBMISSION_STATUS.STARTING) {
+    return <p className="result-submission" role="status">랭킹 게임을 확인하고 있어요.</p>;
+  }
+
   if (submission.status === RESULT_SUBMISSION_STATUS.UNAUTHENTICATED) {
     return (
       <div className="result-submission" role="status">
@@ -19,7 +23,9 @@ export function ResultSubmissionStatus({ submission }) {
     return (
       <div className="result-submission" role="alert">
         <p>{submission.errorMessage}</p>
-        <Button type="button" size="small" variant="secondary" onClick={submission.retry}>다시 저장</Button>
+        {submission.canRetry ? (
+          <Button type="button" size="small" variant="secondary" onClick={submission.retry}>다시 저장</Button>
+        ) : null}
       </div>
     );
   }

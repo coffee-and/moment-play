@@ -29,6 +29,10 @@ function findButton(text) {
   return Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes(text));
 }
 
+async function startGame() {
+  await act(async () => findButton("게임 시작").click());
+}
+
 function getSequenceIds() {
   return Array.from(document.querySelectorAll(".memory-sequence__item"), (item) => item.dataset.symbolId);
 }
@@ -83,9 +87,9 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("shows the input-guide overlay only after the sequence preview ends, and keeps card input disabled until it clears", () => {
+  it("shows the input-guide overlay only after the sequence preview ends, and keeps card input disabled until it clears", async () => {
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
 
     act(() => vi.advanceTimersByTime(COUNTDOWN_TOTAL_MS + ROUND_1_PREVIEW_MS));
 
@@ -104,9 +108,9 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("cannot select cards during countdown or sequence display", () => {
+  it("cannot select cards during countdown or sequence display", async () => {
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     expect(areCardsDisabled()).toBe(true);
 
     act(() => vi.advanceTimersByTime(COUNTDOWN_TOTAL_MS));
@@ -120,10 +124,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("displays ROUND 1 CLEAR! and keeps it visible for its configured duration without advancing the round early", () => {
+  it("displays ROUND 1 CLEAR! and keeps it visible for its configured duration without advancing the round early", async () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     const sequenceIds = getSequenceIds();
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS));
@@ -138,10 +142,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("begins the next round's preview directly after the clear phase finishes", () => {
+  it("begins the next round's preview directly after the clear phase finishes", async () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     const sequenceIds = getSequenceIds();
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS));
@@ -155,9 +159,9 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("keeps the current round when exit is cancelled and clears timers before confirmed navigation", () => {
+  it("keeps the current round when exit is cancelled and clears timers before confirmed navigation", async () => {
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     act(() => findButton("일시정지").click());
     const sequenceBeforeExit = getSequenceIds();
 
@@ -176,9 +180,9 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("restarting from a paused countdown clears the pending timer and a stale timer cannot advance the restarted game", () => {
+  it("restarting from a paused countdown clears the pending timer and a stale timer cannot advance the restarted game", async () => {
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     expect(document.body.textContent).toContain("ROUND —");
 
     act(() => findButton("일시정지").click());
@@ -195,10 +199,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("clears all pending timers on unmount, so a stale round-clear timer cannot fire afterwards", () => {
+  it("clears all pending timers on unmount, so a stale round-clear timer cannot fire afterwards", async () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     const sequenceIds = getSequenceIds();
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS));
@@ -213,11 +217,11 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     expect(() => act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS * 2))).not.toThrow();
   });
 
-  it("offers retry, reset, and exit after failure while preserving the best record", () => {
+  it("offers retry, reset, and exit after failure while preserving the best record", async () => {
     window.localStorage.setItem(MEMORY_BEST_ROUND_KEY, "7");
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     const firstSequence = getSequenceIds();
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS + ROUND_1_SELECTION_MS + 300));
@@ -238,10 +242,10 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     view.unmount();
   });
 
-  it("keeps a new record through a retry and reports it after game over", () => {
+  it("keeps a new record through a retry and reports it after game over", async () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const view = renderGame();
-    act(() => findButton("게임 시작").click());
+    await startGame();
     const firstSequence = getSequenceIds();
 
     act(() => vi.advanceTimersByTime(ROUND_1_PLAYER_TURN_START_MS));

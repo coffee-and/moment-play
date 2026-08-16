@@ -7,10 +7,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let auth = { status: "guest", user: null };
+const beginRankedGameAttempt = vi.fn();
 const submitGameResult = vi.fn();
 
 vi.mock("../../shared/auth/AuthContext.jsx", () => ({ useAuth: () => auth }));
-vi.mock("../../infrastructure/supabase/gameResultsGateway.js", () => ({ submitGameResult }));
+vi.mock("../../infrastructure/supabase/gameResultsGateway.js", () => ({
+  beginRankedGameAttempt,
+  submitGameResult,
+}));
 
 const { useGameResultSubmission } = await import("./useGameResultSubmission.js");
 
@@ -31,6 +35,7 @@ function renderHook() {
 afterEach(() => {
   document.body.innerHTML = "";
   auth = { status: "guest", user: null };
+  beginRankedGameAttempt.mockReset();
   submitGameResult.mockReset();
   latest = null;
 });
@@ -48,9 +53,14 @@ describe("useGameResultSubmission", () => {
 
   it("submits an authenticated terminal result only once per attempt", async () => {
     auth = { status: "authenticated", user: { id: "user-1" } };
+    beginRankedGameAttempt.mockResolvedValue({
+      attemptId: "22222222-2222-4222-8222-222222222222",
+      seed: 1234,
+    });
     submitGameResult.mockResolvedValue({ duplicate: false });
     const view = renderHook();
-    const terminalResult = { gameKey: "2048", scoreValue: 4096 };
+    await act(async () => latest.startAttempt({ gameKey: "2048" }));
+    const terminalResult = { gameKey: "2048", proof: { moves: ["left"] } };
     await act(async () => {
       await Promise.all([latest.submitResult(terminalResult), latest.submitResult(terminalResult)]);
     });
@@ -61,9 +71,20 @@ describe("useGameResultSubmission", () => {
 
   it("surfaces a failed save without removing the result screen and allows retry", async () => {
     auth = { status: "authenticated", user: { id: "user-1" } };
+    beginRankedGameAttempt.mockResolvedValue({
+      attemptId: "22222222-2222-4222-8222-222222222222",
+    });
     submitGameResult.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({ duplicate: false });
     const view = renderHook();
-    await act(async () => latest.submitResult({ gameKey: "sudoku", mode: "easy", durationMs: 30000 }));
+    await act(async () => latest.startAttempt({
+      gameKey: "sudoku",
+      mode: "easy",
+      context: { puzzleId: "ocean-01" },
+    }));
+    await act(async () => latest.submitResult({
+      gameKey: "sudoku",
+      proof: { puzzleId: "ocean-01", board: Array(81).fill(1) },
+    }));
     expect(latest.status).toBe("error");
     expect(latest.errorMessage).toBe("network down");
     expect(view.host.textContent).toContain("RESULT SCREEN");

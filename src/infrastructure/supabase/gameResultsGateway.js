@@ -28,22 +28,39 @@ export async function fetchLeaderboard({ gameKey, mode = null, limit = DEFAULT_L
   return (data ?? []).map(mapLeaderboardEntry);
 }
 
-export async function submitGameResult({ authStatus, user, result }, client = getSupabaseClient()) {
+function assertPermanentAccount(authStatus, user) {
   if (authStatus !== "authenticated" || !user) {
     throw new ResultSubmissionNotAllowedError("로그인해야 랭킹 기록을 저장할 수 있습니다.");
   }
+}
 
-  const row = {
-    user_id: user.id,
-    game_key: result.gameKey,
-    mode: result.mode ?? null,
-    score_value: result.scoreValue ?? null,
-    duration_ms: result.durationMs ?? null,
-    match_result: result.matchResult ?? null,
-    client_submission_id: result.clientSubmissionId,
-  };
-  const { error } = await client.from("game_results").insert(row);
-  if (error?.code === "23505") return { duplicate: true };
+export async function beginRankedGameAttempt({
+  authStatus,
+  user,
+  gameKey,
+  mode = null,
+  context = {},
+}, client = getSupabaseClient()) {
+  assertPermanentAccount(authStatus, user);
+
+  const { data, error } = await client.rpc("begin_ranked_game", {
+    p_game_key: gameKey,
+    p_mode: mode,
+    p_context: context,
+  });
   if (error) throw error;
-  return { duplicate: false };
+  if (!data?.attemptId) throw new Error("랭킹 게임 시도를 시작하지 못했습니다.");
+  return data;
+}
+
+export async function submitGameResult({ authStatus, user, result }, client = getSupabaseClient()) {
+  assertPermanentAccount(authStatus, user);
+
+  const { data, error } = await client.rpc("complete_ranked_game", {
+    p_attempt_id: result.attemptId,
+    p_client_submission_id: result.clientSubmissionId,
+    p_proof: result.proof,
+  });
+  if (error) throw error;
+  return data;
 }

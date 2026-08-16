@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
+import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -121,6 +122,9 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const gameOverButtonRef = useRef(null);
   const resetCancelButtonRef = useRef(null);
   const pointerStartRef = useRef(null);
+  const rankedRandomRef = useRef(Math.random);
+  const rankedMovesRef = useRef([]);
+  const isStartingRef = useRef(false);
 
   const round = targetIndex + 1;
   const currentTarget = TARGET_TILES[targetIndex] ?? TARGET_TILES[TARGET_TILES.length - 1];
@@ -175,29 +179,46 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     saveBestScore(nextScore);
   }
 
-  function startNewGame() {
-    playSound("countdownFinal");
-    rankingSubmission.startAttempt();
-    const nextBoard = createInitialBoard();
-    setBoard(nextBoard);
-    setScore(0);
-    setDidBreakRecordThisAttempt(false);
-    setTargetIndex(0);
-    setIsResetConfirmOpen(false);
-    setPhase(GAME_2048_PHASE.PLAYING);
-    focusBoard();
+  async function startNewGame() {
+    if (isStartingRef.current) return;
+    isStartingRef.current = true;
+    try {
+      const attempt = await rankingSubmission.startAttempt({ gameKey: RANKING_GAME.GAME_2048 });
+      if (!attempt) return;
+      rankedRandomRef.current = attempt?.seed ? createRankedRandom(attempt.seed) : Math.random;
+      rankedMovesRef.current = [];
+
+      playSound("countdownFinal");
+      const nextBoard = createInitialBoard(rankedRandomRef.current);
+      setBoard(nextBoard);
+      setScore(0);
+      setDidBreakRecordThisAttempt(false);
+      setTargetIndex(0);
+      setIsResetConfirmOpen(false);
+      setPhase(GAME_2048_PHASE.PLAYING);
+      focusBoard();
+    } finally {
+      isStartingRef.current = false;
+    }
   }
 
   function requestNewGame() {
     if (phaseRef.current === GAME_2048_PHASE.IDLE) {
-      startNewGame();
+      void startNewGame();
       return;
     }
     if (phaseRef.current === GAME_2048_PHASE.GAME_OVER || phaseRef.current === GAME_2048_PHASE.COMPLETED) {
-      startNewGame();
+      void startNewGame();
       return;
     }
     setIsResetConfirmOpen(true);
+  }
+
+  function submitRankedResult() {
+    void rankingSubmission.submitResult({
+      gameKey: RANKING_GAME.GAME_2048,
+      proof: { moves: [...rankedMovesRef.current] },
+    });
   }
 
   function closeResetConfirm() {
@@ -223,7 +244,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
       if (targetIndexRef.current === TARGET_TILES.length - 1) {
         playSound("clear");
         setPhase(GAME_2048_PHASE.COMPLETED);
-        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
+        submitRankedResult();
         return;
       }
       playSound("clear");
@@ -234,7 +255,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     if (!hasAvailableMove(nextBoard)) {
       playSound("gameOver");
       setPhase(GAME_2048_PHASE.GAME_OVER);
-      void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: nextScore });
+      if (phaseRef.current !== GAME_2048_PHASE.ENDLESS) submitRankedResult();
       return;
     }
 
@@ -243,16 +264,17 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   function handleMove(direction) {
     if (!canMoveBoard) return;
+    rankedMovesRef.current.push(direction);
     const result = moveBoard(boardRef.current, direction);
     if (!result.changed) {
       if (!hasAvailableMove(boardRef.current)) {
         playSound("gameOver");
         setPhase(GAME_2048_PHASE.GAME_OVER);
-        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
+        if (phaseRef.current !== GAME_2048_PHASE.ENDLESS) submitRankedResult();
       }
       return;
     }
-    finishMove(addRandomTile(result.board), result.scoreDelta);
+    finishMove(addRandomTile(result.board, rankedRandomRef.current), result.scoreDelta);
   }
 
   function handleBoardKeyDown(event) {
@@ -319,7 +341,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
       if (nextIndex === TARGET_TILES.length - 1) {
         playSound("clear");
         setPhase(GAME_2048_PHASE.COMPLETED);
-        void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
+        submitRankedResult();
         return;
       }
       playSound("clear");
@@ -329,7 +351,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
     if (!hasAvailableMove(boardRef.current)) {
       playSound("gameOver");
       setPhase(GAME_2048_PHASE.GAME_OVER);
-      void rankingSubmission.submitResult({ gameKey: RANKING_GAME.GAME_2048, scoreValue: scoreRef.current });
+      submitRankedResult();
       return;
     }
     setPhase(GAME_2048_PHASE.PLAYING);
@@ -342,7 +364,6 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
       setPhase(GAME_2048_PHASE.GAME_OVER);
       return;
     }
-    rankingSubmission.startAttempt();
     setPhase(GAME_2048_PHASE.ENDLESS);
     focusBoard();
   }
@@ -404,7 +425,9 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <strong className="game-2048__target-value">{formatNumber(currentTarget)}</strong>
               <h3 id="game-2048-start-title">{formatNumber(currentTarget)} 타일부터 시작해요.</h3>
               <p>{GAME_2048_COPY.start.description}</p>
-              <Button ref={startButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.start.startButton}</Button>
+              <Button ref={startButtonRef} type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>
+                {rankingSubmission.isStarting ? "랭킹 게임 준비 중…" : GAME_2048_COPY.start.startButton}
+              </Button>
             </GameStageModal>
           ) : null}
           {isExitConfirmOpen ? (
@@ -443,7 +466,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <ResultSubmissionStatus submission={rankingSubmission} />
               <div className="game-stage-modal__actions">
                 <Button ref={completedContinueButtonRef} type="button" onClick={continueEndless}>{GAME_2048_COPY.completed.continueButton}</Button>
-                <Button type="button" variant="secondary" onClick={startNewGame}>{GAME_2048_COPY.completed.newGameButton}</Button>
+                <Button type="button" variant="secondary" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.completed.newGameButton}</Button>
               </div>
             </GameStageModal>
           ) : null}
@@ -455,7 +478,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <strong>{formatNumber(score)}</strong>
               <p>{GAME_2048_COPY.gameOver.maxTileLabel} {formatNumber(maxTile)}</p>
               <ResultSubmissionStatus submission={rankingSubmission} />
-              <Button ref={gameOverButtonRef} type="button" onClick={startNewGame}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
+              <Button ref={gameOverButtonRef} type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
             </GameStageModal>
           ) : null}
           {isResetConfirmOpen && !isExitConfirmOpen ? (
@@ -464,7 +487,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <p>{GAME_2048_COPY.reset.description}</p>
               <div className="game-stage-modal__actions">
                 <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{GAME_2048_COPY.reset.continueButton}</Button>
-                <Button type="button" onClick={startNewGame}>{GAME_2048_COPY.reset.newGameButton}</Button>
+                <Button type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.reset.newGameButton}</Button>
               </div>
             </GameStageModal>
           ) : null}

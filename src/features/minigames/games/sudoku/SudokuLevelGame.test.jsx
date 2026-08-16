@@ -27,10 +27,12 @@ vi.mock("../../../ranking/useGameResultSubmission.js", () => ({
     IDLE: "idle",
     SAVED: "saved",
     SAVING: "saving",
+    STARTING: "starting",
     UNAUTHENTICATED: "unauthenticated",
   },
   useGameResultSubmission: () => ({
     errorMessage: "",
+    isStarting: false,
     retry: vi.fn(),
     startAttempt,
     status: "idle",
@@ -50,9 +52,9 @@ function renderGame() {
   return { host, unmount: () => act(() => root.unmount()) };
 }
 
-function startEasyGame(view) {
+async function startEasyGame(view) {
   const startButton = document.querySelector('[aria-label="초급 난이도 시작"]');
-  act(() => startButton.click());
+  await act(async () => startButton.click());
 }
 
 function solveDefaultPuzzle(view) {
@@ -66,7 +68,10 @@ function solveDefaultPuzzle(view) {
 }
 
 beforeEach(() => {
-  startAttempt.mockClear();
+  startAttempt.mockReset();
+  startAttempt.mockResolvedValue({
+    attemptId: "22222222-2222-4222-8222-222222222222",
+  });
   submitResult.mockClear();
 });
 
@@ -76,9 +81,9 @@ afterEach(() => {
 });
 
 describe("Sudoku hint ranking policy", () => {
-  it("submits an unassisted completed puzzle to the ranking", () => {
+  it("submits an unassisted completed puzzle to the ranking", async () => {
     const view = renderGame();
-    startEasyGame(view);
+    await startEasyGame(view);
     solveDefaultPuzzle(view);
 
     expect(submitResult).toHaveBeenCalledTimes(1);
@@ -88,9 +93,9 @@ describe("Sudoku hint ranking policy", () => {
     view.unmount();
   });
 
-  it("keeps a hinted completion local and does not submit it to the ranking", () => {
+  it("keeps a hinted completion local and does not submit it to the ranking", async () => {
     const view = renderGame();
-    startEasyGame(view);
+    await startEasyGame(view);
     act(() => [...view.host.querySelectorAll("button")]
       .find((button) => button.textContent === "힌트 보기").click());
     act(() => [...view.host.querySelectorAll("button")]

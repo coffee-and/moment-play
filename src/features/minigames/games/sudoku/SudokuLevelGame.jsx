@@ -102,6 +102,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const resetCancelButtonRef = useRef(null);
   const completedButtonRef = useRef(null);
   const nextRoundPendingRef = useRef(false);
+  const isStartingRef = useRef(false);
 
   const activeLevel = getPuzzleLevel(activePuzzle);
   const activeLevelLabel = getLevelLabel(activeLevel);
@@ -174,11 +175,41 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
 
   function focusCell(index) { window.requestAnimationFrame(() => { cellRefs.current[index]?.focus({ preventScroll: true }); }); }
   function getCurrentElapsedSeconds() { if (!startedAtRef.current) return elapsedSecondsRef.current; return Math.max(0, Math.floor((performance.now() - startedAtRef.current) / 1000)); }
-  function startPuzzle(puzzle, { preserveStreak = false } = {}) { playSound("countdownFinal"); const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle); rankingSubmission.startAttempt(); hint.resetHints(); gameStreak.beginRound({ preserveStreak }); startedAtRef.current = performance.now(); setActivePuzzle(puzzle); setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(nextSelectedIndex); setDidBreakRecordThisAttempt(false); setIsAnswerRevealed(false); setIsSurrenderOpen(false); setPhase(SUDOKU_PHASE.PLAYING); phaseRef.current = SUDOKU_PHASE.PLAYING; focusCell(nextSelectedIndex); }
-  function startLevel(level, options) { startPuzzle(getFirstPuzzleByLevel(level), options); }
-  function requestNewGame() { if (phaseRef.current === SUDOKU_PHASE.IDLE) { startLevel(activeLevel); return; } if (phaseRef.current === SUDOKU_PHASE.COMPLETED) { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); return; } if (phaseRef.current !== SUDOKU_PHASE.RESET_CONFIRM) setPhase(SUDOKU_PHASE.RESET_CONFIRM); }
+  async function startPuzzle(puzzle, { preserveStreak = false } = {}) {
+    if (isStartingRef.current) return;
+    isStartingRef.current = true;
+    try {
+      const level = getPuzzleLevel(puzzle);
+      const attempt = await rankingSubmission.startAttempt({
+        gameKey: RANKING_GAME.SUDOKU,
+        mode: level,
+        context: { puzzleId: puzzle.id },
+      });
+      if (!attempt) return;
+
+      playSound("countdownFinal");
+      const nextSelectedIndex = getInitialSelectedIndex(puzzle.puzzle);
+      hint.resetHints();
+      gameStreak.beginRound({ preserveStreak });
+      startedAtRef.current = performance.now();
+      setActivePuzzle(puzzle);
+      setUserValues(createEmptyUserValues());
+      setElapsedSeconds(0);
+      setSelectedIndex(nextSelectedIndex);
+      setDidBreakRecordThisAttempt(false);
+      setIsAnswerRevealed(false);
+      setIsSurrenderOpen(false);
+      setPhase(SUDOKU_PHASE.PLAYING);
+      phaseRef.current = SUDOKU_PHASE.PLAYING;
+      focusCell(nextSelectedIndex);
+    } finally {
+      isStartingRef.current = false;
+    }
+  }
+  function startLevel(level, options) { void startPuzzle(getFirstPuzzleByLevel(level), options); }
+  function requestNewGame() { if (phaseRef.current === SUDOKU_PHASE.IDLE) { startLevel(activeLevel); return; } if (phaseRef.current === SUDOKU_PHASE.COMPLETED) { void startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); return; } if (phaseRef.current !== SUDOKU_PHASE.RESET_CONFIRM) setPhase(SUDOKU_PHASE.RESET_CONFIRM); }
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
-  function confirmNewGame() { startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
+  function confirmNewGame() { void startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
   function returnToLevelSelect() { const puzzle = activePuzzleRef.current; gameStreak.disqualifyRound(); startedAtRef.current = null; setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(getInitialSelectedIndex(puzzle.puzzle)); setPhase(SUDOKU_PHASE.IDLE); }
   function requestExit() { if (phaseRef.current === SUDOKU_PHASE.IDLE || phaseRef.current === SUDOKU_PHASE.COMPLETED) { navigate("/"); return; } const currentElapsed = getCurrentElapsedSeconds(); elapsedSecondsRef.current = currentElapsed; setElapsedSeconds(currentElapsed); startedAtRef.current = null; setIsExitConfirmOpen(true); }
   function cancelExit() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
@@ -186,9 +217,9 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function requestSurrender() { const currentElapsed = getCurrentElapsedSeconds(); elapsedSecondsRef.current = currentElapsed; setElapsedSeconds(currentElapsed); startedAtRef.current = null; setIsSurrenderOpen(true); }
   function cancelSurrender() { startedAtRef.current = performance.now() - elapsedSecondsRef.current * 1000; setIsSurrenderOpen(false); focusCell(selectedIndexRef.current); }
   function revealSolution() { gameStreak.disqualifyRound({ answerRevealed: true }); setUserValues([...activePuzzleRef.current.solution]); setIsSurrenderOpen(false); setIsAnswerRevealed(true); }
-  function continueAfterAnswer() { if (nextRoundPendingRef.current) return; nextRoundPendingRef.current = true; startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
+  function continueAfterAnswer() { if (nextRoundPendingRef.current) return; nextRoundPendingRef.current = true; void startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
   function continueAfterComplete() { if (nextRoundPendingRef.current) return; nextRoundPendingRef.current = true; startLevel(completedCopy.nextLevel, { preserveStreak: true }); }
-  function completeGame() { if (phaseRef.current !== SUDOKU_PHASE.PLAYING || isAnswerRevealed) return; phaseRef.current = SUDOKU_PHASE.COMPLETED; gameStreak.recordSuccess(); playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); if (!hint.hasUsedHint) void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, mode: level, durationMs: Math.max(1000, finalTimeSeconds * 1000) }); }
+  function completeGame(completedBoard) { if (phaseRef.current !== SUDOKU_PHASE.PLAYING || isAnswerRevealed) return; phaseRef.current = SUDOKU_PHASE.COMPLETED; gameStreak.recordSuccess(); playSound("clear"); const finalTimeSeconds = getCurrentElapsedSeconds(); const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); if (!hint.hasUsedHint) void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, proof: { puzzleId: activePuzzleRef.current.id, board: completedBoard } }); }
   function updateSelectedValue(value) {
     if (!canEditSelected) return;
     const index = selectedIndexRef.current;
@@ -198,7 +229,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
     const isComplete = isBoardComplete(nextBoard, activePuzzle.solution);
     setUserValues(nextUserValues);
     if (isComplete) {
-      completeGame();
+      completeGame(nextBoard);
       return;
     }
     if (value === 0) {
@@ -267,7 +298,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <p>{SUDOKU_COPY.start.description}</p>
               <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
                 {SUDOKU_LEVEL_OPTIONS.map((option, index) => (
-                  <button ref={index === 0 ? startButtonRef : null} type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} aria-label={`${option.label} 난이도 시작`}>
+                  <button ref={index === 0 ? startButtonRef : null} type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
                     <strong>{option.label}</strong>
                     <span>{option.description}</span>
                   </button>
