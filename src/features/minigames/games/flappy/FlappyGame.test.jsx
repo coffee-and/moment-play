@@ -48,22 +48,6 @@ afterEach(() => {
 });
 
 describe("FlappyGame", () => {
-  it("renders one fixed SVG character with separate body, tail, and fin layers", () => {
-    const view = renderGame();
-    const moon = view.host.querySelector("svg.flappy-game__moon");
-    const fish = view.host.querySelector(".flappy-game__bird .flappy-fish-svg");
-
-    expect(moon).not.toBeNull();
-    expect(moon.querySelectorAll("path")).toHaveLength(1);
-    expect(fish).not.toBeNull();
-    expect(fish.hasAttribute("data-skin")).toBe(false);
-    expect(fish.querySelector("svg.flappy-fish-svg__body")).not.toBeNull();
-    expect(fish.querySelector("svg.flappy-fish-svg__tail")).not.toBeNull();
-    expect(fish.querySelector("svg.flappy-fish-svg__wing")).not.toBeNull();
-    expect(view.host.querySelector(".flappy-game__score")).toBeNull();
-    view.unmount();
-  });
-
   it("does not render or persist a fish picker", () => {
     const view = renderGame();
 

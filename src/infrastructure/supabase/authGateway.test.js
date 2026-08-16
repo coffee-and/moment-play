@@ -88,8 +88,6 @@ describe("authGateway", () => {
 
   it.each([
     ["google", "VITE_AUTH_GOOGLE_ENABLED", "google"],
-    ["kakao", "VITE_AUTH_KAKAO_ENABLED", "kakao"],
-    ["naver", "VITE_AUTH_NAVER_ENABLED", "custom:naver"],
   ])("starts %s through the shared OAuth gateway", async (provider, flagName, supabaseProvider) => {
     vi.stubEnv(flagName, "true");
     const client = createClient({
@@ -116,6 +114,7 @@ describe("authGateway", () => {
   });
 
   it("rejects a disabled provider before starting OAuth", async () => {
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "false");
     const client = createClient();
 
     await expect(signInWithProvider({

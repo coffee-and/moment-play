@@ -2,52 +2,24 @@ import "./flappy-fish-svg.css";
 
 export function FlappyFish({ className = "" }) {
   return (
-    <span
+    <svg
       aria-hidden="true"
       className={`flappy-fish-svg ${className}`.trim()}
+      focusable="false"
+      viewBox="0 0 110 48"
     >
-      <svg
-        className="flappy-fish-svg__tail"
-        focusable="false"
-        preserveAspectRatio="none"
-        viewBox="0 0 160 160"
-      >
+      <g className="flappy-fish-svg__tail">
         <path
-          d="M54 134A27 27 0 0 1 54 80A27 27 0 0 1 54 26Q96 26 138 80Q96 134 54 134Z"
-          fill="var(--fish-tail-color)"
-          stroke="var(--fish-outline-color)"
-          strokeLinejoin="round"
-          strokeWidth="8"
+          d="M25 23C18 15 10 10 5 11C4 16 6 21 10 24C6 27 4 32 5 37C11 38 19 33 25 26Z"
+          fill="var(--flappy-tail)"
         />
-      </svg>
-
-      <svg className="flappy-fish-svg__body" focusable="false" viewBox="0 0 430 220">
-        <ellipse
-          cx="215"
-          cy="110"
-          fill="var(--fish-body-color)"
-          rx="196"
-          ry="92"
-          stroke="var(--fish-outline-color)"
-          strokeWidth="8"
-        />
-        <circle cx="352" cy="92" fill="var(--fish-eye-color)" r="9" />
-      </svg>
-
-      <svg
-        className="flappy-fish-svg__wing"
-        focusable="false"
-        preserveAspectRatio="none"
-        viewBox="0 0 180 150"
-      >
-        <path
-          d="M24 75C24 43 54 19 92 19C123 19 149 39 160 75C149 111 123 131 92 131C54 131 24 107 24 75Z"
-          fill="var(--fish-fin-color)"
-          stroke="var(--fish-outline-color)"
-          strokeLinejoin="round"
-          strokeWidth="8"
-        />
-      </svg>
-    </span>
+      </g>
+      <path
+        className="flappy-fish-svg__body"
+        d="M22 24C28 10 46 5 66 6C84 7 100 14 106 24C100 34 84 41 66 42C46 43 28 38 22 24Z"
+        fill="var(--flappy-fish)"
+      />
+      <circle className="flappy-fish-svg__eye" cx="88" cy="19" r="2.6" />
+    </svg>
   );
 }

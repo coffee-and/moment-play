@@ -127,7 +127,7 @@
   position: absolute;
   z-index: 4;
   width: clamp(28px, 4.4vw, 36px);
-  aspect-ratio: 430 / 220;
+  aspect-ratio: 110 / 48;
   transform: translate(-50%, -50%) rotate(var(--bird-tilt));
   transition: transform .08s linear;
   filter: drop-shadow(0 0 8px color-mix(in oklab, var(--flappy-glow) 38%, transparent));
