@@ -24,9 +24,7 @@ export function MemoryGameOverlays({
   rankingSubmission,
   requestExit,
   resetToIdle,
-  resumeButtonRef,
   resumeGame,
-  retryButtonRef,
   retryRound,
   round,
   score,
@@ -155,7 +153,7 @@ export function MemoryGameOverlays({
         >
           <h3 className="memory-game__state-title" id="memory-game-pause-title">일시정지</h3>
           <div className="memory-game__state-actions game-stage-modal__actions">
-            <Button ref={resumeButtonRef} className="memory-game__state-button" type="button" onClick={resumeGame}>
+            <Button className="memory-game__state-button" type="button" onClick={resumeGame}>
               계속하기
             </Button>
             <Button className="memory-game__state-button" variant="secondary" type="button" onClick={resetToIdle}>
@@ -191,7 +189,7 @@ export function MemoryGameOverlays({
           <ResultSubmissionStatus submission={rankingSubmission} />
           <div className="memory-game__state-actions game-stage-modal__actions">
             {failureStatus !== "over" ? (
-              <Button ref={retryButtonRef} className="memory-game__state-button" type="button" onClick={retryRound}>
+              <Button className="memory-game__state-button" type="button" onClick={retryRound}>
                 남은 목숨으로 재도전
               </Button>
             ) : null}

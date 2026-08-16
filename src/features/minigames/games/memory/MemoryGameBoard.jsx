@@ -39,14 +39,12 @@ export function MemoryGameBoard({
   correctAnnouncement,
   correctFeedback,
   data,
-  isStageCovered,
   isTimerUrgent,
   onChoose,
   phase,
   remainingMs,
   round,
   sequenceDensity,
-  stageContentRef,
   step,
 }) {
   const shouldReveal = (index) => phase === MEMORY_PHASE.PREVIEW || index < step || phase === MEMORY_PHASE.CLEARED;
@@ -54,7 +52,7 @@ export function MemoryGameBoard({
   const shouldShowTimer = phase === MEMORY_PHASE.PREVIEW || phase === MEMORY_PHASE.PLAYING;
 
   return (
-    <div ref={stageContentRef} className="memory-game__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
+    <div className="memory-game__stage-content">
       {phase !== MEMORY_PHASE.IDLE ? (
         <div className="memory-game__play-shell" data-memory-count={data.count} data-phase={phase}>
           <div className="memory-game__timer-row">

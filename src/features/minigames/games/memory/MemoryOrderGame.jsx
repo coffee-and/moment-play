@@ -42,15 +42,6 @@ const DEFAULT_GAME_META = {
 export { MEMORY_SYMBOLS, MEMORY_TIMING, isMemoryTimerUrgent } from "./memoryGameConfig.js";
 export { MEMORY_PHASE as MEMORY_TIMER_PHASE } from "./memoryGameConfig.js";
 
-function focusElement(element) {
-  if (!element?.focus) return;
-  try {
-    element.focus({ preventScroll: true });
-  } catch {
-    element.focus();
-  }
-}
-
 export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
@@ -87,10 +78,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const stepRef = useRef(step);
   const bestRef = useRef(best);
   const countdownIndexRef = useRef(countdownIndex);
-  const stageContentRef = useRef(null);
-  const pauseButtonRef = useRef(null);
-  const resumeButtonRef = useRef(null);
-  const retryButtonRef = useRef(null);
   const scoreRef = useRef(score);
   const comboRef = useRef(combo);
   const livesRef = useRef(lives);
@@ -124,16 +111,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   comboRef.current = combo;
   livesRef.current = lives;
   replayGaugeRef.current = replayGauge;
-
-  useEffect(() => {
-    if (!stageContentRef.current) return;
-    stageContentRef.current.inert = isStageCovered;
-  }, [isStageCovered]);
-
-  useEffect(() => {
-    if (phase === PHASE.PAUSED) focusElement(resumeButtonRef.current);
-    if (phase === PHASE.FAILED) focusElement(retryButtonRef.current);
-  }, [phase]);
 
   useEffect(() => () => clearGameTimers({ updateFeedback: false }), []);
 
@@ -517,13 +494,12 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
     phaseRef.current = previousPhase;
     previousPhaseRef.current = null;
     resumeActiveTimer();
-    window.requestAnimationFrame(() => focusElement(pauseButtonRef.current));
   }
 
   const gameActions = (
     <>
       {canPause ? (
-        <Button ref={pauseButtonRef} className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>
+        <Button className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>
           일시정지
         </Button>
       ) : null}
@@ -571,14 +547,12 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
         correctAnnouncement={correctAnnouncement}
         correctFeedback={correctFeedback}
         data={data}
-        isStageCovered={isStageCovered}
         isTimerUrgent={isTimerUrgent}
         onChoose={choose}
         phase={phase}
         remainingMs={remainingMs}
         round={round}
         sequenceDensity={sequenceDensity}
-        stageContentRef={stageContentRef}
         step={step}
       />
       <MemoryGameOverlays
@@ -596,9 +570,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
         rankingSubmission={rankingSubmission}
         requestExit={requestExit}
         resetToIdle={resetToIdle}
-        resumeButtonRef={resumeButtonRef}
         resumeGame={resumeGame}
-        retryButtonRef={retryButtonRef}
         retryRound={retryRound}
         round={round}
         score={score}

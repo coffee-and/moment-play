@@ -304,6 +304,10 @@
   animation: modal-enter .35s var(--ease);
 }
 
+.modal:focus {
+  outline: none;
+}
+
 .modal > :not([data-modal-decoration]) {
   position: relative;
   z-index: var(--layer-raised);

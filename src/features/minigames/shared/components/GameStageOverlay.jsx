@@ -1,7 +1,7 @@
-import { Children, cloneElement, isValidElement, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import { Children, cloneElement, isValidElement, useEffect } from 'react';
 import styles from './GameStage.module.css';
 import { useGameAudio } from '../../../../shared/audio/GameAudioContext.jsx';
+import { ModalLayer } from '../../../../shared/overlays/ModalLayer.jsx';
 import { CompletionStars } from './CompletionStars.jsx';
 import { GameCelebrationProvider } from './GameCelebration.jsx';
 
@@ -27,50 +27,26 @@ export function GameStageOverlay({
   state,
   ...props
 }) {
-  const overlayRef = useRef(null);
   const { popDucking, pushDucking } = useGameAudio();
-  const onCloseRef = useRef(onClose);
-  const previousFocusRef = useRef(null);
-  onCloseRef.current = onClose;
 
   useEffect(() => {
     pushDucking();
     return () => popDucking();
   }, [popDucking, pushDucking]);
 
-  useEffect(() => {
-    previousFocusRef.current = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const focusTarget = overlayRef.current?.querySelector('[autofocus], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])');
-    focusTarget?.focus({ preventScroll: true });
-
-    function handleKeyDown(event) {
-      if (event.key === 'Escape' && closeOnEscape) onCloseRef.current?.();
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = previousOverflow;
-      previousFocusRef.current?.focus?.({ preventScroll: true });
-    };
-  }, [closeOnEscape]);
-
-  return createPortal(
-    <div
-      ref={overlayRef}
+  return (
+    <ModalLayer
       className={joinClassNames([styles.overlay, className])}
+      closeOnBackdrop={closeOnBackdrop}
+      closeOnEscape={closeOnEscape}
+      focusKey={state}
+      onClose={onClose}
       data-game-stage-overlay=""
       data-state={state}
-      onMouseDown={(event) => {
-        if (closeOnBackdrop && event.target === event.currentTarget) onCloseRef.current?.();
-      }}
       {...props}
     >
       {children}
-    </div>,
-    document.body,
+    </ModalLayer>
   );
 }
 
@@ -80,6 +56,7 @@ export function GameStageModal({
   className = '',
   showCompletionStars = false,
   showCelebration = showCompletionStars,
+  tabIndex = -1,
   ...props
 }) {
   return (
@@ -87,6 +64,7 @@ export function GameStageModal({
       className={joinClassNames([styles.modal, className])}
       data-game-stage-modal=""
       data-has-celebration={showCelebration ? 'true' : undefined}
+      tabIndex={tabIndex}
       {...props}
     >
       {showCompletionStars ? <CompletionStars streak={celebrationStreak} /> : null}

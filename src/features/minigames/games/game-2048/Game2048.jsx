@@ -114,13 +114,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const bestScoreRef = useRef(bestScore);
   const targetIndexRef = useRef(targetIndex);
   const phaseRef = useRef(phase);
-  const stageContentRef = useRef(null);
   const boardElementRef = useRef(null);
-  const startButtonRef = useRef(null);
-  const milestoneButtonRef = useRef(null);
-  const completedContinueButtonRef = useRef(null);
-  const gameOverButtonRef = useRef(null);
-  const resetCancelButtonRef = useRef(null);
   const pointerStartRef = useRef(null);
   const rankedRandomRef = useRef(Math.random);
   const rankedMovesRef = useRef([]);
@@ -140,32 +134,6 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   bestScoreRef.current = bestScore;
   targetIndexRef.current = targetIndex;
   phaseRef.current = phase;
-
-  useEffect(() => {
-    if (!stageContentRef.current) return;
-    stageContentRef.current.inert = isStageCovered;
-  }, [isStageCovered]);
-
-  useEffect(() => {
-    if (phase === GAME_2048_PHASE.IDLE) {
-      startButtonRef.current?.focus();
-    }
-    if (phase === GAME_2048_PHASE.MILESTONE_CLEAR && !isResetConfirmOpen) {
-      milestoneButtonRef.current?.focus();
-    }
-    if (phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen) {
-      completedContinueButtonRef.current?.focus();
-    }
-    if (phase === GAME_2048_PHASE.GAME_OVER && !isResetConfirmOpen) {
-      gameOverButtonRef.current?.focus();
-    }
-  }, [isResetConfirmOpen, phase]);
-
-  useEffect(() => {
-    if (isResetConfirmOpen) {
-      resetCancelButtonRef.current?.focus();
-    }
-  }, [isResetConfirmOpen]);
 
   function focusBoard() {
     window.setTimeout(() => boardElementRef.current?.focus(), 0);
@@ -223,15 +191,6 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   function closeResetConfirm() {
     setIsResetConfirmOpen(false);
-    window.setTimeout(() => {
-      if (phaseRef.current === GAME_2048_PHASE.PLAYING || phaseRef.current === GAME_2048_PHASE.ENDLESS) {
-        boardElementRef.current?.focus();
-        return;
-      }
-      if (phaseRef.current === GAME_2048_PHASE.MILESTONE_CLEAR) {
-        milestoneButtonRef.current?.focus();
-      }
-    }, 0);
   }
 
   function finishMove(nextBoard, scoreDelta) {
@@ -389,7 +348,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   return (
     <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
-      <div ref={stageContentRef} className="game-2048__stage-content" aria-hidden={isStageCovered ? "true" : undefined}>
+      <div className="game-2048__stage-content">
         {phase !== GAME_2048_PHASE.IDLE ? (
           <>
             <section className="game-2048__meta" aria-label="2048 게임 정보">
@@ -425,7 +384,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <strong className="game-2048__target-value">{formatNumber(currentTarget)}</strong>
               <h3 id="game-2048-start-title">{formatNumber(currentTarget)} 타일부터 시작해요.</h3>
               <p>{GAME_2048_COPY.start.description}</p>
-              <Button ref={startButtonRef} type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>
+              <Button type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>
                 {rankingSubmission.isStarting ? "랭킹 게임 준비 중…" : GAME_2048_COPY.start.startButton}
               </Button>
             </GameStageModal>
@@ -446,7 +405,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <h3 id="game-2048-milestone-title">{formatNumber(currentTarget)} 타일을 완성했어요.</h3>
               <p>{GAME_2048_COPY.milestone.nextTargetLabel}</p>
               <strong>{formatNumber(getNextTargetLabel(targetIndex))}</strong>
-              <Button ref={milestoneButtonRef} type="button" onClick={continueToNextTarget}>{GAME_2048_COPY.milestone.nextButtonLabel} {formatNumber(getNextTargetLabel(targetIndex))}</Button>
+              <Button type="button" onClick={continueToNextTarget}>{GAME_2048_COPY.milestone.nextButtonLabel} {formatNumber(getNextTargetLabel(targetIndex))}</Button>
             </GameStageModal>
           ) : null}
           {phase === GAME_2048_PHASE.COMPLETED && !isResetConfirmOpen && !isExitConfirmOpen ? (
@@ -465,7 +424,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <p>{GAME_2048_COPY.completed.detail}</p>
               <ResultSubmissionStatus submission={rankingSubmission} />
               <div className="game-stage-modal__actions">
-                <Button ref={completedContinueButtonRef} type="button" onClick={continueEndless}>{GAME_2048_COPY.completed.continueButton}</Button>
+                <Button type="button" onClick={continueEndless}>{GAME_2048_COPY.completed.continueButton}</Button>
                 <Button type="button" variant="secondary" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.completed.newGameButton}</Button>
               </div>
             </GameStageModal>
@@ -478,7 +437,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <strong>{formatNumber(score)}</strong>
               <p>{GAME_2048_COPY.gameOver.maxTileLabel} {formatNumber(maxTile)}</p>
               <ResultSubmissionStatus submission={rankingSubmission} />
-              <Button ref={gameOverButtonRef} type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
+              <Button type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.gameOver.newGameButton}</Button>
             </GameStageModal>
           ) : null}
           {isResetConfirmOpen && !isExitConfirmOpen ? (
@@ -486,7 +445,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
               <h3 id="game-2048-reset-title">{GAME_2048_COPY.reset.title}</h3>
               <p>{GAME_2048_COPY.reset.description}</p>
               <div className="game-stage-modal__actions">
-                <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{GAME_2048_COPY.reset.continueButton}</Button>
+                <Button type="button" variant="secondary" onClick={closeResetConfirm}>{GAME_2048_COPY.reset.continueButton}</Button>
                 <Button type="button" onClick={startNewGame} disabled={rankingSubmission.isStarting}>{GAME_2048_COPY.reset.newGameButton}</Button>
               </div>
             </GameStageModal>

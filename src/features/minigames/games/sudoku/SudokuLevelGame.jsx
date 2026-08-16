@@ -96,11 +96,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const elapsedSecondsRef = useRef(elapsedSeconds);
   const recordsRef = useRef(records);
   const startedAtRef = useRef(null);
-  const stageContentRef = useRef(null);
   const cellRefs = useRef([]);
-  const startButtonRef = useRef(null);
-  const resetCancelButtonRef = useRef(null);
-  const completedButtonRef = useRef(null);
   const nextRoundPendingRef = useRef(false);
   const isStartingRef = useRef(false);
 
@@ -162,9 +158,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   elapsedSecondsRef.current = elapsedSeconds;
   recordsRef.current = records;
 
-  useEffect(() => { if (!stageContentRef.current) return; stageContentRef.current.inert = isStageCovered; }, [isStageCovered]);
   useEffect(() => { if (phase === SUDOKU_PHASE.PLAYING) nextRoundPendingRef.current = false; }, [phase]);
-  useEffect(() => { if (phase === SUDOKU_PHASE.IDLE) startButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.RESET_CONFIRM) resetCancelButtonRef.current?.focus({ preventScroll: true }); if (phase === SUDOKU_PHASE.COMPLETED) completedButtonRef.current?.focus({ preventScroll: true }); }, [phase]);
   useEffect(() => {
     if (isExitConfirmOpen || isSurrenderOpen || isAnswerRevealed || (phase !== SUDOKU_PHASE.PLAYING && phase !== SUDOKU_PHASE.RESET_CONFIRM)) return undefined;
     function updateElapsedSeconds() { setElapsedSeconds(getCurrentElapsedSeconds()); }
@@ -246,7 +240,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
 
   return (
     <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
-      <div ref={stageContentRef} className="sudoku-game__stage" aria-hidden={isStageCovered ? "true" : undefined} onKeyDown={handleGameKeyDown}>
+      <div className="sudoku-game__stage" onKeyDown={handleGameKeyDown}>
         {phase !== SUDOKU_PHASE.IDLE ? (
           <div className="sudoku-game__play">
             <section className="sudoku-game__meta" aria-label={`${activeLevelLabel} 스도쿠 기록`}>
@@ -298,7 +292,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <p>{SUDOKU_COPY.start.description}</p>
               <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
                 {SUDOKU_LEVEL_OPTIONS.map((option, index) => (
-                  <button ref={index === 0 ? startButtonRef : null} type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
+                  <button type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
                     <strong>{option.label}</strong>
                     <span>{option.description}</span>
                   </button>
@@ -333,7 +327,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
                 ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록 · 랭킹 미제출</p>
                 : <ResultSubmissionStatus submission={rankingSubmission} />}
               <div className="game-stage-modal__actions">
-                <Button ref={completedButtonRef} type="button" onClick={continueAfterComplete}>{NEXT_ROUND_LABEL}</Button>
+                <Button type="button" onClick={continueAfterComplete}>{NEXT_ROUND_LABEL}</Button>
                 <Button type="button" variant="secondary" onClick={returnToLevelSelect}>{SUDOKU_COPY.actions.chooseLevel}</Button>
               </div>
             </GameStageModal>
@@ -343,7 +337,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
               <h3 id="sudoku-game-reset-title">{SUDOKU_COPY.reset.title}</h3>
               <p>{SUDOKU_COPY.reset.description}</p>
               <div className="game-stage-modal__actions">
-                <Button ref={resetCancelButtonRef} type="button" variant="secondary" onClick={closeResetConfirm}>{SUDOKU_COPY.actions.keepPlaying}</Button>
+                <Button type="button" variant="secondary" onClick={closeResetConfirm}>{SUDOKU_COPY.actions.keepPlaying}</Button>
                 <Button type="button" onClick={confirmNewGame}>{SUDOKU_COPY.reset.confirm}</Button>
               </div>
             </GameStageModal>
