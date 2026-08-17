@@ -25,6 +25,7 @@
 | 7 | 중간 | 대기 | 전역 CSS 소유권 축소 | `src/styles.css`의 기능별 규칙을 소비자 단위로 이동하고 전역 선택자·import 순서 결합과 미사용 토큰을 제거한다. |
 | 8 | 중간 | 대기 | Omok 화면 책임 분리 | 흐름 컨트롤러, 온라인 로비, 게임 보드, 설정·결과 다이얼로그가 명시적 경계와 입력 계약을 가진다. |
 | 9 | 보통 | 대기 | 핵심 브라우저 회귀 게이트 도입 | 모달 정지·키보드 조작·반응형 가로 넘침·테마·라우팅 같은 사용자 동작 불변조건을 실제 브라우저에서 검증한다. |
+| 10 | 보통 | 대기 | 미사용 파일·코드·계약 제거 | 프로덕션 진입점과 실제 소비자를 기준으로 도달 불가능한 파일, 사용되지 않는 API·RPC·스타일·토큰을 제거하고 삭제 후 import 그래프와 전체 품질 게이트를 통과한다. |
 
 ## 1. Timing Tap 종료 확인 상태 결함
 
@@ -91,6 +92,60 @@
 - 현재 321개 프런트 테스트는 Vitest/jsdom 기반이며 실제 브라우저 테스트가 없다.
 - CSS 변수 계산, 포커스 기본 동작, 키보드에 따른 네이티브 버튼 활성화, 반응형 레이아웃과 OAuth 리다이렉트는 jsdom만으로 충분히 검증되지 않는다.
 - 픽셀 스냅샷이나 문구 순서 대신 사용자 동작 불변조건만 최소 브라우저 스모크 테스트로 관리한다.
+
+## 10. 미사용 파일·코드·계약 정리
+
+프로덕션 진입점 `src/main.jsx`에서 정적 import, 동적 import, CSS import와 에셋 URL을 따라 전체 그래프를 확인했다. 이름이 비슷하거나 참조 횟수가 적다는 이유만으로 삭제하지 않고 실제 코드·테스트·문서·DB 계약 소비자를 다시 검색했다.
+
+### 즉시 삭제 가능한 파일과 에셋
+
+- `src/shared/components/editorial/EditorialLabel.jsx`는 GameStage 구조 교체 때 마지막 소비자가 제거됐다. 현재 파일 외 참조가 없으며 파일을 삭제하면 비는 `editorial` 디렉터리도 함께 제거할 수 있다.
+- Flappy의 `fin-whale-blue.svg`, `fish-blue.svg`, `fish-yellow.svg`, `whale-blue.svg`, `wing-blue.svg`, `wing-yellow.svg` 여섯 파일은 현재 인라인 `FlappyFish` SVG로 교체된 이전 구현 에셋이다. import 그래프와 빌드 산출물 어디에도 포함되지 않는다.
+- `dist/`는 Git에서 제외된 생성물이라 로컬에서는 언제든 삭제 후 `npm run build`로 재생성할 수 있다. 저장소 정리 커밋에는 포함하지 않는다.
+
+### 즉시 삭제 가능한 JavaScript 잔재
+
+- `getLongestLine`, `getFallbackOnlineNickname`, `getOnlineRoleForStone`, `getBoxIndex`는 선언 외 소비자가 없다.
+- `gameProgression.js`의 endless 난이도 상수와 `normalizeEndlessDifficulty`, `getEndlessRoundProgress`, `getNextEndlessDifficulty`, `canAdvanceEndlessDifficulty`, `formatEndlessMilestone`는 실제 게임에서 사용되지 않고 해당 함수 자체를 검사하는 테스트에서만 사용된다.
+- `touchRetainedData`는 실제 저장 흐름에서 호출되지 않고 전용 테스트만 남아 있다.
+- `getSupabaseConfigStatus`는 앱에서 사용되지 않고 테스트 전용 진단 객체만 반환한다. 운영 코드는 `isSupabaseConfigured`만 사용한다.
+- `LITS_SOLUTION`은 `LITS_PUZZLES[0].solution`의 테스트용 별칭일 뿐이며 게임은 해당 별칭을 사용하지 않는다.
+- 미니게임 카탈로그의 모든 `recordType`, `rankingType` 속성은 어떤 화면·저장·랭킹 로직에서도 읽히지 않는 사장된 메타데이터다.
+- 위 테스트 전용 코드의 테스트는 기능 회귀를 보장하지 않으므로 구현과 함께 제거하거나 실제 소비자 계약을 검증하도록 바꾼다.
+
+### 즉시 삭제 가능한 CSS 잔재
+
+- 이전 GameStage 장식인 `.board-motif`와 `.board-motif.is-bottom` 전체 규칙
+- 삭제할 EditorialLabel의 `.editorial-label` 묶음 선택자
+- 현재 walkthrough가 `__actions`만 렌더링한 뒤 남은 `.game-guide-walkthrough__steps` 규칙
+- 소비자가 없는 `.omok-game__dialog-link` 전체 규칙
+- 사용되는 `.visually-hidden`과 중복이지만 소비자가 없는 `.sr-only` 별칭
+- 공용 묶음에 이름만 남은 `.memory-game__hint`
+- 현재 Button 소비자가 없는 `.button--large` variant 스타일
+- foundation에서 한 번도 소비되지 않는 `--accent-sage`, `--game-effect-clear`, `--flappy-moon-cutout`, Flappy score 토큰 3개와 curtain 토큰 4개
+
+이 전역 CSS와 토큰은 소스에만 남아 있는 것이 아니라 전역 스타일 import 때문에 현재 프로덕션 CSS 번들에도 포함된다.
+
+### 코드·테스트·DB를 함께 제거할 대상
+
+- `fetchPendingFriendOmokInviteCount`는 해당 게이트웨이 테스트 외 호출자가 없다. 현재 알림 흐름은 `get_friend_omok_invites()` 결과에서 대기 건수를 계산한다.
+- 대응하는 `get_pending_friend_omok_invite_count()` RPC도 프런트에서 호출되지 않으며 마이그레이션, 권한 목록, DB 테스트와 문서에만 남아 있다.
+- 새 마이그레이션에서 RPC를 제거하고 게이트웨이 함수·테스트·권한 허용 목록·DB 계약·`friend-omok-invites.md`를 함께 갱신한다. 이 정리로 의도하지 않은 `SECURITY DEFINER` 공개 표면과 Advisor 경고 하나도 줄어든다.
+
+### 제품 의도를 확정한 뒤 정리할 Omok 로컬 대국 잔재
+
+- `MATCH_TYPE.LOCAL`과 해당 라벨은 어떤 시작 흐름에서도 선택되지 않는다.
+- `getResolvedLocalPlayerTwoNickname`, `saveLocalPlayerTwo`, `getLocalPlayerTwoNickname`, `saveLocalPlayerTwoNickname`, `DEFAULT_LOCAL_PLAYER_TWO_NICKNAME`는 서로만 참조하며 실제 UI 소비자가 없다.
+- 반면 미니게임 카탈로그 설명은 아직 “로컬 대국과 컴퓨터 대전”을 제공한다고 안내한다.
+- 로컬 2인 대국이 현재 제품 범위가 아니라면 enum·라벨·Player 2 저장 코드와 오래된 저장 필드를 제거하고 카탈로그 설명을 실제 AI·친구 대전에 맞춘다.
+- 로컬 대국이 유지할 요구사항이면 이 코드는 삭제 대상이 아니라 끊어진 기능 경로이며, 8번 Omok 구조 분리에서 명시적인 로컬 대전 화면으로 복구해야 한다.
+
+### 유지 대상으로 확인한 항목
+
+- 폰트의 OFL 라이선스 파일과 폰트 README는 런타임 import가 없어도 배포 자산의 라이선스 근거이므로 유지한다.
+- Figma 이름이 붙은 고양이·게임 카드 에셋은 Home과 게임 카드에서 실제 사용 중이다.
+- 공용 doodle SVG 여섯 개는 GameStageDoodle과 완료 연출에서 모두 사용 중이다.
+- 미사용 인덱스 Advisor INFO만으로 DB 인덱스를 삭제하지 않는다. FK 동작과 쿼리 근거는 이전 감사 문서의 유지 결정을 따른다.
 
 ## 2026-08-17 재검사 기준선
 
