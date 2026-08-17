@@ -49,23 +49,24 @@ Run the application tests:
 npm test
 ```
 
-Run the Phase 4 database test against the linked Supabase project:
+Start the isolated local database and run the Phase 4 database contract:
 
 ```sh
+npx supabase db start
 npm run test:db:friends
 ```
 
 Equivalent command:
 
 ```sh
-npx supabase db query --linked --file supabase/tests/phase4_friendships_test.sql
+npx supabase test db supabase/tests/phase4_friendships_test.sql
 ```
 
 The SQL file opens a transaction, creates isolated users and relationships, runs the pgTAP assertions, and rolls everything back.
 
 Friend-code fixtures are assigned before the test switches to restricted database roles. This matters because SQL function arguments are evaluated with the caller's permissions: an authenticated user must not query another user's `profiles` row merely to discover the code passed to a SECURITY DEFINER RPC.
 
-The linked query command returns a non-zero result when an uncaught SQL exception interrupts the suite. Review all emitted pgTAP rows as well and confirm that none begin with `not ok`.
+The test command returns a non-zero result when an assertion fails or an uncaught SQL exception interrupts the suite. Never add `--linked`; the fixtures must remain isolated from hosted data. See [Database contract tests](./database-contract-tests.md) for the full suite and CI contract.
 
 ## Next phase
 

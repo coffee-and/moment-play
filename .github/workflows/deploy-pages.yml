@@ -16,8 +16,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  quality-gates:
+    name: Run quality gates
+    uses: ./.github/workflows/app-ci.yml
+
   build:
     name: Build Pages artifact
+    needs: quality-gates
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -49,12 +54,6 @@ jobs:
             echo "::error::Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in repository Actions variables."
             exit 1
           fi
-
-      - name: Run static quality gates
-        run: npm run quality
-
-      - name: Run application tests
-        run: npm test
 
       - name: Build production bundle
         run: npm run build

@@ -72,10 +72,12 @@ npx supabase db push --linked
 Run the transaction-only database verification:
 
 ```sh
+npx supabase db start
 npm run test:db:invites
 ```
 
 The pgTAP SQL creates isolated test users, friendships, invites, and rooms inside a transaction and rolls everything back.
+It runs only against the local database; never add `--linked`. See [Database contract tests](./database-contract-tests.md) for the full suite and CI contract.
 
 ## Next phase
 
