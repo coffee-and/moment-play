@@ -12,6 +12,7 @@
     "lint:styles": "stylelint \"src/**/*.css\"",
     "quality": "npm run check:static && npm run lint:styles && npm run check:css-tokens",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:db": "supabase test db",
     "test:db:ranking": "supabase test db supabase/tests/phase3_game_results_test.sql",
     "test:db:friends": "supabase test db supabase/tests/phase4_friendships_test.sql",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.62.1",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",

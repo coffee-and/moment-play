@@ -5,7 +5,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 
 const sourceFiles = ["src/**/*.{js,jsx}"];
-const testFiles = ["src/**/*.{test,spec}.{js,jsx}"];
+const testFiles = ["src/**/*.{test,spec}.{js,jsx}", "tests/e2e/**/*.js"];
 const configFiles = ["*.config.js"];
 
 export default [
@@ -16,7 +16,7 @@ export default [
     },
   },
   {
-    files: [...sourceFiles, ...configFiles],
+    files: [...sourceFiles, ...testFiles, ...configFiles],
     ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: "latest",
