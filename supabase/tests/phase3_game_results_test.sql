@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = extensions, public, pg_catalog;
 
-select plan(82);
+select plan(97);
 
 -- Schema ---------------------------------------------------------------------
 
@@ -67,6 +67,80 @@ select results_eq(
       ('easy'::text, 3::bigint),
       ('medium'::text, 3::bigint)$$,
   'the server has multiple reviewed boards for every Sudoku difficulty'
+);
+
+select has_function(
+  'private', 'ranked_2048_is_terminal', array['integer[]'],
+  'ranked 2048 has one server-owned terminal-state predicate'
+);
+
+select is(
+  private.ranked_2048_is_terminal(
+    array[2048, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ),
+  true,
+  'a board with the target tile is terminal'
+);
+
+select is(
+  private.ranked_2048_is_terminal(
+    array[2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2]
+  ),
+  true,
+  'a full board without adjacent matches is terminal'
+);
+
+select is(
+  private.ranked_2048_is_terminal(
+    array[2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ),
+  false,
+  'a board with an available cell is not terminal'
+);
+
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'private.ranked_2048_is_terminal(integer[])',
+    'EXECUTE'
+  ),
+  'browser roles cannot call the private 2048 terminal predicate'
+);
+
+select is(
+  private.verify_ranked_2048(
+    1,
+    jsonb_build_object(
+      'moves',
+      (
+        select jsonb_agg(
+          (array['left', 'down', 'right', 'down'])[1 + mod(position - 1, 4)]
+          order by position
+        )
+        from generate_series(1, 431) as move(position)
+      )
+    )
+  ),
+  4884::bigint,
+  'ranked 2048 accepts a replay ending exactly when no move remains'
+);
+
+select throws_ok(
+  $$select private.verify_ranked_2048(
+      1,
+      jsonb_build_object(
+        'moves',
+        (
+          select jsonb_agg(
+            (array['left', 'down', 'right', 'down'])[1 + mod(position - 1, 4)]
+            order by position
+          ) || '["left"]'::jsonb
+          from generate_series(1, 431) as move(position)
+        )
+      )
+    )$$,
+  'P0001', '2048 proof continues after the first terminal state',
+  'ranked 2048 rejects moves appended after a no-move game over'
 );
 
 select ok(
@@ -448,6 +522,161 @@ select throws_ok(
       ('10000000-0000-4000-8000-000000000001', '2048', 112, '30000000-0000-4000-8000-000000000003')$$,
   '42501', 'permission denied for table game_results',
   'duplicate direct inserts are denied before constraints'
+);
+
+-- Ranked 2048 terminal lifecycle --------------------------------------------
+
+select ok(
+  set_config(
+    'phase3.game_2048_begin_response',
+    public.begin_ranked_game('2048', null, '{}'::jsonb)::text,
+    true
+  ) is not null,
+  'the server issues a seeded ranked 2048 attempt'
+);
+
+reset role;
+
+select is(
+  (
+    select array_agg(key order by key)
+    from jsonb_object_keys(
+      current_setting('phase3.game_2048_begin_response')::jsonb
+    ) as key
+  ),
+  array['attemptId', 'seed', 'startedAt'],
+  'the ranked 2048 attempt exposes only its public replay contract'
+);
+
+select set_config(
+  'phase3.game_2048_attempt_id',
+  current_setting('phase3.game_2048_begin_response')::jsonb ->> 'attemptId',
+  true
+);
+
+-- A fixed seed and reviewed terminal path keep the verifier regression
+-- deterministic without exposing any production-only shortcut.
+update private.ranked_game_attempts
+set seed = 1
+where id = current_setting('phase3.game_2048_attempt_id')::uuid;
+
+select set_config(
+  'phase3.game_2048_terminal_path',
+  'LLRULULRLUUULDULLDLLRLDLDRDUDRRDULLDRLLDLURUDUULUDULRDURDLRDDDULLDDRUDURDLDULDULRULLRUUULLULLRDLDDRD'
+  || 'DLLDDRDDURDRULDDULLDRURLUDUURDDURLRRLRDLRULURULULULUUUURLUUDULLLLLRUUULDULLLLLRDUULDDULDURDLDRURDLDR'
+  || 'DLLRULDRLUDUULRLRLDURUURLRDRURRULRLRULUUDLLRDULDULLLLUURUUURUURLLDRURLRDURLULDDULULRLLDLDDRRDLRRDLDD'
+  || 'RDLLUDLDLDRDDDRDRULUDLRDLLRLDLRRURULRDDULDDLDRDRUURLLDLLLDRRDRUDRUDUULUULLLRLRULURUDLRDDDDLUUDLULURU'
+  || 'LRDURLUURRLLULUDLLUURULRDULLULRUULURLDULULLDUULDLURDRRUDLLURLDURRUDLRLUUDURDLUDRULDDLLDRDRULLLLUDULL'
+  || 'UDLLDLDRULDLDRRULLURDRLULULRURRLDULDLRLUURLDULLLLUURDURUULLUURDLDDLRLUDDLDLLRUDLDDLLDRLURRDUUUDURURU'
+  || 'RRRURUUDDUDRDRLRLRURLRUDRLLRLDLULRULLDULLDDLULLRLURULULLRRLLUURULLULRLULDLURLRLLLURURURDDUDULLLRLDDU'
+  || 'LULLDDLRDLULULDLDULDDDDURRULRRDLRUDUUDDDDLRRLDLULRDUUDRLRURUDRDULUULUDLURUDLULUUUDRURLDLLRDDURDLLURU'
+  || 'ULUDLULULURURLDRLLDLDULUURUURURLULRRUULURULULRULRURULDULLLUULLRDURDLLRURRDDDRRUDURDRRDUDRRDUURDUDRDD'
+  || 'RURLLDLLLLLLDULDDULLURLRULLURURULDLDRLRULLRLDUUDDR',
+  true
+);
+
+select set_config(
+  'phase3.game_2048_terminal_proof',
+  (
+    select jsonb_build_object(
+      'moves',
+      jsonb_agg(
+        case substring(current_setting('phase3.game_2048_terminal_path') from position for 1)
+          when 'L' then 'left'
+          when 'R' then 'right'
+          when 'U' then 'up'
+          else 'down'
+        end
+        order by position
+      )
+    )::text
+    from generate_series(
+      1,
+      length(current_setting('phase3.game_2048_terminal_path'))
+    ) as path(position)
+  ),
+  true
+);
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.game_2048_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000012',
+      current_setting('phase3.game_2048_terminal_proof')::jsonb
+        || '{"score":999999}'::jsonb
+    )$$,
+  'P0001', '2048 proof contains unsupported fields',
+  'ranked 2048 rejects client-supplied fields outside the move contract'
+);
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.game_2048_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000012',
+      '{"moves":[]}'::jsonb
+    )$$,
+  'P0001', '2048 attempt has not reached a rankable terminal state',
+  'ranked 2048 rejects a proof that stops before a terminal state'
+);
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.game_2048_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000012',
+      jsonb_set(
+        current_setting('phase3.game_2048_terminal_proof')::jsonb,
+        '{moves}',
+        current_setting('phase3.game_2048_terminal_proof')::jsonb -> 'moves'
+          || '["left","left"]'::jsonb
+      )
+    )$$,
+  'P0001', '2048 proof continues after the first terminal state',
+  'ranked 2048 rejects valid score-producing moves appended after 2048'
+);
+
+select lives_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.game_2048_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000012',
+      current_setting('phase3.game_2048_terminal_proof')::jsonb
+    )$$,
+  'ranked 2048 accepts the same replay when it ends exactly at 2048'
+);
+
+reset role;
+
+select is(
+  (
+    select score_value
+    from public.game_results
+    where attempt_id = current_setting('phase3.game_2048_attempt_id')::uuid
+  ),
+  20256::bigint,
+  'ranked 2048 stores the score at the first terminal state'
+);
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select is(
+  public.complete_ranked_game(
+    current_setting('phase3.game_2048_attempt_id')::uuid,
+    '30000000-0000-4000-8000-000000000012',
+    current_setting('phase3.game_2048_terminal_proof')::jsonb
+  ) ->> 'duplicate',
+  'true',
+  'repeating the accepted terminal replay remains idempotent'
 );
 
 -- Ranked Sudoku evidence lifecycle -------------------------------------------
