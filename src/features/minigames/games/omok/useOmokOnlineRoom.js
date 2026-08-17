@@ -1,22 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { omokOnlineRoomGateway } from "../../../../infrastructure/supabase/omokOnlineRoomGateway.js";
-import { getForbiddenPositions, validateMove, positionKey } from "./domain/index.js";
-import { FORBIDDEN_REASON_LABEL, OMOK_MODE, STONE } from "./omok.constants.js";
+import { validateMove } from "./domain/index.js";
+import { FORBIDDEN_REASON_LABEL } from "./omok.constants.js";
 import {
-  deriveOmokStateFromMoves,
-  getOnlinePlayerStone,
   isValidOnlineRoomId,
   validateOnlineNickname,
 } from "./online/omokOnline.utils.js";
 import {
   ONLINE_ACTION_STATUS,
-  ONLINE_COPY_RESET_MS,
   ONLINE_NICKNAME_SAVE_FAILED_MESSAGE,
   ONLINE_PENDING_ACTION,
   ONLINE_POLL_INTERVAL_MS,
   ONLINE_ROOM_LOAD_STATUS,
-  ONLINE_ROOM_STATUS,
 } from "./online/omokOnline.constants.js";
+import { useInviteClipboard } from "./online/useInviteClipboard.js";
+import { useOmokOnlineDerivedState } from "./online/useOmokOnlineDerivedState.js";
 
 const ONLINE_UNAVAILABLE_MESSAGE = "온라인 방 기능을 사용하려면 Supabase 환경 변수가 필요합니다.";
 
@@ -34,7 +32,6 @@ const initialState = {
   moves: [],
   currentUserId: null,
   inviteUrl: "",
-  copied: false,
   errorMessage: null,
   syncWarning: null,
   pendingAction: null,
@@ -48,14 +45,6 @@ function getErrorMessage(error, fallbackMessage = "온라인 방을 처리하는
   return fallbackMessage;
 }
 
-function getCurrentPlayer(room, userId) {
-  return room?.players?.find((player) => player.userId === userId) ?? null;
-}
-
-function getOpponent(room, userId) {
-  return room?.players?.find((player) => player.userId !== userId) ?? null;
-}
-
 export function useOmokOnlineRoom({
   gateway = omokOnlineRoomGateway,
   onNavigateToLobby,
@@ -67,52 +56,31 @@ export function useOmokOnlineRoom({
   const roomIdRef = useRef(null);
   const refreshInFlightRef = useRef(false);
   const pendingActionRef = useRef(null);
-  const copiedTimeoutRef = useRef(null);
   const autoJoinRoomIdRef = useRef(null);
 
-  const derivedGame = useMemo(() => {
-    if (!state.room) return deriveOmokStateFromMoves([], OMOK_MODE.STANDARD);
-    return deriveOmokStateFromMoves(state.moves, state.room.gameMode, state.room.currentRound);
-  }, [state.moves, state.room]);
-
-  const currentPlayer = useMemo(() => getCurrentPlayer(state.room, state.currentUserId), [state.currentUserId, state.room]);
-  const opponent = useMemo(() => getOpponent(state.room, state.currentUserId), [state.currentUserId, state.room]);
-  const playerStone = useMemo(() => getOnlinePlayerStone(state.room, state.currentUserId), [state.currentUserId, state.room]);
-  const isSubmittingMove = state.actionStatus === ONLINE_ACTION_STATUS.SUBMITTING_MOVE;
-  const isOnlineReady = state.status === ONLINE_ROOM_LOAD_STATUS.READY && Boolean(state.room);
-  const opponentLeft = isOnlineReady && state.room.status === ONLINE_ROOM_STATUS.PLAYING && !opponent;
-  const canSubmitMove = Boolean(
-    isOnlineReady &&
-    state.room.status === ONLINE_ROOM_STATUS.PLAYING &&
-    !opponentLeft &&
-    !isSubmittingMove &&
-    playerStone &&
-    derivedGame.valid &&
-    !derivedGame.winner &&
-    !derivedGame.draw &&
-    derivedGame.turn === playerStone,
-  );
-
-  const isStandardRoom = state.room?.gameMode === OMOK_MODE.STANDARD;
-  const effectiveShowForbiddenPositions = Boolean(
-    isStandardRoom && state.room?.allowForbiddenPositions && currentPlayer?.showForbiddenPositions,
-  );
-  const effectiveExplainForbiddenReasons = Boolean(
-    isStandardRoom && state.room?.allowForbiddenReasons && currentPlayer?.explainForbiddenReasons,
-  );
-
-  const forbiddenPositionKeys = useMemo(() => {
-    if (
-      !effectiveShowForbiddenPositions ||
-      derivedGame.turn !== STONE.BLACK ||
-      derivedGame.winner ||
-      derivedGame.draw
-    ) {
-      return new Set();
-    }
-
-    return new Set(getForbiddenPositions(derivedGame.board).map(positionKey));
-  }, [derivedGame.board, derivedGame.draw, derivedGame.turn, derivedGame.winner, effectiveShowForbiddenPositions]);
+  const {
+    canSubmitMove,
+    currentPlayer,
+    derivedGame,
+    effectiveExplainForbiddenReasons,
+    effectiveShowForbiddenPositions,
+    forbiddenPositionKeys,
+    isOnlineReady,
+    opponent,
+    opponentLeft,
+    playerStone,
+  } = useOmokOnlineDerivedState(state);
+  const clearCopyError = useCallback(() => {
+    setState((previous) => ({ ...previous, errorMessage: null }));
+  }, []);
+  const setCopyError = useCallback((errorMessage) => {
+    setState((previous) => ({ ...previous, errorMessage }));
+  }, []);
+  const { copied, copyInviteUrl } = useInviteClipboard({
+    inviteUrl: state.inviteUrl,
+    onError: setCopyError,
+    onSuccess: clearCopyError,
+  });
 
   const applySnapshot = useCallback((snapshot) => {
     if (!snapshot?.room || !Array.isArray(snapshot.moves)) return;
@@ -473,28 +441,6 @@ export function useOmokOnlineRoom({
     }
   }, [gateway, onNavigateToLobby, state.room?.id]);
 
-  const copyInviteUrl = useCallback(async () => {
-    if (!state.inviteUrl) return false;
-    if (copiedTimeoutRef.current) window.clearTimeout(copiedTimeoutRef.current);
-
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(state.inviteUrl);
-      setState((previous) => ({ ...previous, copied: true, errorMessage: null }));
-      copiedTimeoutRef.current = window.setTimeout(() => {
-        setState((previous) => ({ ...previous, copied: false }));
-      }, ONLINE_COPY_RESET_MS);
-      return true;
-    } catch {
-      setState((previous) => ({
-        ...previous,
-        copied: false,
-        errorMessage: "복사하지 못했습니다. 초대 링크를 직접 복사해 주세요.",
-      }));
-      return false;
-    }
-  }, [state.inviteUrl]);
-
   const resetRoom = useCallback(() => {
     roomIdRef.current = null;
     pendingActionRef.current = null;
@@ -505,7 +451,6 @@ export function useOmokOnlineRoom({
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      if (copiedTimeoutRef.current) window.clearTimeout(copiedTimeoutRef.current);
     };
   }, []);
 
@@ -531,6 +476,7 @@ export function useOmokOnlineRoom({
 
   return {
     ...state,
+    copied,
     canSubmitMove,
     currentPlayer,
     derivedGame,
