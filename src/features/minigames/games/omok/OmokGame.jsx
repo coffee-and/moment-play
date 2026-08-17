@@ -39,6 +39,7 @@ import {
   saveSharedNickname,
 } from "./online/sharedNickname.js";
 import { createOmokMatchConfig, isSamePosition, pointToPercent, positionKey } from "./omok.utils.js";
+import "./omok.css";
 
 const DEFAULT_GAME_META = {
   eyebrow: "BOARD / 1 VS 1",

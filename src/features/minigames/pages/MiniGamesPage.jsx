@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG, MINIGAME_CATEGORY_ORDER } from "../data/minigameCatalog.js";
+import "./minigame-catalog.css";
 
 export function MiniGamesPage() {
   const navigate = useNavigate();

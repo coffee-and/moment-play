@@ -16,6 +16,7 @@ import {
 } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
 import { GameGuideProvider } from "../shared/components/GameGuideContext.jsx";
+import "./minigame-play.css";
 
 function MinigameBlockingState(props) {
   return (

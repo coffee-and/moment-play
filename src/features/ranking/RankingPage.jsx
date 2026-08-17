@@ -14,6 +14,7 @@ import {
   RANKING_GAME_OPTIONS,
   SUDOKU_RANKING_MODES,
 } from "./rankingConstants.js";
+import styles from "./RankingPage.module.css";
 
 const LOAD_STATUS = { LOADING: "loading", READY: "ready", ERROR: "error" };
 
@@ -52,21 +53,21 @@ export function RankingPage() {
   }, [gameKey, isConfigured, mode, reloadKey]);
 
   return (
-    <section className="wrap ranking-page" aria-labelledby="ranking-title">
-      <header className="ranking-page__header">
+    <section className={`wrap ${styles.page}`} aria-labelledby="ranking-title">
+      <header className={styles.header}>
         <p className="eyebrow">Leaderboard</p>
         <h1 className="page-title" id="ranking-title">RANKING</h1>
         <p>각 게임의 최고 기록을 확인해 보세요. 플레이는 로그인 없이 계속할 수 있습니다.</p>
       </header>
 
       {authStatus !== "authenticated" ? (
-        <div className="ranking-page__guest card">
+        <div className={`card ${styles.guest}`}>
           <p>로그인하면 완료한 게임 기록을 랭킹에 저장할 수 있어요.</p>
           <Button as={Link} to={LOGIN_PATH} size="small">{AUTH_LABELS.login}</Button>
         </div>
       ) : null}
 
-      <div className="ranking-filters" role="tablist" aria-label="게임 선택">
+      <div className={styles.filters} role="tablist" aria-label="게임 선택">
         {RANKING_GAME_OPTIONS.map((game) => (
           <button
             className={`chipf${game.id === gameKey ? " on" : ""}`}
@@ -82,7 +83,7 @@ export function RankingPage() {
       </div>
 
       {gameKey === RANKING_GAME.SUDOKU ? (
-        <div className="ranking-filters ranking-filters--mode" role="group" aria-label="Sudoku 난이도">
+        <div className={`${styles.filters} ${styles.modeFilters}`} role="group" aria-label="Sudoku 난이도">
           {SUDOKU_RANKING_MODES.map((modeOption) => (
             <button
               className={`chipf${modeOption.id === sudokuMode ? " on" : ""}`}
@@ -104,11 +105,11 @@ export function RankingPage() {
       ) : null}
 
       {gameKey !== RANKING_GAME.OMOK && !isConfigured ? (
-        <StatusPanel type="error" title="랭킹 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
+        <StatusPanel title="랭킹 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
       ) : null}
 
       {gameKey !== RANKING_GAME.OMOK && isConfigured && loadStatus === LOAD_STATUS.LOADING ? (
-        <div className="card ranking-page__loading">
+        <div className={`card ${styles.loading}`}>
           <LoadingIndicator label="랭킹을 불러오는 중…" />
         </div>
       ) : null}
@@ -127,14 +128,14 @@ export function RankingPage() {
       ) : null}
 
       {gameKey !== RANKING_GAME.OMOK && loadStatus === LOAD_STATUS.READY && entries.length > 0 ? (
-        <div className="card ranking-table-wrap">
-          <table className="ranking-table">
+        <div className={`card ${styles.tableWrap}`}>
+          <table className={styles.table}>
             <thead><tr><th>순위</th><th>닉네임</th><th>모드</th><th>{activeGame.valueLabel}</th><th>완료일</th></tr></thead>
             <tbody>
               {entries.map((entry) => (
-                <tr className={entry.isCurrentUser ? "is-current-user" : undefined} key={`${entry.rank}-${entry.nickname}-${entry.createdAt}`}>
+                <tr className={entry.isCurrentUser ? styles.currentUser : undefined} key={`${entry.rank}-${entry.nickname}-${entry.createdAt}`}>
                   <td data-label="순위"><strong>#{entry.rank}</strong></td>
-                  <td data-label="닉네임">{entry.nickname}{entry.isCurrentUser ? <span className="ranking-table__you">나</span> : null}</td>
+                  <td data-label="닉네임">{entry.nickname}{entry.isCurrentUser ? <span className={styles.you}>나</span> : null}</td>
                   <td data-label="모드">{getRankingModeLabel(entry.mode)}</td>
                   <td data-label={activeGame.valueLabel}>{formatRankingValue(entry)}</td>
                   <td data-label="완료일"><time dateTime={entry.createdAt}>{formatRankingDate(entry.createdAt)}</time></td>

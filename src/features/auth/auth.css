@@ -1,7 +1,7 @@
 /*
- * Onboarding/Login/Signup pages. Reuses shared tokens and the existing
- * .card/.button/.txt/.f-label/.brand primitives from styles.css - only
- * the layout and small feedback-notice styles below are new.
+ * Onboarding/Login/Signup pages. Reuses foundation tokens and the shared
+ * card, button, input, and field-label contracts. This file owns only the
+ * authentication layout and feedback notices.
  */
 .auth-page {
   display: flex;

@@ -1,0 +1,44 @@
+.root {
+  flex: none;
+}
+
+.root :global(.wrap) {
+  padding-top: 0;
+}
+
+.content {
+  padding-block: 22px 26px;
+}
+
+.identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 20px;
+}
+
+.copyright {
+  color: var(--chrome-foreground);
+  font-size: 11.5px;
+  line-height: 1;
+}
+
+@media (min-width: 681px) {
+  .copyright {
+    transform: translateY(0.25em);
+  }
+}
+
+@media (max-width: 680px) {
+  .identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .root {
+    margin-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+}

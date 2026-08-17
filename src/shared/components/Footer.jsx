@@ -1,15 +1,16 @@
 import { Brand } from "./Brand.jsx";
+import styles from "./Footer.module.css";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="app-footer">
+    <footer className={styles.root}>
       <div className="wrap">
-        <div className="footer">
-          <div className="footer__identity">
+        <div className={styles.content}>
+          <div className={styles.identity}>
             <Brand />
-            <div className="foot-copy">© {currentYear} moment Play · 짧은 순간을 위한 미니게임.</div>
+            <div className={styles.copyright}>© {currentYear} moment Play · 짧은 순간을 위한 미니게임.</div>
           </div>
         </div>
       </div>

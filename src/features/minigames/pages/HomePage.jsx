@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { FeaturedCatPattern } from "../components/FeaturedCatPattern.jsx";
 import { MiniGameCard } from "../components/MiniGameCard.jsx";
 import { getMinigameById, MINIGAME_CATALOG, MINIGAME_STATUS } from "../data/minigameCatalog.js";
+import "./minigame-catalog.css";
 
 export function HomePage() {
   const navigate = useNavigate();

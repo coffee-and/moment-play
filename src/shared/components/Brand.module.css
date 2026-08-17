@@ -1,0 +1,32 @@
+.root {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  line-height: 0;
+}
+
+.logoStack {
+  display: grid;
+  width: 210px;
+}
+
+.logo {
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.root[data-variant="light"] .lightTheme,
+.root[data-variant="dark"] .darkTheme {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 560px) {
+  .logoStack {
+    width: clamp(146px, 42vw, 220px);
+  }
+}

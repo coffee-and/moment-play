@@ -9,6 +9,7 @@ import { TabBar } from "../shared/components/nav/TabBar.jsx";
 import { SoundToggle } from "../shared/audio/SoundToggle.jsx";
 import { ThemeToggle } from "../shared/theme/ThemeToggle.jsx";
 import { isImmersiveRoute } from "../routes/routePresentation.js";
+import "./app-shell.css";
 
 function AccountControl() {
   const { signOut, status, user } = useAuth();
@@ -68,7 +69,7 @@ export function AppLayout() {
           </div>
         </header>
       ) : null}
-      <main className={isImmersiveGame ? "app-main--immersive" : undefined}>
+      <main>
         <Outlet />
       </main>
       {!isImmersiveGame ? <Footer /> : null}

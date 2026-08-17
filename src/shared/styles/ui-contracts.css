@@ -1,0 +1,197 @@
+.wrap {
+  width: min(100%, var(--layout-max-width));
+  margin-inline: auto;
+  padding: clamp(14px, 2.05vw, 30px);
+}
+
+.page-content {
+  width: min(100%, var(--page-content-max-width, var(--content-max-width)));
+  margin-inline: auto;
+}
+
+.page-title {
+  margin: 0;
+  color: var(--type-page-title-color);
+  font-family: var(--font-display);
+  font-size: var(--type-page-title-size);
+  font-synthesis: none;
+  font-weight: var(--type-page-title-weight);
+  letter-spacing: var(--type-page-title-letter-spacing);
+  line-height: var(--type-page-title-line-height);
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--home-card-border);
+  border-radius: var(--r-lg);
+  background: var(--home-card-surface);
+  color: var(--text);
+  box-shadow: var(--sh-sm);
+}
+
+.card:is(a, button, [role="button"]) {
+  transition: transform 0.2s var(--ease), border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.card:is(a, button, [role="button"]):hover {
+  border-color: var(--home-card-hover-border);
+  background: var(--home-card-hover-surface);
+  box-shadow: var(--home-card-hover-shadow);
+  transform: translateY(1px) scale(0.998);
+}
+
+.card:is(a, button, [role="button"]):active {
+  box-shadow: var(--home-card-active-shadow);
+  transform: translateY(2px) scale(0.995);
+}
+
+.kicker,
+.badge,
+.f-label {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.kicker {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.17em;
+}
+
+.kicker em {
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.badge.online,
+.badge.coral {
+  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  color: var(--accent-2);
+}
+
+.f-label {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+.txt {
+  width: 100%;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--r-md);
+  padding: 14px 15px;
+  background: var(--input-surface);
+  color: var(--text);
+  font-size: 15px;
+  box-shadow: var(--input-shadow);
+}
+
+.txt::placeholder {
+  color: var(--muted);
+}
+
+.txt:focus {
+  border-color: var(--input-focus-border);
+  outline: none;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid var(--button-border);
+  border-radius: var(--r-md);
+  padding: 0 22px;
+  background: var(--button-surface);
+  color: var(--button-text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--button-shadow);
+  transition: transform 0.2s var(--ease), border-color 0.2s, background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--button-hover-border);
+  background: var(--button-hover-surface);
+  box-shadow: var(--button-hover-shadow);
+  transform: translateY(1px) scale(0.995);
+}
+
+.button:active:not(:disabled) {
+  box-shadow: var(--button-active-shadow);
+  transform: translateY(2px) scale(0.985);
+}
+
+.button--secondary {
+  border-color: var(--button-secondary-border);
+  padding-inline: 20px;
+  font-size: 14px;
+  box-shadow: var(--button-secondary-shadow);
+}
+
+.button--small { min-height: 38px; padding-inline: 16px; border-radius: 11px; font-size: 13px; }
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.button--full {
+  width: 100%;
+}
+
+.arw {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 17L17 7M9 7h8v8' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .card:is(a, button, [role="button"]) {
+    transition: none;
+    transform: none;
+  }
+}

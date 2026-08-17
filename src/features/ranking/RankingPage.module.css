@@ -1,0 +1,158 @@
+.page {
+  padding-top: 54px;
+  padding-bottom: 110px;
+}
+
+.header {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 6px 0 10px;
+}
+
+.header p,
+.guest p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.guest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filters :global(.chipf) {
+  flex: none;
+}
+
+.modeFilters {
+  margin-top: -4px;
+  margin-bottom: 20px;
+}
+
+.loading {
+  display: flex;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.tableWrap {
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.table th {
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr.currentUser {
+  background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+}
+
+.you {
+  display: inline-flex;
+  margin-left: 8px;
+  border-radius: var(--r-sm);
+  padding: 2px 7px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 10px;
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding-top: 34px;
+  }
+
+  .guest {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tableWrap {
+    padding: 10px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table tr {
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 12px 14px;
+    background: var(--surface);
+    box-shadow: var(--sh-sm);
+  }
+
+  .table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: none;
+    padding: 6px 0;
+    text-align: right;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+}

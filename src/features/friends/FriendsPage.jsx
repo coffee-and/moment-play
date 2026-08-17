@@ -96,7 +96,7 @@ export function FriendsPage() {
   if (!isConfigured) {
     return (
       <section className="wrap friends-page">
-        <StatusPanel type="error" title="친구 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
+        <StatusPanel title="친구 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
       </section>
     );
   }

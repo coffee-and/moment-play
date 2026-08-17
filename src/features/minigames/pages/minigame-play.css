@@ -1,0 +1,24 @@
+.minigame-play-page {
+  width: min(100%, var(--layout-max-width));
+  margin-inline: auto;
+}
+
+.minigame-play-page--blocking {
+  display: grid;
+  flex: 1 0 auto;
+  place-items: center;
+  padding-top: max(clamp(24px, 5vh, 48px), env(safe-area-inset-top));
+  padding-bottom: max(clamp(24px, 5vh, 48px), env(safe-area-inset-bottom));
+}
+
+@media (max-width: 620px) {
+  .minigame-play-page--active {
+    padding: 0;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 720px) {
+  .minigame-play-page--active {
+    padding-top: clamp(38px, 6vh, 64px);
+  }
+}

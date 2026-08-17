@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './shared/styles/foundation.css';
-import './styles.css';
+import './shared/styles/ui-contracts.css';
+import './shared/styles/motion.css';
 import App from './App';
 import { Router } from './routes/router.jsx';
 import { initializeTheme } from './shared/theme/theme.js';

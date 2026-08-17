@@ -1,0 +1,22 @@
+.root {
+  width: min(100%, var(--status-panel-max-width));
+  margin-inline: auto;
+  padding: var(--gap);
+  text-align: center;
+}
+
+.title {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.description {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.action {
+  margin-top: var(--gap);
+}

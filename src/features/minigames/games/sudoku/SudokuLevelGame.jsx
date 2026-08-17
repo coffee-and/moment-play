@@ -38,6 +38,7 @@ import {
   solveSudoku,
 } from "./sudoku.logic.js";
 import { DEFAULT_SUDOKU_PUZZLE, SUDOKU_PUZZLES } from "./sudoku.puzzles.js";
+import "./sudoku.css";
 
 const EMPTY_LEVEL_RECORD = { completedCount: 0, bestTimeSeconds: null, lastCompletedAt: null };
 
