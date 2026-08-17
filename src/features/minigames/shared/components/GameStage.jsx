@@ -16,6 +16,7 @@ export function GameStage({
   className = '',
   eyebrow,
   isExitConfirmationOpen = false,
+  isPaused = false,
   onRequestExit,
   phase,
   sidebar,
@@ -56,6 +57,7 @@ export function GameStage({
       className={joinClassNames([styles.root, className])}
       aria-label={ariaLabel ?? title}
       data-game-stage=""
+      data-paused={isPaused ? "" : undefined}
       data-phase={phase}
     >
       <header className={styles.topbar} data-stage-slot="topbar">

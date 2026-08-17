@@ -21,6 +21,22 @@ import {
   scoreTimingResult,
 } from "./timingTap.logic.js";
 
+const FEEDBACK_DURATION_MS = 760;
+const KEYBOARD_TAP_KEYS = new Set([" ", "Enter"]);
+const INTERACTIVE_CONTROL_SELECTOR = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "[contenteditable='true']",
+  "[role='button']",
+].join(",");
+
+function isInteractiveControl(target) {
+  return target instanceof Element && Boolean(target.closest(INTERACTIVE_CONTROL_SELECTOR));
+}
+
 function readBestScore() {
   try {
     const score = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.TIMING_TAP_BEST_SCORE));
@@ -58,22 +74,36 @@ export function TimingTapGame({ game }) {
   const [isExitOpen, setIsExitOpen] = useState(false);
   const frameRef = useRef(null);
   const roundStartRef = useRef(0);
+  const roundElapsedRef = useRef(0);
   const feedbackTimerRef = useRef(null);
+  const feedbackDeadlineRef = useRef(0);
+  const feedbackRemainingRef = useRef(0);
+  const tapNowRef = useRef(null);
   const phaseRef = useRef(phase);
+  const isExitOpenRef = useRef(isExitOpen);
   const roundRef = useRef(round);
+  const roundConfigRef = useRef(roundConfig);
+  const needlePositionRef = useRef(needlePosition);
   const scoreRef = useRef(score);
   const perfectComboRef = useRef(perfectCombo);
   const focusGaugeRef = useRef(focusGauge);
   const bestRef = useRef(best);
 
   phaseRef.current = phase;
+  isExitOpenRef.current = isExitOpen;
   roundRef.current = round;
+  roundConfigRef.current = roundConfig;
+  needlePositionRef.current = needlePosition;
   scoreRef.current = score;
   perfectComboRef.current = perfectCombo;
   focusGaugeRef.current = focusGauge;
   bestRef.current = best;
 
   function beginRound(nextRound) {
+    window.clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = null;
+    feedbackDeadlineRef.current = 0;
+    feedbackRemainingRef.current = 0;
     playSound("countdownFinal");
     const useFocusAssist = focusGaugeRef.current >= 100;
     const config = getTimingRoundConfig(nextRound, Math.random, useFocusAssist ? 4 : 0);
@@ -81,11 +111,16 @@ export function TimingTapGame({ game }) {
       focusGaugeRef.current = 0;
       setFocusGauge(0);
     }
+    roundRef.current = nextRound;
+    roundConfigRef.current = config;
     setRound(nextRound);
     setRoundConfig(config);
     setNeedlePosition(0);
+    needlePositionRef.current = 0;
     setResult(null);
     roundStartRef.current = performance.now();
+    roundElapsedRef.current = 0;
+    phaseRef.current = "playing";
     setPhase("playing");
   }
 
@@ -98,19 +133,24 @@ export function TimingTapGame({ game }) {
     setPerfectCombo(0);
     setFocusGauge(0);
     setMistakes(0);
+    isExitOpenRef.current = false;
     setIsExitOpen(false);
     beginRound(1);
   }
 
   useEffect(() => {
-    if (phase !== "playing") return undefined;
+    if (phase !== "playing" || isExitOpen) return undefined;
     function animate(now) {
-      setNeedlePosition(getNeedlePosition(now - roundStartRef.current, roundConfig.durationMs));
+      const elapsed = now - roundStartRef.current;
+      const nextNeedlePosition = getNeedlePosition(elapsed, roundConfig.durationMs);
+      roundElapsedRef.current = elapsed;
+      needlePositionRef.current = nextNeedlePosition;
+      setNeedlePosition(nextNeedlePosition);
       frameRef.current = window.requestAnimationFrame(animate);
     }
     frameRef.current = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frameRef.current);
-  }, [phase, roundConfig.durationMs]);
+  }, [isExitOpen, phase, roundConfig.durationMs]);
 
   useEffect(() => () => {
     window.cancelAnimationFrame(frameRef.current);
@@ -119,6 +159,7 @@ export function TimingTapGame({ game }) {
 
   function completeGame(finalScore) {
     playSound("clear");
+    phaseRef.current = "completed";
     setPhase("completed");
     const didBreakRecord = isNewGameRecord({ previous: bestRef.current, next: finalScore });
     if (didBreakRecord) {
@@ -128,11 +169,45 @@ export function TimingTapGame({ game }) {
     }
   }
 
+  function advanceAfterFeedback() {
+    feedbackTimerRef.current = null;
+    feedbackDeadlineRef.current = 0;
+    feedbackRemainingRef.current = 0;
+    if (phaseRef.current !== "feedback" || isExitOpenRef.current) return;
+
+    if (roundRef.current >= TIMING_TAP_ROUNDS) {
+      completeGame(scoreRef.current);
+    } else {
+      beginRound(roundRef.current + 1);
+    }
+  }
+
+  function scheduleFeedbackAdvance(delayMs = FEEDBACK_DURATION_MS) {
+    window.clearTimeout(feedbackTimerRef.current);
+    const safeDelay = Math.max(0, delayMs);
+    feedbackRemainingRef.current = safeDelay;
+    feedbackDeadlineRef.current = performance.now() + safeDelay;
+    feedbackTimerRef.current = window.setTimeout(advanceAfterFeedback, safeDelay);
+  }
+
+  function pauseFeedbackAdvance() {
+    if (feedbackTimerRef.current == null) return;
+    feedbackRemainingRef.current = Math.max(0, feedbackDeadlineRef.current - performance.now());
+    window.clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = null;
+    feedbackDeadlineRef.current = 0;
+  }
+
   function tapNow() {
-    if (phaseRef.current !== "playing") return;
+    if (phaseRef.current !== "playing" || isExitOpenRef.current) return;
     phaseRef.current = "feedback";
     window.cancelAnimationFrame(frameRef.current);
-    const judged = judgeTiming(needlePosition, roundConfig.targetCenter, roundConfig.targetWidth);
+    const currentRoundConfig = roundConfigRef.current;
+    const judged = judgeTiming(
+      needlePositionRef.current,
+      currentRoundConfig.targetCenter,
+      currentRoundConfig.targetWidth,
+    );
     const scored = scoreTimingResult(judged, perfectComboRef.current);
     const nextScore = scoreRef.current + scored.points;
     const nextFocusGauge = judged.grade === "MISS"
@@ -149,32 +224,53 @@ export function TimingTapGame({ game }) {
     playSound(judged.grade === "MISS" ? "wrong" : judged.grade === "PERFECT" ? "success" : "correct");
     setPhase("feedback");
     vibrate(judged.grade === "PERFECT" ? 24 : judged.grade === "MISS" ? 8 : 14);
-    feedbackTimerRef.current = window.setTimeout(() => {
-      if (roundRef.current >= TIMING_TAP_ROUNDS) {
-        completeGame(nextScore);
-      } else {
-        beginRound(roundRef.current + 1);
-      }
-    }, 760);
+    scheduleFeedbackAdvance();
   }
+
+  tapNowRef.current = tapNow;
 
   useEffect(() => {
     function handleKeyDown(event) {
-      if ((event.key === " " || event.key === "Enter") && phaseRef.current === "playing") {
-        event.preventDefault();
-        tapNow();
-      }
+      if (!KEYBOARD_TAP_KEYS.has(event.key)) return;
+      if (event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (phaseRef.current !== "playing" || isExitOpenRef.current) return;
+      if (isInteractiveControl(event.target)) return;
+
+      event.preventDefault();
+      tapNowRef.current?.();
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  });
+  }, []);
 
   function requestExit() {
-    if (phase === "idle" || phase === "completed") {
+    const currentPhase = phaseRef.current;
+    if (currentPhase === "idle" || currentPhase === "completed") {
       navigate("/");
       return;
     }
+    if (isExitOpenRef.current) return;
+
+    isExitOpenRef.current = true;
+    if (currentPhase === "playing") {
+      roundElapsedRef.current = performance.now() - roundStartRef.current;
+      window.cancelAnimationFrame(frameRef.current);
+    } else if (currentPhase === "feedback") {
+      pauseFeedbackAdvance();
+    }
     setIsExitOpen(true);
+  }
+
+  function continueGame() {
+    if (!isExitOpenRef.current) return;
+
+    isExitOpenRef.current = false;
+    if (phaseRef.current === "playing") {
+      roundStartRef.current = performance.now() - roundElapsedRef.current;
+    } else if (phaseRef.current === "feedback") {
+      scheduleFeedbackAdvance(feedbackRemainingRef.current);
+    }
+    setIsExitOpen(false);
   }
 
   const average = round > 1 || phase === "completed"
@@ -203,6 +299,7 @@ export function TimingTapGame({ game }) {
       className="timing-tap"
       eyebrow="REACTION / TIMING"
       isExitConfirmationOpen={isExitOpen}
+      isPaused={isExitOpen}
       onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
@@ -243,7 +340,7 @@ export function TimingTapGame({ game }) {
         </div>
 
         {phase === "playing" ? (
-          <button className="timing-tap__tap-button" type="button" onPointerDown={tapNow}>
+          <button className="timing-tap__tap-button" type="button" onClick={tapNow}>
             <span>TAP</span>
             <small>Space · Enter</small>
           </button>
@@ -287,14 +384,14 @@ export function TimingTapGame({ game }) {
       ) : null}
 
       {isExitOpen ? (
-        <GameStageOverlay state="confirm">
+        <GameStageOverlay closeOnEscape onClose={continueGame} state="confirm">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="timing-exit-title">
             <div className="game-stage-modal__eyebrow">LEAVE GAME</div>
             <h3 id="timing-exit-title">타이밍 도전을 나갈까요?</h3>
             <p>현재 라운드 기록은 저장되지 않아요.</p>
             <div className="game-stage-modal__actions">
               <Button onClick={() => navigate("/")}>나가기</Button>
-              <Button variant="secondary" onClick={() => setIsExitOpen(false)}>계속하기</Button>
+              <Button data-modal-initial-focus="" variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>

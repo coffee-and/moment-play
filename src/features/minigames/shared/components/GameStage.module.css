@@ -209,6 +209,15 @@
   gap: 11px;
 }
 
+.root[data-paused] .content,
+.root[data-paused] .content *,
+.root[data-paused] .content::before,
+.root[data-paused] .content::after,
+.root[data-paused] .content *::before,
+.root[data-paused] .content *::after {
+  animation-play-state: paused;
+}
+
 .root button,
 .root [role="button"],
 .root [role="gridcell"],
