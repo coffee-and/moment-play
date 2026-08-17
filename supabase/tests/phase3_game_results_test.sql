@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = extensions, public, pg_catalog;
 
-select plan(65);
+select plan(82);
 
 -- Schema ---------------------------------------------------------------------
 
@@ -30,6 +30,44 @@ select col_type_is('public', 'game_results', 'client_submission_id', 'uuid', 'cl
 select col_type_is('public', 'game_results', 'created_at', 'timestamp with time zone', 'created_at is timestamptz');
 
 select has_pk('public', 'game_results', 'game_results has a primary key');
+
+select has_table('private', 'ranked_sudoku_puzzles', 'ranked Sudoku puzzle table exists');
+
+select columns_are(
+  'private',
+  'ranked_sudoku_puzzles',
+  array['puzzle_id', 'mode', 'solution', 'puzzle', 'minimum_duration_ms'],
+  'ranked Sudoku puzzles keep the board, solution, and timing policy server-side'
+);
+
+select ok(
+  (select relrowsecurity
+   from pg_catalog.pg_class
+   where oid = 'private.ranked_sudoku_puzzles'::regclass),
+  'RLS is enabled on ranked Sudoku puzzles'
+);
+
+select is(
+  (select count(*)
+   from information_schema.role_table_grants
+   where table_schema = 'private'
+     and table_name = 'ranked_sudoku_puzzles'
+     and grantee in ('anon', 'authenticated')),
+  0::bigint,
+  'browser roles have no direct access to ranked Sudoku puzzles or solutions'
+);
+
+select results_eq(
+  $$select mode, count(*)
+    from private.ranked_sudoku_puzzles
+    group by mode
+    order by mode$$,
+  $$values
+      ('advanced'::text, 3::bigint),
+      ('easy'::text, 3::bigint),
+      ('medium'::text, 3::bigint)$$,
+  'the server has multiple reviewed boards for every Sudoku difficulty'
+);
 
 select ok(
   exists (
@@ -410,6 +448,226 @@ select throws_ok(
       ('10000000-0000-4000-8000-000000000001', '2048', 112, '30000000-0000-4000-8000-000000000003')$$,
   '42501', 'permission denied for table game_results',
   'duplicate direct inserts are denied before constraints'
+);
+
+-- Ranked Sudoku evidence lifecycle -------------------------------------------
+
+select lives_ok(
+  $$select set_config(
+      'phase3.sudoku_begin_response',
+      public.begin_ranked_game('sudoku', 'easy', '{}'::jsonb)::text,
+      true
+    )$$,
+  'the server issues a ranked Sudoku attempt and chooses its board'
+);
+
+reset role;
+
+select is(
+  (
+    select array_agg(key order by key)
+    from jsonb_object_keys(
+      current_setting('phase3.sudoku_begin_response')::jsonb
+    ) as key
+  ),
+  array['attemptId', 'proofVersion', 'puzzle', 'puzzleId', 'startedAt'],
+  'the Sudoku attempt exposes the playable board but never its solution'
+);
+
+select ok(
+  current_setting('phase3.sudoku_begin_response')::jsonb ->> 'puzzle' ~ '^[0-9]{81}$'
+    and current_setting('phase3.sudoku_begin_response')::jsonb ->> 'proofVersion' = '2',
+  'the issued Sudoku board and proof version have the approved shape'
+);
+
+select set_config(
+  'phase3.sudoku_attempt_id',
+  current_setting('phase3.sudoku_begin_response')::jsonb ->> 'attemptId',
+  true
+);
+
+select set_config(
+  'phase3.sudoku_proof',
+  (
+    select jsonb_build_object(
+      'puzzleId', attempt.context ->> 'puzzleId',
+      'events', (
+        select jsonb_agg(
+          jsonb_build_object(
+            'index', editable.cell_index - 1,
+            'value', substring(ranked_puzzle.solution from editable.cell_index for 1)::integer,
+            'elapsedMs', ranked_puzzle.minimum_duration_ms + editable.ordinal * 100
+          )
+          order by editable.cell_index
+        )
+        from (
+          select
+            cell_index,
+            row_number() over (order by cell_index)::integer as ordinal
+          from generate_series(1, 81) as cells(cell_index)
+          where substring(ranked_puzzle.puzzle from cell_index for 1) = '0'
+        ) as editable
+      )
+    )::text
+    from private.ranked_game_attempts as attempt
+    join private.ranked_sudoku_puzzles as ranked_puzzle
+      on ranked_puzzle.puzzle_id = attempt.context ->> 'puzzleId'
+    where attempt.id = current_setting('phase3.sudoku_attempt_id')::uuid
+  ),
+  true
+);
+
+select set_config(
+  'phase3.sudoku_given_event',
+  (
+    select jsonb_build_object(
+      'index', given_cell.cell_index - 1,
+      'value', substring(ranked_puzzle.solution from given_cell.cell_index for 1)::integer,
+      'elapsedMs', 0
+    )::text
+    from private.ranked_game_attempts as attempt
+    join private.ranked_sudoku_puzzles as ranked_puzzle
+      on ranked_puzzle.puzzle_id = attempt.context ->> 'puzzleId'
+    cross join lateral (
+      select cell_index
+      from generate_series(1, 81) as cells(cell_index)
+      where substring(ranked_puzzle.puzzle from cell_index for 1) <> '0'
+      order by cell_index
+      limit 1
+    ) as given_cell
+    where attempt.id = current_setting('phase3.sudoku_attempt_id')::uuid
+  ),
+  true
+);
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select throws_ok(
+  $$select public.begin_ranked_game(
+      'sudoku',
+      'easy',
+      '{"puzzleId":"ocean-01"}'::jsonb
+    )$$,
+  'P0001', 'Sudoku attempt context is server-owned',
+  'callers cannot choose the ranked Sudoku board'
+);
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.sudoku_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000011',
+      jsonb_build_object(
+        'puzzleId', current_setting('phase3.sudoku_proof')::jsonb ->> 'puzzleId',
+        'board', '[]'::jsonb
+      )
+    )$$,
+  'P0001', 'Sudoku proof contains unsupported fields',
+  'the former board-only instant submission contract is rejected'
+);
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.sudoku_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000011',
+      current_setting('phase3.sudoku_proof')::jsonb
+    )$$,
+  'P0001', 'Sudoku attempt completed faster than the ranking permits',
+  'a forged complete event stream cannot create an instant Sudoku record'
+);
+
+reset role;
+
+update private.ranked_game_attempts
+set started_at = clock_timestamp() - interval '30 seconds'
+where id = current_setting('phase3.sudoku_attempt_id')::uuid;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.sudoku_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000011',
+      jsonb_set(
+        current_setting('phase3.sudoku_proof')::jsonb,
+        '{events}',
+        jsonb_build_array(
+          current_setting('phase3.sudoku_given_event')::jsonb
+        ) || (current_setting('phase3.sudoku_proof')::jsonb -> 'events')
+      )
+    )$$,
+  'P0001', 'Sudoku proof edits a given cell',
+  'Sudoku evidence cannot edit a server-issued clue'
+);
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.sudoku_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000011',
+      jsonb_set(
+        current_setting('phase3.sudoku_proof')::jsonb,
+        '{events,1,elapsedMs}',
+        '0'::jsonb
+      )
+    )$$,
+  'P0001', 'Sudoku proof event times are not monotonic',
+  'Sudoku evidence requires monotonic action timing'
+);
+
+select lives_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.sudoku_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000011',
+      current_setting('phase3.sudoku_proof')::jsonb
+    )$$,
+  'a valid server-issued Sudoku event replay is accepted'
+);
+
+reset role;
+
+select ok(
+  (select duration_ms >= 29000
+   from public.game_results
+   where attempt_id = current_setting('phase3.sudoku_attempt_id')::uuid),
+  'Sudoku duration comes from the server attempt clock rather than client events'
+);
+
+select ok(
+  exists (
+    select 1
+    from public.game_results
+    where attempt_id = current_setting('phase3.sudoku_attempt_id')::uuid
+      and game_key = 'sudoku'
+      and mode = 'easy'
+      and verified_at is not null
+  ),
+  'the verified Sudoku result is linked to its one-time attempt'
+);
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}',
+  true
+);
+set local role authenticated;
+
+select is(
+  public.complete_ranked_game(
+    current_setting('phase3.sudoku_attempt_id')::uuid,
+    '30000000-0000-4000-8000-000000000011',
+    current_setting('phase3.sudoku_proof')::jsonb
+  ) ->> 'duplicate',
+  'true',
+  'repeating an accepted Sudoku submission remains idempotent'
 );
 
 -- Leaderboard behavior --------------------------------------------------------

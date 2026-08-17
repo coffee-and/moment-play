@@ -50,7 +50,27 @@ export async function beginRankedGameAttempt({
   });
   if (error) throw error;
   if (!data?.attemptId) throw new Error("랭킹 게임 시도를 시작하지 못했습니다.");
-  return data;
+
+  const attempt = {
+    attemptId: data.attemptId,
+    seed: data.seed ?? null,
+    startedAt: data.startedAt ?? null,
+  };
+  if (gameKey !== "sudoku") return attempt;
+  if (
+    typeof data.puzzleId !== "string"
+    || Number(data.proofVersion) !== 2
+    || !/^[0-9]{81}$/.test(data.puzzle)
+  ) {
+    throw new Error("서버가 유효한 스도쿠 퍼즐을 발급하지 않았습니다.");
+  }
+
+  return {
+    ...attempt,
+    proofVersion: Number(data.proofVersion),
+    puzzleId: data.puzzleId,
+    puzzle: [...data.puzzle].map(Number),
+  };
 }
 
 export async function submitGameResult({ authStatus, user, result }, client = getSupabaseClient()) {

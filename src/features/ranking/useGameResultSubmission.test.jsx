@@ -78,11 +78,10 @@ describe("useGameResultSubmission", () => {
     await act(async () => latest.startAttempt({
       gameKey: "sudoku",
       mode: "easy",
-      context: { puzzleId: "ocean-01" },
     }));
     await act(async () => latest.submitResult({
       gameKey: "sudoku",
-      proof: { puzzleId: "ocean-01", board: Array(81).fill(1) },
+      proof: { puzzleId: "ocean-01", events: [] },
     }));
     expect(latest.status).toBe("error");
     expect(latest.errorMessage).toBe("network down");

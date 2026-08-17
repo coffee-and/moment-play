@@ -3,6 +3,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { solveSudoku } from "./sudoku.logic.js";
 import { DEFAULT_SUDOKU_PUZZLE } from "./sudoku.puzzles.js";
 import { SudokuLevelGame } from "./SudokuLevelGame.jsx";
 
@@ -58,10 +59,11 @@ async function startEasyGame() {
 }
 
 function solveDefaultPuzzle(view) {
+  const solution = solveSudoku(DEFAULT_SUDOKU_PUZZLE.puzzle);
   DEFAULT_SUDOKU_PUZZLE.puzzle.forEach((value, index) => {
     if (value !== 0) return;
     const cell = view.host.querySelector(`[aria-rowindex="${Math.floor(index / 9) + 1}"][aria-colindex="${index % 9 + 1}"]`);
-    const number = DEFAULT_SUDOKU_PUZZLE.solution[index];
+    const number = solution[index];
     act(() => cell.click());
     act(() => view.host.querySelector(`[aria-label="${number} 입력"]`).click());
   });
@@ -71,6 +73,10 @@ beforeEach(() => {
   startAttempt.mockReset();
   startAttempt.mockResolvedValue({
     attemptId: "22222222-2222-4222-8222-222222222222",
+    proofVersion: 2,
+    puzzleId: DEFAULT_SUDOKU_PUZZLE.id,
+    puzzle: DEFAULT_SUDOKU_PUZZLE.puzzle,
+    ranked: true,
   });
   submitResult.mockClear();
 });
@@ -87,6 +93,13 @@ describe("Sudoku hint ranking policy", () => {
     solveDefaultPuzzle(view);
 
     expect(submitResult).toHaveBeenCalledTimes(1);
+    expect(submitResult).toHaveBeenCalledWith(expect.objectContaining({
+      proof: expect.objectContaining({
+        puzzleId: DEFAULT_SUDOKU_PUZZLE.id,
+        events: expect.any(Array),
+      }),
+    }));
+    expect(submitResult.mock.calls[0][0].proof).not.toHaveProperty("board");
     expect([...document.body.querySelectorAll("button")]
       .find((button) => button.textContent === "다음판!")).toBeDefined();
     expect(document.body.textContent).toContain("잘했어요");

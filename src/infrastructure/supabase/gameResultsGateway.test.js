@@ -43,7 +43,9 @@ describe("gameResultsGateway", () => {
   it("begins a server-owned attempt without accepting a caller-supplied owner", async () => {
     const attempt = {
       attemptId: result.attemptId,
-      seed: 1234,
+      proofVersion: 2,
+      puzzleId: "ocean-01-shift",
+      puzzle: "000000010002195300198000567009761423026053701700020856000000084280019030300286070",
       startedAt: "2026-08-16T00:00:00Z",
     };
     const client = createClient({ beginData: attempt });
@@ -53,14 +55,17 @@ describe("gameResultsGateway", () => {
       user: authenticatedUser,
       gameKey: "sudoku",
       mode: "easy",
-      context: { puzzleId: "ocean-01" },
       userId: "other-user",
-    }, client)).resolves.toEqual(attempt);
+    }, client)).resolves.toEqual({
+      ...attempt,
+      puzzle: [...attempt.puzzle].map(Number),
+      seed: null,
+    });
 
     expect(client.rpc).toHaveBeenCalledWith("begin_ranked_game", {
       p_game_key: "sudoku",
       p_mode: "easy",
-      p_context: { puzzleId: "ocean-01" },
+      p_context: {},
     });
   });
 

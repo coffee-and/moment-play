@@ -54,6 +54,46 @@ export function getConflictIndexes(board) {
   }, []);
 }
 
-export function isBoardComplete(board, solution) {
-  return board.length === SUDOKU_CELL_COUNT && solution.length === SUDOKU_CELL_COUNT && board.every((value, index) => value !== 0 && value === solution[index]);
+function getCandidateNumbers(board, index) {
+  return Array.from({ length: SUDOKU_BOARD_SIZE }, (_, offset) => offset + 1)
+    .filter((value) => !hasConflict(board, index, value));
+}
+
+export function solveSudoku(puzzle) {
+  if (!Array.isArray(puzzle) || puzzle.length !== SUDOKU_CELL_COUNT) return null;
+  const board = puzzle.map(Number);
+  if (board.some((value) => !Number.isInteger(value) || value < 0 || value > SUDOKU_BOARD_SIZE)) return null;
+  if (getConflictIndexes(board).length > 0) return null;
+
+  function solveNextCell() {
+    let targetIndex = -1;
+    let targetCandidates = null;
+
+    for (let index = 0; index < board.length; index += 1) {
+      if (board[index] !== 0) continue;
+      const candidates = getCandidateNumbers(board, index);
+      if (!candidates.length) return false;
+      if (targetCandidates === null || candidates.length < targetCandidates.length) {
+        targetIndex = index;
+        targetCandidates = candidates;
+      }
+    }
+
+    if (targetIndex < 0) return true;
+    for (const candidate of targetCandidates) {
+      board[targetIndex] = candidate;
+      if (solveNextCell()) return true;
+    }
+    board[targetIndex] = 0;
+    return false;
+  }
+
+  return solveNextCell() ? board : null;
+}
+
+export function isBoardComplete(board) {
+  return Array.isArray(board)
+    && board.length === SUDOKU_CELL_COUNT
+    && board.every((value) => Number.isInteger(value) && value >= 1 && value <= SUDOKU_BOARD_SIZE)
+    && getConflictIndexes(board).length === 0;
 }
