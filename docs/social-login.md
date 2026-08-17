@@ -30,8 +30,10 @@ These flags are public UI configuration, not authorization controls. Supabase
 must also have the provider enabled. OAuth client secrets belong only in the
 provider console and Supabase Dashboard; never put them in a `VITE_` variable.
 
-The GitHub Pages workflow reads `VITE_AUTH_GOOGLE_ENABLED` from a repository
-Actions variable and defaults it to `false`.
+The GitHub Pages workflow requires the repository Actions variable
+`VITE_AUTH_GOOGLE_ENABLED=true`. The build fails when it is missing or has a
+different value, so the authorized Google login cannot silently disappear from
+the deployed application.
 
 ## Shared application flow
 
