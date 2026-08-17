@@ -9,7 +9,6 @@ vi.mock("../../../../infrastructure/supabase/supabaseClient.js", () => ({
   getSupabaseClient: () => {
     throw new Error("supabase client unavailable in tests");
   },
-  getSupabaseConfigStatus: () => ({ isConfigured: false, missingPublishableKey: true, missingUrl: true }),
   isSupabaseConfigured: () => false,
 }));
 

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getLitsShapeType, LITS_PUZZLES, LITS_SOLUTION, validateLits } from "./lits.logic.js";
+import { getLitsShapeType, LITS_PUZZLES, validateLits } from "./lits.logic.js";
 
 describe("LITS rules", () => {
   it("keeps the published answer valid", () => {
-    expect(validateLits(LITS_SOLUTION).valid).toBe(true);
+    expect(validateLits(LITS_PUZZLES[0].solution).valid).toBe(true);
   });
 
   it("ships at least four structurally valid, distinct puzzles", () => {

@@ -9,14 +9,6 @@ export function isSupabaseConfigured() {
   return Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
 }
 
-export function getSupabaseConfigStatus() {
-  return {
-    isConfigured: isSupabaseConfigured(),
-    missingUrl: !SUPABASE_URL,
-    missingPublishableKey: !SUPABASE_PUBLISHABLE_KEY,
-  };
-}
-
 export function getSupabaseClient() {
   if (!isSupabaseConfigured()) {
     throw new Error("온라인 방 기능을 사용하려면 Supabase 환경 변수가 필요합니다.");

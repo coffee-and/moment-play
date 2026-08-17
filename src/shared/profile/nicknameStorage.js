@@ -11,16 +11,5 @@ export function getLocalNickname() {
 }
 
 export function saveLocalNickname(nickname) {
-  const data = readRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { maxAgeMs: LOCAL_MAX_AGE_MS }) ?? {};
-  writeRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { ...data, nickname });
-}
-
-export function getLocalPlayerTwoNickname() {
-  const data = readRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { maxAgeMs: LOCAL_MAX_AGE_MS });
-  return typeof data?.playerTwoNickname === "string" ? data.playerTwoNickname : null;
-}
-
-export function saveLocalPlayerTwoNickname(playerTwoNickname) {
-  const data = readRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { maxAgeMs: LOCAL_MAX_AGE_MS }) ?? {};
-  writeRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { ...data, playerTwoNickname });
+  writeRetainedData(LOCAL_STORAGE_KEYS.PROFILE_NICKNAME, { nickname });
 }

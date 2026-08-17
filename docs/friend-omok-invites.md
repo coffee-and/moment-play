@@ -45,7 +45,6 @@ The `friend_game_invites` table has RLS enabled and no direct `anon` or `authent
 - `respond_friend_omok_invite(uuid, text)`
 - `cancel_friend_omok_invite(uuid)`
 - `get_friend_omok_invites()`
-- `get_pending_friend_omok_invite_count()`
 
 Internal cleanup and expiry helpers are not directly executable by browser roles.
 

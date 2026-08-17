@@ -56,22 +56,3 @@ export function writeRetainedData(key, data) {
     // noop - storage may be unavailable (private browsing, quota, etc.)
   }
 }
-
-// Refreshes lastActiveAt without changing the stored data, for activity that
-// isn't itself a data update (e.g. actually playing a match).
-export function touchRetainedData(key) {
-  if (!isStorageAvailable()) return;
-
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return;
-
-    const envelope = JSON.parse(raw);
-    if (!envelope || typeof envelope !== "object") return;
-
-    envelope.lastActiveAt = Date.now();
-    window.localStorage.setItem(key, JSON.stringify(envelope));
-  } catch {
-    // noop
-  }
-}

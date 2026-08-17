@@ -3,14 +3,11 @@ import { getSupabaseClient, isSupabaseConfigured } from "../../../../../infrastr
 import { getProfileByUserId, saveCurrentProfileNickname } from "../../../../../infrastructure/supabase/omokOnlineRoomGateway.js";
 import {
   getLocalNickname,
-  getLocalPlayerTwoNickname,
   saveLocalNickname,
-  saveLocalPlayerTwoNickname,
 } from "../../../../../shared/profile/nicknameStorage.js";
 import { isFallbackOnlineNickname, normalizeOnlineNickname, validateOnlineNickname } from "./omokOnline.utils.js";
 
 export const GUEST_FALLBACK_NICKNAME = "Guest";
-export const DEFAULT_LOCAL_PLAYER_TWO_NICKNAME = "Player 2";
 
 function isValidLocalNickname(nickname) {
   return Boolean(nickname) && validateOnlineNickname(nickname).valid;
@@ -48,21 +45,10 @@ export async function resolveSharedNickname() {
   return GUEST_FALLBACK_NICKNAME;
 }
 
-export function getResolvedLocalPlayerTwoNickname() {
-  const stored = getLocalPlayerTwoNickname();
-  return isValidLocalNickname(stored) ? stored : DEFAULT_LOCAL_PLAYER_TWO_NICKNAME;
-}
-
 // Local-only: normalize/validate + persist. Does not touch Supabase.
 export function saveLocalSharedNickname(rawNickname) {
   const normalized = normalizeAndValidate(rawNickname);
   saveLocalNickname(normalized);
-  return normalized;
-}
-
-export function saveLocalPlayerTwo(rawNickname) {
-  const normalized = normalizeAndValidate(rawNickname);
-  saveLocalPlayerTwoNickname(normalized);
   return normalized;
 }
 

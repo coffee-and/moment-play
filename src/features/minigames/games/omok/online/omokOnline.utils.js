@@ -3,7 +3,6 @@ import { createEmptyBoard, getNextStone, playMove } from "../domain/index.js";
 import {
   ONLINE_NICKNAME_MAX_LENGTH,
   ONLINE_NICKNAME_MIN_LENGTH,
-  ONLINE_PLAYER_ROLE,
   ONLINE_ROLE_STONE,
   ONLINE_ROOM_ID_PATTERN,
 } from "./omokOnline.constants.js";
@@ -26,10 +25,6 @@ export function validateOnlineNickname(value) {
   return { valid: true, value: nickname, message: null };
 }
 
-export function getFallbackOnlineNickname(userId) {
-  return `Player-${String(userId ?? "").slice(0, 5)}`;
-}
-
 export function isFallbackOnlineNickname(nickname) {
   return !nickname || /^Player-[0-9a-f]{5}$/i.test(nickname);
 }
@@ -45,12 +40,6 @@ export function createOmokInviteUrl(roomId, locationLike = window.location) {
 
 export function getStoneForOnlineRole(role) {
   return ONLINE_ROLE_STONE[role] ?? null;
-}
-
-export function getOnlineRoleForStone(stone) {
-  if (stone === STONE.BLACK) return ONLINE_PLAYER_ROLE.HOST;
-  if (stone === STONE.WHITE) return ONLINE_PLAYER_ROLE.GUEST;
-  return null;
 }
 
 export function getExpectedOnlineStone(moveNumber) {

@@ -112,11 +112,6 @@ select ok(
   to_regprocedure('public.get_friend_omok_invites()') is not null,
   'get_friend_omok_invites exists'
 );
-select ok(
-  to_regprocedure('public.get_pending_friend_omok_invite_count()') is not null,
-  'get_pending_friend_omok_invite_count exists'
-);
-
 select is(
   (
     select count(*)
@@ -127,12 +122,11 @@ select is(
       'public.create_friend_omok_invite(uuid,text,boolean,boolean,boolean,boolean)'::regprocedure,
       'public.respond_friend_omok_invite(uuid,text)'::regprocedure,
       'public.cancel_friend_omok_invite(uuid)'::regprocedure,
-      'public.get_friend_omok_invites()'::regprocedure,
-      'public.get_pending_friend_omok_invite_count()'::regprocedure
+      'public.get_friend_omok_invites()'::regprocedure
     )
       and prosecdef
   ),
-  7::bigint,
+  6::bigint,
   'all invite helpers and RPCs are SECURITY DEFINER'
 );
 
@@ -146,12 +140,11 @@ select is(
       'public.create_friend_omok_invite(uuid,text,boolean,boolean,boolean,boolean)'::regprocedure,
       'public.respond_friend_omok_invite(uuid,text)'::regprocedure,
       'public.cancel_friend_omok_invite(uuid)'::regprocedure,
-      'public.get_friend_omok_invites()'::regprocedure,
-      'public.get_pending_friend_omok_invite_count()'::regprocedure
+      'public.get_friend_omok_invites()'::regprocedure
     )
       and proconfig = array['search_path=pg_catalog, public']
   ),
-  7::bigint,
+  6::bigint,
   'all invite helpers and RPCs use a fixed search path'
 );
 
@@ -178,10 +171,6 @@ select ok(
 select ok(
   has_function_privilege('authenticated', 'public.get_friend_omok_invites()', 'EXECUTE'),
   'authenticated can execute get_friend_omok_invites'
-);
-select ok(
-  has_function_privilege('authenticated', 'public.get_pending_friend_omok_invite_count()', 'EXECUTE'),
-  'authenticated can execute pending invite count'
 );
 select ok(
   not has_function_privilege(
@@ -442,9 +431,13 @@ select set_config(
 set local role authenticated;
 
 select is(
-  public.get_pending_friend_omok_invite_count(),
+  (
+    select count(*)::integer
+    from public.get_friend_omok_invites()
+    where direction = 'incoming' and status = 'pending'
+  ),
   1,
-  'the receiver pending badge count includes the invite'
+  'the receiver derives the pending badge count from the invite overview'
 );
 
 select results_eq(
@@ -744,9 +737,13 @@ select set_config(
 set local role authenticated;
 
 select is(
-  public.get_pending_friend_omok_invite_count(),
+  (
+    select count(*)::integer
+    from public.get_friend_omok_invites()
+    where direction = 'incoming' and status = 'pending'
+  ),
   0,
-  'pending count expires stale incoming invites before counting'
+  'the invite overview expires stale incoming invites before deriving the pending count'
 );
 
 reset role;

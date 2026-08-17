@@ -19,8 +19,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/2048",
     category: "Number",
-    recordType: "score",
-    rankingType: "highScore",
   },
   {
     id: "memory",
@@ -33,8 +31,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/memory",
     category: "Memory",
-    recordType: "round",
-    rankingType: "bestRound",
   },
   {
     id: "sudoku",
@@ -46,21 +42,17 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/sudoku",
     category: "Puzzle",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "omok",
     title: "Omok",
-    description: "로컬 대국과 컴퓨터 대전으로 다섯 돌을 먼저 완성해요.",
+    description: "친구 초대 대국과 컴퓨터 대전으로 다섯 돌을 먼저 완성해요.",
     cardDescription: "흑과 백으로 다섯 돌을 이어요.",
     howTo: "교차점을 선택해 돌을 놓고, Standard Omok에서는 흑의 금수 자리를 피하세요.",
     guide: GAME_GUIDES.omok,
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/omok",
     category: "Board",
-    recordType: "winRate",
-    rankingType: "winRate",
   },
   {
     id: "flappy",
@@ -72,8 +64,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/flappy",
     category: "Arcade",
-    recordType: null,
-    rankingType: null,
   },
   {
     id: "timing-tap",
@@ -85,8 +75,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/timing-tap",
     category: "Reaction",
-    recordType: null,
-    rankingType: null,
   },
   {
     id: "glow-sequence",
@@ -99,8 +87,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/glow-sequence",
     category: "Memory",
-    recordType: "round",
-    rankingType: "bestRound",
   },
   {
     id: "solitaire",
@@ -113,8 +99,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/solitaire",
     category: "Card",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "lits",
@@ -126,8 +110,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/lits",
     category: "Puzzle",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "shikaku",
@@ -139,8 +121,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/shikaku",
     category: "Puzzle",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "minesweeper",
@@ -152,8 +132,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/minesweeper",
     category: "Puzzle",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "set",
@@ -165,8 +143,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/set",
     category: "Card",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "mosaic",
@@ -178,8 +154,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/mosaic",
     category: "Puzzle",
-    recordType: "time",
-    rankingType: "bestTime",
   },
   {
     id: "block-blast",
@@ -191,8 +165,6 @@ export const MINIGAME_CATALOG = [
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/block-blast",
     category: "Puzzle",
-    recordType: "score",
-    rankingType: "highScore",
   },
 ];
 

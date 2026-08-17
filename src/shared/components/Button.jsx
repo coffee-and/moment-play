@@ -24,7 +24,7 @@ export const Button = forwardRef(function Button({
       className={joinClassNames([
         'button',
         `button--${variant}`,
-        size ? `button--${size}` : '',
+        size === 'small' ? 'button--small' : '',
         fullWidth ? 'button--full' : '',
         className,
       ])}

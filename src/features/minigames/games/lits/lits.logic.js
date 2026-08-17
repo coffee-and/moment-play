@@ -83,8 +83,6 @@ export const LITS_PUZZLES = [
 ];
 
 export const LITS_REGION_MAP = LITS_PUZZLES[0].regionMap;
-export const LITS_SOLUTION = LITS_PUZZLES[0].solution;
-
 const BASE_SHAPES = {
   I: [[0, 0], [0, 1], [0, 2], [0, 3]],
   L: [[0, 0], [1, 0], [2, 0], [2, 1]],

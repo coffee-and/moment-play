@@ -30,13 +30,6 @@ export function getContiguousLine(board, position, stone, direction) {
   return [...before, position, ...after];
 }
 
-export function getLongestLine(board, position, stone) {
-  return OMOK_DIRECTIONS.reduce((longest, direction) => {
-    const line = getContiguousLine(board, position, stone, direction);
-    return line.length > longest.length ? line : longest;
-  }, []);
-}
-
 export function hasOverline(board, position, stone = STONE.BLACK) {
   return OMOK_DIRECTIONS.some((direction) => getContiguousLine(board, position, stone, direction).length >= 6);
 }

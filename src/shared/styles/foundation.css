@@ -52,7 +52,6 @@
   --flappy-sky-top: #1b2450;
   --flappy-sky-center: #2a2f6b;
   --flappy-moon: #eef4ff;
-  --flappy-moon-cutout: #20295b;
   --flappy-pillar: #edf4ff;
   --flappy-fish: #79b5e8;
   --flappy-glow: #79a7e8;
@@ -61,13 +60,6 @@
   --flappy-star-cool: #ecf3ff;
   --flappy-star-glow: #b9d3ff;
   --flappy-shield: #b9d3ff;
-  --flappy-score-surface: #111b44;
-  --flappy-score-shadow: #070c22;
-  --flappy-score-text: #fff7dc;
-  --flappy-curtain-start: #141e4b;
-  --flappy-curtain-center: #222e69;
-  --flappy-curtain-text: #ffffff;
-  --flappy-curtain-muted: #dbe5f4;
 
   --palette-light-bg: var(--palette-white);
   --palette-light-bg-subtle: color-mix(in oklab, var(--palette-neutral-100) 52%, var(--palette-ivory));
@@ -97,7 +89,6 @@
   --accent: var(--palette-teal);
   --accent-2: var(--palette-teal);
   --accent-terracotta: var(--palette-terracotta);
-  --accent-sage: var(--palette-sage);
   --accent-yellow: var(--palette-yellow);
   --on-accent: var(--palette-ivory);
   --game-color-red: var(--palette-game-red);
@@ -110,7 +101,6 @@
   --game-color-pink: var(--palette-game-pink);
   --game-effect-positive: var(--game-color-green);
   --game-effect-perfect: var(--palette-effect-gold);
-  --game-effect-clear: var(--game-color-cyan);
   --game-effect-negative: var(--game-color-red);
   --game-effect-impact: var(--palette-effect-orange);
   --game-effect-depth: var(--palette-effect-plum);

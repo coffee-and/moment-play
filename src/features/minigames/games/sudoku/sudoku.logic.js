@@ -8,12 +8,6 @@ export function getColumnIndex(cellIndex) {
   return cellIndex % SUDOKU_BOARD_SIZE;
 }
 
-export function getBoxIndex(cellIndex) {
-  const row = getRowIndex(cellIndex);
-  const column = getColumnIndex(cellIndex);
-  return Math.floor(row / SUDOKU_BOX_SIZE) * SUDOKU_BOX_SIZE + Math.floor(column / SUDOKU_BOX_SIZE);
-}
-
 export function getRowIndexes(cellIndex) {
   const row = getRowIndex(cellIndex);
   const startIndex = row * SUDOKU_BOARD_SIZE;

@@ -13,7 +13,6 @@ export const OMOK_MODE = Object.freeze({
 });
 
 export const MATCH_TYPE = Object.freeze({
-  LOCAL: "local",
   COMPUTER: "computer",
   ONLINE: "online",
 });
@@ -59,13 +58,11 @@ export const OMOK_MODE_COMPACT_LABEL = Object.freeze({
 });
 
 export const MATCH_TYPE_LABEL = Object.freeze({
-  [MATCH_TYPE.LOCAL]: "Local match",
   [MATCH_TYPE.COMPUTER]: "Computer match",
   [MATCH_TYPE.ONLINE]: "Online room",
 });
 
 export const MATCH_TYPE_COMPACT_LABEL = Object.freeze({
-  [MATCH_TYPE.LOCAL]: "LOCAL",
   [MATCH_TYPE.COMPUTER]: "AI",
   [MATCH_TYPE.ONLINE]: "FRIEND",
 });

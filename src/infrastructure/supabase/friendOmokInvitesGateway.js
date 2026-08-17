@@ -64,9 +64,3 @@ export async function fetchFriendOmokInvites(client = getSupabaseClient()) {
   throwIfError(error);
   return (data ?? []).map(mapInvite);
 }
-
-export async function fetchPendingFriendOmokInviteCount(client = getSupabaseClient()) {
-  const { data, error } = await client.rpc("get_pending_friend_omok_invite_count");
-  throwIfError(error);
-  return Number(data ?? 0);
-}

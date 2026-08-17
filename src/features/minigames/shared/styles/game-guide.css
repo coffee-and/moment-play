@@ -42,19 +42,13 @@
   letter-spacing: .05em;
 }
 
-.game-guide-walkthrough__steps {
-  display: flex;
-  gap: 6px;
-}
-
-.game-guide-walkthrough__steps button,
 .game-guide-walkthrough__actions button {
   display: inline-grid;
-  min-width: 30px;
+  min-width: 72px;
   min-height: 30px;
   place-items: center;
   border: 1px solid var(--game-modal-action-border);
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 5px 9px;
   background: var(--game-modal-bg);
   color: var(--game-modal-muted);
@@ -64,18 +58,6 @@
   cursor: pointer;
 }
 
-.game-guide-walkthrough__steps button[aria-current="step"] {
-  border-color: var(--game-modal-text);
-  background: var(--game-modal-text);
-  color: var(--game-modal-bg);
-}
-
-.game-guide-walkthrough__actions button {
-  min-width: 72px;
-  border-radius: 10px;
-}
-
-.game-guide-walkthrough__steps button:disabled,
 .game-guide-walkthrough__actions button:disabled {
   cursor: default;
   opacity: .35;

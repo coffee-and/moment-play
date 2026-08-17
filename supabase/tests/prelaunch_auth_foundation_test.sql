@@ -106,7 +106,6 @@ values
   ('public.respond_friend_omok_invite(uuid,text)'),
   ('public.cancel_friend_omok_invite(uuid)'),
   ('public.get_friend_omok_invites()'),
-  ('public.get_pending_friend_omok_invite_count()'),
   ('public.omok_create_room(text,boolean,boolean,boolean,boolean)'),
   ('public.omok_join_room(uuid)'),
   ('public.omok_leave_room(uuid)'),

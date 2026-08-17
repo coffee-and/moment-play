@@ -3,7 +3,6 @@ import {
   cancelFriendOmokInvite,
   createFriendOmokInvite,
   fetchFriendOmokInvites,
-  fetchPendingFriendOmokInviteCount,
   respondToFriendOmokInvite,
 } from "./friendOmokInvitesGateway.js";
 
@@ -116,11 +115,6 @@ describe("friendOmokInvitesGateway", () => {
     expect(client.rpc).toHaveBeenCalledWith("cancel_friend_omok_invite", {
       p_invite_id: "invite-1",
     });
-  });
-
-  it("normalizes the pending incoming invite count to a number", async () => {
-    const client = createClient({ data: "3" });
-    await expect(fetchPendingFriendOmokInviteCount(client)).resolves.toBe(3);
   });
 
   it("propagates Supabase RPC errors", async () => {

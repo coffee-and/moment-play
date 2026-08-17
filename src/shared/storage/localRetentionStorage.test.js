@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
-import { readRetainedData, touchRetainedData, writeRetainedData } from "./localRetentionStorage.js";
+import { readRetainedData, writeRetainedData } from "./localRetentionStorage.js";
 
 const KEY = "eunContents.test.retention";
 const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
@@ -51,20 +51,5 @@ describe("localRetentionStorage", () => {
       configurable: true,
       value: originalLocalStorage,
     });
-  });
-
-  it("touchRetainedData refreshes lastActiveAt without changing the stored data", () => {
-    const staleEnvelope = {
-      data: { nickname: "Sunny" },
-      lastActiveAt: Date.now() - 1000,
-      version: 1,
-    };
-    window.localStorage.setItem(KEY, JSON.stringify(staleEnvelope));
-
-    touchRetainedData(KEY);
-
-    const updated = JSON.parse(window.localStorage.getItem(KEY));
-    expect(updated.data).toEqual({ nickname: "Sunny" });
-    expect(updated.lastActiveAt).toBeGreaterThan(staleEnvelope.lastActiveAt);
   });
 });
