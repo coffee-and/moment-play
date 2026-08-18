@@ -249,7 +249,7 @@
 4. [x] 친구 초대 스냅샷과 폴링 소유권 단일화
 5. [x] Flappy 토큰 중복 소유와 SET 원시 스타일 정리
 6. [x] Pages base path를 포함한 OAuth 실제 브라우저 회귀 검사 추가
-7. [ ] ESLint와 Playwright 산출물 디렉터리의 병렬 실행 경합 제거
+7. [x] ESLint와 Playwright 산출물 디렉터리의 병렬 실행 경합 제거
 8. [ ] 미사용 `.d3` 모션 스타일 제거와 최종 전체 검증
 
 ### 1번 완료 기록
@@ -301,3 +301,11 @@
 - E2E 환경 상수와 Supabase 인증 에뮬레이터를 support 모듈로 분리했다. 기존 게임 브라우저 검사는 세션 설치 계약만 재사용하고 OAuth 요청 형식은 전용 Pages 스펙이 소유한다.
 - 현재 Supabase redirect URL·Google OAuth 문서와 2026년 breaking-change 목록을 확인했다. 이번 검사는 현재 token endpoint 성공 상태인 HTTP 200을 사용하며 제품 코드나 DB 스키마에는 테스트 전용 분기와 변경을 추가하지 않았다.
 - ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, `/moment-play/`에서 실행한 Playwright 6개와 301개 모듈 Pages 프로덕션 빌드를 통과했다. 빌드 결과의 스크립트·스타일 경로도 모두 `/moment-play/assets/`를 사용한다.
+
+### 7번 완료 기록
+
+- Playwright의 기본 `test-results` 디렉터리는 실행 시작 시 정리되지만 `eslint .`의 순회 대상에서는 제외되지 않아, 병렬 실행 중 ESLint가 방금 사라진 파일을 읽으려는 경합이 가능했다. 실행 순서를 고정하거나 실패를 재시도하지 않고 두 도구가 공유하던 디렉터리 경계를 제거했다.
+- E2E 환경 계약이 `.artifacts/playwright`를 Playwright 전용 산출물 루트로 소유한다. 테스트 첨부물은 `test-results`, CI HTML 보고서는 `report` 하위로 분리하고 Playwright 설정은 이 공용 경로 상수만 사용한다.
+- ESLint는 `globalIgnores()`로 Playwright 전용 산출물 루트의 디렉터리 순회 자체를 제외하며 Git도 같은 루트만 추적 대상에서 제외한다. 이전 기본 경로의 ignore 규칙과 남아 있던 생성물은 제거해 두 출력 체계가 공존하지 않도록 했다.
+- `npm run check:static`과 Pages 프로덕션 빌드를 포함한 `npm run test:e2e`를 실제로 동시에 시작하는 검증을 3회 반복했다. 매회 ESLint와 Playwright 6개가 모두 통과했고 이전 기본 경로는 다시 생성되지 않았다.
+- CI 환경의 HTML reporter까지 실행해 `.artifacts/playwright/report/index.html` 생성 위치를 확인했다. 전체 품질 검사, Vitest 62개 파일 328개와 CI 조건 Playwright 6개를 통과했다.

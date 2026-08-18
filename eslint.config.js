@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import react from "eslint-plugin-react";
@@ -8,9 +9,9 @@ const sourceFiles = ["src/**/*.{js,jsx}"];
 const testFiles = ["src/**/*.{test,spec}.{js,jsx}", "tests/e2e/**/*.js"];
 const configFiles = ["*.config.js"];
 
-export default [
+export default defineConfig([
+  globalIgnores([".artifacts/playwright/", "dist/"], "Generated artifacts"),
   {
-    ignores: ["dist/**", "node_modules/**"],
     linterOptions: {
       reportUnusedDisableDirectives: "error",
     },
@@ -60,4 +61,4 @@ export default [
       globals: globals.node,
     },
   },
-];
+]);
