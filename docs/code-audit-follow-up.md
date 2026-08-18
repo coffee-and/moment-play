@@ -248,7 +248,7 @@
 3. [x] 지뢰찾기 터치 제스처의 취소·종료·언마운트 수명주기 복구
 4. [x] 친구 초대 스냅샷과 폴링 소유권 단일화
 5. [x] Flappy 토큰 중복 소유와 SET 원시 스타일 정리
-6. [ ] Pages base path를 포함한 OAuth 실제 브라우저 회귀 검사 추가
+6. [x] Pages base path를 포함한 OAuth 실제 브라우저 회귀 검사 추가
 7. [ ] ESLint와 Playwright 산출물 디렉터리의 병렬 실행 경합 제거
 8. [ ] 미사용 `.d3` 모션 스타일 제거와 최종 전체 검증
 
@@ -292,3 +292,12 @@
 - SET 카드의 surface·border·radius와 기본·힌트·선택·정답 shadow를 게임 루트의 의미 기반 토큰 계약으로 정리했다. 하위 카드 상태는 원시 색상·그림자·반지름을 반복하지 않고 역할 토큰만 소비한다.
 - 기존 색상과 그림자 계산식은 그대로 유지했다. 도형의 원·다이아몬드·물결 곡률은 공용 UI 장식이 아니라 게임 데이터 표현이므로 억지로 공용 반지름 토큰에 결합하지 않았다.
 - Flappy·SET 집중 테스트 29개와 ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, Playwright 5개 및 301개 모듈 프로덕션 빌드를 통과했다.
+
+### 6번 완료 기록
+
+- Playwright 서버가 항상 `GITHUB_PAGES=true`로 Pages 프로덕션 번들을 새로 빌드하고 `/moment-play/`에서 preview하도록 바꿨다. 기존 브라우저 검사도 루트 절대 경로 대신 이 배포 base를 기준으로 이동하므로, 개발 서버의 `/`에서만 우연히 통과하거나 이전 `dist`를 재사용하는 경로가 없다.
+- Google 버튼을 실제로 눌러 `supabase-js`가 PKCE authorize URL과 verifier를 생성하고 브라우저를 이동하게 했다. 외부 제공자와 Supabase 서버 응답만 네트워크 경계에서 에뮬레이션하며, 제품의 AuthProvider·callback 파싱·code 교환·세션 저장·보호 경로 복귀는 우회하지 않는다.
+- authorize 요청의 provider, S256 code challenge, 정확한 origin과 `/moment-play/` callback 경로, HashRouter 경로와 안전한 `returnTo`를 검증한다. callback에서는 query의 code와 저장된 verifier가 token 교환에 사용되고, 민감한 code가 URL에서 제거된 뒤 인증이 필요한 Settings 화면까지 복귀하는지를 확인한다.
+- E2E 환경 상수와 Supabase 인증 에뮬레이터를 support 모듈로 분리했다. 기존 게임 브라우저 검사는 세션 설치 계약만 재사용하고 OAuth 요청 형식은 전용 Pages 스펙이 소유한다.
+- 현재 Supabase redirect URL·Google OAuth 문서와 2026년 breaking-change 목록을 확인했다. 이번 검사는 현재 token endpoint 성공 상태인 HTTP 200을 사용하며 제품 코드나 DB 스키마에는 테스트 전용 분기와 변경을 추가하지 않았다.
+- ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, `/moment-play/`에서 실행한 Playwright 6개와 301개 모듈 Pages 프로덕션 빌드를 통과했다. 빌드 결과의 스크립트·스타일 경로도 모두 `/moment-play/assets/`를 사용한다.
