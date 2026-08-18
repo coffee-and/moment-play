@@ -14,14 +14,16 @@ import "./invite-notifications.css";
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const MAX_STORED_RESULT_KEYS = 80;
+const EMPTY_INVITES = Object.freeze([]);
+const EMPTY_SNAPSHOT = Object.freeze({ userId: null, invites: EMPTY_INVITES });
 
 const EMPTY_CONTEXT = Object.freeze({
+  invites: EMPTY_INVITES,
   isRefreshing: false,
   lastUpdatedAt: null,
   pendingCount: 0,
   recentResults: [],
   refreshInviteNotifications: async () => 0,
-  syncPendingCountFromInvites: () => 0,
 });
 
 const InviteNotificationContext = createContext(EMPTY_CONTEXT);
@@ -69,25 +71,26 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
   const requestRef = useRef(null);
   const seenResultKeysRef = useRef(new Set());
   const resultBaselineReadyRef = useRef(false);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [recentResults, setRecentResults] = useState([]);
+  const [snapshot, setSnapshot] = useState(EMPTY_SNAPSHOT);
   const [refreshStatus, setRefreshStatus] = useState("idle");
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
   const [resultNotification, setResultNotification] = useState(null);
 
   activeUserIdRef.current = activeUserId;
 
-  const applyInviteSnapshot = useCallback((invites) => {
-    const count = countActiveIncomingInvites(invites);
-    const recentInviteResults = getRecentInviteResults(invites, 4);
-    setPendingCount(count);
-    setRecentResults(recentInviteResults);
+  const invites = snapshot.userId === activeUserId ? snapshot.invites : EMPTY_INVITES;
+  const pendingCount = useMemo(() => countActiveIncomingInvites(invites), [invites]);
+  const recentResults = useMemo(() => getRecentInviteResults(invites, 4), [invites]);
+
+  const applyInviteSnapshot = useCallback((nextInvites) => {
+    setSnapshot({ userId: activeUserId, invites: nextInvites });
+    const count = countActiveIncomingInvites(nextInvites);
     setRefreshStatus("ready");
     setLastUpdatedAt(Date.now());
 
     if (!activeUserId) return count;
 
-    const resultHistory = getRecentInviteResults(invites, MAX_STORED_RESULT_KEYS);
+    const resultHistory = getRecentInviteResults(nextInvites, MAX_STORED_RESULT_KEYS);
     const entries = resultHistory
       .map((invite) => ({ invite, key: getInviteResultKey(invite) }))
       .filter((entry) => entry.key);
@@ -122,8 +125,7 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
 
   const refreshInviteNotifications = useCallback(async () => {
     if (!isConfigured || !activeUserId) {
-      setPendingCount(0);
-      setRecentResults([]);
+      setSnapshot(EMPTY_SNAPSHOT);
       setRefreshStatus("idle");
       setLastUpdatedAt(null);
       return 0;
@@ -136,12 +138,14 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
     const requestUserId = activeUserId;
     setRefreshStatus((current) => (current === "idle" ? "loading" : "refreshing"));
 
-    const request = fetchFriendOmokInvites()
+    const controller = new AbortController();
+    const request = fetchFriendOmokInvites({ signal: controller.signal })
       .then((invites) => {
-        if (activeUserIdRef.current !== requestUserId) return 0;
+        if (controller.signal.aborted || activeUserIdRef.current !== requestUserId) return 0;
         return applyInviteSnapshot(invites);
       })
       .catch((error) => {
+        if (controller.signal.aborted) return 0;
         if (activeUserIdRef.current === requestUserId) setRefreshStatus("error");
         throw error;
       })
@@ -149,21 +153,19 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
         if (requestRef.current?.promise === request) requestRef.current = null;
       });
 
-    requestRef.current = { promise: request, userId: requestUserId };
+    requestRef.current = { controller, promise: request, userId: requestUserId };
     return request;
   }, [activeUserId, applyInviteSnapshot, isConfigured]);
 
-  const syncPendingCountFromInvites = useCallback((invites) => applyInviteSnapshot(invites), [applyInviteSnapshot]);
-
   useEffect(() => {
+    requestRef.current?.controller.abort();
     requestRef.current = null;
     setResultNotification(null);
 
     if (!isConfigured || !activeUserId) {
       seenResultKeysRef.current = new Set();
       resultBaselineReadyRef.current = false;
-      setPendingCount(0);
-      setRecentResults([]);
+      setSnapshot(EMPTY_SNAPSHOT);
       setRefreshStatus("idle");
       setLastUpdatedAt(null);
       return undefined;
@@ -189,6 +191,10 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
       window.clearInterval(intervalId);
       window.removeEventListener("focus", refreshSilently);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (requestRef.current?.userId === activeUserId) {
+        requestRef.current.controller.abort();
+        requestRef.current = null;
+      }
     };
   }, [activeUserId, isConfigured, pollIntervalMs, refreshInviteNotifications]);
 
@@ -199,13 +205,13 @@ export function InviteNotificationProvider({ children, pollIntervalMs = DEFAULT_
   }, [resultNotification]);
 
   const value = useMemo(() => ({
+    invites,
     isRefreshing: refreshStatus === "loading" || refreshStatus === "refreshing",
     lastUpdatedAt,
     pendingCount,
     recentResults,
     refreshInviteNotifications,
-    syncPendingCountFromInvites,
-  }), [lastUpdatedAt, pendingCount, recentResults, refreshInviteNotifications, refreshStatus, syncPendingCountFromInvites]);
+  }), [invites, lastUpdatedAt, pendingCount, recentResults, refreshInviteNotifications, refreshStatus]);
 
   return (
     <InviteNotificationContext.Provider value={value}>

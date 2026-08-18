@@ -7,8 +7,11 @@ import {
 } from "./friendOmokInvitesGateway.js";
 
 function createClient({ data = null, error = null } = {}) {
+  const request = Promise.resolve({ data, error });
+  request.abortSignal = vi.fn(() => request);
   return {
-    rpc: vi.fn(async () => ({ data, error })),
+    request,
+    rpc: vi.fn(() => request),
   };
 }
 
@@ -71,7 +74,7 @@ describe("friendOmokInvitesGateway", () => {
       }],
     });
 
-    const [invite] = await fetchFriendOmokInvites(client);
+    const [invite] = await fetchFriendOmokInvites({ client });
 
     expect(invite).toEqual({
       inviteId: "invite-1",
@@ -121,6 +124,15 @@ describe("friendOmokInvitesGateway", () => {
     const error = new Error("offline");
     const client = createClient({ error });
 
-    await expect(fetchFriendOmokInvites(client)).rejects.toBe(error);
+    await expect(fetchFriendOmokInvites({ client })).rejects.toBe(error);
+  });
+
+  it("forwards an AbortSignal to the invite snapshot request", async () => {
+    const client = createClient({ data: [] });
+    const controller = new AbortController();
+
+    await fetchFriendOmokInvites({ client, signal: controller.signal });
+
+    expect(client.request.abortSignal).toHaveBeenCalledWith(controller.signal);
   });
 });

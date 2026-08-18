@@ -1,5 +1,3 @@
-export const FRIEND_INVITE_REFRESH_INTERVAL_MS = 20_000;
-
 export const FRIENDS_LOAD_STATUS = {
   IDLE: "idle",
   LOADING: "loading",
