@@ -250,7 +250,7 @@
 5. [x] Flappy 토큰 중복 소유와 SET 원시 스타일 정리
 6. [x] Pages base path를 포함한 OAuth 실제 브라우저 회귀 검사 추가
 7. [x] ESLint와 Playwright 산출물 디렉터리의 병렬 실행 경합 제거
-8. [ ] 미사용 `.d3` 모션 스타일 제거와 최종 전체 검증
+8. [x] 미사용 `.d3` 모션 스타일 제거와 최종 전체 검증
 
 ### 1번 완료 기록
 
@@ -309,3 +309,10 @@
 - ESLint는 `globalIgnores()`로 Playwright 전용 산출물 루트의 디렉터리 순회 자체를 제외하며 Git도 같은 루트만 추적 대상에서 제외한다. 이전 기본 경로의 ignore 규칙과 남아 있던 생성물은 제거해 두 출력 체계가 공존하지 않도록 했다.
 - `npm run check:static`과 Pages 프로덕션 빌드를 포함한 `npm run test:e2e`를 실제로 동시에 시작하는 검증을 3회 반복했다. 매회 ESLint와 Playwright 6개가 모두 통과했고 이전 기본 경로는 다시 생성되지 않았다.
 - CI 환경의 HTML reporter까지 실행해 `.artifacts/playwright/report/index.html` 생성 위치를 확인했다. 전체 품질 검사, Vitest 62개 파일 328개와 CI 조건 Playwright 6개를 통과했다.
+
+### 8번 완료 기록
+
+- 전역 모션 스타일의 `.d3`는 CSS 정의 외에 JSX, JavaScript, 테스트와 동적 클래스 조합 어디에도 소비자가 없음을 전체 검색으로 확인하고 제거했다.
+- 실제 사용 중인 `.d1`과 `.d2`, 공용 `.reveal` 애니메이션과 reduced-motion 계약은 변경하지 않았다. 소스 CSS와 새로 생성한 프로덕션 CSS 결과물 모두에 `.d3` 선택자가 남지 않았음을 확인했다.
+- ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, 일반 프로덕션 빌드와 Pages 프로덕션 번들을 사용하는 Playwright 6개를 통과했다.
+- `npm audit --audit-level=high` 결과 취약점은 0건이며 작업 목록의 코드 변경 항목을 모두 완료했다.

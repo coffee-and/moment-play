@@ -11,10 +11,6 @@
   animation-delay: 0.12s;
 }
 
-.d3 {
-  animation-delay: 0.19s;
-}
-
 @keyframes fadeUp {
   from {
     opacity: 0;
