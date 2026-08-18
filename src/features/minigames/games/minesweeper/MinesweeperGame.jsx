@@ -15,6 +15,7 @@ import {
   revealMineCell,
   toggleMineFlag,
 } from "./minesweeper.logic.js";
+import { useMinesweeperCellPress } from "./useMinesweeperCellPress.js";
 import "./minesweeper.css";
 
 const SIZE = 9;
@@ -46,8 +47,6 @@ export function MinesweeperGame({ game }) {
   const [status, setStatus] = useState("첫 칸은 항상 안전해요.");
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const boardRef = useRef(null);
-  const longPressTimerRef = useRef(null);
-  const suppressClickRef = useRef(false);
   const revealedNumberIndex = board.findIndex((cell, index) => (
     cell.state === MINE_CELL_STATE.REVEALED
     && cell.adjacent > 0
@@ -78,8 +77,14 @@ export function MinesweeperGame({ game }) {
       targetIndexes: [safeIndex],
     },
   ]);
+  const cellPress = useMinesweeperCellPress({
+    isEnabled: session.phase === "playing" && !isAnswerRevealed,
+    onFlag: flagCell,
+    onReveal: revealCell,
+  });
 
   function startGame({ preserveStreak = false } = {}) {
+    cellPress.cancel();
     setBoard(createHiddenBoard(SIZE));
     setHasPlantedMines(false);
     setFlagMode(false);
@@ -128,6 +133,7 @@ export function MinesweeperGame({ game }) {
   }
 
   function revealAnswer() {
+    cellPress.cancel();
     const plantedBoard = hasPlantedMines
       ? board
       : plantMines(SIZE, MINE_COUNT, Math.floor((SIZE * SIZE) / 2), Math.random, board);
@@ -199,27 +205,8 @@ export function MinesweeperGame({ game }) {
                 data-index={index}
                 disabled={isAnswerRevealed}
                 key={index}
-                onClick={() => {
-                  if (suppressClickRef.current) {
-                    suppressClickRef.current = false;
-                    return;
-                  }
-                  revealCell(index);
-                }}
-                onContextMenu={(event) => {
-                  event.preventDefault();
-                  flagCell(index);
-                }}
                 onKeyDown={(event) => handleKeyDown(event, index)}
-                onPointerCancel={() => window.clearTimeout(longPressTimerRef.current)}
-                onPointerDown={(event) => {
-                  if (event.pointerType !== "touch") return;
-                  longPressTimerRef.current = window.setTimeout(() => {
-                    suppressClickRef.current = true;
-                    flagCell(index);
-                  }, 480);
-                }}
-                onPointerUp={() => window.clearTimeout(longPressTimerRef.current)}
+                {...cellPress.getCellHandlers(index)}
                 type="button"
               >
                 {cell.state === MINE_CELL_STATE.FLAGGED

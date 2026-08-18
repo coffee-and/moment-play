@@ -59,6 +59,38 @@ async function openTimingTap(page, { fromCatalog = false } = {}) {
   await expect(page.getByRole("dialog", { name: "목표 구간에 맞춰 탭!" })).toBeVisible();
 }
 
+async function openMinesweeper(page) {
+  await useAuthenticatedSession(page);
+  await page.goto("/?browser-test=minesweeper-touch#/");
+  await page.evaluate(() => { window.location.hash = "#/minigames/minesweeper"; });
+  await page.getByRole("button", { name: "게임 시작하기" }).click();
+  await page.getByRole("dialog", { name: "Minesweeper" })
+    .getByRole("button", { name: "게임 시작", exact: true })
+    .click();
+  await expect(page.locator(".minesweeper-board")).toBeVisible();
+}
+
+async function longPressWithNativeTouch(page, target, durationMs) {
+  await target.scrollIntoViewIfNeeded();
+  const bounds = await target.boundingBox();
+  if (!bounds) throw new Error("Touch target has no visible bounds.");
+
+  const client = await page.context().newCDPSession(page);
+  await client.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 1 });
+  const touchPoint = {
+    force: 1,
+    id: 1,
+    radiusX: 1,
+    radiusY: 1,
+    x: Math.floor(bounds.x + bounds.width / 2),
+    y: Math.floor(bounds.y + bounds.height / 2),
+  };
+  await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [touchPoint] });
+  await page.waitForTimeout(durationMs);
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await client.detach();
+}
+
 async function expectNoHorizontalOverflow(page) {
   const widths = await page.evaluate(() => ({
     body: document.body.scrollWidth,
@@ -131,6 +163,62 @@ test("game controls activate from the keyboard and the exit modal pauses play", 
   await expect(page).toHaveURL(/#\/$/);
   expect(await page.goForward()).toBeNull();
   await expect(page.getByRole("button", { name: "게임 시작하기" })).toHaveCount(0);
+});
+
+test("minesweeper touch gestures cancel pending work across movement, pause, and exit", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await openMinesweeper(page);
+
+  const firstCell = page.locator('[data-index="0"]');
+  await longPressWithNativeTouch(page, firstCell, 1_420);
+  await expect(firstCell).toHaveAttribute("aria-label", /깃발/);
+
+  const movedCell = page.locator('[data-index="1"]');
+  await movedCell.dispatchEvent("pointerdown", {
+    clientX: 10,
+    clientY: 10,
+    isPrimary: true,
+    pointerId: 2,
+    pointerType: "touch",
+  });
+  await movedCell.dispatchEvent("pointermove", {
+    clientX: 30,
+    clientY: 10,
+    pointerId: 2,
+    pointerType: "touch",
+  });
+  await page.waitForTimeout(520);
+  await expect(movedCell).toHaveAttribute("aria-label", /닫힘/);
+
+  const pausedCell = page.locator('[data-index="2"]');
+  await pausedCell.dispatchEvent("pointerdown", {
+    clientX: 10,
+    clientY: 10,
+    isPrimary: true,
+    pointerId: 3,
+    pointerType: "touch",
+  });
+  await page.getByRole("button", { name: "게임 일시정지" }).click();
+  await page.waitForTimeout(520);
+  await expect(pausedCell).toHaveAttribute("aria-label", /닫힘/);
+  await page.getByRole("button", { name: "계속하기", exact: true }).click();
+
+  const exitingCell = page.locator('[data-index="3"]');
+  await exitingCell.dispatchEvent("pointerdown", {
+    clientX: 10,
+    clientY: 10,
+    isPrimary: true,
+    pointerId: 4,
+    pointerType: "touch",
+  });
+  await page.getByRole("button", { name: "게임 나가기" }).click();
+  await page.getByRole("dialog", { name: "게임을 나갈까요?" })
+    .getByRole("button", { name: "나가기", exact: true })
+    .click();
+  await page.waitForTimeout(520);
+  await expect(page).toHaveURL(/#\/$/);
+  expect(pageErrors).toEqual([]);
 });
 
 test("core screens do not create horizontal overflow on a narrow viewport", async ({ page }) => {
