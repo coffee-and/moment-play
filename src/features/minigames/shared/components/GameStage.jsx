@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
 import { useGameGuide } from './GameGuideContext.jsx';
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
-import { useGameBrowserBackGuard } from '../hooks/useGameBrowserBackGuard.js';
 import styles from './GameStage.module.css';
 
 function joinClassNames(values) {
@@ -15,9 +14,7 @@ export function GameStage({
   children,
   className = '',
   eyebrow,
-  isExitConfirmationOpen = false,
   isPaused = false,
-  onRequestExit,
   phase,
   sidebar,
   title,
@@ -27,8 +24,6 @@ export function GameStage({
   const touchTimerRef = useRef(null);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const guide = useGameGuide();
-
-  useGameBrowserBackGuard({ isExitConfirmationOpen, onRequestExit });
 
   function handleTouchFeedback(event) {
     if (event.button != null && event.button !== 0) return;

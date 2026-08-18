@@ -13,6 +13,7 @@ import { GameStageModal, GameStageOverlay } from "../../shared/components/GameSt
 import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
 import { getStreakCelebrationCopy, NEXT_ROUND_LABEL, useGameStreak } from "../../shared/gameStreak.js";
 import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import {
   DEFAULT_SUDOKU_GAME_META,
@@ -89,6 +90,11 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const [records, setRecords] = useState(() => readRecords());
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitConfirmOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const [isSurrenderOpen, setIsSurrenderOpen] = useState(false);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
@@ -224,9 +230,9 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function closeResetConfirm() { setPhase(SUDOKU_PHASE.PLAYING); focusCell(selectedIndexRef.current); }
   function confirmNewGame() { void startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
   function returnToLevelSelect() { const puzzle = activePuzzleRef.current; gameStreak.disqualifyRound(); startedAtRef.current = null; elapsedMillisecondsRef.current = 0; isRankedAttemptRef.current = false; rankedEventsRef.current = []; setUserValues(createEmptyUserValues()); setElapsedSeconds(0); setSelectedIndex(getInitialSelectedIndex(puzzle.puzzle)); setPhase(SUDOKU_PHASE.IDLE); }
-  function requestExit() { if (phaseRef.current === SUDOKU_PHASE.IDLE || phaseRef.current === SUDOKU_PHASE.COMPLETED) { navigate("/"); return; } const currentElapsedMs = getCurrentElapsedMilliseconds(); elapsedMillisecondsRef.current = currentElapsedMs; elapsedSecondsRef.current = Math.floor(currentElapsedMs / 1000); setElapsedSeconds(elapsedSecondsRef.current); startedAtRef.current = null; setIsExitConfirmOpen(true); }
+  function requestExit() { if (phaseRef.current === SUDOKU_PHASE.IDLE || phaseRef.current === SUDOKU_PHASE.COMPLETED) { navigateFromGame("/"); return; } const currentElapsedMs = getCurrentElapsedMilliseconds(); elapsedMillisecondsRef.current = currentElapsedMs; elapsedSecondsRef.current = Math.floor(currentElapsedMs / 1000); setElapsedSeconds(elapsedSecondsRef.current); startedAtRef.current = null; setIsExitConfirmOpen(true); }
   function cancelExit() { startedAtRef.current = performance.now() - elapsedMillisecondsRef.current; setIsExitConfirmOpen(false); focusCell(selectedIndexRef.current); }
-  function confirmExit() { gameStreak.disqualifyRound(); startedAtRef.current = null; navigate("/"); }
+  function confirmExit() { gameStreak.disqualifyRound(); startedAtRef.current = null; navigateFromGame("/"); }
   function requestSurrender() { const currentElapsedMs = getCurrentElapsedMilliseconds(); elapsedMillisecondsRef.current = currentElapsedMs; elapsedSecondsRef.current = Math.floor(currentElapsedMs / 1000); setElapsedSeconds(elapsedSecondsRef.current); startedAtRef.current = null; setIsSurrenderOpen(true); }
   function cancelSurrender() { startedAtRef.current = performance.now() - elapsedMillisecondsRef.current; setIsSurrenderOpen(false); focusCell(selectedIndexRef.current); }
   function revealSolution() { const solution = activeSolutionRef.current; if (!solution) return; gameStreak.disqualifyRound({ answerRevealed: true }); setUserValues([...solution]); setIsSurrenderOpen(false); setIsAnswerRevealed(true); }
@@ -262,7 +268,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty", hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""]); }
 
   return (
-    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel={game.title}>
+    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} actions={gameActions} sidebar={sidebar} ariaLabel={game.title}>
       <div className="sudoku-game__stage">
         {phase !== SUDOKU_PHASE.IDLE ? (
           <div className="sudoku-game__play">

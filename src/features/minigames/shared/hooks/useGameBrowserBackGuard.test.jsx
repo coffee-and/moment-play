@@ -6,8 +6,14 @@ import { useGameBrowserBackGuard } from "./useGameBrowserBackGuard.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-function GuardHarness({ isOpen, onRequestExit }) {
-  useGameBrowserBackGuard({ isExitConfirmationOpen: isOpen, onRequestExit });
+let latestNavigateFromGame = null;
+
+function GuardHarness({ isOpen, onNavigate, onRequestExit }) {
+  latestNavigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isOpen,
+    onNavigate,
+    onRequestExit,
+  });
   return null;
 }
 
@@ -30,19 +36,21 @@ function renderGuard(props) {
 
 describe("useGameBrowserBackGuard", () => {
   afterEach(() => {
+    latestNavigateFromGame = null;
     window.history.replaceState({}, "", "/");
   });
 
   it("turns a browser back event on a hash game route into an exit request", () => {
     window.history.replaceState({}, "", "/#/minigames/memory");
+    const onNavigate = vi.fn();
     const onRequestExit = vi.fn();
-    const view = renderGuard({ isOpen: false, onRequestExit });
+    const view = renderGuard({ isOpen: false, onNavigate, onRequestExit });
 
     act(() => window.dispatchEvent(new PopStateEvent("popstate")));
     expect(onRequestExit).toHaveBeenCalledTimes(1);
 
-    view.rerender({ isOpen: true, onRequestExit });
-    view.rerender({ isOpen: false, onRequestExit });
+    view.rerender({ isOpen: true, onNavigate, onRequestExit });
+    view.rerender({ isOpen: false, onNavigate, onRequestExit });
     act(() => window.dispatchEvent(new PopStateEvent("popstate")));
     expect(onRequestExit).toHaveBeenCalledTimes(2);
     view.unmount();
@@ -50,11 +58,41 @@ describe("useGameBrowserBackGuard", () => {
 
   it("does not intercept navigation away from non-game routes", () => {
     window.history.replaceState({}, "", "/#/games");
+    const onNavigate = vi.fn();
     const onRequestExit = vi.fn();
-    const view = renderGuard({ isOpen: false, onRequestExit });
+    const view = renderGuard({ isOpen: false, onNavigate, onRequestExit });
 
     act(() => window.dispatchEvent(new PopStateEvent("popstate")));
     expect(onRequestExit).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it("unwinds its guard entry before replacing the original game route", () => {
+    window.history.replaceState({}, "", "/#/minigames/memory");
+    const onNavigate = vi.fn();
+    const onRequestExit = vi.fn();
+    const view = renderGuard({ isOpen: false, onNavigate, onRequestExit });
+
+    act(() => latestNavigateFromGame("/"));
+    expect(onNavigate).not.toHaveBeenCalled();
+
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    expect(onNavigate).toHaveBeenCalledWith("/", { replace: true });
+    expect(onRequestExit).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it("replaces the original route directly after browser Back was confirmed", () => {
+    window.history.replaceState({}, "", "/#/minigames/memory");
+    const onNavigate = vi.fn();
+    const onRequestExit = vi.fn();
+    const view = renderGuard({ isOpen: false, onNavigate, onRequestExit });
+
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    act(() => latestNavigateFromGame("/"));
+
+    expect(onRequestExit).toHaveBeenCalledTimes(1);
+    expect(onNavigate).toHaveBeenCalledWith("/", { replace: true });
     view.unmount();
   });
 });

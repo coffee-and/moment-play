@@ -40,11 +40,18 @@ async function useAuthenticatedSession(page) {
   }, { storageKey: AUTH_STORAGE_KEY, session: createTestSession() });
 }
 
-async function openTimingTap(page) {
+async function openTimingTap(page, { fromCatalog = false } = {}) {
   await useAuthenticatedSession(page);
   // A query-string navigation forces a new document even when a previous
   // assertion already changed only the HashRouter fragment in this page.
-  await page.goto("/?browser-test=auth#/minigames/timing-tap");
+  await page.goto("/?browser-test=auth#/");
+  if (fromCatalog) {
+    const primaryNavigation = page.getByRole("navigation", { name: "주요 메뉴" });
+    await primaryNavigation.getByRole("link", { name: "게임" }).click();
+    await page.locator('[data-game="timing-tap"]').click();
+  } else {
+    await page.evaluate(() => { window.location.hash = "#/minigames/timing-tap"; });
+  }
   const routeStartButton = page.getByRole("button", { name: "게임 시작하기" });
   await expect(routeStartButton).toBeVisible();
   await routeStartButton.focus();
@@ -92,7 +99,7 @@ test("primary navigation and unknown-route recovery preserve hash routing", asyn
 });
 
 test("game controls activate from the keyboard and the exit modal pauses play", async ({ page }) => {
-  await openTimingTap(page);
+  await openTimingTap(page, { fromCatalog: true });
   const gameStartButton = page.getByRole("button", { name: "게임 시작", exact: true });
   await gameStartButton.focus();
   await page.keyboard.press("Enter");
@@ -109,6 +116,21 @@ test("game controls activate from the keyboard and the exit modal pauses play", 
 
   await page.getByRole("button", { name: "계속하기" }).click();
   await expect.poll(() => needle.getAttribute("style")).not.toBe(pausedPosition);
+
+  await page.goBack();
+  await expect(page.getByRole("dialog", { name: "타이밍 도전을 나갈까요?" })).toBeVisible();
+  await page.getByRole("button", { name: "나가기", exact: true }).click();
+  await expect(page).toHaveURL(/#\/$/);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#\/minigames$/);
+  await expect(page.getByRole("heading", { name: "ALL GAMES" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "게임 시작하기" })).toHaveCount(0);
+
+  await page.goForward();
+  await expect(page).toHaveURL(/#\/$/);
+  expect(await page.goForward()).toBeNull();
+  await expect(page.getByRole("button", { name: "게임 시작하기" })).toHaveCount(0);
 });
 
 test("core screens do not create horizontal overflow on a narrow viewport", async ({ page }) => {

@@ -10,6 +10,7 @@ import { GameCelebration } from "../../shared/components/GameCelebration.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import feedbackStyles from "./timing-tap-feedback.module.css";
 import "./timing-tap.css";
 import {
@@ -72,6 +73,11 @@ export function TimingTapGame({ game }) {
   const [best, setBest] = useState(readBestScore);
   const [result, setResult] = useState(null);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const frameRef = useRef(null);
   const roundStartRef = useRef(0);
   const roundElapsedRef = useRef(0);
@@ -246,7 +252,7 @@ export function TimingTapGame({ game }) {
   function requestExit() {
     const currentPhase = phaseRef.current;
     if (currentPhase === "idle" || currentPhase === "completed") {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     if (isExitOpenRef.current) return;
@@ -298,9 +304,7 @@ export function TimingTapGame({ game }) {
       ariaLabel="타이밍 탭 게임"
       className="timing-tap"
       eyebrow="REACTION / TIMING"
-      isExitConfirmationOpen={isExitOpen}
       isPaused={isExitOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
@@ -390,7 +394,7 @@ export function TimingTapGame({ game }) {
             <h3 id="timing-exit-title">타이밍 도전을 나갈까요?</h3>
             <p>현재 라운드 기록은 저장되지 않아요.</p>
             <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button data-modal-initial-focus="" variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>
           </GameStageModal>

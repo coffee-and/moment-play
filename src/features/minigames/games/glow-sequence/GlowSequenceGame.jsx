@@ -9,6 +9,7 @@ import { GameRecordCelebration } from "../../shared/components/GameRecordCelebra
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { GAME_COLOR_PALETTE } from "../../shared/gameColorPalette.js";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import {
   GLOW_SEQUENCE_MASTER_COUNT,
   GLOW_SEQUENCE_MAX_ROUND,
@@ -55,6 +56,11 @@ export function GlowSequenceGame({ game }) {
   const [bestRound, setBestRound] = useState(readBestRound);
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const bestRoundRef = useRef(bestRound);
 
   const sequenceLength = getGlowSequenceLength(round);
@@ -170,7 +176,7 @@ export function GlowSequenceGame({ game }) {
 
   function requestExit() {
     if (phase === "idle" || phase === "master") {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     clearTimers();
@@ -210,8 +216,6 @@ export function GlowSequenceGame({ game }) {
       ariaLabel="글로우 시퀀스 게임"
       className="glow-sequence"
       eyebrow="MEMORY / LIGHT"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
@@ -274,7 +278,7 @@ export function GlowSequenceGame({ game }) {
             <p>{GLOW_SEQUENCE_MASTER_COUNT}개의 빛 순서를 모두 기억했어요. 실수 {mistakes}회로 최종 단계를 완료했습니다.</p>
             <div className="game-stage-modal__actions">
               <Button onClick={startGame}>다시 도전</Button>
-              <Button variant="secondary" onClick={() => navigate("/")}>홈으로</Button>
+              <Button variant="secondary" onClick={() => navigateFromGame("/")}>홈으로</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -287,7 +291,7 @@ export function GlowSequenceGame({ game }) {
             <h3 id="glow-exit-title">도전을 나갈까요?</h3>
             <p>최고 라운드는 저장되지만 현재 진행 중인 순서는 종료돼요.</p>
             <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>
           </GameStageModal>

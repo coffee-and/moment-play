@@ -11,6 +11,7 @@ import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/Puzzl
 import { getStreakCelebrationCopy, NEXT_ROUND_LABEL, useGameStreak } from "../../shared/gameStreak.js";
 import { isNewGameRecord, RECORD_DIRECTION } from "../../shared/gameRecord.js";
 import { formatActiveGameTime, useActiveGameTimer } from "../../shared/hooks/useActiveGameTimer.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import {
   dealSolitaire,
@@ -167,6 +168,11 @@ export function SolitaireGame({ game }) {
   const [records, setRecords] = useState(() => readSolitaireRecords());
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const [isNewGameOpen, setIsNewGameOpen] = useState(false);
   const { elapsedMs, resetTimer } = useActiveGameTimer(
     phase === "playing" && !isExitOpen && !isNewGameOpen,
@@ -352,7 +358,7 @@ export function SolitaireGame({ game }) {
   }
 
   function requestExit() {
-    if (phase === "idle" || phase === "completed") navigate("/");
+    if (phase === "idle" || phase === "completed") navigateFromGame("/");
     else setIsExitOpen(true);
   }
 
@@ -406,8 +412,6 @@ export function SolitaireGame({ game }) {
       ariaLabel="솔리테어 게임"
       className="solitaire-game"
       eyebrow="CARD / KLONDIKE"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
@@ -606,7 +610,7 @@ export function SolitaireGame({ game }) {
               <Button onClick={() => setIsExitOpen(false)}>계속하기</Button>
               <Button variant="secondary" onClick={() => {
                 gameStreak.disqualifyRound();
-                navigate("/");
+                navigateFromGame("/");
               }}>게임 나가기</Button>
             </div>
           </GameStageModal>

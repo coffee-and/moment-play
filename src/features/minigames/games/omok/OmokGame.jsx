@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import {
   FORBIDDEN_REASON_LABEL,
   MATCH_TYPE,
@@ -61,9 +62,14 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
   const [activeMatch, setActiveMatch] = useState(() => createOmokMatchConfig(MATCH_TYPE.COMPUTER, DEFAULT_OMOK_SETTINGS));
   const [matchKey, setMatchKey] = useState(0);
   const [startedOnlineRound, setStartedOnlineRound] = useState(null);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: dialog === OMOK_DIALOG.LEAVE_CONFIRM,
+    onNavigate: navigate,
+    onRequestExit: requestGameExit,
+  });
   const online = useOmokOnlineRoom({
-    onNavigateToLobby: () => navigate("/minigames/omok"),
-    onNavigateToRoom: (nextRoomId) => navigate(`/minigames/omok/room/${encodeURIComponent(nextRoomId)}`),
+    onNavigateToLobby: () => navigateFromGame("/minigames/omok"),
+    onNavigateToRoom: (nextRoomId) => navigateFromGame(`/minigames/omok/room/${encodeURIComponent(nextRoomId)}`),
     roomId,
   });
 
@@ -404,7 +410,7 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
       requestReturnToMenu();
       return;
     }
-    navigate("/");
+    navigateFromGame("/");
   }
 
   const sidebar = (
@@ -440,8 +446,6 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
       className={"omok-game" + (isGameScreenVisible ? " is-game-screen" : "")}
       eyebrow={game.eyebrow}
       title={game.title}
-      isExitConfirmationOpen={dialog === OMOK_DIALOG.LEAVE_CONFIRM}
-      onRequestExit={requestGameExit}
       sidebar={sidebar}
       ariaLabel={game.title}
     >

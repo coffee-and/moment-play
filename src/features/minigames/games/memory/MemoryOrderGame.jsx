@@ -6,6 +6,7 @@ import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
 import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import {
   MEMORY_ORDER_INITIAL_LIVES,
   MEMORY_ORDER_ROUNDS,
@@ -65,6 +66,11 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const [replayGauge, setReplayGauge] = useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [failureStatus, setFailureStatus] = useState(null);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitConfirmOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
 
   const activeTimerRef = useRef(null);
   const roundTransitionTimerRef = useRef(null);
@@ -303,7 +309,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function requestExit() {
     if (phaseRef.current === PHASE.IDLE || phaseRef.current === PHASE.FAILED || phaseRef.current === PHASE.COMPLETED) {
       clearGameTimers();
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     setIsExitConfirmOpen(true);
@@ -316,7 +322,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   function confirmExit() {
     clearGameTimers();
     setIsExitConfirmOpen(false);
-    navigate("/");
+    navigateFromGame("/");
   }
 
   async function startGame() {
@@ -538,8 +544,6 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
       eyebrow={game.eyebrow}
       title={game.title}
       actions={gameActions}
-      isExitConfirmationOpen={isExitConfirmOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       ariaLabel={game.title}
     >

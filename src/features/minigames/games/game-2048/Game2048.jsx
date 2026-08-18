@@ -12,6 +12,7 @@ import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import "./game-2048.css";
 import {
   BOARD_SIZE,
@@ -108,6 +109,11 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitConfirmOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
 
   const boardRef = useRef(board);
   const scoreRef = useRef(score);
@@ -282,7 +288,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   function requestExit() {
     pointerStartRef.current = null;
     if (phaseRef.current === GAME_2048_PHASE.IDLE || phaseRef.current === GAME_2048_PHASE.GAME_OVER || phaseRef.current === GAME_2048_PHASE.COMPLETED) {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     setIsExitConfirmOpen(true);
@@ -290,7 +296,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
 
   function confirmExit() {
     pointerStartRef.current = null;
-    navigate("/");
+    navigateFromGame("/");
   }
 
   function continueToNextTarget() {
@@ -347,7 +353,7 @@ export function Game2048({ game = DEFAULT_GAME_META }) {
   );
 
   return (
-    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} actions={gameActions} isExitConfirmationOpen={isExitConfirmOpen} onRequestExit={requestExit} sidebar={sidebar} ariaLabel="2048 게임">
+    <GameStage className="game-2048" eyebrow={game.eyebrow} title={game.title} actions={gameActions} sidebar={sidebar} ariaLabel="2048 게임">
       <div className="game-2048__stage-content">
         {phase !== GAME_2048_PHASE.IDLE ? (
           <>

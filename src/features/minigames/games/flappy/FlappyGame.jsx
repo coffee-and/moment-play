@@ -10,6 +10,7 @@ import { GameRecordCelebration } from "../../shared/components/GameRecordCelebra
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { FlappyFish } from "./FlappyFish.jsx";
 import {
   FLAPPY_CONFIG,
@@ -59,6 +60,11 @@ export function FlappyGame({ game }) {
   const [best, setBest] = useState(readBestScore);
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const [actionFeedback, setActionFeedback] = useState(null);
   const phaseRef = useRef(phase);
   const worldRef = useRef(world);
@@ -229,7 +235,7 @@ export function FlappyGame({ game }) {
 
   function requestExit() {
     if (phase === "idle" || phase === "over") {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     resumeAfterDialogRef.current = phase === "playing";
@@ -271,8 +277,6 @@ export function FlappyGame({ game }) {
       ariaLabel="별빛 비행 게임"
       className="flappy-game"
       eyebrow="ARCADE / FLIGHT"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
@@ -387,7 +391,7 @@ export function FlappyGame({ game }) {
             <h3 id="flappy-exit-title">비행을 종료할까요?</h3>
             <p>현재 점수는 최고 기록에 반영되지 않아요.</p>
             <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={closeExitDialog}>계속 비행</Button>
             </div>
           </GameStageModal>

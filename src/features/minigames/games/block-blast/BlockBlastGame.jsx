@@ -17,6 +17,7 @@ import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import {
   BLOCK_BLAST_SIZE,
@@ -62,6 +63,11 @@ export function BlockBlastGame({ game }) {
   const [isExitOpen, setIsExitOpen] = useState(false);
   const [previewOrigin, setPreviewOrigin] = useState(null);
   const [actionFeedback, setActionFeedback] = useState(null);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const dragPieceIndexRef = useRef(null);
   const feedbackSequenceRef = useRef(0);
   const feedbackTimerRef = useRef(null);
@@ -185,7 +191,7 @@ export function BlockBlastGame({ game }) {
 
   function requestExit() {
     if (phase === "idle" || phase === "gameover") {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     setIsExitOpen(true);
@@ -245,8 +251,6 @@ export function BlockBlastGame({ game }) {
       ariaLabel="블록 블라스트 게임"
       className="block-blast-game"
       eyebrow="BLOCK / SCORE"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       phase={phase}
       sidebar={sidebar}
       title={game.title}
@@ -379,7 +383,7 @@ export function BlockBlastGame({ game }) {
             {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
             <div className="game-stage-modal__actions">
               <Button onClick={startGame}>다시 도전</Button>
-              <Button variant="secondary" onClick={() => navigate("/")}>게임 목록으로</Button>
+              <Button variant="secondary" onClick={() => navigateFromGame("/")}>게임 목록으로</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -406,7 +410,7 @@ export function BlockBlastGame({ game }) {
             <h2 id="block-blast-exit-title">게임을 나갈까요?</h2>
             <p>현재 점수와 보드는 저장되지 않아요.</p>
             <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>
           </GameStageModal>
