@@ -22,13 +22,14 @@ import {
   normalizeFriendCode,
 } from "./friendsPageModel.js";
 
-export function useFriendsDashboard({ authStatus, isConfigured, navigateToRoom }) {
+export function useFriendsDashboard({ accountId, navigateToRoom }) {
   const {
     invites,
     isRefreshing: isRefreshingInvites,
     refreshInviteNotifications,
   } = useInviteNotifications();
   const copyResetTimerRef = useRef(null);
+  const activeRef = useRef(true);
   const [profile, setProfile] = useState(null);
   const [overview, setOverview] = useState([]);
   const [loadStatus, setLoadStatus] = useState(FRIENDS_LOAD_STATUS.IDLE);
@@ -72,11 +73,6 @@ export function useFriendsDashboard({ authStatus, isConfigured, navigateToRoom }
   }, [refreshInviteNotifications]);
 
   useEffect(() => {
-    if (authStatus !== "authenticated" || !isConfigured) {
-      setLoadStatus(FRIENDS_LOAD_STATUS.IDLE);
-      return undefined;
-    }
-
     let active = true;
     setLoadStatus(FRIENDS_LOAD_STATUS.LOADING);
     setPageError("");
@@ -96,14 +92,21 @@ export function useFriendsDashboard({ authStatus, isConfigured, navigateToRoom }
     return () => {
       active = false;
     };
-  }, [applyDashboard, authStatus, fetchDashboard, isConfigured]);
+  }, [accountId, applyDashboard, fetchDashboard]);
 
-  useEffect(() => () => window.clearTimeout(copyResetTimerRef.current), []);
+  useEffect(() => {
+    activeRef.current = true;
+    return () => {
+      activeRef.current = false;
+      window.clearTimeout(copyResetTimerRef.current);
+    };
+  }, []);
 
   const groups = useMemo(() => groupFriendOverview(overview), [overview]);
   const inviteGroups = useMemo(() => groupFriendInvites(invites), [invites]);
 
   const enterRoom = useCallback((roomId) => {
+    if (!activeRef.current) return;
     if (!roomId) {
       setInviteError("초대 대기실 정보를 찾지 못했어요.");
       return;

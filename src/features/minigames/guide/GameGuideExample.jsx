@@ -1,8 +1,13 @@
+import { bindCssModule } from "../../../shared/styles/bindCssModule.js";
+import styles from "./game-guide.module.css";
+
+const cx = bindCssModule(styles);
+
 function GuideGrid({ cells, columns, label }) {
   return (
     <div
       aria-label={label}
-      className="game-guide-example__grid"
+      className={cx("game-guide-example__grid")}
       role="img"
       style={{
         "--guide-grid-columns": columns,
@@ -12,7 +17,7 @@ function GuideGrid({ cells, columns, label }) {
       {cells.map((cell, index) => (
         <span
           aria-hidden="true"
-          className={`game-guide-example__cell is-${cell.state ?? "empty"}`}
+          className={cx("game-guide-example__cell", `is-${cell.state ?? "empty"}`)}
           key={index}
         >
           {cell.label ?? ""}
@@ -151,9 +156,9 @@ function SetExample({ variant = "success" }) {
       : "색과 개수가 모두 다른 올바른 SET 카드 세 장";
 
   return (
-    <div className={`game-guide-example__set is-${variant}`} role="img" aria-label={label}>
+    <div className={cx("game-guide-example__set", `is-${variant}`)} role="img" aria-label={label}>
       {cards.map((card, cardIndex) => (
-        <span aria-hidden="true" className={`game-guide-example__set-card is-${card.color}`} key={`${card.color}-${cardIndex}`}>
+        <span aria-hidden="true" className={cx("game-guide-example__set-card", `is-${card.color}`)} key={`${card.color}-${cardIndex}`}>
           {Array.from({ length: card.count }, (_, index) => <i key={index}>●</i>)}
         </span>
       ))}
@@ -163,20 +168,20 @@ function SetExample({ variant = "success" }) {
 
 function FlappyExample() {
   return (
-    <div className="game-guide-example__flight" role="img" aria-label="별이 위아래 기둥 사이의 빈 공간을 통과하는 성공 예시">
-      <span className="game-guide-example__pillar is-top" aria-hidden="true" />
-      <span className="game-guide-example__flight-star" aria-hidden="true">★</span>
-      <span className="game-guide-example__flight-path" aria-hidden="true">→</span>
-      <span className="game-guide-example__pillar is-bottom" aria-hidden="true" />
+    <div className={cx("game-guide-example__flight")} role="img" aria-label="별이 위아래 기둥 사이의 빈 공간을 통과하는 성공 예시">
+      <span className={cx("game-guide-example__pillar", "is-top")} aria-hidden="true" />
+      <span className={cx("game-guide-example__flight-star")} aria-hidden="true">★</span>
+      <span className={cx("game-guide-example__flight-path")} aria-hidden="true">→</span>
+      <span className={cx("game-guide-example__pillar", "is-bottom")} aria-hidden="true" />
     </div>
   );
 }
 
 function TimingTapExample() {
   return (
-    <div className="game-guide-example__timing" role="img" aria-label="움직이는 표시가 목표 구간 중앙에 멈춘 성공 예시">
-      <span className="game-guide-example__timing-target" aria-hidden="true" />
-      <span className="game-guide-example__timing-marker" aria-hidden="true" />
+    <div className={cx("game-guide-example__timing")} role="img" aria-label="움직이는 표시가 목표 구간 중앙에 멈춘 성공 예시">
+      <span className={cx("game-guide-example__timing-target")} aria-hidden="true" />
+      <span className={cx("game-guide-example__timing-marker")} aria-hidden="true" />
     </div>
   );
 }
@@ -184,10 +189,10 @@ function TimingTapExample() {
 function SolitaireExample({ variant = "stack" }) {
   if (variant === "foundation") {
     return (
-      <div className="game-guide-example__solitaire is-foundation-flow" role="img" aria-label="스페이드 완성 칸에 A 다음 2를 순서대로 올리는 예시">
-        <span className="game-guide-example__playing-card is-black" aria-hidden="true"><b>A</b><i>♠</i></span>
-        <span className="game-guide-example__solitaire-arrow" aria-hidden="true">→</span>
-        <span className="game-guide-example__playing-card is-black is-foundation" aria-hidden="true"><b>2</b><i>♠</i></span>
+      <div className={cx("game-guide-example__solitaire", "is-foundation-flow")} role="img" aria-label="스페이드 완성 칸에 A 다음 2를 순서대로 올리는 예시">
+        <span className={cx("game-guide-example__playing-card", "is-black")} aria-hidden="true"><b>A</b><i>♠</i></span>
+        <span className={cx("game-guide-example__solitaire-arrow")} aria-hidden="true">→</span>
+        <span className={cx("game-guide-example__playing-card", "is-black", "is-foundation")} aria-hidden="true"><b>2</b><i>♠</i></span>
       </div>
     );
   }
@@ -195,19 +200,18 @@ function SolitaireExample({ variant = "stack" }) {
   const invalid = variant === "invalid";
   return (
     <div
-      className={`game-guide-example__solitaire${invalid ? " is-invalid" : ""}`}
+      className={cx("game-guide-example__solitaire", invalid && "is-invalid")}
       role="img"
       aria-label={invalid ? "검정 8 아래에 같은 색 검정 7을 놓을 수 없는 예시" : "검정 8 아래에 빨강 7을 놓는 올바른 예시"}
     >
-      <span className="game-guide-example__playing-card is-black" aria-hidden="true"><b>8</b><i>♣</i></span>
-      <span className={`game-guide-example__playing-card ${invalid ? "is-black" : "is-red"} is-lower`} aria-hidden="true"><b>7</b><i>{invalid ? "♠" : "♥"}</i></span>
-      <span className={`game-guide-example__verdict is-${invalid ? "invalid" : "valid"}`} aria-hidden="true">{invalid ? "×" : "✓"}</span>
+      <span className={cx("game-guide-example__playing-card", "is-black")} aria-hidden="true"><b>8</b><i>♣</i></span>
+      <span className={cx("game-guide-example__playing-card", invalid ? "is-black" : "is-red", "is-lower")} aria-hidden="true"><b>7</b><i>{invalid ? "♠" : "♥"}</i></span>
+      <span className={cx("game-guide-example__verdict", `is-${invalid ? "invalid" : "valid"}`)} aria-hidden="true">{invalid ? "×" : "✓"}</span>
     </div>
   );
 }
 
-export function GameGuideExample({ type }) {
-  const examples = {
+const GAME_GUIDE_EXAMPLES = {
     "2048": {
       caption: "플레이 예시 · 같은 숫자 2 두 개를 한쪽으로 밀면 4로 합쳐져요.",
       visual: <GuideGrid cells={GAME_2048_CELLS} columns={4} label="숫자 2 두 개가 숫자 4로 합쳐지는 예시" />,
@@ -336,12 +340,14 @@ export function GameGuideExample({ type }) {
       caption: "성공 방법 · 가로나 세로 한 줄을 모두 채우면 그 줄이 사라져요.",
       visual: <GuideGrid cells={BLOCK_BLAST_FINISH_CELLS} columns={5} label="블록으로 한 줄을 모두 채워 삭제하는 성공 예시" />,
     },
-  };
-  const example = examples[type];
+};
+
+export function GameGuideExample({ type }) {
+  const example = GAME_GUIDE_EXAMPLES[type];
   if (!example) return null;
 
   return (
-    <figure className="game-guide-example">
+    <figure className={cx("game-guide-example")}>
       {example.visual}
       <figcaption>{example.caption}</figcaption>
     </figure>

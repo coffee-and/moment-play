@@ -114,14 +114,14 @@
   gap: 4px;
   overflow: hidden;
   border: 1px solid var(--theme-preview-line);
-  border-radius: 9px;
+  border-radius: var(--r-icon);
   padding: 6px;
   background: var(--theme-preview-bg);
 }
 
 .theme-choice__preview > span:first-child {
   grid-column: 1 / -1;
-  border-radius: 4px;
+  border-radius: var(--r-compact);
   background: var(--theme-preview-surface);
 }
 

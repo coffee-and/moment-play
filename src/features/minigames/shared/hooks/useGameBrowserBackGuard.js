@@ -34,7 +34,6 @@ export function useGameBrowserBackGuard({ isExitConfirmationOpen, onNavigate, on
 
     ownsGuardRef.current = false;
     onNavigateRef.current?.(destination, { replace: true });
-    onNavigateRef.current?.(destination);
   }, []);
 
   const navigateFromGame = useCallback((destination = '/') => {

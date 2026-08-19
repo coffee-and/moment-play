@@ -10,11 +10,11 @@ import {
   ONLINE_ACTION_STATUS,
   ONLINE_NICKNAME_SAVE_FAILED_MESSAGE,
   ONLINE_PENDING_ACTION,
-  ONLINE_POLL_INTERVAL_MS,
   ONLINE_ROOM_LOAD_STATUS,
 } from "./online/omokOnline.constants.js";
 import { useInviteClipboard } from "./online/useInviteClipboard.js";
 import { useOmokOnlineDerivedState } from "./online/useOmokOnlineDerivedState.js";
+import { useOmokRoomLifecycle } from "./online/useOmokRoomLifecycle.js";
 
 const ONLINE_UNAVAILABLE_MESSAGE = "온라인 방 기능을 사용하려면 Supabase 환경 변수가 필요합니다.";
 
@@ -56,7 +56,6 @@ export function useOmokOnlineRoom({
   const roomIdRef = useRef(null);
   const refreshInFlightRef = useRef(false);
   const pendingActionRef = useRef(null);
-  const autoJoinRoomIdRef = useRef(null);
 
   const {
     canSubmitMove,
@@ -454,25 +453,14 @@ export function useOmokOnlineRoom({
     };
   }, []);
 
-  useEffect(() => {
-    roomIdRef.current = state.room?.id ?? null;
-  }, [state.room?.id]);
-
-  useEffect(() => {
-    if (!roomId) return;
-    if (autoJoinRoomIdRef.current === roomId) return;
-    autoJoinRoomIdRef.current = roomId;
-    joinRoom(roomId);
-  }, [joinRoom, roomId]);
-
-  useEffect(() => {
-    if (state.status !== ONLINE_ROOM_LOAD_STATUS.READY || !state.room?.id) return undefined;
-    const intervalId = window.setInterval(() => {
-      refreshRoom();
-    }, ONLINE_POLL_INTERVAL_MS);
-
-    return () => window.clearInterval(intervalId);
-  }, [refreshRoom, state.room?.id, state.status]);
+  useOmokRoomLifecycle({
+    activeRoomId: state.room?.id,
+    joinRoom,
+    refreshRoom,
+    requestedRoomId: roomId,
+    roomIdRef,
+    status: state.status,
+  });
 
   return {
     ...state,

@@ -51,8 +51,7 @@ function renderPage(path) {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
-  act(() => {
-    root.render(
+  const render = () => root.render(
       <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route path="/minigames/:gameId" element={<MinigamePlayPage />} />
@@ -60,11 +59,14 @@ function renderPage(path) {
           <Route path="/login" element={<div>Login screen</div>} />
         </Routes>
         <LocationProbe />
-      </MemoryRouter>,
-    );
-  });
+      </MemoryRouter>
+  );
+  act(() => render());
   return {
     host,
+    rerender() {
+      act(() => render());
+    },
     unmount() {
       act(() => root.unmount());
       host.remove();
@@ -141,6 +143,19 @@ describe("MinigamePlayPage authentication gate", () => {
     expect(view.host.textContent).toContain("게임 시작하기");
     expect(view.host.textContent).not.toContain("Game content");
     expect(mountedGameIds).toEqual(["2048"]);
+    view.unmount();
+  });
+
+  it("remounts the active game when the authenticated account changes", () => {
+    auth = { status: "authenticated", user: { id: "user-1" } };
+    const view = renderPage("/minigames/2048");
+    act(() => view.host.querySelector("button").click());
+    expect(mountedGameIds).toEqual(["2048"]);
+
+    auth = { status: "authenticated", user: { id: "user-2" } };
+    view.rerender();
+
+    expect(mountedGameIds).toEqual(["2048", "2048"]);
     view.unmount();
   });
 

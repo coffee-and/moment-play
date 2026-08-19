@@ -27,8 +27,9 @@ import {
 } from "./solitaire.logic.js";
 import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import styles from "./solitaire.module.css";
-import { getSolitaireDestination, getSolitaireSource, getTableauCardOffset, SolitaireCard } from "./SolitaireCard.jsx";
+import { getTableauCardOffset, SolitaireCard } from "./SolitaireCard.jsx";
 import { EMPTY_DIFFICULTY_RECORD, readSolitaireRecords, saveSolitaireRecords } from "./solitaireRecords.js";
+import { useSolitaireDrag } from "./useSolitaireDrag.js";
 
 const cx = bindCssModule(styles);
 
@@ -56,8 +57,6 @@ export function SolitaireGame({ game }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
   const gameStreak = useGameStreak();
-  const dragRef = useRef(null);
-  const suppressClickRef = useRef(false);
   const phaseRef = useRef("idle");
   const nextRoundPendingRef = useRef(false);
   const [phase, setPhase] = useState("idle");
@@ -110,6 +109,16 @@ export function SolitaireGame({ game }) {
         source: suggestedMove.source,
       },
   ] : []);
+  const {
+    consumeSuppressedClick,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+  } = useSolitaireDrag({
+    enabled: phase === "playing",
+    onMove: applyMove,
+    onSelect: setSelection,
+  });
 
   function startGame(nextDifficulty = difficulty, { preserveStreak = false } = {}) {
     gameStreak.beginRound({ preserveStreak });
@@ -183,10 +192,7 @@ export function SolitaireGame({ game }) {
 
   function chooseSource(source) {
     if (phase !== "playing") return;
-    if (suppressClickRef.current) {
-      suppressClickRef.current = false;
-      return;
-    }
+    if (consumeSuppressedClick()) return;
     if (selection) {
       const destination = source.type === "tableau"
         ? { type: "tableau", column: source.column }
@@ -228,33 +234,6 @@ export function SolitaireGame({ game }) {
   function chooseDestination(destination) {
     if (!selection) return;
     applyMove(selection, destination);
-  }
-
-  function handlePointerDown(event) {
-    if (phase !== "playing") return;
-    const source = getSolitaireSource(event.target);
-    if (!source) return;
-    dragRef.current = { source, startX: event.clientX, startY: event.clientY, moved: false };
-  }
-
-  function handlePointerMove(event) {
-    const drag = dragRef.current;
-    if (!drag) return;
-    if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 8) return;
-    drag.moved = true;
-    setSelection(drag.source);
-  }
-
-  function handlePointerUp(event) {
-    const drag = dragRef.current;
-    dragRef.current = null;
-    if (!drag?.moved) return;
-    const target = typeof document.elementFromPoint === "function"
-      ? document.elementFromPoint(event.clientX, event.clientY)
-      : event.target;
-    const destination = getSolitaireDestination(target);
-    if (destination) applyMove(drag.source, destination);
-    suppressClickRef.current = true;
   }
 
   function requestExit() {

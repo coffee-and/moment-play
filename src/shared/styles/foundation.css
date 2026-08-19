@@ -47,32 +47,13 @@
   --palette-effect-orange: #eb5b00;
   --palette-effect-plum: #640d5f;
 
-  /* External brand and game-specific palettes are defined once, then consumed semantically. */
+  /* External brand colors are shared because the provider button is application chrome. */
   --palette-google-border: #747775;
   --palette-google-text: #1f1f1f;
   --palette-google-hover-border: #5f6368;
   --palette-google-hover-bg: #f8f9fa;
   --palette-google-active-bg: #f1f3f4;
   --palette-google-focus: #4285f4;
-  --palette-set-hint-accent: #b66b17;
-  --palette-set-hint-shadow: #d78a25;
-  --palette-set-hint-ink: #7a4710;
-  --palette-set-hint-surface: #fff1c8;
-  --palette-set-hint-text: #442300;
-
-  /* Star Flight keeps its original cool-night artwork palette in both themes. */
-  --flappy-sky-deep: #172454;
-  --flappy-sky-top: #1b2450;
-  --flappy-sky-center: #2a2f6b;
-  --flappy-moon: #fff1b8;
-  --flappy-pillar: #edf4ff;
-  --flappy-fish: #79b5e8;
-  --flappy-glow: #79a7e8;
-  --flappy-tail: #f08aa0;
-  --flappy-star: #f6c85f;
-  --flappy-star-cool: #ecf3ff;
-  --flappy-star-glow: #b9d3ff;
-  --flappy-shield: #b9d3ff;
 
   --palette-light-bg: var(--palette-white);
   --palette-light-bg-subtle: color-mix(in oklab, var(--palette-neutral-100) 52%, var(--palette-ivory));
@@ -142,10 +123,22 @@
   --font: var(--font-display);
   --primary-nav-text: var(--chrome-foreground);
   --primary-nav-active: var(--chrome-foreground);
-  --r-xl: 28px;
-  --r-lg: 20px;
-  --r-md: 14px;
+  --r-micro: 1px;
+  --r-mark: 3px;
+  --r-compact: 4px;
+  --r-cell: 5px;
+  --r-cell-lg: 6px;
+  --r-tile: 7px;
+  --r-icon: 9px;
   --r-sm: 10px;
+  --r-control: 12px;
+  --r-md: 14px;
+  --r-preview: 15px;
+  --r-panel: 16px;
+  --r-card: 18px;
+  --r-lg: 20px;
+  --r-section: 24px;
+  --r-xl: 28px;
   --r-pill: 999px;
   --gap: 18px;
   --layout-max-width: 1460px;
@@ -186,6 +179,9 @@
   --header-control-active-shadow: var(--home-card-active-shadow);
   --input-border: transparent;
   --input-focus-border: var(--accent);
+  --focus-ring-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+  --invalid-cell-shadow: inset 0 0 0 2px var(--game-color-red);
+  --cell-outline-shadow: inset 0 0 0 1px var(--line);
   --input-surface: var(--surface-2);
   --input-shadow: none;
   /* Game screens reuse the same quiet surface system as the home cards. */
@@ -254,32 +250,12 @@
     drop-shadow(0 0 5px color-mix(in oklab, var(--game-effect-perfect) 68%, transparent));
   --layer-base: 0;
   --layer-raised: 1;
+  --layer-content: 2;
+  --layer-overlay: 3;
   --layer-feedback: 10;
   --layer-navigation: 20;
   --layer-notification: 30;
   --layer-modal: 40;
-  --game-2048-board-bg: var(--home-card-surface);
-  --game-2048-empty-cell-bg: var(--home-button-surface);
-  --game-2048-grid-gap: 10px;
-  --game-2048-cell-border: var(--line);
-  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--text) 8%, transparent);
-  --tile-2-bg: color-mix(in oklab, var(--game-color-green) 24%, var(--surface));
-  --tile-2-text: color-mix(in oklab, var(--game-color-green) 72%, var(--text));
-  --tile-4-bg: color-mix(in oklab, var(--game-color-cyan) 34%, var(--surface));
-  --tile-4-text: color-mix(in oklab, var(--game-color-blue) 68%, var(--text));
-  --tile-8-bg: color-mix(in oklab, var(--game-color-yellow) 52%, var(--surface));
-  --tile-8-text: var(--palette-neutral-900);
-  --tile-16-bg: color-mix(in oklab, var(--game-color-orange) 62%, var(--surface));
-  --tile-16-text: var(--palette-neutral-900);
-  --tile-32-bg: var(--game-color-pink);
-  --tile-32-text: var(--palette-ivory);
-  --tile-64-bg: var(--game-color-red);
-  --tile-64-text: var(--palette-ivory);
-  --tile-128-bg: var(--game-color-purple);
-  --tile-128-text: var(--palette-ivory);
-  --tile-256-bg: var(--game-color-blue);
-  --tile-256-text: var(--palette-ivory);
-
   font-family: var(--font);
   line-height: 1.5;
   color: var(--text);
@@ -361,10 +337,6 @@
   --sudoku-grid-line-strong: color-mix(in oklab, var(--text) 54%, var(--line));
   --sudoku-selected-bg: color-mix(in oklab, var(--game-color-yellow) 22%, var(--palette-dark-elevated));
   --sudoku-conflict-bg: color-mix(in oklab, var(--game-color-red) 22%, var(--palette-dark-elevated));
-  --game-2048-board-bg: var(--home-card-surface);
-  --game-2048-empty-cell-bg: var(--home-button-surface);
-  --game-2048-cell-border: var(--palette-dark-line);
-  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--palette-dark-bg) 76%, transparent);
 }
 
 * {

@@ -135,6 +135,20 @@ Configuration. At minimum allow:
 Do not add OAuth client secrets to Vite variables. The browser uses only
 `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
+## Password policy
+
+The signup form and local Supabase configuration share the following contract:
+
+- at least 8 characters
+- at least one lowercase letter, uppercase letter, digit, and symbol
+
+Keep the hosted project's Authentication password settings aligned with this
+contract in the Supabase Dashboard. Do not run `supabase config push` from the
+repository merely to change this setting: that command applies the complete
+local Auth configuration, including environment-specific URLs and providers.
+Leaked-password protection remains intentionally deferred until the project
+plan supports it; the database advisor gate allows only that named warning.
+
 ## Return-path rules
 
 `returnTo` must begin with one `/` and resolve to the Moment Play origin.

@@ -3,7 +3,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Brand } from "../../../shared/components/Brand.jsx";
 import { Button } from "../../../shared/components/Button.jsx";
 import { useAuth } from "../../../shared/auth/AuthContext.jsx";
-import { AUTH_LABELS, AUTH_MESSAGES, LOGIN_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
+import {
+  AUTH_LABELS,
+  AUTH_MESSAGES,
+  isStrongPassword,
+  LOGIN_PATH,
+  MIN_PASSWORD_LENGTH,
+} from "../../../shared/auth/authConstants.js";
 import { buildAuthRoute, getReturnToFromSearch } from "../../../shared/auth/returnTo.js";
 import { SocialLoginOptions } from "../components/SocialLoginOptions.jsx";
 import { authClassNames as cx } from "../authStyles.js";
@@ -35,6 +41,10 @@ export function SignupPage() {
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
       setErrorMessage(AUTH_MESSAGES.passwordTooShort);
+      return;
+    }
+    if (!isStrongPassword(password)) {
+      setErrorMessage(AUTH_MESSAGES.passwordTooWeak);
       return;
     }
     if (password !== confirmPassword) {
@@ -89,6 +99,7 @@ export function SignupPage() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
+                <p className={cx("auth-form__help")}>8자 이상, 영문 대·소문자, 숫자, 특수문자를 포함해 주세요.</p>
               </div>
               <div>
                 <label className="f-label" htmlFor="signup-confirm-password">비밀번호 확인</label>

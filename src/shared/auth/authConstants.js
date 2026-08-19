@@ -1,7 +1,17 @@
 export const AUTH_CALLBACK_PATH = "/auth/callback";
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
-export const MIN_PASSWORD_LENGTH = 6;
+export const MIN_PASSWORD_LENGTH = 8;
+
+const PASSWORD_SYMBOLS = "!@#$%^&*()_+-=[]{};'\\:\"|<>?,./`~";
+
+export function isStrongPassword(password) {
+  return password.length >= MIN_PASSWORD_LENGTH
+    && /[a-z]/.test(password)
+    && /[A-Z]/.test(password)
+    && /[0-9]/.test(password)
+    && [...password].some((character) => PASSWORD_SYMBOLS.includes(character));
+}
 
 export const AUTH_LABELS = {
   accountFallback: "내 계정",
@@ -21,6 +31,7 @@ export const AUTH_MESSAGES = {
   notConfigured: "Supabase 환경 변수가 설정되지 않아 이 기능을 사용할 수 없습니다.",
   emailAndPasswordRequired: "이메일과 비밀번호를 입력해 주세요.",
   passwordTooShort: `비밀번호는 최소 ${MIN_PASSWORD_LENGTH}자 이상이어야 합니다.`,
+  passwordTooWeak: "비밀번호에는 영문 대문자·소문자·숫자·특수문자를 각각 하나 이상 포함해 주세요.",
   passwordMismatch: "비밀번호가 일치하지 않습니다.",
   emailAlreadyRegistered: "이미 가입된 이메일이에요. 로그인해 주세요.",
   signUpFailed: "회원가입에 실패했습니다.",

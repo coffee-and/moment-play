@@ -97,8 +97,8 @@ describe("email authentication pages", () => {
     signUp.mockResolvedValueOnce({ session: null, user: { id: "new-user" } });
     const view = renderPage("/signup?returnTo=%2Fminigames%2Fsudoku", "signup");
     changeInput(view.host.querySelector("#signup-email"), "new@example.com");
-    changeInput(view.host.querySelector("#signup-password"), "secret1");
-    changeInput(view.host.querySelector("#signup-confirm-password"), "secret1");
+    changeInput(view.host.querySelector("#signup-password"), "Secret1!");
+    changeInput(view.host.querySelector("#signup-confirm-password"), "Secret1!");
 
     await act(async () => view.host.querySelector("form").dispatchEvent(
       new Event("submit", { bubbles: true, cancelable: true }),
@@ -106,11 +106,26 @@ describe("email authentication pages", () => {
 
     expect(signUp).toHaveBeenCalledWith({
       email: "new@example.com",
-      password: "secret1",
+      password: "Secret1!",
       returnTo: "/minigames/sudoku",
     });
     expect(view.host.querySelector('[role="status"]').textContent).toMatch(/인증 링크/);
     expect(currentLocation.pathname).toBe("/signup");
+    view.unmount();
+  });
+
+  it("rejects a signup password that does not satisfy the configured character policy", async () => {
+    const view = renderPage("/signup", "signup");
+    changeInput(view.host.querySelector("#signup-email"), "new@example.com");
+    changeInput(view.host.querySelector("#signup-password"), "password");
+    changeInput(view.host.querySelector("#signup-confirm-password"), "password");
+
+    await act(async () => view.host.querySelector("form").dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    ));
+
+    expect(signUp).not.toHaveBeenCalled();
+    expect(view.host.querySelector('[role="alert"]')?.textContent).toContain("대문자");
     view.unmount();
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import packageInfo from "../../../package.json";
 import { fetchMyFriendProfile } from "../../infrastructure/supabase/friendsGateway.js";
@@ -35,12 +35,18 @@ export function SettingsPage() {
   const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
+  const accountId = authStatus === "authenticated" ? user?.id ?? null : null;
+  const accountIdRef = useRef(accountId);
+  accountIdRef.current = accountId;
 
   useEffect(() => {
-    if (authStatus !== "authenticated" || !isConfigured) {
-      setFriendProfile(null);
-      setFriendStatus(FRIEND_STATUS.IDLE);
-      setNicknameInput("");
+    setFriendProfile(null);
+    setFriendStatus(FRIEND_STATUS.IDLE);
+    setNicknameInput("");
+    setNicknameMessage("");
+    setIsSavingNickname(false);
+
+    if (!accountId || !isConfigured) {
       return undefined;
     }
 
@@ -62,28 +68,34 @@ export function SettingsPage() {
     return () => {
       active = false;
     };
-  }, [authStatus, isConfigured]);
+  }, [accountId, isConfigured]);
 
   async function handleNicknameSave(event) {
     event.preventDefault();
+    const savingAccountId = accountId;
+    if (!savingAccountId) return;
+
     setIsSavingNickname(true);
     setNicknameMessage("");
 
     try {
       const savedProfile = await saveCurrentProfileNickname(nicknameInput);
+      if (accountIdRef.current !== savingAccountId) return;
       setFriendProfile((current) => ({
         ...(current ?? {}),
         nickname: savedProfile.nickname,
       }));
       setNicknameInput(savedProfile.nickname);
       await refreshSession?.();
+      if (accountIdRef.current !== savingAccountId) return;
       setNicknameMessageType("status");
       setNicknameMessage("닉네임을 변경했어요.");
     } catch (error) {
+      if (accountIdRef.current !== savingAccountId) return;
       setNicknameMessageType("error");
       setNicknameMessage(error instanceof Error ? error.message : "닉네임을 변경하지 못했습니다.");
     } finally {
-      setIsSavingNickname(false);
+      if (accountIdRef.current === savingAccountId) setIsSavingNickname(false);
     }
   }
 

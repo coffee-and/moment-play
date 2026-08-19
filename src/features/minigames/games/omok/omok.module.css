@@ -167,7 +167,7 @@
 }
 
 .omok-game__intersection {
-  z-index: 1;
+  z-index: var(--layer-raised);
   width: clamp(20px, 7%, 38px);
   aspect-ratio: 1;
   border: 0;
@@ -581,7 +581,7 @@
   .omok-game__player {
     min-width: 0;
     gap: 7px;
-    border-radius: 15px;
+    border-radius: var(--r-preview);
     padding: 9px 10px;
   }
 
@@ -670,7 +670,7 @@
   }
 
   .omok-game__board {
-    border-radius: 18px;
+    border-radius: var(--r-card);
   }
 }
 

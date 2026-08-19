@@ -1,4 +1,25 @@
 .game-2048__board {
+  --game-2048-board-bg: var(--home-card-surface);
+  --game-2048-empty-cell-bg: var(--home-button-surface);
+  --game-2048-grid-gap: 10px;
+  --game-2048-cell-border: var(--line);
+  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--text) 8%, transparent);
+  --tile-2-bg: color-mix(in oklab, var(--game-color-green) 24%, var(--surface));
+  --tile-2-text: color-mix(in oklab, var(--game-color-green) 72%, var(--text));
+  --tile-4-bg: color-mix(in oklab, var(--game-color-cyan) 34%, var(--surface));
+  --tile-4-text: color-mix(in oklab, var(--game-color-blue) 68%, var(--text));
+  --tile-8-bg: color-mix(in oklab, var(--game-color-yellow) 52%, var(--surface));
+  --tile-8-text: var(--palette-neutral-900);
+  --tile-16-bg: color-mix(in oklab, var(--game-color-orange) 62%, var(--surface));
+  --tile-16-text: var(--palette-neutral-900);
+  --tile-32-bg: var(--game-color-pink);
+  --tile-32-text: var(--palette-ivory);
+  --tile-64-bg: var(--game-color-red);
+  --tile-64-text: var(--palette-ivory);
+  --tile-128-bg: var(--game-color-purple);
+  --tile-128-text: var(--palette-ivory);
+  --tile-256-bg: var(--game-color-blue);
+  --tile-256-text: var(--palette-ivory);
   display: grid;
   width: 100%;
   max-width: 460px;
@@ -10,6 +31,11 @@
   padding: 12px;
   background: var(--game-2048-board-bg);
   touch-action: none;
+}
+
+:global(:root[data-theme="dark"]) .game-2048__board {
+  --game-2048-cell-border: var(--palette-dark-line);
+  --game-2048-cell-shadow: 0 3px 8px color-mix(in oklab, var(--palette-dark-bg) 76%, transparent);
 }
 
 .game-2048__board:focus-visible {
@@ -25,7 +51,7 @@
   min-height: 0;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--r-control);
   border: 1px solid var(--game-2048-cell-border);
   background: var(--game-2048-empty-cell-bg);
   box-shadow: var(--game-2048-cell-shadow);
@@ -42,7 +68,7 @@
 }
 
 .game-2048__cell.is-target-reached {
-  z-index: 1;
+  z-index: var(--layer-raised);
   box-shadow:
     0 0 0 3px color-mix(in oklab, var(--game-effect-perfect) 52%, transparent),
     0 0 20px color-mix(in oklab, var(--game-effect-perfect) 42%, transparent);

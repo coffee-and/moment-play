@@ -69,8 +69,14 @@ jobs:
       - name: Start isolated database
         run: npx supabase db start
 
+      - name: Lint database schema
+        run: npx supabase db lint --local --schema public --level warning --fail-on warning
+
       - name: Run database contract tests
         run: npm run test:db
+
+      - name: Check database security advisors
+        run: npm run check:db-advisors
 
       - name: Stop isolated database
         if: always()
