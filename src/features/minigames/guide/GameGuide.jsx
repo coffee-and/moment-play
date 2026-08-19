@@ -34,8 +34,24 @@ export function GameGuideContent({ compact = false, guide }) {
           <p aria-live="polite">{steps[stepIndex]}</p>
           <GameGuideExample type={guide?.examples?.[stepIndex] ?? guide?.example} />
           <div className={cx("game-guide-walkthrough__actions")}>
-            <button disabled={stepIndex === 0} onClick={() => setStepIndex((current) => current - 1)} type="button">이전</button>
-            <button disabled={stepIndex === steps.length - 1} onClick={() => setStepIndex((current) => current + 1)} type="button">다음</button>
+            <Button
+              className={cx("game-guide-walkthrough__step-button")}
+              disabled={stepIndex === 0}
+              onClick={() => setStepIndex((current) => current - 1)}
+              size="small"
+              variant="secondary"
+            >
+              이전
+            </Button>
+            <Button
+              className={cx("game-guide-walkthrough__step-button")}
+              disabled={stepIndex === steps.length - 1}
+              onClick={() => setStepIndex((current) => current + 1)}
+              size="small"
+              variant="secondary"
+            >
+              다음
+            </Button>
           </div>
         </section>
       </div>

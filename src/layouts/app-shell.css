@@ -166,26 +166,6 @@
   box-shadow: var(--sh);
 }
 
-.account-menu__panel button {
-  width: 100%;
-  border: none;
-  border-radius: var(--r-sm);
-  padding: 9px 10px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
-}
-
-.account-menu__panel button:hover {
-  background: var(--surface-2);
-}
-
-.account-menu__panel button:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
 .account-menu__error {
   margin: 6px 10px 4px;
   color: var(--game-effect-negative);

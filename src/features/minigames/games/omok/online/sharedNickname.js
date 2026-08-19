@@ -24,21 +24,31 @@ function normalizeAndValidate(rawNickname) {
 // accounts to inherit a previous user's local nickname. Local storage is used
 // only when there is no Supabase session at all.
 export async function resolveSharedNickname() {
-  if (isSupabaseConfigured()) {
-    try {
-      const client = getSupabaseClient();
-      const session = await getCurrentSession(client);
-      if (session) {
-        const profile = await getProfileByUserId(session.user.id, client);
-        return profile?.nickname && !isFallbackOnlineNickname(profile.nickname)
-          ? profile.nickname
-          : GUEST_FALLBACK_NICKNAME;
-      }
-    } catch {
-      // A Supabase hiccup must never block local nickname resolution.
-    }
+  if (!isSupabaseConfigured()) return resolveLocalNickname();
+
+  const client = getSupabaseClient();
+  let session;
+  try {
+    session = await getCurrentSession(client);
+  } catch {
+    // Without a reliable session result, using browser-local identity could
+    // expose a nickname left by another account on the same device.
+    return GUEST_FALLBACK_NICKNAME;
   }
 
+  if (!session) return resolveLocalNickname();
+
+  try {
+    const profile = await getProfileByUserId(session.user.id, client);
+    return profile?.nickname && !isFallbackOnlineNickname(profile.nickname)
+      ? profile.nickname
+      : GUEST_FALLBACK_NICKNAME;
+  } catch {
+    return GUEST_FALLBACK_NICKNAME;
+  }
+}
+
+function resolveLocalNickname() {
   const localNickname = getLocalNickname();
   if (isValidLocalNickname(localNickname)) return localNickname;
 
@@ -52,21 +62,22 @@ export function saveLocalSharedNickname(rawNickname) {
   return normalized;
 }
 
-// Normalizes + validates, saves locally immediately, and also saves to
-// `profiles` when (and only when) a Supabase session already exists. Never
-// creates a session itself. Used by the local nickname field, where there is
-// no separate pending online action to resume.
+// Account and browser-local nicknames have separate owners. A signed-in
+// account writes only to its server profile; local storage is reserved for a
+// confirmed signed-out session so one account cannot leak into another.
 export async function saveSharedNickname(rawNickname) {
-  const normalized = saveLocalSharedNickname(rawNickname);
+  const normalized = normalizeAndValidate(rawNickname);
 
   if (isSupabaseConfigured()) {
     const client = getSupabaseClient();
     const session = await getCurrentSession(client);
     if (session) {
       await saveCurrentProfileNickname(normalized, client);
+      return normalized;
     }
   }
 
+  saveLocalNickname(normalized);
   return normalized;
 }
 

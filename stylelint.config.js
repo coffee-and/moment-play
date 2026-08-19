@@ -6,6 +6,7 @@ export default {
   rules: {
     "at-rule-no-unknown": true,
     "block-no-empty": true,
+    "color-named": "never",
     "color-no-invalid-hex": true,
     "declaration-block-no-duplicate-custom-properties": true,
     "declaration-block-no-duplicate-properties": true,

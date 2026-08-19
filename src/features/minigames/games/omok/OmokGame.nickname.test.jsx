@@ -8,6 +8,11 @@ import { ONLINE_ACTION_STATUS, ONLINE_ROOM_LOAD_STATUS, ONLINE_ROOM_STATUS } fro
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
+const nicknameGateway = vi.hoisted(() => ({
+  resolveSharedNickname: vi.fn(async () => "LocalNick"),
+  saveSharedNickname: vi.fn(async (value) => value),
+}));
+
 let onlineState;
 
 vi.mock("./useOmokOnlineRoom.js", () => ({
@@ -35,9 +40,9 @@ vi.mock("./useOmokGame.js", () => ({
 vi.mock("./online/sharedNickname.js", () => ({
   GUEST_FALLBACK_NICKNAME: "Guest",
   getNicknamePrefillForOnlineSetup: () => "",
-  resolveSharedNickname: async () => "LocalNick",
+  resolveSharedNickname: nicknameGateway.resolveSharedNickname,
   saveLocalSharedNickname: (value) => value,
-  saveSharedNickname: async (value) => value,
+  saveSharedNickname: nicknameGateway.saveSharedNickname,
 }));
 
 vi.mock("../../shared/components/GameStage.jsx", () => ({
@@ -126,6 +131,8 @@ async function renderGame({ roomId = null } = {}) {
 
 beforeEach(() => {
   onlineState = createOnlineState();
+  nicknameGateway.resolveSharedNickname.mockReset().mockResolvedValue("LocalNick");
+  nicknameGateway.saveSharedNickname.mockReset().mockImplementation(async (value) => value);
 });
 
 afterEach(() => {
@@ -180,6 +187,24 @@ describe("Omok nickname editing policy", () => {
     await view.click("게임 시작");
 
     expect(view.host.querySelector("#omok-nickname").readOnly).toBe(true);
+    view.unmount();
+  });
+
+  it("restores the confirmed nickname and reports a profile save failure", async () => {
+    nicknameGateway.saveSharedNickname.mockRejectedValue(new Error("닉네임을 저장하지 못했어요."));
+    const view = await renderGame();
+    const input = view.host.querySelector("#omok-nickname");
+
+    await act(async () => {
+      input.value = "ChangedNick";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await act(async () => {
+      input.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+    });
+
+    expect(input.value).toBe("LocalNick");
+    expect(view.host.querySelector('[role="alert"]')?.textContent).toContain("저장하지 못했어요");
     view.unmount();
   });
 });

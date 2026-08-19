@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const ALLOWED_AUTHENTICATED_RPC_IDENTITIES = new Set([
   "public_begin_ranked_game_p_game_key text, p_mode text, p_context jsonb",
@@ -68,16 +69,34 @@ function isAllowedAdvisory(advisory) {
   return advisory.name === "auth_leaked_password_protection";
 }
 
-const rawOutput = await runAdvisors();
-const advisories = JSON.parse(rawOutput);
-const unexpectedAdvisories = advisories.filter((advisory) => !isAllowedAdvisory(advisory));
+export function parseAdvisoriesOutput(rawOutput) {
+  const normalizedOutput = rawOutput.trim();
+  if (!normalizedOutput) return [];
 
-if (unexpectedAdvisories.length > 0) {
-  console.error("Unexpected Supabase security advisories:");
-  for (const advisory of unexpectedAdvisories) {
-    console.error(`- ${advisory.name}: ${advisory.detail}`);
+  const advisories = JSON.parse(normalizedOutput);
+  if (!Array.isArray(advisories)) {
+    throw new TypeError("Supabase advisors must return a JSON array.");
   }
-  process.exitCode = 1;
-} else {
-  console.log(`Supabase security advisors: ${advisories.length} reviewed warning(s), no unapproved findings.`);
+
+  return advisories;
+}
+
+async function main() {
+  const advisories = parseAdvisoriesOutput(await runAdvisors());
+  const unexpectedAdvisories = advisories.filter((advisory) => !isAllowedAdvisory(advisory));
+
+  if (unexpectedAdvisories.length > 0) {
+    console.error("Unexpected Supabase security advisories:");
+    for (const advisory of unexpectedAdvisories) {
+      console.error(`- ${advisory.name}: ${advisory.detail}`);
+    }
+    process.exitCode = 1;
+  } else {
+    console.log(`Supabase security advisors: ${advisories.length} reviewed warning(s), no unapproved findings.`);
+  }
+}
+
+const entryPath = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : null;
+if (import.meta.url === entryPath) {
+  await main();
 }
