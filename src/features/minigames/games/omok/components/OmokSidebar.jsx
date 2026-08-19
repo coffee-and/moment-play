@@ -1,3 +1,5 @@
+import { omokClassName as cx } from "../omokStyles.js";
+
 import {
   MATCH_TYPE_COMPACT_LABEL,
   MATCH_TYPE_LABEL,
@@ -37,9 +39,9 @@ export function OmokSidebar({
   return (
     <>
       <div>
-        <label className="f-label" htmlFor="omok-nickname">Nickname</label>
+        <label className={cx("f-label")} htmlFor="omok-nickname">Nickname</label>
         <input
-          className="txt"
+          className={cx("txt")}
           id="omok-nickname"
           type="text"
           value={nickname}
@@ -49,31 +51,31 @@ export function OmokSidebar({
           onChange={(event) => onNicknameChange(event.target.value)}
           onBlur={onCommitNickname}
         />
-        <p className="game-stage__side-note">{nicknameHelpText}</p>
+        <p className={cx("game-stage__side-note")}>{nicknameHelpText}</p>
       </div>
-      <div className="stat-row">
-        <div className="stat"><div className="l">Board</div><div className="v">{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>
-        <div className="stat"><div className="l">Match</div><div className="v"><small aria-label={matchLabel}>{compactMatchLabel}</small></div></div>
+      <div className={cx("stat-row")}>
+        <div className={cx("stat")}><div className={cx("l")}>Board</div><div className={cx("v")}>{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Match</div><div className={cx("v")}><small aria-label={matchLabel}>{compactMatchLabel}</small></div></div>
         {isGameVisible ? (
           <>
-            <div className="stat"><div className="l">Turn</div><div className="v"><small>{getStoneLabel(turn)}</small></div></div>
-            <div className="stat"><div className="l">Moves</div><div className="v">{moveCount}</div></div>
+            <div className={cx("stat")}><div className={cx("l")}>Turn</div><div className={cx("v")}><small>{getStoneLabel(turn)}</small></div></div>
+            <div className={cx("stat")}><div className={cx("l")}>Moves</div><div className={cx("v")}>{moveCount}</div></div>
           </>
         ) : (
           <>
-            <div className="stat"><div className="l">Rule</div><div className="v"><small aria-label={OMOK_MODE_LABEL[activeGameMode]}>{OMOK_MODE_COMPACT_LABEL[activeGameMode]}</small></div></div>
-            <div className="stat"><div className="l">Guide</div><div className="v"><small>{guideEnabled ? "사용 중" : "사용 안 함"}</small></div></div>
+            <div className={cx("stat")}><div className={cx("l")}>Rule</div><div className={cx("v")}><small aria-label={OMOK_MODE_LABEL[activeGameMode]}>{OMOK_MODE_COMPACT_LABEL[activeGameMode]}</small></div></div>
+            <div className={cx("stat")}><div className={cx("l")}>Guide</div><div className={cx("v")}><small>{guideEnabled ? "사용 중" : "사용 안 함"}</small></div></div>
           </>
         )}
       </div>
-      <p className="game-stage__side-note omok-game__rule-summary">
-        <span className="omok-game__rule-summary-text">
+      <p className={cx("game-stage__side-note omok-game__rule-summary")}>
+        <span className={cx("omok-game__rule-summary-text")}>
           <span>{OMOK_MODE_LABEL[activeGameMode]}</span>
           <span>{guideEnabled ? "금수 도움 사용 중" : "금수 도움 사용 안 함"}</span>
         </span>
         <button
           type="button"
-          className="omok-game__rule-info-button"
+          className={cx("omok-game__rule-info-button")}
           aria-label="규칙 자세히 보기"
           onClick={onOpenRules}
         >

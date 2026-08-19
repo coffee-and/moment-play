@@ -114,8 +114,6 @@ export function LogicPuzzleStage({
       ariaLabel={`${game.title} 게임`}
       className="logic-puzzle-stage"
       eyebrow={eyebrow}
-      isExitConfirmationOpen={session.isExitOpen}
-      onRequestExit={session.requestExit}
       phase={session.phase}
       sidebar={sidebar}
       title={game.title}

@@ -73,7 +73,7 @@
   justify-content: center;
   width: fit-content;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 4px 9px;
   color: var(--muted);
   font-size: 9px;

@@ -1,4 +1,5 @@
 import { OMOK_BOARD_SIZE, STONE } from "../omok.constants.js";
+import { omokClassName as cx } from "../omokStyles.js";
 import { getStoneLabel } from "../omok.presentation.js";
 import { isSamePosition, pointToPercent, positionKey } from "../omok.utils.js";
 
@@ -19,11 +20,11 @@ function getIntersectionLabel(position, cell, isForbidden) {
 
 function PlayerSummary({ active, name, status, stone }) {
   return (
-    <div className={`omok-game__player${active ? " is-active" : ""}`}>
-      <span className={`omok-game__dot is-${stone}`} aria-hidden="true" />
+    <div className={cx(`omok-game__player${active ? " is-active" : ""}`)}>
+      <span className={cx(`omok-game__dot is-${stone}`)} aria-hidden="true" />
       <div>
-        <div className="omok-game__player-name">{name}</div>
-        <div className="omok-game__player-status">{status}</div>
+        <div className={cx("omok-game__player-name")}>{name}</div>
+        <div className={cx("omok-game__player-status")}>{status}</div>
       </div>
     </div>
   );
@@ -49,14 +50,14 @@ export function OmokBoard({
 }) {
   return (
     <>
-      <div className="omok-game__turns" aria-label="대국자 정보">
+      <div className={cx("omok-game__turns")} aria-label="대국자 정보">
         <PlayerSummary
           active={turn === STONE.BLACK && !winner && !draw}
           name={players[STONE.BLACK].name}
           status={players[STONE.BLACK].status}
           stone={STONE.BLACK}
         />
-        <span className="omok-game__vs">vs</span>
+        <span className={cx("omok-game__vs")}>vs</span>
         <PlayerSummary
           active={turn === STONE.WHITE && !winner && !draw}
           name={players[STONE.WHITE].name}
@@ -64,12 +65,12 @@ export function OmokBoard({
           stone={STONE.WHITE}
         />
       </div>
-      <div className="omok-game__board-wrap">
-        <div className="omok-game__board" role="group" aria-label={`${OMOK_BOARD_SIZE}x${OMOK_BOARD_SIZE} 오목 보드`}>
-          <span className="omok-game__grid" aria-hidden="true" />
+      <div className={cx("omok-game__board-wrap")}>
+        <div className={cx("omok-game__board")} role="group" aria-label={`${OMOK_BOARD_SIZE}x${OMOK_BOARD_SIZE} 오목 보드`}>
+          <span className={cx("omok-game__grid")} aria-hidden="true" />
           {STAR_POINTS.map(([column, row]) => (
             <span
-              className="omok-game__star"
+              className={cx("omok-game__star")}
               style={{ left: pointToPercent(column), top: pointToPercent(row) }}
               key={`${column}-${row}`}
               aria-hidden="true"
@@ -87,7 +88,7 @@ export function OmokBoard({
 
               return (
                 <button
-                  className={`omok-game__intersection${isForbidden ? " is-forbidden" : ""}${isRejected ? " is-rejected" : ""}`}
+                  className={cx(`omok-game__intersection${isForbidden ? " is-forbidden" : ""}${isRejected ? " is-rejected" : ""}`)}
                   type="button"
                   style={{ left: pointToPercent(colIndex), top: pointToPercent(rowIndex) }}
                   key={key}
@@ -98,7 +99,7 @@ export function OmokBoard({
                 >
                   {cell ? (
                     <span
-                      className={`omok-game__stone is-${cell}${isLast ? " is-last" : ""}${isWinning ? " is-winning" : ""}`}
+                      className={cx(`omok-game__stone is-${cell}${isLast ? " is-last" : ""}${isWinning ? " is-winning" : ""}`)}
                       aria-hidden="true"
                     />
                   ) : null}
@@ -108,11 +109,11 @@ export function OmokBoard({
           )}
         </div>
       </div>
-      <p className="omok-game__hint">{statusMessage}</p>
-      {syncWarning ? <p className="omok-game__hint" role="status">{syncWarning}</p> : null}
-      {deriveWarning ? <p className="omok-game__notice is-error" role="alert">{deriveWarning}</p> : null}
-      {errorMessage ? <p className="omok-game__notice is-error" role="alert">{errorMessage}</p> : null}
-      {forbiddenMessage ? <p className="omok-game__hint" role="status">{forbiddenMessage}</p> : null}
+      <p className={cx("omok-game__hint")}>{statusMessage}</p>
+      {syncWarning ? <p className={cx("omok-game__hint")} role="status">{syncWarning}</p> : null}
+      {deriveWarning ? <p className={cx("omok-game__notice is-error")} role="alert">{deriveWarning}</p> : null}
+      {errorMessage ? <p className={cx("omok-game__notice is-error")} role="alert">{errorMessage}</p> : null}
+      {forbiddenMessage ? <p className={cx("omok-game__hint")} role="status">{forbiddenMessage}</p> : null}
     </>
   );
 }

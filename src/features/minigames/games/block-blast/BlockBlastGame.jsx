@@ -1,225 +1,52 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
-import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
-import {
-  CloseIcon,
-  PauseIcon,
-  PlayIcon,
-  RestartIcon,
-  TrophyIcon,
-} from "../../../../shared/components/icons/PhosphorIcons.jsx";
-import { GameIconButton } from "../../shared/components/GameIconButton.jsx";
-import { GameGuideContent } from "../../shared/components/GameGuide.jsx";
+import { CloseIcon, PauseIcon, PlayIcon, RestartIcon, TrophyIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
+import { GameGuideContent } from "../../shared/components/GameGuide.jsx";
+import { GameIconButton } from "../../shared/components/GameIconButton.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { PuzzleHintButton, PuzzleHintPanel } from "../../shared/components/PuzzleHintPanel.jsx";
-import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
-import {
-  BLOCK_BLAST_SIZE,
-  canPlaceBlockPiece,
-  createBlockBoard,
-  createBlockPieces,
-  findBestBlockMove,
-  getNextBlockBlastCombo,
-  hasBlockMove,
-  placeBlockPiece,
-} from "./blockBlast.logic.js";
+import { BLOCK_BLAST_SIZE, canPlaceBlockPiece } from "./blockBlast.logic.js";
 import feedbackStyles from "./block-blast-feedback.module.css";
-import "./block-blast.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./block-blast.module.css";
+import { useBlockBlastGame } from "./useBlockBlastGame.js";
 
-function readBestScore() {
-  try {
-    const value = Number(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.BLOCK_BLAST_BEST_SCORE));
-    return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveBestScore(score) {
-  try {
-    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.BLOCK_BLAST_BEST_SCORE, String(score));
-  } catch {
-    // Local records are optional.
-  }
-}
+const cx = bindCssModule(styles);
 
 export function BlockBlastGame({ game }) {
-  const navigate = useNavigate();
-  const { playSound } = useGameAudio();
-  const [phase, setPhase] = useState("idle");
-  const [board, setBoard] = useState(createBlockBoard);
-  const [pieces, setPieces] = useState(() => createBlockPieces());
-  const [selectedPieceIndex, setSelectedPieceIndex] = useState(null);
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(readBestScore);
-  const [combo, setCombo] = useState(0);
-  const [status, setStatus] = useState("조각을 고른 뒤 보드에 놓아보세요.");
-  const [isExitOpen, setIsExitOpen] = useState(false);
-  const [previewOrigin, setPreviewOrigin] = useState(null);
-  const [actionFeedback, setActionFeedback] = useState(null);
-  const dragPieceIndexRef = useRef(null);
-  const feedbackSequenceRef = useRef(0);
-  const feedbackTimerRef = useRef(null);
-  const bestMove = findBestBlockMove(board, pieces);
-  const bestPiece = bestMove ? pieces[bestMove.pieceIndex] : null;
-  const bestPlacementIndexes = bestMove && bestPiece
-    ? bestPiece.cells.map(([rowOffset, colOffset]) => (
-      (bestMove.row + rowOffset) * BLOCK_BLAST_SIZE + bestMove.col + colOffset
-    ))
-    : [];
-  const hint = usePuzzleHints(bestMove ? [
-    {
-      message: `${bestPiece.cells.length}칸 블록부터 살펴보세요. 현재 보드에 안정적으로 놓을 수 있어요.`,
-      targetPieceIndex: bestMove.pieceIndex,
-    },
-    {
-      message: bestMove.clearedLines > 0
-        ? `이 블록을 놓으면 ${bestMove.clearedLines}줄을 바로 지울 수 있어요.`
-        : "빈 공간을 잘게 나누지 않도록 가장자리부터 채우는 수예요.",
-      targetPieceIndex: bestMove.pieceIndex,
-      targetIndexes: bestPlacementIndexes,
-    },
-    {
-      message: `${bestMove.row + 1}행 ${bestMove.col + 1}열을 시작점으로 선택하세요.`,
-      targetPieceIndex: bestMove.pieceIndex,
-      targetIndexes: bestPlacementIndexes,
-    },
-  ] : []);
-  const selectedPiece = selectedPieceIndex == null ? null : pieces[selectedPieceIndex];
-  const previewIsValid = Boolean(
-    selectedPiece
-    && previewOrigin
-    && canPlaceBlockPiece(board, selectedPiece, previewOrigin.row, previewOrigin.col),
-  );
-  const previewIndexes = new Set(
-    selectedPiece && previewOrigin
-      ? selectedPiece.cells
-        .map(([rowOffset, colOffset]) => {
-          const row = previewOrigin.row + rowOffset;
-          const col = previewOrigin.col + colOffset;
-          return row >= 0 && row < BLOCK_BLAST_SIZE && col >= 0 && col < BLOCK_BLAST_SIZE
-            ? row * BLOCK_BLAST_SIZE + col
-            : null;
-        })
-        .filter((index) => index != null)
-      : [],
-  );
-
-  function startGame() {
-    window.clearTimeout(feedbackTimerRef.current);
-    setBoard(createBlockBoard());
-    setPieces(createBlockPieces());
-    setSelectedPieceIndex(null);
-    setScore(0);
-    setCombo(0);
-    setStatus("조각을 고른 뒤 보드에 놓아보세요.");
-    setIsExitOpen(false);
-    setPreviewOrigin(null);
-    setActionFeedback(null);
-    hint.resetHints();
-    setPhase("playing");
-  }
-
-  useEffect(() => () => window.clearTimeout(feedbackTimerRef.current), []);
-
-  function showActionFeedback(clearedLines, nextCombo) {
-    window.clearTimeout(feedbackTimerRef.current);
-    feedbackSequenceRef.current += 1;
-    const label = clearedLines >= 3
-      ? "AMAZING!"
-      : clearedLines === 2
-        ? "DOUBLE CLEAR!"
-        : "LINE CLEAR!";
-    setActionFeedback({
-      id: feedbackSequenceRef.current,
-      label,
-      combo: nextCombo,
-      comboLabel: nextCombo >= 2 ? `${nextCombo} COMBO` : "",
-      durationMs: clearedLines >= 2 || nextCombo >= 2 ? 1120 : 860,
-      variant: clearedLines >= 3 ? "major" : nextCombo >= 2 ? "combo" : "standard",
-    });
-    feedbackTimerRef.current = window.setTimeout(
-      () => setActionFeedback(null),
-      clearedLines >= 2 || nextCombo >= 2 ? 1140 : 880,
-    );
-  }
-
-  function finishGame(finalScore) {
-    setPhase("gameover");
-    playSound("wrong");
-    if (finalScore > bestScore) {
-      setBestScore(finalScore);
-      saveBestScore(finalScore);
-    }
-  }
-
-  function placeSelected(row, col, explicitPieceIndex = selectedPieceIndex) {
-    if (phase !== "playing" || explicitPieceIndex == null || !pieces[explicitPieceIndex]) return;
-    const result = placeBlockPiece(board, pieces[explicitPieceIndex], row, col);
-    if (!result.placed) {
-      setStatus("그 자리에는 조각을 놓을 수 없어요.");
-      playSound("wrong");
-      return;
-    }
-
-    const nextCombo = getNextBlockBlastCombo(combo, result.clearedLines);
-    const nextScore = score + result.points + (result.clearedLines > 0 ? nextCombo * 3 : 0);
-    let nextPieces = pieces.map((piece, index) => index === explicitPieceIndex ? null : piece);
-    if (nextPieces.every((piece) => piece == null)) nextPieces = createBlockPieces();
-    setBoard(result.board);
-    setPieces(nextPieces);
-    setSelectedPieceIndex(null);
-    setPreviewOrigin(null);
-    setScore(nextScore);
-    setCombo(nextCombo);
-    setStatus(result.clearedLines > 0 ? `${result.clearedLines}줄을 지웠어요!` : "좋아요. 다음 조각을 놓아보세요.");
-    if (result.clearedLines > 0) showActionFeedback(result.clearedLines, nextCombo);
-    playSound(result.clearedLines > 0 ? "clear" : "correct");
-    if (!hasBlockMove(result.board, nextPieces)) finishGame(nextScore);
-  }
-
-  function requestExit() {
-    if (phase === "idle" || phase === "gameover") {
-      navigate("/");
-      return;
-    }
-    setIsExitOpen(true);
-    setPhase("paused");
-  }
-
-  function pauseGame() {
-    if (phase !== "playing") return;
-    setPhase("paused");
-  }
-
-  function resumeGame() {
-    if (phase !== "paused" || isExitOpen) return;
-    setPhase("playing");
-  }
-
-  function continueGame() {
-    setIsExitOpen(false);
-    setPhase("playing");
-  }
-
-  function selectPiece(pieceIndex) {
-    const piece = pieces[pieceIndex];
-    if (phase !== "playing" || !piece) return;
-    setSelectedPieceIndex(pieceIndex);
-    setPreviewOrigin(null);
-    setStatus(`${piece.cells.length}칸 블록을 선택했어요. 보드의 점 표시가 있는 칸에 놓아보세요.`);
-  }
-
+  const {
+    score,
+    bestScore,
+    combo,
+    phase,
+    pauseGame,
+    isExitOpen,
+    resumeGame,
+    requestExit,
+    setPreviewOrigin,
+    board,
+    selectedPiece,
+    previewIndexes,
+    previewIsValid,
+    hint,
+    placeSelected,
+    dragPieceIndexRef,
+    actionFeedback,
+    pieces,
+    selectedPieceIndex,
+    selectPiece,
+    status,
+    startGame,
+    navigateFromGame,
+    continueGame,
+  } = useBlockBlastGame();
   const sidebar = (
-    <div className="stat-row">
-      <div className="stat"><div className="l">Score</div><div className="v">{score}</div></div>
-      <div className="stat"><div className="l">Best</div><div className="v">{bestScore}</div></div>
-      <div className="stat"><div className="l">Combo</div><div className="v">×{combo}</div></div>
+    <div className={cx("stat-row")}>
+      <div className={cx("stat")}><div className={cx("l")}>Score</div><div className={cx("v")}>{score}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Best</div><div className={cx("v")}>{bestScore}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Combo</div><div className={cx("v")}>×{combo}</div></div>
     </div>
   );
 
@@ -243,10 +70,8 @@ export function BlockBlastGame({ game }) {
         </>
       )}
       ariaLabel="블록 블라스트 게임"
-      className="block-blast-game"
+      className={cx("block-blast-game")}
       eyebrow="BLOCK / SCORE"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       phase={phase}
       sidebar={sidebar}
       title={game.title}
@@ -257,10 +82,10 @@ export function BlockBlastGame({ game }) {
         </span>
       )}
     >
-      <div className="block-blast-layout">
-        <div className={`block-blast-board-wrap ${feedbackStyles.host}`}>
+      <div className={cx("block-blast-layout")}>
+        <div className={cx(`block-blast-board-wrap ${feedbackStyles.host}`)}>
           <div
-            className="block-blast-board"
+            className={cx("block-blast-board")}
             role="grid"
             tabIndex={-1}
             aria-label="8×8 블록 보드"
@@ -277,11 +102,11 @@ export function BlockBlastGame({ game }) {
                   aria-label={`${row + 1}행 ${col + 1}열${value ? ", 채워짐" : ", 비어 있음"}${
                     selectedPiece ? isValidOrigin ? ", 선택한 블록을 놓을 수 있음" : ", 선택한 블록을 놓을 수 없음" : ""
                   }`}
-                  className={`block-blast-cell${value ? ` is-filled color-${value}` : ""}${
+                  className={cx(`block-blast-cell${value ? ` is-filled color-${value}` : ""}${
                     isValidOrigin ? " is-valid-origin" : ""
                   }${isPreview ? previewIsValid ? ` is-preview color-${selectedPiece.color}` : " is-invalid-preview" : ""}${
                     hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""
-                  }`}
+                  }`)}
                   key={index}
                   onClick={() => placeSelected(row, col)}
                   onFocus={() => setPreviewOrigin({ row, col })}
@@ -301,12 +126,12 @@ export function BlockBlastGame({ game }) {
           <GameActionFeedback className={feedbackStyles.feedback} feedback={actionFeedback} />
         </div>
 
-        <div className="block-blast-tray" aria-label="사용할 블록">
+        <div className={cx("block-blast-tray")} aria-label="사용할 블록">
           {pieces.map((piece, pieceIndex) => (
             <button
               aria-label={piece ? `${piece.cells.length}칸 블록 선택` : "사용한 블록"}
               aria-pressed={selectedPieceIndex === pieceIndex}
-              className={`block-piece${selectedPieceIndex === pieceIndex ? " is-selected" : ""}${hint.currentStep?.targetPieceIndex === pieceIndex ? " is-hint-target" : ""}`}
+              className={cx(`block-piece${selectedPieceIndex === pieceIndex ? " is-selected" : ""}${hint.currentStep?.targetPieceIndex === pieceIndex ? " is-hint-target" : ""}`)}
               disabled={!piece || phase !== "playing"}
               draggable={Boolean(piece)}
               key={piece?.instanceId ?? `used-${pieceIndex}`}
@@ -323,10 +148,10 @@ export function BlockBlastGame({ game }) {
               type="button"
             >
               {piece ? (
-                <span className="block-piece-grid">
+                <span className={cx("block-piece-grid")}>
                   {piece.cells.map(([row, col]) => (
                     <span
-                      className={`block-piece-cell color-${piece.color}`}
+                      className={cx(`block-piece-cell color-${piece.color}`)}
                       key={`${row}-${col}`}
                       style={{ gridColumn: col + 1, gridRow: row + 1 }}
                     />
@@ -334,16 +159,16 @@ export function BlockBlastGame({ game }) {
                 </span>
               ) : null}
               {piece ? (
-                <span className="block-piece__hint">
+                <span className={cx("block-piece__hint")}>
                   {selectedPieceIndex === pieceIndex ? "선택됨" : "선택"}
                 </span>
               ) : null}
             </button>
           ))}
         </div>
-        <p className="logic-board-status" role="status">{status}</p>
+        <p className={cx("logic-board-status")} role="status">{status}</p>
         {phase !== "idle" ? (
-          <div className="block-blast-session-controls">
+          <div className={cx("block-blast-session-controls")}>
             {phase === "playing" ? <PuzzleHintButton hint={hint} /> : null}
             <Button size="small" variant="secondary" onClick={startGame}>
               <RestartIcon />
@@ -357,7 +182,7 @@ export function BlockBlastGame({ game }) {
       {phase === "idle" ? (
         <GameStageOverlay state="start">
           <GameStageModal
-            className="game-stage-start-modal"
+            className={cx("game-stage-start-modal")}
             role="dialog"
             aria-modal="true"
             aria-labelledby="block-blast-start-title"
@@ -365,7 +190,7 @@ export function BlockBlastGame({ game }) {
             <GameStageDoodle variant="start" />
             <h2 id="block-blast-start-title">Block Blast</h2>
             <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
-            <div className="game-stage-modal__actions"><Button data-modal-initial-focus="" onClick={startGame}>게임 시작</Button></div>
+            <div className={cx("game-stage-modal__actions")}><Button data-modal-initial-focus="" onClick={startGame}>게임 시작</Button></div>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}
@@ -376,10 +201,10 @@ export function BlockBlastGame({ game }) {
             <GameStageDoodle variant="failure" />
             <h2 id="block-blast-over-title">더 놓을 곳이 없어요</h2>
             <p>이번 점수는 {score}점이에요.</p>
-            {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
-            <div className="game-stage-modal__actions">
+            {hint.hasUsedHint ? <p className={cx("puzzle-hint-result-label")}>힌트 사용 · 연습 기록</p> : null}
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={startGame}>다시 도전</Button>
-              <Button variant="secondary" onClick={() => navigate("/")}>게임 목록으로</Button>
+              <Button variant="secondary" onClick={() => navigateFromGame("/")}>게임 목록으로</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -390,7 +215,7 @@ export function BlockBlastGame({ game }) {
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-paused-title">
             <h2 id="block-blast-paused-title">일시정지</h2>
             <p>보드와 점수가 그대로 멈춰 있어요.</p>
-            <div className="game-stage-modal__actions">
+            <div className={cx("game-stage-modal__actions")}>
               <Button data-modal-initial-focus="" onClick={resumeGame}>
                 <PlayIcon />
                 계속하기
@@ -405,8 +230,8 @@ export function BlockBlastGame({ game }) {
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-exit-title">
             <h2 id="block-blast-exit-title">게임을 나갈까요?</h2>
             <p>현재 점수와 보드는 저장되지 않아요.</p>
-            <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+            <div className={cx("game-stage-modal__actions")}>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>
           </GameStageModal>

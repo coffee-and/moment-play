@@ -59,8 +59,10 @@ export async function cancelFriendOmokInvite(inviteId, client = getSupabaseClien
   return mapInvite(data?.[0] ?? null);
 }
 
-export async function fetchFriendOmokInvites(client = getSupabaseClient()) {
-  const { data, error } = await client.rpc("get_friend_omok_invites");
+export async function fetchFriendOmokInvites({ client = getSupabaseClient(), signal } = {}) {
+  let request = client.rpc("get_friend_omok_invites");
+  if (signal) request = request.abortSignal(signal);
+  const { data, error } = await request;
   throwIfError(error);
   return (data ?? []).map(mapInvite);
 }

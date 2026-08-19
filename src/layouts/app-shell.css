@@ -97,7 +97,7 @@
   align-items: center;
   justify-content: center;
   border: var(--header-control-border-width, 1px) solid var(--home-button-border);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 8px 14px;
   overflow: hidden;
   background: var(--header-control-surface, var(--home-button-surface));
@@ -179,6 +179,18 @@
 
 .account-menu__panel button:hover {
   background: var(--surface-2);
+}
+
+.account-menu__panel button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.account-menu__error {
+  margin: 6px 10px 4px;
+  color: var(--game-effect-negative);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 /* ============================ Bottom tab bar (compact navigation) ============================ */

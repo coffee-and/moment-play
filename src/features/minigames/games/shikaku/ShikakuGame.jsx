@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -13,7 +14,9 @@ import {
   solveShikaku,
   validateShikakuRectangle,
 } from "./shikaku.logic.js";
-import "./shikaku.css";
+import styles from "./shikaku.module.css";
+
+const cx = bindCssModule(styles);
 
 export function ShikakuGame({ game }) {
   const { playSound } = useGameAudio();
@@ -124,10 +127,10 @@ export function ShikakuGame({ game }) {
       session={session}
       stats={[{ label: "Areas", value: `${rectangles.length}/${puzzle.clues.length}` }]}
     >
-      <div className="shikaku-game">
+      <div className={cx("shikaku-game")}>
         <BoardViewport label="시카쿠 보드">
           <div
-            className="shikaku-board"
+            className={cx("shikaku-board")}
             role="grid"
             aria-label={`${puzzle.size}×${puzzle.size} 시카쿠 보드`}
             style={{ "--shikaku-size": puzzle.size }}
@@ -152,7 +155,7 @@ export function ShikakuGame({ game }) {
                 <button
                   aria-label={`${row + 1}행 ${col + 1}열${clue ? `, 숫자 ${clue.value}` : ""}`}
                   aria-pressed={Boolean(rectangle)}
-                  className={`shikaku-cell ${rectangle ? `is-claimed region-${rectangleIndex % 6}` : ""} ${edgeClasses} ${isAnchor ? "is-anchor" : ""} ${isHintTarget ? "is-hint-target" : ""}`}
+                  className={cx(`shikaku-cell ${rectangle ? `is-claimed region-${rectangleIndex % 6}` : ""} ${edgeClasses} ${isAnchor ? "is-anchor" : ""} ${isHintTarget ? "is-hint-target" : ""}`)}
                   disabled={isAnswerRevealed}
                   key={`${row}-${col}`}
                   onClick={() => handleCell(row, col)}

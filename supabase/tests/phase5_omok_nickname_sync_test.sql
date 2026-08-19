@@ -21,6 +21,34 @@ select is(
   'omok_join_room uses a fixed search path'
 );
 
+select is(
+  (
+    select count(*)
+    from pg_catalog.pg_proc
+    where oid in (
+      'public.omok_accept_rematch(uuid)'::regprocedure,
+      'public.omok_cancel_rematch(uuid)'::regprocedure,
+      'public.omok_count_line(uuid,integer,integer,integer,text,integer,integer)'::regprocedure,
+      'public.omok_create_room(text,boolean,boolean,boolean,boolean)'::regprocedure,
+      'public.omok_is_room_member(uuid)'::regprocedure,
+      'public.omok_join_room(uuid)'::regprocedure,
+      'public.omok_leave_room(uuid)'::regprocedure,
+      'public.omok_request_rematch(uuid)'::regprocedure,
+      'public.omok_room_players_touch_activity()'::regprocedure,
+      'public.omok_round_has_winner(uuid,integer,text)'::regprocedure,
+      'public.omok_round_is_finished(uuid,integer,text)'::regprocedure,
+      'public.omok_start_room(uuid)'::regprocedure,
+      'public.omok_submit_move(uuid,integer,integer,integer,integer,text)'::regprocedure,
+      'public.omok_update_player_guide_preferences(uuid,boolean,boolean)'::regprocedure,
+      'public.omok_update_room_settings(uuid,text,boolean,boolean)'::regprocedure
+    )
+      and prosecdef
+      and proconfig = array['search_path=pg_catalog, public']
+  ),
+  15::bigint,
+  'all Omok SECURITY DEFINER functions use the hardened search path'
+);
+
 select ok(
   has_function_privilege('authenticated', 'public.omok_join_room(uuid)', 'EXECUTE'),
   'authenticated users can execute omok_join_room'

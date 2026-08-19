@@ -236,3 +236,83 @@
 - Performance Advisor는 미사용 이력만 있는 인덱스 6개를 INFO로 보고하며 경고·오류는 없다.
 
 자동 검사 통과는 위 결함이 없다는 뜻이 아니다. 이번 후속 작업은 검사 결과와 실제 런타임·서버 신뢰 경계 사이의 공백을 제거하는 것을 목표로 한다.
+
+## 2026-08-18 런타임 재검사 작업 목록
+
+- 작업 브랜치: `fix/runtime-audit-remediation`
+- 브랜치 기준 커밋: `58fe481`
+- 작업 원칙: 실제 원인을 소유하는 공용 계층에서 수정하고, 항목마다 독립 커밋과 재현 검증을 남긴다. 개별 화면 덮어쓰기, 임시 분기, 사용하지 않는 이전 구현 보존은 허용하지 않는다.
+
+1. [x] GitHub Pages의 Google 로그인 활성화 계약 복구
+2. [x] 공용 게임 종료와 브라우저 히스토리 수명주기 복구
+3. [x] 지뢰찾기 터치 제스처의 취소·종료·언마운트 수명주기 복구
+4. [x] 친구 초대 스냅샷과 폴링 소유권 단일화
+5. [x] Flappy 토큰 중복 소유와 SET 원시 스타일 정리
+6. [x] Pages base path를 포함한 OAuth 실제 브라우저 회귀 검사 추가
+7. [x] ESLint와 Playwright 산출물 디렉터리의 병렬 실행 경합 제거
+8. [x] 미사용 `.d3` 모션 스타일 제거와 최종 전체 검증
+
+### 1번 완료 기록
+
+- 로컬에는 `VITE_AUTH_GOOGLE_ENABLED=true`가 있었지만 GitHub 저장소와 `github-pages` 환경에는 변수가 없어 실제 배포 로그인 화면에서 Google 버튼이 사라지는 상태를 확인했다.
+- 저장소 Actions 변수 `VITE_AUTH_GOOGLE_ENABLED=true`를 설정했다.
+- Pages 워크플로에서 묵시적 `false` 기본값을 제거했다. Google 로그인이 운영 필수 계약이므로 값이 없거나 정확히 `true`가 아니면 배포 빌드를 중단한다.
+- 소셜 로그인 문서를 실제 배포 계약과 일치하도록 갱신했다.
+- Pages base path로 만든 프로덕션 결과물의 `/moment-play/#/login`에서 Google 버튼이 노출되고 브라우저 오류가 없음을 Chromium으로 확인했다.
+- ESLint, Stylelint, CSS 토큰 검사, Vitest 61개 파일 318개와 Pages 프로덕션 빌드를 통과했다.
+
+### 2번 완료 기록
+
+- 기존 `GameStage`는 가드용 히스토리 항목만 추가하고 실제 이동은 각 게임의 `navigate("/")`가 따로 수행해, 종료한 게임 경로가 뒤로 가기와 앞으로 가기 기록에 남았다.
+- 공용 `useGameBrowserBackGuard`가 화면 표시 전 가드 생성, 브라우저 뒤로 가기 확인, 취소 후 재무장, 확정 이동 전 원래 게임 항목과 가드 항목 제거를 하나의 수명주기로 소유하도록 변경했다.
+- `GameStage`에서는 라우팅 책임을 제거했다. 2048, Memory, Sudoku, Omok, Star Flight, Timing Tap, Glow Sequence, Solitaire, Block Blast와 공용 퍼즐 세션은 모두 공용 `navigateFromGame` 계약으로 이동한다.
+- 오목의 로비와 방 경로 전환도 같은 계약을 사용해 내부 경로 전환 때 이전 가드가 누적되지 않도록 했다.
+- 실제 Chromium에서 카탈로그 진입, 게임 시작, 종료 모달 취소, 브라우저 뒤로 가기 재시도, 종료 확정, 뒤로·앞으로 이동을 연속 수행했다. 14개 전체 게임에서도 가드 설치 후 브라우저 뒤로 가기, 홈 종료, 카탈로그 복귀, 홈 재진입과 추가 앞으로 가기 차단을 전수 확인했으며 게임 시작 화면이 어느 방향의 기록에서도 다시 나타나지 않았다.
+- 훅 상태 전이 회귀 검사 2개를 추가하고 기존 Playwright 동작 검사를 실제 카탈로그 히스토리 흐름으로 확장했다. ESLint, Stylelint, CSS 토큰 검사, Vitest 61개 파일 320개, Playwright 4개와 프로덕션 빌드를 통과했다.
+
+### 3번 완료 기록
+
+- 기존 지뢰찾기 셀은 컴포넌트 안의 단일 타이머와 전역 클릭 억제 플래그만 사용해 활성 포인터를 구분하지 못했다. 이동·포인터 이탈·세션 종료·새 판·정답 공개·언마운트 시 남은 타이머가 이후 셀 상태를 바꿀 수 있었고, 터치 길게 누르기 뒤 브라우저가 보내는 컨텍스트 메뉴와 클릭이 깃발을 다시 토글하거나 다음 입력을 삼킬 수 있었다.
+- 지뢰찾기 전용 `useMinesweeperCellPress`가 활성 터치 포인터, 이동 임계치, 길게 누르기 타이머, 후속 이벤트 억제와 정리를 하나의 제스처 수명주기로 소유하도록 분리했다. 짧은 터치는 칸 열기, 터치 길게 누르기와 마우스 우클릭은 깃발이라는 게임 명령만 컴포넌트가 제공한다.
+- `pointermove`, `pointerleave`, `pointercancel`, `pointerup`을 구분하고 터치 컨텍스트 메뉴의 전후 이벤트 순서 차이를 흡수한다. 길게 누른 뒤의 클릭 억제는 고정 시각에 먼저 만료되지 않고 포인터가 끝난 시점부터 정리된다. 퍼즐이 일시정지·종료되어 입력이 비활성화되거나 새 판·정답 공개가 시작될 때 즉시 취소하며, 창 포커스 상실·페이지 이탈·언마운트에서도 남은 콜백 실행을 차단한다.
+- 제스처 상태 전이 검사 5개와 실제 Chromium 네이티브 터치 입력에서 장시간 누르기, 컨텍스트 메뉴·클릭 중복 억제, 이동 취소, 일시정지 취소, 종료·언마운트를 검증했다. ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 325개, Playwright 5개와 301개 모듈 프로덕션 빌드를 통과했다.
+
+### 4번 완료 기록
+
+- 전역 `InviteNotificationProvider`와 친구 화면 훅이 동일한 초대 RPC, 요청 중복 제거, 주기 타이머, 포커스·가시성 이벤트를 각각 소유하던 구조를 제거했다. 친구 화면에 들어가면 두 폴링 주기와 두 스냅샷이 경쟁하던 것이 원인이었다.
+- Provider가 사용자 ID가 결합된 전체 초대 스냅샷을 단일 원본으로 소유하고, 배지 수와 최근 처리 결과는 그 배열에서 파생한다. 사용자 전환 시 이전 사용자의 스냅샷은 effect 정리를 기다리지 않고 즉시 소비자에게서 격리된다.
+- 최초 조회, 수동 새로고침, 초대 생성·수락·거절·취소 뒤 갱신, interval·focus·visibility 갱신은 모두 Provider의 하나의 요청 계약을 사용한다. 친구 화면 훅은 초대 데이터를 따로 저장하거나 폴링하지 않고 공용 스냅샷을 표시하며 오류 노출만 담당한다.
+- Supabase 조회에 `AbortSignal`을 전달하고 사용자 전환·Provider 언마운트에서 진행 중 요청을 취소한다. 같은 사용자의 동시 갱신은 한 요청으로 합치고, 취소되거나 이전 사용자가 시작한 응답은 상태를 변경하지 않는다.
+- Provider 스냅샷 노출·동시 요청 병합·요청 취소·계정 간 데이터 격리와 친구 화면의 단일 초대 조회를 회귀 검사로 고정했다. ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, Playwright 5개와 301개 모듈 프로덕션 빌드를 통과했다.
+
+### 5번 완료 기록
+
+- Flappy의 `--flappy-moon`이 foundation의 푸른 기본값과 물고기 SVG 스타일의 노란 덮어쓰기 값으로 이중 정의되어 있었다. 실제 화면에 적용되던 노란 값을 foundation의 유일한 정의로 확정하고, 하위 SVG 파일이 게임 루트 토큰을 몰래 덮어쓰던 규칙을 제거했다.
+- Flappy 팔레트 12개 모두 정의 위치가 정확히 한 곳인지 다시 대조했다. 물고기·배경·피드백 스타일은 동일한 전역 토큰 계약을 소비하며, 파일 로드 순서에 따라 색이 달라지는 경로가 없다.
+- SET 카드의 surface·border·radius와 기본·힌트·선택·정답 shadow를 게임 루트의 의미 기반 토큰 계약으로 정리했다. 하위 카드 상태는 원시 색상·그림자·반지름을 반복하지 않고 역할 토큰만 소비한다.
+- 기존 색상과 그림자 계산식은 그대로 유지했다. 도형의 원·다이아몬드·물결 곡률은 공용 UI 장식이 아니라 게임 데이터 표현이므로 억지로 공용 반지름 토큰에 결합하지 않았다.
+- Flappy·SET 집중 테스트 29개와 ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, Playwright 5개 및 301개 모듈 프로덕션 빌드를 통과했다.
+
+### 6번 완료 기록
+
+- Playwright 서버가 항상 `GITHUB_PAGES=true`로 Pages 프로덕션 번들을 새로 빌드하고 `/moment-play/`에서 preview하도록 바꿨다. 기존 브라우저 검사도 루트 절대 경로 대신 이 배포 base를 기준으로 이동하므로, 개발 서버의 `/`에서만 우연히 통과하거나 이전 `dist`를 재사용하는 경로가 없다.
+- Google 버튼을 실제로 눌러 `supabase-js`가 PKCE authorize URL과 verifier를 생성하고 브라우저를 이동하게 했다. 외부 제공자와 Supabase 서버 응답만 네트워크 경계에서 에뮬레이션하며, 제품의 AuthProvider·callback 파싱·code 교환·세션 저장·보호 경로 복귀는 우회하지 않는다.
+- authorize 요청의 provider, S256 code challenge, 정확한 origin과 `/moment-play/` callback 경로, HashRouter 경로와 안전한 `returnTo`를 검증한다. callback에서는 query의 code와 저장된 verifier가 token 교환에 사용되고, 민감한 code가 URL에서 제거된 뒤 인증이 필요한 Settings 화면까지 복귀하는지를 확인한다.
+- E2E 환경 상수와 Supabase 인증 에뮬레이터를 support 모듈로 분리했다. 기존 게임 브라우저 검사는 세션 설치 계약만 재사용하고 OAuth 요청 형식은 전용 Pages 스펙이 소유한다.
+- 현재 Supabase redirect URL·Google OAuth 문서와 2026년 breaking-change 목록을 확인했다. 이번 검사는 현재 token endpoint 성공 상태인 HTTP 200을 사용하며 제품 코드나 DB 스키마에는 테스트 전용 분기와 변경을 추가하지 않았다.
+- ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, `/moment-play/`에서 실행한 Playwright 6개와 301개 모듈 Pages 프로덕션 빌드를 통과했다. 빌드 결과의 스크립트·스타일 경로도 모두 `/moment-play/assets/`를 사용한다.
+
+### 7번 완료 기록
+
+- Playwright의 기본 `test-results` 디렉터리는 실행 시작 시 정리되지만 `eslint .`의 순회 대상에서는 제외되지 않아, 병렬 실행 중 ESLint가 방금 사라진 파일을 읽으려는 경합이 가능했다. 실행 순서를 고정하거나 실패를 재시도하지 않고 두 도구가 공유하던 디렉터리 경계를 제거했다.
+- E2E 환경 계약이 `.artifacts/playwright`를 Playwright 전용 산출물 루트로 소유한다. 테스트 첨부물은 `test-results`, CI HTML 보고서는 `report` 하위로 분리하고 Playwright 설정은 이 공용 경로 상수만 사용한다.
+- ESLint는 `globalIgnores()`로 Playwright 전용 산출물 루트의 디렉터리 순회 자체를 제외하며 Git도 같은 루트만 추적 대상에서 제외한다. 이전 기본 경로의 ignore 규칙과 남아 있던 생성물은 제거해 두 출력 체계가 공존하지 않도록 했다.
+- `npm run check:static`과 Pages 프로덕션 빌드를 포함한 `npm run test:e2e`를 실제로 동시에 시작하는 검증을 3회 반복했다. 매회 ESLint와 Playwright 6개가 모두 통과했고 이전 기본 경로는 다시 생성되지 않았다.
+- CI 환경의 HTML reporter까지 실행해 `.artifacts/playwright/report/index.html` 생성 위치를 확인했다. 전체 품질 검사, Vitest 62개 파일 328개와 CI 조건 Playwright 6개를 통과했다.
+
+### 8번 완료 기록
+
+- 전역 모션 스타일의 `.d3`는 CSS 정의 외에 JSX, JavaScript, 테스트와 동적 클래스 조합 어디에도 소비자가 없음을 전체 검색으로 확인하고 제거했다.
+- 실제 사용 중인 `.d1`과 `.d2`, 공용 `.reveal` 애니메이션과 reduced-motion 계약은 변경하지 않았다. 소스 CSS와 새로 생성한 프로덕션 CSS 결과물 모두에 `.d3` 선택자가 남지 않았음을 확인했다.
+- ESLint, Stylelint, CSS 토큰 검사, Vitest 62개 파일 328개, 일반 프로덕션 빌드와 Pages 프로덕션 번들을 사용하는 Playwright 6개를 통과했다.
+- `npm audit --audit-level=high` 결과 취약점은 0건이며 작업 목록의 코드 변경 항목을 모두 완료했다.

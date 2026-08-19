@@ -3,6 +3,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { FlagIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -15,7 +16,10 @@ import {
   revealMineCell,
   toggleMineFlag,
 } from "./minesweeper.logic.js";
-import "./minesweeper.css";
+import { useMinesweeperCellPress } from "./useMinesweeperCellPress.js";
+import styles from "./minesweeper.module.css";
+
+const cx = bindCssModule(styles);
 
 const SIZE = 9;
 const MINE_COUNT = 10;
@@ -46,8 +50,6 @@ export function MinesweeperGame({ game }) {
   const [status, setStatus] = useState("첫 칸은 항상 안전해요.");
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const boardRef = useRef(null);
-  const longPressTimerRef = useRef(null);
-  const suppressClickRef = useRef(false);
   const revealedNumberIndex = board.findIndex((cell, index) => (
     cell.state === MINE_CELL_STATE.REVEALED
     && cell.adjacent > 0
@@ -78,8 +80,14 @@ export function MinesweeperGame({ game }) {
       targetIndexes: [safeIndex],
     },
   ]);
+  const cellPress = useMinesweeperCellPress({
+    isEnabled: session.phase === "playing" && !isAnswerRevealed,
+    onFlag: flagCell,
+    onReveal: revealCell,
+  });
 
   function startGame({ preserveStreak = false } = {}) {
+    cellPress.cancel();
     setBoard(createHiddenBoard(SIZE));
     setHasPlantedMines(false);
     setFlagMode(false);
@@ -128,6 +136,7 @@ export function MinesweeperGame({ game }) {
   }
 
   function revealAnswer() {
+    cellPress.cancel();
     const plantedBoard = hasPlantedMines
       ? board
       : plantMines(SIZE, MINE_COUNT, Math.floor((SIZE * SIZE) / 2), Math.random, board);
@@ -177,10 +186,10 @@ export function MinesweeperGame({ game }) {
         { label: "Open", value: revealed },
       ]}
     >
-      <div className="minesweeper-game">
+      <div className={cx("minesweeper-game")}>
         <BoardViewport label="지뢰찾기 보드">
           <div
-            className="minesweeper-board"
+            className={cx("minesweeper-board")}
             ref={boardRef}
             role="grid"
             aria-label="9×9 지뢰찾기 보드"
@@ -194,32 +203,13 @@ export function MinesweeperGame({ game }) {
                       ? "닫힘"
                       : cell.isMine ? "지뢰" : cell.adjacent ? `주변 지뢰 ${cell.adjacent}개` : "안전"
                 }`}
-                className={`minesweeper-cell is-${cell.state}${cell.isMine && cell.state === MINE_CELL_STATE.REVEALED ? " is-mine" : ""}${hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""}`}
+                className={cx(`minesweeper-cell is-${cell.state}${cell.isMine && cell.state === MINE_CELL_STATE.REVEALED ? " is-mine" : ""}${hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""}`)}
                 data-adjacent={cell.adjacent || undefined}
                 data-index={index}
                 disabled={isAnswerRevealed}
                 key={index}
-                onClick={() => {
-                  if (suppressClickRef.current) {
-                    suppressClickRef.current = false;
-                    return;
-                  }
-                  revealCell(index);
-                }}
-                onContextMenu={(event) => {
-                  event.preventDefault();
-                  flagCell(index);
-                }}
                 onKeyDown={(event) => handleKeyDown(event, index)}
-                onPointerCancel={() => window.clearTimeout(longPressTimerRef.current)}
-                onPointerDown={(event) => {
-                  if (event.pointerType !== "touch") return;
-                  longPressTimerRef.current = window.setTimeout(() => {
-                    suppressClickRef.current = true;
-                    flagCell(index);
-                  }, 480);
-                }}
-                onPointerUp={() => window.clearTimeout(longPressTimerRef.current)}
+                {...cellPress.getCellHandlers(index)}
                 type="button"
               >
                 {cell.state === MINE_CELL_STATE.FLAGGED

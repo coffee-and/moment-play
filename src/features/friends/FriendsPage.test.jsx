@@ -39,6 +39,7 @@ vi.mock("../../infrastructure/supabase/friendOmokInvitesGateway.js", () => ({
   respondToFriendOmokInvite,
 }));
 
+const { InviteNotificationProvider } = await import("../../shared/invitations/InviteNotificationContext.jsx");
 const { FriendsPage } = await import("./FriendsPage.jsx");
 
 function LocationProbe() {
@@ -52,11 +53,19 @@ async function renderPage() {
   const root = createRoot(host);
   await act(async () => root.render(
     <MemoryRouter initialEntries={[FRIENDS_PATH]}>
-      <FriendsPage />
-      <LocationProbe />
+      <InviteNotificationProvider pollIntervalMs={60_000}>
+        <FriendsPage />
+        <LocationProbe />
+      </InviteNotificationProvider>
     </MemoryRouter>,
   ));
-  return { host, unmount: () => act(() => root.unmount()) };
+  return {
+    host,
+    unmount() {
+      act(() => root.unmount());
+      host.remove();
+    },
+  };
 }
 
 function clickButton(container, label) {
@@ -128,6 +137,12 @@ const outgoingInvite = {
   respondedAt: null,
 };
 
+const authenticatedUser = {
+  isConfigured: true,
+  status: "authenticated",
+  user: { id: "user-1" },
+};
+
 beforeEach(() => {
   fetchFriendOmokInvites.mockResolvedValue([]);
 });
@@ -161,7 +176,7 @@ describe("FriendsPage", () => {
   });
 
   it("loads relationships and pending Omok invites", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValue(overview);
     fetchFriendOmokInvites.mockResolvedValue([incomingInvite, outgoingInvite]);
@@ -177,11 +192,12 @@ describe("FriendsPage", () => {
     expect(view.host.textContent).toContain("보낸 오목 초대");
     expect(view.host.textContent).toContain("수락하고 입장");
     expect(view.host.textContent).toContain("대기실 입장");
+    expect(fetchFriendOmokInvites).toHaveBeenCalledTimes(1);
     view.unmount();
   });
 
   it("normalizes a friend code, searches, and sends a request", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValue([]);
     findFriendByCode.mockResolvedValue({
@@ -211,7 +227,7 @@ describe("FriendsPage", () => {
   });
 
   it("accepts an incoming friend request and reloads the dashboard", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValueOnce([overview[1]]).mockResolvedValueOnce([]);
     respondToFriendRequest.mockResolvedValue({ friendshipId: "incoming-1" });
@@ -228,7 +244,7 @@ describe("FriendsPage", () => {
   });
 
   it("creates an Omok invite from a friend and enters the waiting room", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValue([overview[0]]);
     createFriendOmokInvite.mockResolvedValue({ inviteId: "invite-new", roomId: "room-new" });
@@ -258,7 +274,7 @@ describe("FriendsPage", () => {
   });
 
   it("accepts an incoming Omok invite and navigates to the shared room", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValue([overview[0]]);
     fetchFriendOmokInvites.mockResolvedValue([incomingInvite]);
@@ -275,7 +291,7 @@ describe("FriendsPage", () => {
   });
 
   it("declines and cancels pending Omok invites without navigating", async () => {
-    auth = { isConfigured: true, status: "authenticated" };
+    auth = authenticatedUser;
     fetchMyFriendProfile.mockResolvedValue(profile);
     fetchFriendOverview.mockResolvedValue([]);
     fetchFriendOmokInvites

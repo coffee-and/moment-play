@@ -8,7 +8,10 @@ import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
 import { dealSetBoard, findSets, isSet } from "./set.logic.js";
 import feedbackStyles from "./set-feedback.module.css";
-import "./set.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./set.module.css";
+
+const cx = bindCssModule(styles);
 
 const SET_TARGET = 5;
 const COLOR_NAMES = ["코랄", "그린", "퍼플"];
@@ -170,9 +173,9 @@ export function SetGame({ game }) {
         { label: "Combo", value: `×${combo}` },
       ]}
     >
-      <div className="set-game">
-        <div className={`set-board-wrap ${feedbackStyles.host}`}>
-          <div className="set-board" role="grid" aria-label="SET 카드 12장">
+      <div className={cx("set-game")}>
+        <div className={cx(`set-board-wrap ${feedbackStyles.host}`)}>
+          <div className={cx("set-board")} role="grid" aria-label="SET 카드 12장">
             {board.map((card, index) => {
               const hintOrder = hint.currentStep?.targetIndexes?.indexOf(index) ?? -1;
               const isHintTarget = hintOrder >= 0;
@@ -180,7 +183,7 @@ export function SetGame({ game }) {
                 <button
                   aria-label={`${COLOR_NAMES[card.color]} ${SHADING_NAMES[card.shading]} ${SHAPE_NAMES[card.shape]} ${card.count}개${revealedSet.includes(index) ? ", 정답 카드" : ""}${isHintTarget ? `, 힌트 카드 ${hintOrder + 1}` : ""}`}
                   aria-pressed={selected.includes(index)}
-                  className={`set-card color-${card.color} shading-${card.shading}${selected.includes(index) ? " is-selected" : ""}${revealedSet.includes(index) ? " is-answer" : ""}${isHintTarget ? " is-set-hint-target" : ""}`}
+                  className={cx(`set-card color-${card.color} shading-${card.shading}${selected.includes(index) ? " is-selected" : ""}${revealedSet.includes(index) ? " is-answer" : ""}${isHintTarget ? " is-set-hint-target" : ""}`)}
                   data-hint-order={isHintTarget ? hintOrder + 1 : undefined}
                   disabled={revealedSet.length > 0}
                   key={`${card.id}-${index}`}
@@ -188,9 +191,9 @@ export function SetGame({ game }) {
                   ref={(element) => { cardRefs.current[index] = element; }}
                   type="button"
                 >
-                  {isHintTarget ? <span aria-hidden="true" className="set-card__hint-badge">{hintOrder + 1}</span> : null}
+                  {isHintTarget ? <span aria-hidden="true" className={cx("set-card__hint-badge")}>{hintOrder + 1}</span> : null}
                   {Array.from({ length: card.count }, (_, shapeIndex) => (
-                    <span className={`set-symbol shape-${card.shape}`} key={shapeIndex} />
+                    <span className={cx(`set-symbol shape-${card.shape}`)} key={shapeIndex} />
                   ))}
                 </button>
               );
@@ -198,9 +201,9 @@ export function SetGame({ game }) {
           </div>
           <GameActionFeedback className={feedbackStyles.feedback} feedback={actionFeedback} />
         </div>
-        <p className="logic-board-status" role="status">{status}</p>
+        <p className={cx("logic-board-status")} role="status">{status}</p>
         {session.phase === "playing" && revealedSet.length > 0 ? (
-          <div className="logic-board-toolbar set-game__toolbar">
+          <div className={cx("logic-board-toolbar set-game__toolbar")}>
             <Button size="small" type="button" variant="secondary" onClick={dealNextBoard}>
               다음 카드
             </Button>

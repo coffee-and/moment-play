@@ -10,6 +10,7 @@ import { GameRecordCelebration } from "../../shared/components/GameRecordCelebra
 import { GameStageModal, GameStageOverlay } from "../../shared/components/GameStageOverlay.jsx";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
+import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { FlappyFish } from "./FlappyFish.jsx";
 import {
   FLAPPY_CONFIG,
@@ -19,7 +20,10 @@ import {
   recoverFlappyState,
 } from "./flappy.logic.js";
 import feedbackStyles from "./flappy-feedback.module.css";
-import "./flappy-game.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./flappy-game.module.css";
+
+const cx = bindCssModule(styles);
 
 const FLAPPY_STAR_FIELD = [
   [8, 13, 4, "warm"], [18, 30, 3, "cool"], [29, 17, 5, "cool"],
@@ -59,6 +63,11 @@ export function FlappyGame({ game }) {
   const [best, setBest] = useState(readBestScore);
   const [didBreakRecordThisAttempt, setDidBreakRecordThisAttempt] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
   const [actionFeedback, setActionFeedback] = useState(null);
   const phaseRef = useRef(phase);
   const worldRef = useRef(world);
@@ -229,7 +238,7 @@ export function FlappyGame({ game }) {
 
   function requestExit() {
     if (phase === "idle" || phase === "over") {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     resumeAfterDialogRef.current = phase === "playing";
@@ -244,16 +253,16 @@ export function FlappyGame({ game }) {
   }
 
   const sidebar = (
-    <div className="stat-row">
-      <div className="stat"><div className="l">Score</div><div className="v">{world.score}</div></div>
-      <div className="stat"><div className="l">Combo</div><div className="v">×{world.combo}</div></div>
-      <div className="stat"><div className="l">Lives</div><div className="v">{world.lives}</div></div>
-      <div className="stat"><div className="l">Shield</div><div className="v">{world.shieldReady ? "READY" : `${world.shieldGauge}%`}</div></div>
+    <div className={cx("stat-row")}>
+      <div className={cx("stat")}><div className={cx("l")}>Score</div><div className={cx("v")}>{world.score}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Combo</div><div className={cx("v")}>×{world.combo}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Lives</div><div className={cx("v")}>{world.lives}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Shield</div><div className={cx("v")}>{world.shieldReady ? "READY" : `${world.shieldGauge}%`}</div></div>
     </div>
   );
 
   const actions = (
-    <div className="game-stage__inline-actions">
+    <div className={cx("game-stage__inline-actions")}>
       {phase === "playing" ? <Button variant="secondary" onClick={pauseGame}>일시정지</Button> : null}
       {phase === "paused" ? <Button variant="secondary" onClick={resumeGame}>계속하기</Button> : null}
       <Button variant="secondary" onClick={requestExit}>게임 나가기</Button>
@@ -269,16 +278,14 @@ export function FlappyGame({ game }) {
     <GameStage
       actions={actions}
       ariaLabel="별빛 비행 게임"
-      className="flappy-game"
+      className={cx("flappy-game")}
       eyebrow="ARCADE / FLIGHT"
-      isExitConfirmationOpen={isExitOpen}
-      onRequestExit={requestExit}
       sidebar={sidebar}
       title={game.title}
     >
-      <div className="flappy-game__wrap">
+      <div className={cx("flappy-game__wrap")}>
         <div
-          className={`flappy-game__sky ${feedbackStyles.host}`}
+          className={cx(`flappy-game__sky ${feedbackStyles.host}`)}
           role="button"
           tabIndex={0}
           aria-label={`별빛 비행, 현재 점수 ${world.score}. 화면이나 Space·Enter를 눌러 날아오르세요.`}
@@ -289,13 +296,13 @@ export function FlappyGame({ game }) {
             flap();
           }}
         >
-          <svg className="flappy-game__moon" aria-hidden="true" viewBox="0 0 64 64">
+          <svg className={cx("flappy-game__moon")} aria-hidden="true" viewBox="0 0 64 64">
             <path d="M41 5C25 7 15 20 16 34c1 17 15 29 31 26 6-1 11-4 15-9-10 5-23 1-29-9-7-12-3-28 8-37Z" />
           </svg>
-          <span className="flappy-game__stars" aria-hidden="true">
+          <span className={cx("flappy-game__stars")} aria-hidden="true">
             {FLAPPY_STAR_FIELD.map(([left, top, size, tone], index) => (
               <i
-                className={`flappy-game__star is-${tone}`}
+                className={cx(`flappy-game__star is-${tone}`)}
                 key={`${left}-${top}`}
                 style={{ left: `${left}%`, top: `${top}%`, "--star-size": `${size}px`, "--star-delay": `${(index % 6) * -0.35}s` }}
               />
@@ -312,19 +319,19 @@ export function FlappyGame({ game }) {
             const gapBottom = pipe.gapY + FLAPPY_CONFIG.gapHeight / 2;
             return (
               <span
-                className="flappy-game__gate"
+                className={cx("flappy-game__gate")}
                 key={pipe.id}
                 style={{ left: `${pipe.x}%`, width: `${FLAPPY_CONFIG.pipeWidth}%` }}
                 aria-hidden="true"
               >
-                <i className="flappy-game__pillar is-top" style={{ height: `${gapTop}%` }} />
-                <i className="flappy-game__pillar is-bottom" style={{ top: `${gapBottom}%` }} />
+                <i className={cx("flappy-game__pillar is-top")} style={{ height: `${gapTop}%` }} />
+                <i className={cx("flappy-game__pillar is-bottom")} style={{ top: `${gapBottom}%` }} />
               </span>
             );
           })}
 
           <span
-            className={`flappy-game__bird ${feedbackStyles.bird}${world.recoveryKind ? ` is-recovering is-${world.recoveryKind}` : ""}`}
+            className={cx("flappy-game__bird", feedbackStyles.bird, world.recoveryKind ? `is-recovering is-${world.recoveryKind}` : "")}
             style={{
               left: `${FLAPPY_CONFIG.birdX}%`,
               top: `${world.birdY}%`,
@@ -335,14 +342,14 @@ export function FlappyGame({ game }) {
             <FlappyFish />
           </span>
         </div>
-        <p className="flappy-game__hint">탭할 때마다 위로 날아요 · 기둥과 천장·바닥을 피하세요</p>
+        <p className={cx("flappy-game__hint")}>탭할 때마다 위로 날아요 · 기둥과 천장·바닥을 피하세요</p>
       </div>
 
       {phase === "idle" ? (
         <GameStageOverlay state="start">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="flappy-start-title">
             <GameStageDoodle variant="start" />
-            <div className="game-stage-modal__eyebrow">ARCADE / FLIGHT</div>
+            <div className={cx("game-stage-modal__eyebrow")}>ARCADE / FLIGHT</div>
             <h3 id="flappy-start-title">별빛 사이를 날아보세요</h3>
             <p>화면을 탭하거나 Space·Enter를 눌러 날개를 펼쳐요.</p>
             <Button onClick={startGame}>비행 시작</Button>
@@ -353,7 +360,7 @@ export function FlappyGame({ game }) {
       {phase === "paused" && !isExitOpen ? (
         <GameStageOverlay state="paused">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="flappy-pause-title">
-            <div className="game-stage-modal__eyebrow">PAUSED</div>
+            <div className={cx("game-stage-modal__eyebrow")}>PAUSED</div>
             <h3 id="flappy-pause-title">잠시 쉬어갈까요?</h3>
             <p>화면을 탭하거나 Space·Enter를 눌러 다시 날아오를 수 있어요.</p>
             <Button onClick={resumeGame}>계속하기</Button>
@@ -372,7 +379,7 @@ export function FlappyGame({ game }) {
             aria-labelledby="flappy-result-title"
           >
             <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
-            <div className="game-stage-modal__eyebrow">FLIGHT ENDED</div>
+            <div className={cx("game-stage-modal__eyebrow")}>FLIGHT ENDED</div>
             <h3 id="flappy-result-title">{starRating} {world.score}점</h3>
             <p>최고 기록 {Math.max(best, world.score)}점</p>
             <Button onClick={startGame}>다시 비행</Button>
@@ -383,11 +390,11 @@ export function FlappyGame({ game }) {
       {isExitOpen ? (
         <GameStageOverlay state="confirm">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="flappy-exit-title">
-            <div className="game-stage-modal__eyebrow">LEAVE FLIGHT</div>
+            <div className={cx("game-stage-modal__eyebrow")}>LEAVE FLIGHT</div>
             <h3 id="flappy-exit-title">비행을 종료할까요?</h3>
             <p>현재 점수는 최고 기록에 반영되지 않아요.</p>
-            <div className="game-stage-modal__actions">
-              <Button onClick={() => navigate("/")}>나가기</Button>
+            <div className={cx("game-stage-modal__actions")}>
+              <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={closeExitDialog}>계속 비행</Button>
             </div>
           </GameStageModal>

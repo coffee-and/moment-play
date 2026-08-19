@@ -11,7 +11,7 @@
   height: 28px;
   align-items: end;
   gap: 3px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 6px 8px;
   background: var(--loading-surface);
 }
@@ -20,7 +20,7 @@
   display: block;
   width: 4px;
   height: 8px;
-  border-radius: 99px;
+  border-radius: var(--r-pill);
   background: var(--accent-terracotta);
   animation: loading-bars 0.75s ease-in-out infinite alternate;
 }

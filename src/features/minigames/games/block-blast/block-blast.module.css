@@ -10,14 +10,14 @@
   justify-content: center;
 }
 
-.block-blast-session-controls .button svg,
-.block-blast-game .game-stage-modal__actions .button svg {
+.block-blast-session-controls :global(.button) svg,
+.block-blast-game :global(.game-stage-modal__actions) :global(.button) svg {
   width: 18px;
   height: 18px;
 }
 
 @media (max-width: 620px) {
-  .block-blast-session-controls .button {
+  .block-blast-session-controls :global(.button) {
     width: auto;
     min-height: 34px;
     padding-inline: 11px;
@@ -190,7 +190,7 @@
     min-height: 86px;
   }
 
-  .block-blast-layout > .logic-board-status {
+  .block-blast-layout > :global(.logic-board-status) {
     grid-row: 3;
   }
 

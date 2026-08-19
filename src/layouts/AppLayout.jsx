@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../shared/auth/authConstants.js";
+import { useSignOutAction } from "../shared/auth/useSignOutAction.js";
 import { Brand } from "../shared/components/Brand.jsx";
 import { Footer } from "../shared/components/Footer.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
@@ -13,6 +14,7 @@ import "./app-shell.css";
 
 function AccountControl() {
   const { signOut, status, user } = useAuth();
+  const { errorMessage, isSigningOut, runSignOut } = useSignOutAction(signOut);
 
   if (status === "loading") {
     return <span className="account-control account-control--loading" aria-label={AUTH_LABELS.loading} />;
@@ -23,7 +25,10 @@ function AccountControl() {
       <details className="account-menu">
         <summary className="account-control"><span className="account-control__label">{getAccountLabel(user)}</span></summary>
         <div className="account-menu__panel">
-          <button type="button" onClick={() => void signOut()}>{AUTH_LABELS.logout}</button>
+          <button type="button" disabled={isSigningOut} onClick={() => void runSignOut()}>
+            {isSigningOut ? AUTH_LABELS.loggingOut : AUTH_LABELS.logout}
+          </button>
+          {errorMessage ? <p className="account-menu__error" role="alert">{errorMessage}</p> : null}
         </div>
       </details>
     );

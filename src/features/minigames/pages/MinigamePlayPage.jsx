@@ -16,11 +16,14 @@ import {
 } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
 import { GameGuideProvider } from "../shared/components/GameGuideContext.jsx";
-import "./minigame-play.css";
+import { bindCssModule } from "../../../shared/styles/bindCssModule.js";
+import styles from "./minigame-play.module.css";
+
+const cx = bindCssModule(styles);
 
 function MinigameBlockingState(props) {
   return (
-    <div className="wrap minigame-play-page minigame-play-page--blocking">
+    <div className={cx("wrap minigame-play-page minigame-play-page--blocking")}>
       <StatusPanel {...props} />
     </div>
   );
@@ -137,7 +140,7 @@ function MinigameRouteSession({ gameId, roomId, returnTo }) {
       fallback={<MinigameErrorState />}
     >
       <Suspense fallback={<MinigameLoadingState game={game} />}>
-        <div className="wrap minigame-play-page minigame-play-page--active">
+        <div className={cx("wrap minigame-play-page minigame-play-page--active")}>
           <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
             <ActiveGameComponent game={game} roomId={roomId ?? null} />
           </GameGuideProvider>

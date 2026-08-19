@@ -8,9 +8,9 @@
   margin-bottom: 24px;
 }
 
-.friends-page__header .eyebrow,
-.friend-code-card .eyebrow,
-.friend-search-card .eyebrow {
+.friends-page__header :global(.eyebrow),
+.friend-code-card :global(.eyebrow),
+.friend-search-card :global(.eyebrow) {
   margin: 0 0 6px;
   color: var(--accent);
   font-family: var(--font);
@@ -128,7 +128,7 @@
 }
 
 .friend-search-result__status {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 6px 10px;
   background: var(--chip);
   color: var(--accent-2);
@@ -157,7 +157,7 @@
   margin: var(--gap) 0;
 }
 
-.friend-stats .card {
+.friend-stats :global(.card) {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -197,7 +197,7 @@
   min-width: 32px;
   height: 32px;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--chip);
   color: var(--accent-2);
   font-family: var(--font);
@@ -300,9 +300,9 @@
   gap: 6px;
 }
 
-.friend-actions .button,
-.friend-search-result .button,
-.friend-code-card__value .button {
+.friend-actions :global(.button),
+.friend-search-result :global(.button),
+.friend-code-card__value :global(.button) {
   min-height: 36px;
   padding: 0 12px;
   font-size: 12px;
@@ -354,9 +354,9 @@
     flex-direction: column;
   }
 
-  .friend-code-card__value .button,
-  .friend-search-form__row .button,
-  .friend-search-result .button {
+  .friend-code-card__value :global(.button),
+  .friend-search-form__row :global(.button),
+  .friend-search-result :global(.button) {
     width: 100%;
   }
 
@@ -368,7 +368,7 @@
     gap: 8px;
   }
 
-  .friend-stats .card {
+  .friend-stats :global(.card) {
     align-items: center;
     padding: 14px 10px;
     flex-direction: column;
@@ -382,7 +382,7 @@
     align-items: stretch;
   }
 
-  .friend-actions .button {
+  .friend-actions :global(.button) {
     flex: 1;
   }
 }

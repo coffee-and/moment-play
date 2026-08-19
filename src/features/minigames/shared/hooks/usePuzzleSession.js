@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStreak } from "../gameStreak.js";
+import { useGameBrowserBackGuard } from "./useGameBrowserBackGuard.js";
 
 function readBestTime(storageKey) {
   try {
@@ -89,9 +90,15 @@ export function usePuzzleSession(storageKey) {
     disqualifyRound();
   }, [disqualifyRound, updateElapsed]);
 
-  const requestExit = useCallback(() => {
+  const navigateFromGame = useGameBrowserBackGuard({
+    isExitConfirmationOpen: isExitOpen,
+    onNavigate: navigate,
+    onRequestExit: requestExit,
+  });
+
+  function requestExit() {
     if (["idle", "completed", "failed"].includes(phaseRef.current)) {
-      navigate("/");
+      navigateFromGame("/");
       return;
     }
     if (phaseRef.current === "paused") {
@@ -102,7 +109,7 @@ export function usePuzzleSession(storageKey) {
     elapsedBeforeStartRef.current = seconds * 1000;
     setPhase("paused");
     setIsExitOpen(true);
-  }, [navigate, updateElapsed]);
+  }
 
   const continueGame = useCallback(() => {
     startedAtRef.current = Date.now();
@@ -136,8 +143,8 @@ export function usePuzzleSession(storageKey) {
 
   const leaveGame = useCallback(() => {
     disqualifyRound();
-    navigate("/");
-  }, [disqualifyRound, navigate]);
+    navigateFromGame("/");
+  }, [disqualifyRound, navigateFromGame]);
 
   return {
     bestTime,
