@@ -9,8 +9,7 @@ import { FriendOmokInviteDialog } from "./FriendOmokInviteDialog.jsx";
 import { FriendOmokInviteSection } from "./FriendOmokInviteSection.jsx";
 import { FRIENDS_LOAD_STATUS, getRelationshipLabel } from "./friendsPageModel.js";
 import { useFriendsDashboard } from "./useFriendsDashboard.js";
-import "./friends.css";
-import "./friend-omok-invites.css";
+import { friendsClassNames as cx } from "./friendsStyles.js";
 
 function formatFriendDate(value) {
   if (!value) return "";
@@ -21,36 +20,36 @@ function formatFriendDate(value) {
 
 function FriendListSection({ title, description, items, emptyText, actionKey, inviteBusyId, onAction, onInvite, type }) {
   return (
-    <section className="card friend-section" aria-labelledby={`friend-section-${type}`}>
-      <header className="friend-section__header">
+    <section className={cx("card", "friend-section")} aria-labelledby={`friend-section-${type}`}>
+      <header className={cx("friend-section__header")}>
         <div>
           <h2 id={`friend-section-${type}`}>{title}</h2>
           <p>{description}</p>
         </div>
-        <span className="friend-section__count" aria-label={`${items.length}명`}>{items.length}</span>
+        <span className={cx("friend-section__count")} aria-label={`${items.length}명`}>{items.length}</span>
       </header>
 
       {items.length === 0 ? (
-        <p className="friend-section__empty">{emptyText}</p>
+        <p className={cx("friend-section__empty")}>{emptyText}</p>
       ) : (
-        <ul className="friend-list">
+        <ul className={cx("friend-list")}>
           {items.map((item) => {
             const isBusy = actionKey === item.friendshipId;
             const isInviteBusy = inviteBusyId === `create:${item.friendshipId}`;
             const displayDate = formatFriendDate(item.respondedAt ?? item.createdAt);
             return (
-              <li className="friend-list__item" key={item.friendshipId}>
-                <div className="friend-list__identity">
-                  <span className="friend-avatar" aria-hidden="true">{item.nickname.slice(0, 1).toUpperCase()}</span>
+              <li className={cx("friend-list__item")} key={item.friendshipId}>
+                <div className={cx("friend-list__identity")}>
+                  <span className={cx("friend-avatar")} aria-hidden="true">{item.nickname.slice(0, 1).toUpperCase()}</span>
                   <div>
                     <strong>{item.nickname}</strong>
                     <span>{item.friendCode}</span>
                   </div>
                 </div>
 
-                <div className="friend-list__meta">
+                <div className={cx("friend-list__meta")}>
                   {displayDate ? <time dateTime={item.respondedAt ?? item.createdAt}>{displayDate}</time> : null}
-                  <div className="friend-actions">
+                  <div className={cx("friend-actions")}>
                     {type === "incoming" ? (
                       <>
                         <Button size="small" disabled={isBusy} onClick={() => onAction(item, "accept")}>수락</Button>
@@ -87,7 +86,7 @@ export function FriendsPage() {
 
   if (authStatus === "loading") {
     return (
-      <section className="wrap friends-page">
+      <section className={cx("wrap", "friends-page")}>
         <StatusPanel title="계정 정보를 확인하고 있어요" description="잠시만 기다려 주세요." />
       </section>
     );
@@ -95,7 +94,7 @@ export function FriendsPage() {
 
   if (!isConfigured) {
     return (
-      <section className="wrap friends-page">
+      <section className={cx("wrap", "friends-page")}>
         <StatusPanel title="친구 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
       </section>
     );
@@ -103,7 +102,7 @@ export function FriendsPage() {
 
   if (authStatus !== "authenticated") {
     return (
-      <section className="wrap friends-page">
+      <section className={cx("wrap", "friends-page")}>
         <StatusPanel
           title="로그인하면 친구와 연결할 수 있어요"
           description="친구 코드를 검색하고 요청을 주고받으려면 로그인해 주세요. 계정이 없다면 로그인 화면에서 회원가입할 수 있어요."
@@ -115,15 +114,15 @@ export function FriendsPage() {
 
   return (
     <>
-      <section className="wrap friends-page" aria-labelledby="friends-title">
-        <header className="friends-page__header">
+      <section className={cx("wrap", "friends-page")} aria-labelledby="friends-title">
+        <header className={cx("friends-page__header")}>
           <p className="eyebrow">Play Together</p>
           <h1 className="page-title" id="friends-title">FRIENDS</h1>
           <p>친구 코드를 주고받고, 함께 플레이할 사람을 안전하게 관리해 보세요.</p>
         </header>
 
         {dashboard.loadStatus === FRIENDS_LOAD_STATUS.LOADING ? (
-          <div className="card friends-page__loading">
+          <div className={cx("card", "friends-page__loading")}>
             <LoadingIndicator label="친구 정보를 불러오는 중…" />
           </div>
         ) : null}
@@ -139,33 +138,33 @@ export function FriendsPage() {
 
         {dashboard.loadStatus === FRIENDS_LOAD_STATUS.READY ? (
           <>
-            {dashboard.pageError ? <p className="friends-page__notice is-error" role="alert">{dashboard.pageError}</p> : null}
-            {dashboard.inviteError && !dashboard.inviteTarget ? <p className="friends-page__notice is-error" role="alert">{dashboard.inviteError}</p> : null}
+            {dashboard.pageError ? <p className={cx("friends-page__notice", "is-error")} role="alert">{dashboard.pageError}</p> : null}
+            {dashboard.inviteError && !dashboard.inviteTarget ? <p className={cx("friends-page__notice", "is-error")} role="alert">{dashboard.inviteError}</p> : null}
 
-            <div className="friends-overview-grid">
-              <section className="card friend-code-card" aria-labelledby="my-friend-code-title">
+            <div className={cx("friends-overview-grid")}>
+              <section className={cx("card", "friend-code-card")} aria-labelledby="my-friend-code-title">
                 <div>
                   <p className="eyebrow">My Friend Code</p>
                   <h2 id="my-friend-code-title">내 친구 코드</h2>
                   <p>이 코드를 친구에게 공유하면 나를 검색할 수 있어요.</p>
                 </div>
-                <div className="friend-code-card__value">
+                <div className={cx("friend-code-card__value")}>
                   <code>{dashboard.profile?.friendCode ?? "----------"}</code>
                   <Button size="small" variant="secondary" onClick={() => void dashboard.copyCode()}>
                     {dashboard.copyStatus === "copied" ? "복사됨" : "코드 복사"}
                   </Button>
                 </div>
-                {dashboard.copyStatus === "error" ? <p className="friends-page__notice is-error">코드를 복사하지 못했어요.</p> : null}
+                {dashboard.copyStatus === "error" ? <p className={cx("friends-page__notice", "is-error")}>코드를 복사하지 못했어요.</p> : null}
               </section>
 
-              <section className="card friend-search-card" aria-labelledby="friend-search-title">
+              <section className={cx("card", "friend-search-card")} aria-labelledby="friend-search-title">
                 <div>
                   <p className="eyebrow">Find a Friend</p>
                   <h2 id="friend-search-title">친구 코드 검색</h2>
                   <p>상대방의 10자리 코드를 입력해 주세요.</p>
                 </div>
                 <form
-                  className="friend-search-form"
+                  className={cx("friend-search-form")}
                   onSubmit={(event) => {
                     event.preventDefault();
                     void dashboard.search();
@@ -173,9 +172,9 @@ export function FriendsPage() {
                   noValidate
                 >
                   <label className="f-label" htmlFor="friend-code-search">친구 코드</label>
-                  <div className="friend-search-form__row">
+                  <div className={cx("friend-search-form__row")}>
                     <input
-                      className="txt friend-code-input"
+                      className={cx("txt", "friend-code-input")}
                       id="friend-code-search"
                       inputMode="text"
                       autoComplete="off"
@@ -184,18 +183,18 @@ export function FriendsPage() {
                       value={dashboard.searchCode}
                       onChange={(event) => dashboard.updateSearchCode(event.target.value)}
                     />
-                    <Button className="friend-search-submit" type="submit" disabled={dashboard.searchStatus === "loading"}>
+                    <Button className={cx("friend-search-submit")} type="submit" disabled={dashboard.searchStatus === "loading"}>
                       {dashboard.searchStatus === "loading" ? "검색 중…" : "검색"}
                     </Button>
                   </div>
                 </form>
 
-                {dashboard.searchMessage ? <p className="friends-page__notice is-error" role="alert">{dashboard.searchMessage}</p> : null}
+                {dashboard.searchMessage ? <p className={cx("friends-page__notice", "is-error")} role="alert">{dashboard.searchMessage}</p> : null}
 
                 {dashboard.searchResult ? (
-                  <div className="friend-search-result" role="status">
-                    <div className="friend-list__identity">
-                      <span className="friend-avatar" aria-hidden="true">{dashboard.searchResult.nickname.slice(0, 1).toUpperCase()}</span>
+                  <div className={cx("friend-search-result")} role="status">
+                    <div className={cx("friend-list__identity")}>
+                      <span className={cx("friend-avatar")} aria-hidden="true">{dashboard.searchResult.nickname.slice(0, 1).toUpperCase()}</span>
                       <div>
                         <strong>{dashboard.searchResult.nickname}</strong>
                         <span>{getRelationshipLabel(dashboard.searchResult.relationshipStatus)}</span>
@@ -210,7 +209,7 @@ export function FriendsPage() {
                         친구 요청 보내기
                       </Button>
                     ) : (
-                      <span className="friend-search-result__status">{getRelationshipLabel(dashboard.searchResult.relationshipStatus)}</span>
+                      <span className={cx("friend-search-result__status")}>{getRelationshipLabel(dashboard.searchResult.relationshipStatus)}</span>
                     )}
                   </div>
                 ) : null}
@@ -229,13 +228,13 @@ export function FriendsPage() {
               onRefresh={() => void dashboard.refreshInvites({ surfaceError: true }).catch(() => {})}
             />
 
-            <div className="friend-stats" aria-label="친구 현황">
+            <div className={cx("friend-stats")} aria-label="친구 현황">
               <div className="card"><strong>{dashboard.groups.friends.length}</strong><span>친구</span></div>
               <div className="card"><strong>{dashboard.groups.incoming.length}</strong><span>받은 요청</span></div>
               <div className="card"><strong>{dashboard.groups.outgoing.length}</strong><span>보낸 요청</span></div>
             </div>
 
-            <div className="friend-sections-grid">
+            <div className={cx("friend-sections-grid")}>
               <FriendListSection
                 type="incoming"
                 title="받은 요청"

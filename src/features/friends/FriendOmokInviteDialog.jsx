@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../../shared/components/Button.jsx";
 import { GameStageModal, GameStageOverlay } from "../minigames/shared/components/GameStageOverlay.jsx";
 import { OMOK_MODE, OMOK_MODE_LABEL } from "../minigames/games/omok/omok.constants.js";
+import { friendsClassNames as cx } from "./friendsStyles.js";
 
 const DEFAULT_INVITE_SETTINGS = Object.freeze({
   allowForbiddenPositions: true,
@@ -43,20 +44,20 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
       onClose={onClose}
       aria-label="친구 오목 초대 설정"
     >
-      <GameStageModal className="friend-invite-modal" role="dialog" aria-modal="true" aria-labelledby="friend-invite-title">
-        <form className="friend-invite-form" onSubmit={handleSubmit}>
-          <header className="friend-invite-form__header">
+      <GameStageModal className={cx("friend-invite-modal")} role="dialog" aria-modal="true" aria-labelledby="friend-invite-title">
+        <form className={cx("friend-invite-form")} onSubmit={handleSubmit}>
+          <header className={cx("friend-invite-form__header")}>
             <p className="eyebrow">Omok Invite</p>
             <h2 id="friend-invite-title">{friend.nickname}님에게 오목 초대</h2>
             <p>초대를 보내면 온라인 대기실이 만들어지고 15분 동안 유지됩니다.</p>
           </header>
 
-          <fieldset className="friend-invite-form__group">
+          <fieldset className={cx("friend-invite-form__group")}>
             <legend>오목 규칙</legend>
-            <div className="friend-invite-form__chips">
+            <div className={cx("friend-invite-form__chips")}>
               {GAME_MODE_OPTIONS.map((mode) => (
                 <button
-                  className={`friend-invite-form__chip${settings.gameMode === mode ? " is-selected" : ""}`}
+                  className={cx("friend-invite-form__chip", settings.gameMode === mode && "is-selected")}
                   type="button"
                   key={mode}
                   aria-pressed={settings.gameMode === mode}
@@ -69,10 +70,10 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
             </div>
           </fieldset>
 
-          <div className="friend-invite-form__settings-grid">
-            <fieldset className="friend-invite-form__group">
+          <div className={cx("friend-invite-form__settings-grid")}>
+            <fieldset className={cx("friend-invite-form__group")}>
               <legend>방 안내 허용</legend>
-              <label className="friend-invite-form__toggle">
+              <label className={cx("friend-invite-form__toggle")}>
                 <span>금수 위치 보기 허용</span>
                 <input
                   type="checkbox"
@@ -81,7 +82,7 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
                   onChange={(event) => updateSetting("allowForbiddenPositions", event.target.checked)}
                 />
               </label>
-              <label className="friend-invite-form__toggle">
+              <label className={cx("friend-invite-form__toggle")}>
                 <span>금수 이유 설명 허용</span>
                 <input
                   type="checkbox"
@@ -92,9 +93,9 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
               </label>
             </fieldset>
 
-            <fieldset className="friend-invite-form__group">
+            <fieldset className={cx("friend-invite-form__group")}>
               <legend>내 금수 안내</legend>
-              <label className="friend-invite-form__toggle">
+              <label className={cx("friend-invite-form__toggle")}>
                 <span>금수 위치 표시</span>
                 <input
                   type="checkbox"
@@ -103,7 +104,7 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
                   onChange={(event) => updateSetting("showForbiddenPositions", event.target.checked)}
                 />
               </label>
-              <label className="friend-invite-form__toggle">
+              <label className={cx("friend-invite-form__toggle")}>
                 <span>금수 이유 설명</span>
                 <input
                   type="checkbox"
@@ -115,10 +116,10 @@ export function FriendOmokInviteDialog({ friend, isSubmitting, errorMessage, onC
             </fieldset>
           </div>
 
-          {isFreeMode ? <p className="friend-invite-form__note">Free Omok에서는 금수 규칙이 적용되지 않습니다.</p> : null}
-          {errorMessage ? <p className="friends-page__notice is-error" role="alert">{errorMessage}</p> : null}
+          {isFreeMode ? <p className={cx("friend-invite-form__note")}>Free Omok에서는 금수 규칙이 적용되지 않습니다.</p> : null}
+          {errorMessage ? <p className={cx("friends-page__notice", "is-error")} role="alert">{errorMessage}</p> : null}
 
-          <div className="game-stage-modal__actions friend-invite-form__actions">
+          <div className={cx("game-stage-modal__actions", "friend-invite-form__actions")}>
             <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "초대 보내는 중…" : "초대 보내고 대기실 입장"}</Button>
             <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>취소</Button>
           </div>

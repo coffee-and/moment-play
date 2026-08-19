@@ -22,8 +22,8 @@
   white-space: nowrap;
 }
 
-.friend-invite-dashboard__refresh .button,
-.friend-invite-results .button {
+.friend-invite-dashboard__refresh :global(.button),
+.friend-invite-results :global(.button) {
   min-height: 36px;
   padding: 0 12px;
   font-size: 12px;
@@ -134,7 +134,7 @@
     grid-column: 2;
   }
 
-  .friend-invite-results .button {
+  .friend-invite-results :global(.button) {
     width: 100%;
   }
 }

@@ -5,7 +5,7 @@ import {
   INVITE_STATUS_LABEL,
 } from "../../shared/invitations/inviteStatus.js";
 import { OMOK_MODE_LABEL } from "../minigames/games/omok/omok.constants.js";
-import "./friend-omok-inbox.css";
+import { friendsClassNames as cx } from "./friendsStyles.js";
 
 function formatInviteDeadline(value) {
   if (!value) return "";
@@ -28,35 +28,35 @@ function formatResultTime(value) {
 
 function InviteList({ title, description, items, emptyText, busyInviteId, direction, onAccept, onDecline, onCancel, onEnterRoom }) {
   return (
-    <section className="card friend-invite-section" aria-labelledby={`friend-invite-${direction}`}>
-      <header className="friend-invite-section__header">
+    <section className={cx("card", "friend-invite-section")} aria-labelledby={`friend-invite-${direction}`}>
+      <header className={cx("friend-invite-section__header")}>
         <div>
           <h2 id={`friend-invite-${direction}`}>{title}</h2>
           <p>{description}</p>
         </div>
-        <span className="friend-section__count" aria-label={`${items.length}개`}>{items.length}</span>
+        <span className={cx("friend-section__count")} aria-label={`${items.length}개`}>{items.length}</span>
       </header>
 
       {items.length === 0 ? (
-        <p className="friend-section__empty">{emptyText}</p>
+        <p className={cx("friend-section__empty")}>{emptyText}</p>
       ) : (
-        <ul className="friend-invite-list">
+        <ul className={cx("friend-invite-list")}>
           {items.map((invite) => {
             const isBusy = busyInviteId === invite.inviteId;
             const deadline = formatInviteDeadline(invite.expiresAt);
             return (
-              <li className="friend-invite-list__item" key={invite.inviteId}>
-                <div className="friend-list__identity">
-                  <span className="friend-avatar" aria-hidden="true">{invite.nickname.slice(0, 1).toUpperCase()}</span>
+              <li className={cx("friend-invite-list__item")} key={invite.inviteId}>
+                <div className={cx("friend-list__identity")}>
+                  <span className={cx("friend-avatar")} aria-hidden="true">{invite.nickname.slice(0, 1).toUpperCase()}</span>
                   <div>
                     <strong>{invite.nickname}</strong>
                     <span>{OMOK_MODE_LABEL[invite.gameMode] ?? "Omok"}</span>
                   </div>
                 </div>
 
-                <div className="friend-invite-list__details">
+                <div className={cx("friend-invite-list__details")}>
                   {deadline ? <time dateTime={invite.expiresAt}>{deadline}까지</time> : null}
-                  <div className="friend-actions">
+                  <div className={cx("friend-actions")}>
                     {direction === "incoming" ? (
                       <>
                         <Button size="small" disabled={isBusy} onClick={() => onAccept(invite)}>수락하고 입장</Button>
@@ -83,21 +83,21 @@ function RecentInviteResults({ items, onEnterRoom }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="card friend-invite-results" aria-labelledby="friend-invite-results-title">
-      <header className="friend-invite-results__header">
+    <section className={cx("card", "friend-invite-results")} aria-labelledby="friend-invite-results-title">
+      <header className={cx("friend-invite-results__header")}>
         <div>
           <h3 id="friend-invite-results-title">최근 초대 결과</h3>
           <p>수락·거절·취소·만료된 최근 기록입니다.</p>
         </div>
       </header>
-      <ul className="friend-invite-results__list">
+      <ul className={cx("friend-invite-results__list")}>
         {items.map((invite) => {
           const resultTime = formatResultTime(invite.respondedAt ?? invite.expiresAt);
           const canEnterRoom = invite.status === "accepted" && invite.direction === "outgoing" && invite.roomId;
           return (
             <li key={`${invite.inviteId}:${invite.status}`}>
-              <div className="friend-invite-results__copy">
-                <span className={`friend-invite-results__status is-${invite.status}`}>
+              <div className={cx("friend-invite-results__copy")}>
+                <span className={cx("friend-invite-results__status", `is-${invite.status}`)}>
                   {INVITE_STATUS_LABEL[invite.status] ?? invite.status}
                 </span>
                 <strong>{getInviteResultMessage(invite)}</strong>
@@ -130,21 +130,21 @@ export function FriendOmokInviteSection({
   const { recentResults } = useInviteNotifications();
 
   return (
-    <section className="friend-invite-dashboard" id="omok-invites" aria-labelledby="friend-invite-dashboard-title">
-      <header className="friend-invite-dashboard__header">
+    <section className={cx("friend-invite-dashboard")} id="omok-invites" aria-labelledby="friend-invite-dashboard-title">
+      <header className={cx("friend-invite-dashboard__header")}>
         <div>
           <p className="eyebrow">Play Together</p>
           <h2 id="friend-invite-dashboard-title">오목 초대함</h2>
           <p>친구가 보낸 초대를 수락하거나 내가 만든 대기실로 이동할 수 있어요.</p>
         </div>
-        <div className="friend-invite-dashboard__refresh">
+        <div className={cx("friend-invite-dashboard__refresh")}>
           <span>자동 갱신</span>
           <Button size="small" type="button" variant="secondary" disabled={isRefreshing} onClick={onRefresh}>
             {isRefreshing ? "갱신 중…" : "새로고침"}
           </Button>
         </div>
       </header>
-      <div className="friend-invite-dashboard__grid">
+      <div className={cx("friend-invite-dashboard__grid")}>
         <InviteList
           direction="incoming"
           title="받은 오목 초대"
