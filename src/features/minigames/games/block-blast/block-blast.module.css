@@ -38,7 +38,7 @@
   height: 100%;
   grid-template-columns: repeat(8, 1fr);
   gap: 4px;
-  border-radius: 18px;
+  border-radius: var(--r-card);
   padding: 9px;
   background: color-mix(in oklab, var(--game-color-blue) 10%, var(--surface-2));
 }
@@ -47,7 +47,7 @@
   position: relative;
   min-width: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--r-cell-lg);
   background: color-mix(in oklab, var(--text) 8%, var(--surface));
   cursor: pointer;
 }
@@ -71,7 +71,7 @@
 
 .block-blast-cell.is-invalid-preview {
   background: color-mix(in oklab, var(--game-color-red) 22%, var(--surface));
-  box-shadow: inset 0 0 0 2px var(--game-color-red);
+  box-shadow: var(--invalid-cell-shadow);
 }
 
 .block-blast-cell.is-filled,
@@ -101,7 +101,7 @@
   min-height: 104px;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-md);
   background: var(--surface);
   cursor: grab;
   padding: 8px 6px 22px;
@@ -116,7 +116,7 @@
 .block-piece.is-selected {
   border-color: var(--accent);
   background: color-mix(in oklab, var(--accent) 7%, var(--surface));
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 .block-piece-grid {
@@ -130,7 +130,7 @@
 }
 
 .block-piece-cell {
-  border-radius: 3px;
+  border-radius: var(--r-mark);
 }
 
 .block-piece__hint {

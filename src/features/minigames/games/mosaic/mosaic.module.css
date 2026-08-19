@@ -43,7 +43,7 @@
 
 .mosaic-cell.clue-conflict {
   color: var(--game-color-red);
-  box-shadow: inset 0 0 0 2px var(--game-color-red);
+  box-shadow: var(--invalid-cell-shadow);
 }
 
 .mosaic-cell.clue-satisfied span {

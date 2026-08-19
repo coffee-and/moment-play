@@ -41,6 +41,13 @@
   text-align: left;
 }
 
+.auth-form__help {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .auth-card :global(.txt) {
   border-color: var(--line);
   background: var(--bg);
@@ -56,7 +63,7 @@
 .auth-card :global(.txt):focus-visible {
   border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 .auth-provider-options {
@@ -76,7 +83,7 @@
   position: relative;
   min-height: 48px;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--r-control);
   font-size: 14px;
   font-weight: 700;
 }

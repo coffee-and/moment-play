@@ -14,6 +14,7 @@
     "check:static": "eslint . --max-warnings 0",
     "check:css-tokens": "node scripts/check-css-custom-properties.mjs",
     "check:style-architecture": "node scripts/check-style-architecture.mjs",
+    "check:db-advisors": "node scripts/check-database-advisors.mjs",
     "lint:styles": "stylelint \"src/**/*.css\"",
     "quality": "npm run check:static && npm run lint:styles && npm run check:css-tokens && npm run check:style-architecture",
     "test": "vitest run",

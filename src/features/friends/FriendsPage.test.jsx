@@ -51,16 +51,18 @@ async function renderPage() {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
-  await act(async () => root.render(
+  const render = () => root.render(
     <MemoryRouter initialEntries={[FRIENDS_PATH]}>
       <InviteNotificationProvider pollIntervalMs={60_000}>
         <FriendsPage />
         <LocationProbe />
       </InviteNotificationProvider>
-    </MemoryRouter>,
-  ));
+    </MemoryRouter>
+  );
+  await act(async () => render());
   return {
     host,
+    rerender: () => act(() => render()),
     unmount() {
       act(() => root.unmount());
       host.remove();
@@ -193,6 +195,27 @@ describe("FriendsPage", () => {
     expect(view.host.textContent).toContain("수락하고 입장");
     expect(view.host.textContent).toContain("대기실 입장");
     expect(fetchFriendOmokInvites).toHaveBeenCalledTimes(1);
+    view.unmount();
+  });
+
+  it("discards the previous dashboard when the authenticated account changes", async () => {
+    auth = authenticatedUser;
+    fetchMyFriendProfile
+      .mockResolvedValueOnce(profile)
+      .mockResolvedValueOnce({ friendCode: "ZZZZZZZZ99", nickname: "SecondAccount" });
+    fetchFriendOverview.mockResolvedValue([]);
+
+    const view = await renderPage();
+    await act(async () => {});
+    expect(view.host.textContent).toContain("AAAAAAAA01");
+
+    auth = { ...authenticatedUser, user: { id: "user-2" } };
+    view.rerender();
+    await act(async () => {});
+
+    expect(fetchMyFriendProfile).toHaveBeenCalledTimes(2);
+    expect(view.host.textContent).toContain("ZZZZZZZZ99");
+    expect(view.host.textContent).not.toContain("AAAAAAAA01");
     view.unmount();
   });
 

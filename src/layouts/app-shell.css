@@ -50,7 +50,7 @@
   height: 42px;
   flex: none;
   place-items: center;
-  border-radius: 9px;
+  border-radius: var(--r-icon);
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 500;

@@ -1,6 +1,6 @@
 .completion-stars {
   inset: -2px;
-  z-index: 0;
+  z-index: var(--layer-base);
   overflow: hidden;
   border-radius: inherit;
   contain: paint;

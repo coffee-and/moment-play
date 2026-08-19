@@ -22,7 +22,7 @@
   display: grid;
   gap: 10px;
   border: 1px solid var(--game-modal-action-border);
-  border-radius: 14px;
+  border-radius: var(--r-md);
   padding: 12px;
   background: var(--game-modal-action-bg);
 }
@@ -77,7 +77,7 @@
   gap: 9px;
   margin: 0;
   border: 1px solid var(--game-modal-action-border);
-  border-radius: 16px;
+  border-radius: var(--r-panel);
   padding: 14px;
   background: color-mix(in oklab, var(--game-modal-action-bg) 76%, transparent);
 }
@@ -104,7 +104,7 @@
   min-height: 28px;
   place-items: center;
   border: 1px solid color-mix(in oklab, var(--game-modal-text) 18%, transparent);
-  border-radius: 5px;
+  border-radius: var(--r-cell);
   background: color-mix(in oklab, var(--game-modal-text) 5%, var(--game-modal-bg));
   color: var(--game-modal-text);
   font-family: var(--font-display);
@@ -211,19 +211,19 @@
 }
 
 .game-guide-example__cell.is-number {
-  border-radius: 1px;
+  border-radius: var(--r-micro);
   background: var(--game-modal-bg);
 }
 
 .game-guide-example__cell.is-number-focus {
   border: 2px solid var(--game-color-blue);
-  border-radius: 1px;
+  border-radius: var(--r-micro);
   background: color-mix(in oklab, var(--game-color-blue) 18%, var(--game-modal-bg));
 }
 
 .game-guide-example__cell.is-black-stone,
 .game-guide-example__cell.is-white-stone {
-  border-radius: 1px;
+  border-radius: var(--r-micro);
   background:
     linear-gradient(color-mix(in oklab, var(--game-modal-text) 22%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in oklab, var(--game-modal-text) 22%, transparent) 1px, transparent 1px),
@@ -244,7 +244,7 @@
   margin-inline: auto;
   overflow: hidden;
   border: 1px solid var(--game-modal-action-border);
-  border-radius: 12px;
+  border-radius: var(--r-control);
   background: color-mix(in oklab, var(--game-color-blue) 8%, var(--game-modal-bg));
 }
 
@@ -346,7 +346,7 @@
   position: absolute;
   inset: 4px;
   border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
-  border-radius: 5px;
+  border-radius: var(--r-cell);
 }
 
 .game-guide-example__playing-card.is-red {
@@ -354,7 +354,7 @@
 }
 
 .game-guide-example__playing-card.is-lower {
-  z-index: 1;
+  z-index: var(--layer-raised);
   margin-left: -36px;
   margin-top: 30px;
 }
@@ -366,7 +366,7 @@
 .game-guide-example__playing-card b,
 .game-guide-example__playing-card i {
   position: relative;
-  z-index: 1;
+  z-index: var(--layer-raised);
 }
 
 .game-guide-example__playing-card b {
@@ -425,7 +425,7 @@
   justify-content: center;
   gap: 2px;
   border: 1px solid color-mix(in oklab, currentColor 45%, transparent);
-  border-radius: 9px;
+  border-radius: var(--r-icon);
   background: var(--game-modal-bg);
   font-size: 12px;
 }
@@ -450,7 +450,7 @@
   --game-stage-modal-width: min(440px, calc(100vw - 32px));
 }
 
-.game-stage-start-modal {
+:global(.game-stage-start-modal) {
   width: min(380px, 100%);
   min-height: 0;
 }
@@ -509,21 +509,21 @@
 }
 
 @media (max-width: 620px) {
-  .game-stage-start-modal {
+  :global(.game-stage-start-modal) {
     gap: 9px;
     padding: 22px 18px;
   }
 
-  .game-stage-start-modal .game-stage-doodle[data-doodle-variant="start"] {
+  :global(.game-stage-start-modal) :global(.game-stage-doodle)[data-doodle-variant="start"] {
     width: 104px;
   }
 
-  .game-stage-start-modal .game-guide-content > p {
+  :global(.game-stage-start-modal) .game-guide-content > p {
     font-size: 12.5px;
     line-height: 1.5;
   }
 
-  .game-stage-start-modal .game-stage-modal__actions .button {
+  :global(.game-stage-start-modal) :global(.game-stage-modal__actions) :global(.button) {
     min-height: 44px;
   }
 }

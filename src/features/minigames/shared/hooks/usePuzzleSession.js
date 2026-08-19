@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStreak } from "../gameStreak.js";
 import { useGameBrowserBackGuard } from "./useGameBrowserBackGuard.js";
+import { createPuzzleElapsedClock } from "../timing/puzzleElapsedClock.js";
 
 function readBestTime(storageKey) {
   try {
@@ -35,16 +36,22 @@ export function usePuzzleSession(storageKey) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [bestTime, setBestTime] = useState(() => readBestTime(storageKey));
   const [isExitOpen, setIsExitOpen] = useState(false);
-  const startedAtRef = useRef(0);
-  const elapsedBeforeStartRef = useRef(0);
+  const elapsedClockRef = useRef(null);
+  if (!elapsedClockRef.current) elapsedClockRef.current = createPuzzleElapsedClock();
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
 
   const updateElapsed = useCallback(() => {
-    const elapsedMs = elapsedBeforeStartRef.current + (Date.now() - startedAtRef.current);
+    const elapsedMs = elapsedClockRef.current.read();
     const seconds = Math.max(0, Math.floor(elapsedMs / 1000));
     setElapsedSeconds(seconds);
-    return seconds;
+    return elapsedMs;
+  }, []);
+
+  const pauseElapsed = useCallback(() => {
+    const elapsedMs = elapsedClockRef.current.pause();
+    setElapsedSeconds(Math.max(0, Math.floor(elapsedMs / 1000)));
+    return elapsedMs;
   }, []);
 
   useEffect(() => {
@@ -54,8 +61,7 @@ export function usePuzzleSession(storageKey) {
   }, [phase, updateElapsed]);
 
   const begin = useCallback((preserveStreak) => {
-    elapsedBeforeStartRef.current = 0;
-    startedAtRef.current = Date.now();
+    elapsedClockRef.current.resetAndStart();
     phaseRef.current = "playing";
     setElapsedSeconds(0);
     setIsExitOpen(false);
@@ -69,8 +75,8 @@ export function usePuzzleSession(storageKey) {
   const complete = useCallback(() => {
     if (phaseRef.current !== "playing") return null;
     phaseRef.current = "completed";
-    const finalSeconds = Math.max(1, updateElapsed());
-    elapsedBeforeStartRef.current = finalSeconds * 1000;
+    const finalElapsedMs = pauseElapsed();
+    const finalSeconds = Math.max(1, Math.floor(finalElapsedMs / 1000));
     setPhase("completed");
     recordSuccess();
     setBestTime((current) => {
@@ -79,16 +85,15 @@ export function usePuzzleSession(storageKey) {
       return finalSeconds;
     });
     return finalSeconds;
-  }, [recordSuccess, storageKey, updateElapsed]);
+  }, [pauseElapsed, recordSuccess, storageKey]);
 
   const fail = useCallback(() => {
     if (phaseRef.current !== "playing") return;
     phaseRef.current = "failed";
-    const finalSeconds = updateElapsed();
-    elapsedBeforeStartRef.current = finalSeconds * 1000;
+    pauseElapsed();
     setPhase("failed");
     disqualifyRound();
-  }, [disqualifyRound, updateElapsed]);
+  }, [disqualifyRound, pauseElapsed]);
 
   const navigateFromGame = useGameBrowserBackGuard({
     isExitConfirmationOpen: isExitOpen,
@@ -105,28 +110,26 @@ export function usePuzzleSession(storageKey) {
       setIsExitOpen(true);
       return;
     }
-    const seconds = updateElapsed();
-    elapsedBeforeStartRef.current = seconds * 1000;
+    pauseElapsed();
     setPhase("paused");
     setIsExitOpen(true);
   }
 
   const continueGame = useCallback(() => {
-    startedAtRef.current = Date.now();
+    elapsedClockRef.current.resume();
     setIsExitOpen(false);
     setPhase("playing");
   }, []);
 
   const pause = useCallback(() => {
     if (phaseRef.current !== "playing") return;
-    const seconds = updateElapsed();
-    elapsedBeforeStartRef.current = seconds * 1000;
+    pauseElapsed();
     setPhase("paused");
-  }, [updateElapsed]);
+  }, [pauseElapsed]);
 
   const resume = useCallback(() => {
     if (phaseRef.current !== "paused" || isExitOpen) return;
-    startedAtRef.current = Date.now();
+    elapsedClockRef.current.resume();
     setPhase("playing");
   }, [isExitOpen]);
 

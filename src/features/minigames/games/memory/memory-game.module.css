@@ -191,7 +191,7 @@
 .memory-card__success {
   position: absolute;
   inset: -9px;
-  z-index: 2;
+  z-index: var(--layer-content);
   pointer-events: none;
 }
 
@@ -206,7 +206,7 @@
 
 .memory-card__success-label {
   position: absolute;
-  z-index: 1;
+  z-index: var(--layer-raised);
   right: -5px;
   bottom: -2px;
   display: block;

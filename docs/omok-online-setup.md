@@ -1,5 +1,8 @@
 # Omok Online Rooms Setup
 
+이 문서는 현재 온라인 오목 운영 계약을 설명한다. 초기 PR 범위에 관한 과거 계획은 제거했으며,
+랭킹·로그인 기능의 현재 상태는 코드와 `supabase/migrations`를 기준으로 한다.
+
 ## Environment
 
 Create a local `.env.local` file with browser-safe Supabase values:
@@ -54,34 +57,14 @@ Online rooms use polling, not Supabase Realtime. The client refreshes an active 
 
 Database constraints and RPCs enforce seats, turn order, stone ownership, occupied positions, move order, finished-round checks, rematch acceptance, and room capacity. Standard/Free win completion is checked in SQL for round finality. Full forbidden-move legality is still validated by the current client/domain engine before submitting moves; a future trusted server rule engine would be needed for stronger anti-cheat guarantees.
 
-## Future Ranking Readiness (not implemented in this PR)
-
-The shared `profiles` table exists so future ranking work has a stable `user_id` to key off of, but this PR does **not** add ranking functionality, a `game_results` table, ranking calculations, or ranking UI. When that work happens, the expected shape is:
-
-```text
-game_results
-- user_id references profiles.user_id
-- game_id
-- mode
-- score
-- duration_ms
-- result
-- metadata
-- created_at
-```
-
-Ranking writes are limited to authenticated users and validated server-side; a client must never submit an arbitrary owner for a ranking record.
-
-## Excluded
+## 현재 제외 범위
 
 - Random matchmaking
 - Public room browser
 - Password rooms
 - Spectators
 - Match history
-- Account login UI
 - Payments
-- Rankings
 - Replay
 - Turn timer
 - Undo

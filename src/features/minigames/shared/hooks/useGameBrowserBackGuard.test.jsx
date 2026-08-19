@@ -78,6 +78,7 @@ describe("useGameBrowserBackGuard", () => {
 
     act(() => window.dispatchEvent(new PopStateEvent("popstate")));
     expect(onNavigate).toHaveBeenCalledWith("/", { replace: true });
+    expect(onNavigate).toHaveBeenCalledTimes(1);
     expect(onRequestExit).not.toHaveBeenCalled();
     view.unmount();
   });
@@ -93,6 +94,7 @@ describe("useGameBrowserBackGuard", () => {
 
     expect(onRequestExit).toHaveBeenCalledTimes(1);
     expect(onNavigate).toHaveBeenCalledWith("/", { replace: true });
+    expect(onNavigate).toHaveBeenCalledTimes(1);
     view.unmount();
   });
 });

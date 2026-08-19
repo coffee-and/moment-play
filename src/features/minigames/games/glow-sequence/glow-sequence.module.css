@@ -50,10 +50,10 @@
   width: min(100%, 410px);
   grid-template-columns: repeat(var(--glow-grid-size), minmax(0, 1fr));
   gap: clamp(8px, 1.5vw, 13px);
-  border-radius: 24px;
+  border-radius: var(--r-section);
   padding: clamp(14px, 2vw, 20px);
   background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line);
+  box-shadow: var(--cell-outline-shadow);
 }
 
 .glow-sequence__grid[data-size="4"] { --glow-grid-size: 4; }
@@ -65,7 +65,7 @@
   border: 0;
   border-radius: clamp(10px, 2vw, 17px);
   background: color-mix(in oklab, var(--cell-color) 22%, var(--surface));
-  box-shadow: inset 0 0 0 1px var(--line);
+  box-shadow: var(--cell-outline-shadow);
   cursor: pointer;
   transition: background .14s ease, box-shadow .14s ease, transform .14s ease;
   touch-action: manipulation;

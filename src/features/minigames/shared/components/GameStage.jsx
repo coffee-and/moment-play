@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { GameGuideIconButton, GameGuideModal } from './GameGuide.jsx';
-import { useGameGuide } from './GameGuideContext.jsx';
+import { GameGuideIconButton, GameGuideModal } from "../../guide/GameGuide.jsx";
+import { useGameGuide } from "../../guide/GameGuideContext.jsx";
 import { SoundToggle } from '../../../../shared/audio/SoundToggle.jsx';
 import styles from './GameStage.module.css';
 

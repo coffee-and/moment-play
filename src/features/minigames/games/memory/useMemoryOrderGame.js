@@ -24,6 +24,7 @@ import {
   MEMORY_TIMING,
   isMemoryTimerUrgent,
 } from "./memoryGameConfig.js";
+import { useMemoryGameTimer } from "./useMemoryGameTimer.js";
 
 const PHASE = MEMORY_PHASE;
 const FAILURE_REASON = MEMORY_FAILURE_REASON;
@@ -58,7 +59,6 @@ export function useMemoryOrderGame() {
     onRequestExit: requestExit,
   });
 
-  const activeTimerRef = useRef(null);
   const roundTransitionTimerRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const feedbackSequenceRef = useRef(0);
@@ -104,22 +104,17 @@ export function useMemoryOrderGame() {
   livesRef.current = lives;
   replayGaugeRef.current = replayGauge;
 
-  const clearActiveTimer = useCallback(({ preserve = false } = {}) => {
-    const timer = activeTimerRef.current;
-    if (!timer) return;
-    window.clearTimeout(timer.timeoutId);
-    window.clearInterval(timer.intervalId);
-    if (preserve) {
-      activeTimerRef.current = {
-        ...timer,
-        intervalId: null,
-        timeoutId: null,
-        remainingMs: Math.max(0, timer.deadline - performance.now()),
-      };
-      return;
-    }
-    activeTimerRef.current = null;
-  }, []);
+  const {
+    clearTimer: clearActiveTimer,
+    pauseTimer: pauseActiveTimer,
+    resumeTimer: resumeActiveTimer,
+    runTimer,
+  } = useMemoryGameTimer({
+    onComplete: handleTimerComplete,
+    onTick: (kind, nextRemainingMs) => {
+      if (kind === "preview" || kind === "selection") setRemainingMs(nextRemainingMs);
+    },
+  });
 
   const clearRoundTransitionTimer = useCallback(() => {
     if (!roundTransitionTimerRef.current) return;
@@ -145,36 +140,6 @@ export function useMemoryOrderGame() {
   }, [clearActiveTimer, clearCorrectFeedback, clearRoundTransitionTimer]);
 
   useEffect(() => () => clearGameTimers({ updateFeedback: false }), [clearGameTimers]);
-
-  function runTimer(kind, durationMs) {
-    clearActiveTimer();
-    const safeDuration = Math.max(0, durationMs);
-    const deadline = performance.now() + safeDuration;
-    const updateRemaining = () => {
-      const next = Math.max(0, deadline - performance.now());
-      if (kind === "preview" || kind === "selection") setRemainingMs(next);
-    };
-    updateRemaining();
-    const intervalId = window.setInterval(updateRemaining, 50);
-    const timeoutId = window.setTimeout(() => {
-      clearActiveTimer();
-      handleTimerComplete(kind);
-    }, safeDuration);
-    activeTimerRef.current = {
-      kind,
-      deadline,
-      durationMs: safeDuration,
-      remainingMs: safeDuration,
-      intervalId,
-      timeoutId,
-    };
-  }
-
-  function resumeActiveTimer() {
-    const timer = activeTimerRef.current;
-    if (!timer) return;
-    runTimer(timer.kind, timer.remainingMs);
-  }
 
   function handleTimerComplete(kind) {
     if (phaseRef.current === PHASE.PAUSED) return;
@@ -474,7 +439,7 @@ export function useMemoryOrderGame() {
   function pauseGame() {
     if (!canPause || phaseRef.current === PHASE.PAUSED) return;
     previousPhaseRef.current = phaseRef.current;
-    clearActiveTimer({ preserve: true });
+    pauseActiveTimer();
     setPhase(PHASE.PAUSED);
     phaseRef.current = PHASE.PAUSED;
   }

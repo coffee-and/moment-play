@@ -78,12 +78,10 @@ function FriendListSection({ title, description, items, emptyText, actionKey, in
 
 export function FriendsPage() {
   const navigate = useNavigate();
-  const { isConfigured, status: authStatus } = useAuth();
+  const { isConfigured, status: authStatus, user } = useAuth();
   const navigateToRoom = useCallback((roomId) => {
     navigate(`/minigames/omok/room/${encodeURIComponent(roomId)}`);
   }, [navigate]);
-  const dashboard = useFriendsDashboard({ authStatus, isConfigured, navigateToRoom });
-
   if (authStatus === "loading") {
     return (
       <section className={cx("wrap", "friends-page")}>
@@ -111,6 +109,12 @@ export function FriendsPage() {
       </section>
     );
   }
+
+  return <AuthenticatedFriendsPage key={user.id} accountId={user.id} navigateToRoom={navigateToRoom} />;
+}
+
+function AuthenticatedFriendsPage({ accountId, navigateToRoom }) {
+  const dashboard = useFriendsDashboard({ accountId, navigateToRoom });
 
   return (
     <>

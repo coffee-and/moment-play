@@ -32,12 +32,17 @@ async function renderPage() {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
-  await act(async () => root.render(
+  const render = () => root.render(
     <MemoryRouter>
       <ThemeProvider><SettingsPage /></ThemeProvider>
-    </MemoryRouter>,
-  ));
-  return { host, unmount: () => act(() => root.unmount()) };
+    </MemoryRouter>
+  );
+  await act(async () => render());
+  return {
+    host,
+    rerender: () => act(() => render()),
+    unmount: () => act(() => root.unmount()),
+  };
 }
 
 function findButton(host, label) {
@@ -98,7 +103,7 @@ describe("SettingsPage", () => {
       refreshSession: vi.fn(async () => {}),
       signOut: vi.fn(async () => {}),
       status: "authenticated",
-      user: { email: "sky.player@example.com", user_metadata: { nickname: "달빛여우" } },
+      user: { id: "user-1", email: "sky.player@example.com", user_metadata: { nickname: "달빛여우" } },
     };
     fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "달빛여우" });
 
@@ -113,6 +118,32 @@ describe("SettingsPage", () => {
     view.unmount();
   });
 
+  it("reloads account-scoped profile data when the authenticated user changes", async () => {
+    auth = {
+      isConfigured: true,
+      refreshSession: vi.fn(async () => {}),
+      signOut: vi.fn(async () => {}),
+      status: "authenticated",
+      user: { id: "user-1", email: "first@example.com" },
+    };
+    fetchMyFriendProfile
+      .mockResolvedValueOnce({ friendCode: "AAAAAAAA01", nickname: "First" })
+      .mockResolvedValueOnce({ friendCode: "BBBBBBBB02", nickname: "Second" });
+
+    const view = await renderPage();
+    await act(async () => {});
+    expect(view.host.textContent).toContain("AAAAAAAA01");
+
+    auth = { ...auth, user: { id: "user-2", email: "second@example.com" } };
+    view.rerender();
+    await act(async () => {});
+
+    expect(fetchMyFriendProfile).toHaveBeenCalledTimes(2);
+    expect(view.host.textContent).toContain("BBBBBBBB02");
+    expect(view.host.textContent).not.toContain("AAAAAAAA01");
+    view.unmount();
+  });
+
   it("saves one account nickname and refreshes the auth session label", async () => {
     const refreshSession = vi.fn(async () => {});
     auth = {
@@ -120,7 +151,7 @@ describe("SettingsPage", () => {
       refreshSession,
       signOut: vi.fn(async () => {}),
       status: "authenticated",
-      user: { email: "sky.player@example.com", user_metadata: { nickname: "후츄" } },
+      user: { id: "user-1", email: "sky.player@example.com", user_metadata: { nickname: "후츄" } },
     };
     fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "후츄" });
     saveCurrentProfileNickname.mockResolvedValue({
@@ -147,7 +178,7 @@ describe("SettingsPage", () => {
       refreshSession: vi.fn(async () => {}),
       signOut: vi.fn(async () => {}),
       status: "authenticated",
-      user: { email: "sky.player@example.com" },
+      user: { id: "user-1", email: "sky.player@example.com" },
     };
     fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "Sky" });
     saveCurrentProfileNickname.mockRejectedValue(new Error("닉네임은 2자 이상 입력해 주세요."));
@@ -168,7 +199,7 @@ describe("SettingsPage", () => {
       refreshSession: vi.fn(async () => {}),
       signOut,
       status: "authenticated",
-      user: { email: "sky.player@example.com" },
+      user: { id: "user-1", email: "sky.player@example.com" },
     };
     fetchMyFriendProfile.mockResolvedValue({ friendCode: "AAAAAAAA01", nickname: "Sky" });
 

@@ -1,3 +1,18 @@
+.flappy-game {
+  --flappy-sky-deep: #172454;
+  --flappy-sky-top: #1b2450;
+  --flappy-sky-center: #2a2f6b;
+  --flappy-moon: #fff1b8;
+  --flappy-pillar: #edf4ff;
+  --flappy-fish: #79b5e8;
+  --flappy-glow: #79a7e8;
+  --flappy-tail: #f08aa0;
+  --flappy-star: #f6c85f;
+  --flappy-star-cool: #ecf3ff;
+  --flappy-star-glow: #b9d3ff;
+  --flappy-shield: #b9d3ff;
+}
+
 .flappy-game__wrap {
   display: grid;
   width: min(100%, 980px);
@@ -67,7 +82,7 @@
 
 .flappy-game__gate {
   position: absolute;
-  z-index: 2;
+  z-index: var(--layer-content);
   inset-block: 0;
 }
 
@@ -96,7 +111,7 @@
   left: -10%;
   height: 12px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--r-cell);
   background: linear-gradient(
     180deg,
     var(--palette-white),
@@ -125,7 +140,7 @@
 
 .flappy-game__bird {
   position: absolute;
-  z-index: 4;
+  z-index: var(--layer-feedback);
   width: clamp(28px, 4.4vw, 36px);
   aspect-ratio: 110 / 48;
   transform: translate(-50%, -50%) rotate(var(--bird-tilt));

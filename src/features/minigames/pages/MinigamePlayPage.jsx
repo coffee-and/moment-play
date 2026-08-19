@@ -15,7 +15,7 @@ import {
   getMinigameById,
 } from "../data/minigameCatalog.js";
 import { getMinigameComponent } from "../data/minigameRegistry.js";
-import { GameGuideProvider } from "../shared/components/GameGuideContext.jsx";
+import { GameGuideProvider } from "../guide/GameGuideContext.jsx";
 import { bindCssModule } from "../../../shared/styles/bindCssModule.js";
 import styles from "./minigame-play.module.css";
 
@@ -60,7 +60,7 @@ function MinigameErrorState() {
 }
 
 function MinigameRouteSession({ gameId, roomId, returnTo }) {
-  const { status: authStatus } = useAuth();
+  const { status: authStatus, user } = useAuth();
   const [hasStarted, setHasStarted] = useState(false);
   const game = getMinigameById(gameId);
   const ActiveGameComponent = game ? getMinigameComponent(game.id) : null;
@@ -136,13 +136,13 @@ function MinigameRouteSession({ gameId, roomId, returnTo }) {
 
   return (
     <ErrorBoundary
-      resetKey={`${game.id}:${roomId ?? "solo"}`}
+      resetKey={`${game.id}:${roomId ?? "solo"}:${user.id}`}
       fallback={<MinigameErrorState />}
     >
       <Suspense fallback={<MinigameLoadingState game={game} />}>
         <div className={cx("wrap minigame-play-page minigame-play-page--active")}>
           <GameGuideProvider guide={game.guide ?? { description: game.howTo }}>
-            <ActiveGameComponent game={game} roomId={roomId ?? null} />
+            <ActiveGameComponent key={user.id} game={game} roomId={roomId ?? null} />
           </GameGuideProvider>
         </div>
       </Suspense>

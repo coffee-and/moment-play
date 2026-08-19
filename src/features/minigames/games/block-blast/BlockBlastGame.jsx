@@ -1,7 +1,7 @@
 import { Button } from "../../../../shared/components/Button.jsx";
 import { CloseIcon, PauseIcon, PlayIcon, RestartIcon, TrophyIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
-import { GameGuideContent } from "../../shared/components/GameGuide.jsx";
+import { GameGuideContent } from "../../guide/GameGuide.jsx";
 import { GameIconButton } from "../../shared/components/GameIconButton.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";

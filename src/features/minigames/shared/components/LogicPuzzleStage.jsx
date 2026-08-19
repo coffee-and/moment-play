@@ -9,7 +9,7 @@ import {
   TrophyIcon,
 } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GameIconButton } from "./GameIconButton.jsx";
-import { GameGuideContent } from "./GameGuide.jsx";
+import { GameGuideContent } from "../../guide/GameGuide.jsx";
 import { GameStage } from "./GameStage.jsx";
 import { GameStageDoodle } from "./GameStageDoodle.jsx";
 import { GameStageModal, GameStageOverlay } from "./GameStageOverlay.jsx";

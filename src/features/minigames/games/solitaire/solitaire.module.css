@@ -89,7 +89,7 @@ button.solitaire-pile:disabled {
 .solitaire-card.is-front::before {
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: var(--layer-base);
   inset: 3px;
   border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
   border-radius: calc(clamp(7px, 1vw, 11px) - 3px);
@@ -99,7 +99,7 @@ button.solitaire-pile:disabled {
 .solitaire-card.is-front::after {
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: var(--layer-base);
   inset: 0;
   background: linear-gradient(120deg, transparent 34%, color-mix(in oklab, var(--palette-ivory) 50%, transparent) 50%, transparent 66%);
   opacity: .42;
@@ -163,7 +163,7 @@ button.solitaire-card:active {
   left: 11%;
   display: grid;
   justify-items: center;
-  z-index: 2;
+  z-index: var(--layer-content);
   font-size: clamp(9px, 1.3vw, 14px);
   font-weight: 750;
   line-height: .9;
@@ -190,7 +190,7 @@ button.solitaire-card:active {
 
 .solitaire-card__suit {
   position: absolute;
-  z-index: 1;
+  z-index: var(--layer-raised);
   top: 50%;
   left: 50%;
   display: grid;
@@ -382,7 +382,7 @@ button.solitaire-card:active {
   .solitaire-foundation__empty,
   .solitaire-tableau-empty {
     width: clamp(39px, 11vw, 52px);
-    border-radius: 7px;
+    border-radius: var(--r-tile);
   }
 
   .solitaire-waste {

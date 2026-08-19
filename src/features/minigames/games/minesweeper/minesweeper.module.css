@@ -9,7 +9,7 @@
   aspect-ratio: 1;
   grid-template-columns: repeat(9, 1fr);
   gap: 3px;
-  border-radius: 18px;
+  border-radius: var(--r-card);
   padding: 8px;
   background: color-mix(in oklab, var(--game-color-purple) 9%, var(--surface-2));
 }
@@ -19,7 +19,7 @@
   min-width: 0;
   place-items: center;
   border: 1px solid color-mix(in oklab, var(--game-color-purple) 18%, var(--line));
-  border-radius: 6px;
+  border-radius: var(--r-cell-lg);
   background: color-mix(in oklab, var(--game-color-purple) 14%, var(--surface));
   color: var(--text);
   cursor: pointer;
