@@ -3,11 +3,11 @@
   --set-card-radius: var(--r-md);
   --set-card-surface: var(--surface);
   --set-card-shadow: 0 6px 14px color-mix(in oklab, var(--text) 8%, transparent);
-  --set-hint-accent-base: #b66b17;
-  --set-hint-shadow-color: #d78a25;
-  --set-hint-ink: #7a4710;
-  --set-hint-surface: #fff1c8;
-  --set-hint-text: #442300;
+  --set-hint-accent-base: var(--palette-set-hint-accent);
+  --set-hint-shadow-color: var(--palette-set-hint-shadow);
+  --set-hint-ink: var(--palette-set-hint-ink);
+  --set-hint-surface: var(--palette-set-hint-surface);
+  --set-hint-text: var(--palette-set-hint-text);
   --set-hint-border: color-mix(in oklab, var(--game-color-yellow) 78%, var(--set-hint-accent-base));
   --set-hint-card-shadow:
     0 0 0 3px color-mix(in oklab, var(--game-color-yellow) 26%, transparent),
@@ -117,7 +117,7 @@
   background: currentColor;
 }
 
-.set-symbol.shape-0 { border-radius: 999px; }
+.set-symbol.shape-0 { border-radius: var(--r-pill); }
 .set-symbol.shape-1 {
   width: clamp(22px, 4.5vw, 34px);
   height: clamp(22px, 4.5vw, 34px);

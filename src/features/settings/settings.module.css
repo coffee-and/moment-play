@@ -127,7 +127,7 @@
 
 .theme-choice__preview > span:nth-child(2),
 .theme-choice__preview > span:nth-child(3) {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
 .theme-choice__preview > span:nth-child(2) {
@@ -196,7 +196,7 @@
 .settings-card__badge {
   flex: none;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 5px 8px;
   background: var(--chip);
   color: var(--accent-2);

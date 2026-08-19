@@ -96,7 +96,7 @@
 
 .friend-invite-results__status {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 3px 7px;
   background: var(--surface-2);
   color: var(--muted);

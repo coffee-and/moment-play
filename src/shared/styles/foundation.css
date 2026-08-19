@@ -47,6 +47,19 @@
   --palette-effect-orange: #eb5b00;
   --palette-effect-plum: #640d5f;
 
+  /* External brand and game-specific palettes are defined once, then consumed semantically. */
+  --palette-google-border: #747775;
+  --palette-google-text: #1f1f1f;
+  --palette-google-hover-border: #5f6368;
+  --palette-google-hover-bg: #f8f9fa;
+  --palette-google-active-bg: #f1f3f4;
+  --palette-google-focus: #4285f4;
+  --palette-set-hint-accent: #b66b17;
+  --palette-set-hint-shadow: #d78a25;
+  --palette-set-hint-ink: #7a4710;
+  --palette-set-hint-surface: #fff1c8;
+  --palette-set-hint-text: #442300;
+
   /* Star Flight keeps its original cool-night artwork palette in both themes. */
   --flappy-sky-deep: #172454;
   --flappy-sky-top: #1b2450;
@@ -133,6 +146,7 @@
   --r-lg: 20px;
   --r-md: 14px;
   --r-sm: 10px;
+  --r-pill: 999px;
   --gap: 18px;
   --layout-max-width: 1460px;
   --content-max-width: 950px;

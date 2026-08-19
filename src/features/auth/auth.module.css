@@ -96,24 +96,24 @@
 }
 
 .auth-provider-button--google {
-  border: 1px solid #747775;
-  background: #fff;
-  color: #1f1f1f;
+  border: 1px solid var(--palette-google-border);
+  background: var(--palette-white);
+  color: var(--palette-google-text);
 }
 
 .auth-card .auth-provider-button--google:hover:not(:disabled) {
-  border-color: #5f6368;
-  background: #f8f9fa;
-  color: #1f1f1f;
+  border-color: var(--palette-google-hover-border);
+  background: var(--palette-google-hover-bg);
+  color: var(--palette-google-text);
 }
 
 .auth-card .auth-provider-button--google:active:not(:disabled) {
-  background: #f1f3f4;
-  color: #1f1f1f;
+  background: var(--palette-google-active-bg);
+  color: var(--palette-google-text);
 }
 
 .auth-card .auth-provider-button--google:focus-visible {
-  outline: 2px solid #4285f4;
+  outline: 2px solid var(--palette-google-focus);
   outline-offset: 3px;
 }
 

@@ -97,7 +97,7 @@
   align-items: center;
   justify-content: center;
   border: var(--header-control-border-width, 1px) solid var(--home-button-border);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 8px 14px;
   overflow: hidden;
   background: var(--header-control-surface, var(--home-button-surface));

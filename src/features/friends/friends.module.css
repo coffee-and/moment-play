@@ -128,7 +128,7 @@
 }
 
 .friend-search-result__status {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 6px 10px;
   background: var(--chip);
   color: var(--accent-2);
@@ -197,7 +197,7 @@
   min-width: 32px;
   height: 32px;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--chip);
   color: var(--accent-2);
   font-family: var(--font);

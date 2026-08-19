@@ -3,7 +3,7 @@
   min-width: 17px;
   height: 17px;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 0 4px;
   background: var(--accent);
   color: var(--on-accent);

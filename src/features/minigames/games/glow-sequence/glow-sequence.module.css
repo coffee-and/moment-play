@@ -29,7 +29,7 @@
 }
 
 .glow-sequence__status small {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   padding: 3px 8px;
   background: color-mix(in oklab, var(--game-effect-perfect) 16%, transparent);
   color: var(--game-effect-perfect);
@@ -97,7 +97,7 @@
   width: min(74%, 300px);
   height: 6px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--text) 10%, transparent);
 }
 
