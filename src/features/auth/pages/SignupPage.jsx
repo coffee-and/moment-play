@@ -6,7 +6,7 @@ import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, AUTH_MESSAGES, LOGIN_PATH, MIN_PASSWORD_LENGTH } from "../../../shared/auth/authConstants.js";
 import { buildAuthRoute, getReturnToFromSearch } from "../../../shared/auth/returnTo.js";
 import { SocialLoginOptions } from "../components/SocialLoginOptions.jsx";
-import "../auth.css";
+import { authClassNames as cx } from "../authStyles.js";
 
 export function SignupPage() {
   const location = useLocation();
@@ -58,16 +58,16 @@ export function SignupPage() {
   }
 
   return (
-    <div className="wrap auth-page">
-      <div className="card auth-card reveal d1">
+    <div className={cx("wrap", "auth-page")}>
+      <div className={cx("card", "auth-card", "reveal", "d1")}>
         <Brand />
-        <h1 className="auth-card__title">회원가입</h1>
-        <p className="auth-card__subtitle">이메일과 비밀번호로 계정을 만드세요.</p>
+        <h1 className={cx("auth-card__title")}>회원가입</h1>
+        <p className={cx("auth-card__subtitle")}>이메일과 비밀번호로 계정을 만드세요.</p>
 
         {isConfigured ? (
           <>
             <SocialLoginOptions returnTo={returnTo} />
-            <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            <form className={cx("auth-form")} onSubmit={handleSubmit} noValidate>
               <div>
                 <label className="f-label" htmlFor="signup-email">이메일</label>
                 <input
@@ -101,21 +101,21 @@ export function SignupPage() {
                   onChange={(event) => setConfirmPassword(event.target.value)}
                 />
               </div>
-              {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
-              {successMessage ? <p className="auth-notice is-success" role="status">{successMessage}</p> : null}
+              {errorMessage ? <p className={cx("auth-notice", "is-error")} role="alert">{errorMessage}</p> : null}
+              {successMessage ? <p className={cx("auth-notice", "is-success")} role="status">{successMessage}</p> : null}
               <Button type="submit" variant="primary" fullWidth disabled={submitting || Boolean(successMessage)}>
                 {submitting ? "가입 처리 중…" : "회원가입"}
               </Button>
             </form>
           </>
         ) : (
-          <p className="auth-notice is-error" role="alert">{AUTH_MESSAGES.notConfigured}</p>
+          <p className={cx("auth-notice", "is-error")} role="alert">{AUTH_MESSAGES.notConfigured}</p>
         )}
 
-        <p className="auth-switch">
+        <p className={cx("auth-switch")}>
           이미 계정이 있으신가요? <Link to={buildAuthRoute(LOGIN_PATH, returnTo)}>{AUTH_LABELS.login}</Link>
         </p>
-        <p className="auth-switch"><Link to={returnTo}>게스트로 계속 둘러보기</Link></p>
+        <p className={cx("auth-switch")}><Link to={returnTo}>게스트로 계속 둘러보기</Link></p>
       </div>
     </div>
   );

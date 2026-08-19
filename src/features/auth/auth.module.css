@@ -17,7 +17,7 @@
   text-align: center;
 }
 
-.auth-card .brand {
+.auth-card :global(.brand) {
   justify-content: center;
 }
 
@@ -41,19 +41,19 @@
   text-align: left;
 }
 
-.auth-card .txt {
+.auth-card :global(.txt) {
   border-color: var(--line);
   background: var(--bg);
   color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
-.auth-card .txt:hover {
+.auth-card :global(.txt):hover {
   border-color: color-mix(in oklab, var(--line) 64%, var(--text));
 }
 
-.auth-card .txt:focus,
-.auth-card .txt:focus-visible {
+.auth-card :global(.txt):focus,
+.auth-card :global(.txt):focus-visible {
   border-color: var(--accent);
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);

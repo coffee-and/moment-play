@@ -6,7 +6,7 @@ import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { completeAuthCallback, parseAuthCallback } from "../../../shared/auth/authCallback.js";
 import { AUTH_LABELS, LOGIN_PATH, SIGNUP_PATH } from "../../../shared/auth/authConstants.js";
 import { buildAuthRoute } from "../../../shared/auth/returnTo.js";
-import "../auth.css";
+import { authClassNames as cx } from "../authStyles.js";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -52,23 +52,23 @@ export function AuthCallbackPage() {
   const returnTo = initialCallback.current.returnTo;
 
   return (
-    <div className="wrap auth-page">
-      <div className="card auth-card reveal d1">
+    <div className={cx("wrap", "auth-page")}>
+      <div className={cx("card", "auth-card", "reveal", "d1")}>
         <Brand />
-        <h1 className="auth-card__title">계정 인증</h1>
+        <h1 className={cx("auth-card__title")}>계정 인증</h1>
         {state.status === "loading" ? (
-          <p className="auth-notice" role="status">인증 확인 중…</p>
+          <p className={cx("auth-notice")} role="status">인증 확인 중…</p>
         ) : null}
         {state.status === "success" ? (
-          <p className="auth-notice is-success" role="status">인증이 완료되었습니다.</p>
+          <p className={cx("auth-notice", "is-success")} role="status">인증이 완료되었습니다.</p>
         ) : null}
         {state.status === "error" ? (
           <>
-            <p className="auth-notice is-error" role="alert">{state.errorMessage}</p>
+            <p className={cx("auth-notice", "is-error")} role="alert">{state.errorMessage}</p>
             <Button as={Link} to={buildAuthRoute(LOGIN_PATH, returnTo)} variant="primary" fullWidth>
               {AUTH_LABELS.login}
             </Button>
-            <p className="auth-switch">
+            <p className={cx("auth-switch")}>
               새 인증 메일이 필요하신가요? <Link to={buildAuthRoute(SIGNUP_PATH, returnTo)}>회원가입</Link>
             </p>
           </>

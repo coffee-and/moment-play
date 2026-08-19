@@ -3,6 +3,7 @@ import { useAuth } from "../../../shared/auth/AuthContext.jsx";
 import { AUTH_MESSAGES } from "../../../shared/auth/authConstants.js";
 import { getAuthProvider } from "../../../shared/auth/authProviders.js";
 import { Button } from "../../../shared/components/Button.jsx";
+import { authClassNames as cx } from "../authStyles.js";
 
 function ProviderIcon() {
   return (
@@ -40,8 +41,8 @@ export function SocialLoginOptions({ returnTo }) {
   }
 
   return (
-    <section className="auth-provider-options" aria-label="소셜 로그인">
-      <div className="auth-provider-options__buttons">
+    <section className={cx("auth-provider-options")} aria-label="소셜 로그인">
+      <div className={cx("auth-provider-options__buttons")}>
         {providers.map((provider) => {
           const definition = getAuthProvider(provider);
           if (!definition) return null;
@@ -50,13 +51,13 @@ export function SocialLoginOptions({ returnTo }) {
           return (
             <Button
               key={provider}
-              className={`auth-provider-button auth-provider-button--${provider}`}
+              className={cx("auth-provider-button", `auth-provider-button--${provider}`)}
               fullWidth
               disabled={Boolean(pendingProvider)}
               onClick={() => handleProviderSignIn(provider)}
               aria-busy={pending || undefined}
             >
-              <span className="auth-provider-button__icon">
+              <span className={cx("auth-provider-button__icon")}>
                 <ProviderIcon />
               </span>
               <span>{pending ? `${definition.label}…` : definition.label}</span>
@@ -64,8 +65,8 @@ export function SocialLoginOptions({ returnTo }) {
           );
         })}
       </div>
-      {errorMessage ? <p className="auth-notice is-error" role="alert">{errorMessage}</p> : null}
-      <div className="auth-divider" aria-hidden="true"><span>또는</span></div>
+      {errorMessage ? <p className={cx("auth-notice", "is-error")} role="alert">{errorMessage}</p> : null}
+      <div className={cx("auth-divider")} aria-hidden="true"><span>또는</span></div>
     </section>
   );
 }

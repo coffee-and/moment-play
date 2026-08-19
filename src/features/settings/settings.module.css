@@ -9,8 +9,8 @@
   margin-bottom: 18px;
 }
 
-.settings-page__header .eyebrow,
-.settings-card .eyebrow {
+.settings-page__header :global(.eyebrow),
+.settings-card :global(.eyebrow) {
   margin: 0 0 5px;
   color: var(--accent);
   font-family: var(--font);
@@ -295,7 +295,7 @@
   background: var(--surface-2);
 }
 
-.nickname-settings .f-label {
+.nickname-settings :global(.f-label) {
   margin: 0;
   font-size: 10.5px;
 }
@@ -329,17 +329,17 @@
   outline-offset: 1px;
 }
 
-.nickname-settings__save.button,
-.settings-actions .button,
-.data-settings > .button,
-.account-settings--guest .button {
+.nickname-settings__save:global(.button),
+.settings-actions :global(.button),
+.data-settings > :global(.button),
+.account-settings--guest :global(.button) {
   min-height: var(--settings-control-height);
   padding: 0 13px;
   font-size: 12px;
   white-space: nowrap;
 }
 
-.nickname-settings__save.button {
+.nickname-settings__save:global(.button) {
   min-width: 68px;
 }
 
@@ -389,7 +389,7 @@
   gap: 8px;
 }
 
-.settings-actions .button {
+.settings-actions :global(.button) {
   width: 100%;
 }
 
@@ -427,7 +427,7 @@
   line-height: 1.45;
 }
 
-.data-settings > .button {
+.data-settings > :global(.button) {
   width: 100%;
   flex: none;
 }
@@ -498,7 +498,7 @@
     flex-direction: row;
   }
 
-  .settings-card--data .data-settings > .button {
+  .settings-card--data .data-settings > :global(.button) {
     width: auto;
   }
 }
@@ -552,10 +552,10 @@
     grid-template-columns: 1fr;
   }
 
-  .nickname-settings__save.button,
-  .settings-card--data .data-settings > .button,
-  .settings-actions .button,
-  .account-settings--guest .button {
+  .nickname-settings__save:global(.button),
+  .settings-card--data .data-settings > :global(.button),
+  .settings-actions :global(.button),
+  .account-settings--guest :global(.button) {
     width: 100%;
   }
 
