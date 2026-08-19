@@ -69,10 +69,11 @@ Supabase의 유출 비밀번호 보호 기능은 Pro 플랜 기능이므로 사�
 - Omok의 `SECURITY DEFINER` 함수 14개에 빈 `search_path`를 고정하고 함수 내부 객체 참조를 명시적으로 한정했다.
 - pgTAP 회귀 검사를 추가했으며 격리된 DB CI에서 마이그레이션과 보안 검사를 통과했다.
 - 커밋: `add35ff`
+
 ### 8. 전체 검증
 
 - `npm run quality`의 ESLint, Stylelint, CSS custom property와 스타일 구조 검사가 모두 통과했다.
 - Vitest 62개 파일 329개, 일반 프로덕션 빌드 314개 모듈, Pages 환경 Playwright 20개가 통과했다.
 - `npm audit --audit-level=high` 결과 취약점은 0건이다.
 - 기능 영역의 비모듈 CSS는 명시적인 공용 게임 계약 다섯 개뿐이며, CSS의 `!important`, foundation 밖 원시 hex와 임의의 큰 z-index가 없음을 재확인했다.
-- 원격 GitHub Actions의 App·Database 작업 결과는 아래 최종 검증 커밋에 기록한다.
+- 현재 브랜치 HEAD는 원격 GitHub Actions의 App·Database 작업으로 다시 검증한다.
