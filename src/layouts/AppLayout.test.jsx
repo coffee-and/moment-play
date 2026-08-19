@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LOGIN_PATH } from "../shared/auth/authConstants.js";
+import { AUTH_MESSAGES, LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -90,6 +90,21 @@ describe("AppLayout account control", () => {
     expect(signOut).toHaveBeenCalledTimes(1);
     view.render();
     expect(view.host.querySelector(`a[href="${LOGIN_PATH}"]`)?.textContent).toBe("로그인");
+    view.unmount();
+  });
+
+  it("keeps the account action usable and reports a failed logout", async () => {
+    signOut.mockRejectedValueOnce(new Error("network down"));
+    auth = { status: "authenticated", user: { email: "sky.player@example.com" }, signOut };
+    const view = renderLayout();
+
+    await act(async () => {
+      Array.from(view.host.querySelectorAll("button")).find((button) => button.textContent === "로그아웃").click();
+      await Promise.resolve();
+    });
+
+    expect(view.host.querySelector('[role="alert"]')?.textContent).toBe(AUTH_MESSAGES.signOutFailed);
+    expect(view.host.querySelector("button").disabled).toBe(false);
     view.unmount();
   });
 });

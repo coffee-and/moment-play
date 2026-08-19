@@ -6,6 +6,7 @@ import { saveCurrentProfileNickname } from "../../infrastructure/supabase/omokOn
 import { FRIENDS_PATH } from "../friends/friendsConstants.js";
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../../shared/auth/authConstants.js";
+import { useSignOutAction } from "../../shared/auth/useSignOutAction.js";
 import { Button } from "../../shared/components/Button.jsx";
 import { clearMomentPlayLocalData } from "../../shared/settings/localDataSettings.js";
 import { THEME } from "../../shared/theme/theme.js";
@@ -21,6 +22,7 @@ const FRIEND_STATUS = {
 
 export function SettingsPage() {
   const { isConfigured, refreshSession, signOut, status: authStatus, user } = useAuth();
+  const { errorMessage: accountMessage, isSigningOut, runSignOut } = useSignOutAction(signOut);
   const { setTheme, theme } = useTheme();
   const [friendProfile, setFriendProfile] = useState(null);
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.IDLE);
@@ -28,8 +30,6 @@ export function SettingsPage() {
   const [nicknameMessage, setNicknameMessage] = useState("");
   const [nicknameMessageType, setNicknameMessageType] = useState("status");
   const [isSavingNickname, setIsSavingNickname] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
-  const [accountMessage, setAccountMessage] = useState("");
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
 
@@ -81,19 +81,6 @@ export function SettingsPage() {
       setNicknameMessage(error instanceof Error ? error.message : "닉네임을 변경하지 못했습니다.");
     } finally {
       setIsSavingNickname(false);
-    }
-  }
-
-  async function handleSignOut() {
-    setIsSigningOut(true);
-    setAccountMessage("");
-
-    try {
-      await signOut();
-    } catch {
-      setAccountMessage("로그아웃하지 못했습니다. 잠시 후 다시 시도해 주세요.");
-    } finally {
-      setIsSigningOut(false);
     }
   }
 
@@ -242,8 +229,8 @@ export function SettingsPage() {
 
                 <div className="settings-actions settings-actions--account">
                   <Button as={Link} size="small" to={FRIENDS_PATH} variant="secondary">친구 관리</Button>
-                  <Button size="small" type="button" variant="secondary" disabled={isSigningOut} onClick={() => void handleSignOut()}>
-                    {isSigningOut ? "로그아웃 중…" : AUTH_LABELS.logout}
+                  <Button size="small" type="button" variant="secondary" disabled={isSigningOut} onClick={() => void runSignOut()}>
+                    {isSigningOut ? AUTH_LABELS.loggingOut : AUTH_LABELS.logout}
                   </Button>
                 </div>
               </div>

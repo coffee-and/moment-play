@@ -9,6 +9,7 @@ export const AUTH_LABELS = {
   loading: "계정 확인 중",
   login: "로그인",
   logout: "로그아웃",
+  loggingOut: "로그아웃 중…",
 };
 
 export function getAccountLabel(user) {
@@ -24,7 +25,7 @@ export const AUTH_MESSAGES = {
   emailAlreadyRegistered: "이미 가입된 이메일이에요. 로그인해 주세요.",
   signUpFailed: "회원가입에 실패했습니다.",
   signInFailed: "이메일 또는 비밀번호가 올바르지 않습니다.",
-  signOutFailed: "로그아웃에 실패했습니다.",
+  signOutFailed: "로그아웃하지 못했습니다. 잠시 후 다시 시도해 주세요.",
   sessionRestoreFailed: "로그인 상태를 복원하지 못했습니다.",
   authenticationRequired: "로그인해야 게임을 시작할 수 있습니다.",
   verifyCodeFailed: "인증 링크가 만료되었거나 올바르지 않습니다.",

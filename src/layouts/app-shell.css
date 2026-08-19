@@ -181,6 +181,18 @@
   background: var(--surface-2);
 }
 
+.account-menu__panel button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.account-menu__error {
+  margin: 6px 10px 4px;
+  color: var(--game-effect-negative);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 /* ============================ Bottom tab bar (compact navigation) ============================ */
 .tabbar {
   display: none;
