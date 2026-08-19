@@ -54,9 +54,11 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
   const resultSoundRef = useRef(null);
+  const committedNicknameRef = useRef(GUEST_FALLBACK_NICKNAME);
   const [screen, setScreen] = useState(OMOK_SCREEN.MENU);
   const [dialog, setDialog] = useState(null);
   const [sharedNickname, setSharedNickname] = useState(GUEST_FALLBACK_NICKNAME);
+  const [nicknameSaveError, setNicknameSaveError] = useState(null);
   const [onlineNickname, setOnlineNickname] = useState("");
   const [settings, setSettings] = useState(DEFAULT_OMOK_SETTINGS);
   const [activeMatch, setActiveMatch] = useState(() => createOmokMatchConfig(MATCH_TYPE.COMPUTER, DEFAULT_OMOK_SETTINGS));
@@ -174,7 +176,10 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
     let cancelled = false;
 
     resolveSharedNickname().then((resolved) => {
-      if (!cancelled) setSharedNickname(resolved);
+      if (!cancelled) {
+        committedNicknameRef.current = resolved;
+        setSharedNickname(resolved);
+      }
     });
 
     return () => {
@@ -336,6 +341,22 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
     online.saveNicknameAndResume(onlineNickname);
   }
 
+  async function commitSharedNickname() {
+    if (!canEditSidebarNickname) return;
+
+    setNicknameSaveError(null);
+    try {
+      const savedNickname = await saveSharedNickname(sharedNickname);
+      committedNicknameRef.current = savedNickname;
+      setSharedNickname(savedNickname);
+    } catch (error) {
+      setSharedNickname(committedNicknameRef.current);
+      setNicknameSaveError(error instanceof Error && error.message
+        ? error.message
+        : "닉네임을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    }
+  }
+
   function closeOnlineError() {
     online.resetRoom();
     closeDialog();
@@ -423,13 +444,14 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
       moveCount={activeMoveCount}
       nickname={sidebarNickname}
       nicknameEditable={canEditSidebarNickname}
+      nicknameErrorMessage={canEditSidebarNickname ? nicknameSaveError : null}
       nicknameHelpText={nicknameHelpText}
-      onCommitNickname={() => {
-        if (!canEditSidebarNickname) return;
-        saveSharedNickname(sharedNickname).then(setSharedNickname).catch(() => {});
-      }}
+      onCommitNickname={() => void commitSharedNickname()}
       onNicknameChange={(value) => {
-        if (canEditSidebarNickname) setSharedNickname(value);
+        if (canEditSidebarNickname) {
+          setNicknameSaveError(null);
+          setSharedNickname(value);
+        }
       }}
       onOpenRules={() => openDialog(OMOK_DIALOG.RULES)}
       turn={activeTurn}

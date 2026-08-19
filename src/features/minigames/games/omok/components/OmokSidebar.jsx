@@ -18,6 +18,7 @@ export function OmokSidebar({
   moveCount,
   nickname,
   nicknameEditable,
+  nicknameErrorMessage,
   nicknameHelpText,
   onCommitNickname,
   onNicknameChange,
@@ -51,7 +52,9 @@ export function OmokSidebar({
           onChange={(event) => onNicknameChange(event.target.value)}
           onBlur={onCommitNickname}
         />
-        <p className={cx("game-stage__side-note")}>{nicknameHelpText}</p>
+        <p className={cx("game-stage__side-note")} role={nicknameErrorMessage ? "alert" : undefined}>
+          {nicknameErrorMessage ?? nicknameHelpText}
+        </p>
       </div>
       <div className={cx("stat-row")}>
         <div className={cx("stat")}><div className={cx("l")}>Board</div><div className={cx("v")}>{OMOK_BOARD_SIZE}<small>x{OMOK_BOARD_SIZE}</small></div></div>

@@ -152,12 +152,42 @@
   box-shadow: var(--button-secondary-shadow);
 }
 
+.button--menu {
+  width: 100%;
+  min-height: 0;
+  justify-content: flex-start;
+  border: 0;
+  border-radius: var(--r-sm);
+  padding: 9px 10px;
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  text-align: left;
+}
+
+.button--menu:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--surface-2);
+  box-shadow: none;
+  transform: none;
+}
+
+.button--menu:active:not(:disabled) {
+  box-shadow: none;
+  transform: none;
+}
+
 .button--small { min-height: 38px; padding-inline: 16px; border-radius: 11px; font-size: 13px; }
 
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
   box-shadow: none;
+}
+
+.button--menu:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .button--full {

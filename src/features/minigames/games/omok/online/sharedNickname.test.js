@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getLocalNickname } from "../../../../../shared/profile/nicknameStorage.js";
 
 const getCurrentSession = vi.fn();
 const isSupabaseConfigured = vi.fn();
@@ -60,6 +61,23 @@ describe("resolveSharedNickname precedence", () => {
     expect(result).toBe(GUEST_FALLBACK_NICKNAME);
   });
 
+  it("does not expose a local nickname when the signed-in profile cannot be loaded", async () => {
+    isSupabaseConfigured.mockReturnValue(true);
+    getCurrentSession.mockResolvedValue({ user: { id: "user-2" } });
+    getProfileByUserId.mockRejectedValue(new Error("network unavailable"));
+    saveLocalSharedNickname("PreviousUser");
+
+    await expect(resolveSharedNickname()).resolves.toBe(GUEST_FALLBACK_NICKNAME);
+  });
+
+  it("does not use local identity when session state cannot be determined", async () => {
+    isSupabaseConfigured.mockReturnValue(true);
+    getCurrentSession.mockRejectedValue(new Error("session unavailable"));
+    saveLocalSharedNickname("PreviousUser");
+
+    await expect(resolveSharedNickname()).resolves.toBe(GUEST_FALLBACK_NICKNAME);
+  });
+
   it("falls back to the locally stored nickname when no session exists", async () => {
     isSupabaseConfigured.mockReturnValue(true);
     getCurrentSession.mockResolvedValue(null);
@@ -114,6 +132,17 @@ describe("saveSharedNickname", () => {
     await saveSharedNickname("Sunny");
 
     expect(saveCurrentProfileNickname).toHaveBeenCalledWith("Sunny", expect.anything());
+    expect(getLocalNickname()).toBeNull();
+  });
+
+  it("does not change local identity when the signed-in profile save fails", async () => {
+    isSupabaseConfigured.mockReturnValue(true);
+    getCurrentSession.mockResolvedValue({ user: { id: "user-1" } });
+    saveCurrentProfileNickname.mockRejectedValue(new Error("save failed"));
+    saveLocalSharedNickname("PreviousUser");
+
+    await expect(saveSharedNickname("Sunny")).rejects.toThrow("save failed");
+    expect(getLocalNickname()).toBe("PreviousUser");
   });
 
   it("rejects an invalid nickname without persisting it", async () => {

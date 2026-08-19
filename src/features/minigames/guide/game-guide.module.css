@@ -42,25 +42,8 @@
   letter-spacing: .05em;
 }
 
-.game-guide-walkthrough__actions button {
-  display: inline-grid;
+.game-guide-walkthrough__step-button {
   min-width: 72px;
-  min-height: 30px;
-  place-items: center;
-  border: 1px solid var(--game-modal-action-border);
-  border-radius: 10px;
-  padding: 5px 9px;
-  background: var(--game-modal-bg);
-  color: var(--game-modal-muted);
-  font: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.game-guide-walkthrough__actions button:disabled {
-  cursor: default;
-  opacity: .35;
 }
 
 .game-guide-walkthrough > p {

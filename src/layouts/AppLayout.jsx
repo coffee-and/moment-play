@@ -4,6 +4,7 @@ import { useAuth } from "../shared/auth/AuthContext.jsx";
 import { AUTH_LABELS, getAccountLabel, LOGIN_PATH } from "../shared/auth/authConstants.js";
 import { useSignOutAction } from "../shared/auth/useSignOutAction.js";
 import { Brand } from "../shared/components/Brand.jsx";
+import { Button } from "../shared/components/Button.jsx";
 import { Footer } from "../shared/components/Footer.jsx";
 import { PrimaryNav } from "../shared/components/nav/PrimaryNav.jsx";
 import { TabBar } from "../shared/components/nav/TabBar.jsx";
@@ -25,9 +26,9 @@ function AccountControl() {
       <details className="account-menu">
         <summary className="account-control"><span className="account-control__label">{getAccountLabel(user)}</span></summary>
         <div className="account-menu__panel">
-          <button type="button" disabled={isSigningOut} onClick={() => void runSignOut()}>
+          <Button variant="menu" disabled={isSigningOut} onClick={() => void runSignOut()}>
             {isSigningOut ? AUTH_LABELS.loggingOut : AUTH_LABELS.logout}
-          </button>
+          </Button>
           {errorMessage ? <p className="account-menu__error" role="alert">{errorMessage}</p> : null}
         </div>
       </details>
