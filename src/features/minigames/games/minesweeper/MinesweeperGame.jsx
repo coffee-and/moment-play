@@ -3,6 +3,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { FlagIcon } from "../../../../shared/components/icons/PhosphorIcons.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -16,7 +17,9 @@ import {
   toggleMineFlag,
 } from "./minesweeper.logic.js";
 import { useMinesweeperCellPress } from "./useMinesweeperCellPress.js";
-import "./minesweeper.css";
+import styles from "./minesweeper.module.css";
+
+const cx = bindCssModule(styles);
 
 const SIZE = 9;
 const MINE_COUNT = 10;
@@ -183,10 +186,10 @@ export function MinesweeperGame({ game }) {
         { label: "Open", value: revealed },
       ]}
     >
-      <div className="minesweeper-game">
+      <div className={cx("minesweeper-game")}>
         <BoardViewport label="지뢰찾기 보드">
           <div
-            className="minesweeper-board"
+            className={cx("minesweeper-board")}
             ref={boardRef}
             role="grid"
             aria-label="9×9 지뢰찾기 보드"
@@ -200,7 +203,7 @@ export function MinesweeperGame({ game }) {
                       ? "닫힘"
                       : cell.isMine ? "지뢰" : cell.adjacent ? `주변 지뢰 ${cell.adjacent}개` : "안전"
                 }`}
-                className={`minesweeper-cell is-${cell.state}${cell.isMine && cell.state === MINE_CELL_STATE.REVEALED ? " is-mine" : ""}${hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""}`}
+                className={cx(`minesweeper-cell is-${cell.state}${cell.isMine && cell.state === MINE_CELL_STATE.REVEALED ? " is-mine" : ""}${hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""}`)}
                 data-adjacent={cell.adjacent || undefined}
                 data-index={index}
                 disabled={isAnswerRevealed}

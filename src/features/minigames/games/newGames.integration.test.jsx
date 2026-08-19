@@ -72,14 +72,14 @@ describe("new playable games", () => {
 
     act(() => hintButton.click());
     expect(view.host.textContent).toContain("공식 랭킹에는 제출되지 않아요");
-    expect(view.host.querySelectorAll(".is-hint-target")).toHaveLength(0);
+    expect(view.host.querySelectorAll('[data-hint-target="true"]')).toHaveLength(0);
 
     const acceptButton = [...view.host.querySelectorAll("button")]
       .find((button) => button.textContent === "힌트 사용하기");
     act(() => acceptButton.click());
 
     expect(view.host.textContent).toContain("힌트 1 / 3");
-    expect(view.host.querySelectorAll(".is-hint-target").length).toBeGreaterThan(0);
+    expect(view.host.querySelectorAll('[data-hint-target="true"]').length).toBeGreaterThan(0);
     view.unmount();
   });
 
@@ -159,10 +159,10 @@ describe("new playable games", () => {
 
   it("moves LITS to the next validated puzzle after a clear", () => {
     const view = renderGame(LitsGame, "lits");
-    const firstPuzzleId = view.host.querySelector(".lits-board").dataset.puzzleId;
+    const firstPuzzleId = view.host.querySelector("[data-puzzle-id]").dataset.puzzleId;
 
     LITS_PUZZLES[0].solution.forEach((index) => {
-      act(() => view.host.querySelectorAll(".lits-cell")[index].click());
+      act(() => view.host.querySelectorAll('[role="grid"] > button')[index].click());
     });
 
     const nextButton = [...document.body.querySelectorAll("button")]
@@ -171,8 +171,8 @@ describe("new playable games", () => {
     expect(document.body.textContent).toContain("잘했어요");
     act(() => nextButton.click());
 
-    expect(view.host.querySelector(".lits-board").dataset.puzzleId).not.toBe(firstPuzzleId);
-    expect(view.host.querySelector(".lits-board").dataset.puzzleId).toBe(LITS_PUZZLES[1].id);
+    expect(view.host.querySelector("[data-puzzle-id]").dataset.puzzleId).not.toBe(firstPuzzleId);
+    expect(view.host.querySelector("[data-puzzle-id]").dataset.puzzleId).toBe(LITS_PUZZLES[1].id);
     view.unmount();
   });
 
@@ -210,7 +210,7 @@ describe("new playable games", () => {
       .find((button) => button.textContent === "정답 보기");
     act(() => confirmButton.click());
 
-    const cells = [...view.host.querySelectorAll(".lits-cell")];
+    const cells = [...view.host.querySelectorAll('[role="grid"] > button')];
     expect(cells.filter((cell) => cell.getAttribute("aria-pressed") === "true")).toHaveLength(24);
     expect(cells.every((cell) => cell.disabled)).toBe(true);
     expect(view.host.querySelector('[role="status"]').textContent).toContain("정답을 표시");
@@ -221,7 +221,7 @@ describe("new playable games", () => {
 
   it("starts Mosaic and fills a clue cell", () => {
     const view = renderGame(MosaicGame, "mosaic");
-    const firstCell = view.host.querySelector(".mosaic-cell");
+    const firstCell = view.host.querySelector('[role="grid"] > button');
     act(() => firstCell.click());
     expect(firstCell.getAttribute("aria-pressed")).toBe("true");
     view.unmount();

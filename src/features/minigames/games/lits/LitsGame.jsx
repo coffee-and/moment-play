@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
 import { usePuzzleSession } from "../../shared/hooks/usePuzzleSession.js";
 import { LITS_PUZZLES, validateLits } from "./lits.logic.js";
-import "./lits.css";
+import styles from "./lits.module.css";
+
+const cx = bindCssModule(styles);
 
 const UNKNOWN = 0;
 const FILLED = 1;
@@ -129,10 +132,10 @@ export function LitsGame({ game }) {
         { label: "Areas", value: `${completedRegions}/${new Set(puzzle.regionMap).size}` },
       ]}
     >
-      <div className="lits-game">
+      <div className={cx("lits-game")}>
         <BoardViewport label="LITS 보드">
           <div
-            className="lits-board"
+            className={cx("lits-board")}
             data-puzzle-id={puzzle.id}
             role="grid"
             aria-label={`${puzzle.size}×${puzzle.size} LITS 보드, ${puzzleIndex + 1}번 퍼즐`}
@@ -149,7 +152,8 @@ export function LitsGame({ game }) {
                 <button
                   aria-label={`${row + 1}행 ${col + 1}열, 영역 ${region + 1}`}
                   aria-pressed={cell === FILLED}
-                  className={`lits-cell state-${cell} region-${region} ${topEdge ? "edge-top" : ""} ${rightEdge ? "edge-right" : ""} ${bottomEdge ? "edge-bottom" : ""} ${leftEdge ? "edge-left" : ""} ${hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""}`}
+                  className={cx(`lits-cell state-${cell} region-${region} ${topEdge ? "edge-top" : ""} ${rightEdge ? "edge-right" : ""} ${bottomEdge ? "edge-bottom" : ""} ${leftEdge ? "edge-left" : ""} ${hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""}`)}
+                  data-hint-target={hint.currentStep?.targetIndexes?.includes(index) || undefined}
                   disabled={isAnswerRevealed}
                   key={index}
                   onClick={() => changeCell(index)}

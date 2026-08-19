@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { BoardViewport } from "../../shared/components/BoardViewport.jsx";
 import { LogicPuzzleStage } from "../../shared/components/LogicPuzzleStage.jsx";
 import { usePuzzleHints } from "../../shared/hooks/usePuzzleHints.js";
@@ -13,7 +14,9 @@ import {
   MOSAIC_CELL_STATE,
   MOSAIC_PUZZLES,
 } from "./mosaic.logic.js";
-import "./mosaic.css";
+import styles from "./mosaic.module.css";
+
+const cx = bindCssModule(styles);
 
 export function MosaicGame({ game }) {
   const { playSound } = useGameAudio();
@@ -117,14 +120,14 @@ export function MosaicGame({ game }) {
         { label: "Clues", value: `${satisfied}/${puzzle.clues.length}` },
       ]}
     >
-      <div className="mosaic-game">
+      <div className={cx("mosaic-game")}>
         <BoardViewport label="모자이크 보드">
-          <div className="mosaic-board" role="grid" aria-label="8×8 모자이크 보드">
+          <div className={cx("mosaic-board")} role="grid" aria-label="8×8 모자이크 보드">
             {board.map((cell, index) => (
               <button
                 aria-label={`${Math.floor(index / puzzle.size) + 1}행 ${index % puzzle.size + 1}열, 단서 ${puzzle.clues[index]}`}
                 aria-pressed={cell === MOSAIC_CELL_STATE.FILLED}
-                className={`mosaic-cell state-${cell} clue-${clueStates[index]} ${hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""}`}
+                className={cx(`mosaic-cell state-${cell} clue-${clueStates[index]} ${hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""}`)}
                 disabled={isAnswerRevealed}
                 key={index}
                 onClick={() => changeCell(index)}

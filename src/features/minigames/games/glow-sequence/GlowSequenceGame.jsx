@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
@@ -19,7 +20,9 @@ import {
   getGlowPlaybackTiming,
   getGlowSequenceLength,
 } from "./glowSequence.logic.js";
-import "./glow-sequence.css";
+import styles from "./glow-sequence.module.css";
+
+const cx = bindCssModule(styles);
 
 const CELL_COLORS = GAME_COLOR_PALETTE.map((color) => color.value);
 
@@ -214,14 +217,14 @@ export function GlowSequenceGame({ game }) {
     <GameStage
       actions={<Button variant="secondary" onClick={requestExit}>게임 나가기</Button>}
       ariaLabel="글로우 시퀀스 게임"
-      className="glow-sequence"
+      className={cx("glow-sequence")}
       eyebrow="MEMORY / LIGHT"
       sidebar={sidebar}
       title={game.title}
     >
-      <div className="glow-sequence__game">
+      <div className={cx("glow-sequence__game")}>
         <div
-          className={`glow-sequence__status${phase === "cleared" && round % 10 === 0 ? " is-milestone" : ""}`}
+          className={cx(`glow-sequence__status${phase === "cleared" && round % 10 === 0 ? " is-milestone" : ""}`)}
           aria-live="polite"
         >
           <span>ROUND {round} · {sequenceLength} CELLS</span>
@@ -230,7 +233,7 @@ export function GlowSequenceGame({ game }) {
         </div>
 
         <div
-          className="glow-sequence__grid"
+          className={cx("glow-sequence__grid")}
           data-size={gridSize}
           role="grid"
           aria-label={`${gridSize} 곱하기 ${gridSize} 빛 순서 보드`}
@@ -238,7 +241,7 @@ export function GlowSequenceGame({ game }) {
           {cells.map((cell) => (
             <button
               aria-label={`${cell + 1}번 칸`}
-              className={`glow-sequence__cell${activeCell === cell ? " is-active" : ""}`}
+              className={cx(`glow-sequence__cell${activeCell === cell ? " is-active" : ""}`)}
               disabled={phase !== "input"}
               key={cell}
               onClick={() => handleCellClick(cell)}
@@ -248,7 +251,7 @@ export function GlowSequenceGame({ game }) {
           ))}
         </div>
 
-        {phase === "input" ? <div className="glow-sequence__progress" aria-hidden="true"><span style={{ width: `${(inputStep / sequenceLength) * 100}%` }} /></div> : null}
+        {phase === "input" ? <div className={cx("glow-sequence__progress")} aria-hidden="true"><span style={{ width: `${(inputStep / sequenceLength) * 100}%` }} /></div> : null}
       </div>
 
       {phase === "idle" ? (
