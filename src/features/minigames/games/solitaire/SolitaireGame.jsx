@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
-import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { GameRecordCelebration } from "../../shared/components/GameRecordCelebration.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -28,10 +27,11 @@ import {
 } from "./solitaire.logic.js";
 import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import styles from "./solitaire.module.css";
+import { getSolitaireDestination, getSolitaireSource, getTableauCardOffset, SolitaireCard } from "./SolitaireCard.jsx";
+import { EMPTY_DIFFICULTY_RECORD, readSolitaireRecords, saveSolitaireRecords } from "./solitaireRecords.js";
 
 const cx = bindCssModule(styles);
 
-const EMPTY_DIFFICULTY_RECORD = { bestTimeSeconds: null, completedCount: 0 };
 const DIFFICULTY_COPY = {
   [SOLITAIRE_DIFFICULTY.EASY]: {
     label: "쉬움",
@@ -45,115 +45,12 @@ const DIFFICULTY_COPY = {
   },
 };
 
-function createEmptyRecords() {
-  return {
-    [SOLITAIRE_DIFFICULTY.EASY]: { ...EMPTY_DIFFICULTY_RECORD },
-    [SOLITAIRE_DIFFICULTY.HARD]: { ...EMPTY_DIFFICULTY_RECORD },
-  };
-}
-
-function normalizeDifficultyRecord(value) {
-  const bestTimeSeconds = Number(value?.bestTimeSeconds);
-  const completedCount = Number(value?.completedCount);
-  return {
-    bestTimeSeconds: Number.isFinite(bestTimeSeconds) && bestTimeSeconds > 0 ? bestTimeSeconds : null,
-    completedCount: Number.isFinite(completedCount) && completedCount > 0 ? completedCount : 0,
-  };
-}
-
-export function readSolitaireRecords() {
-  if (typeof window === "undefined") return createEmptyRecords();
-  try {
-    const stored = JSON.parse(window.localStorage.getItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS));
-    return {
-      [SOLITAIRE_DIFFICULTY.EASY]: normalizeDifficultyRecord(stored?.[SOLITAIRE_DIFFICULTY.EASY]),
-      [SOLITAIRE_DIFFICULTY.HARD]: normalizeDifficultyRecord(stored?.[SOLITAIRE_DIFFICULTY.HARD]),
-    };
-  } catch {
-    return createEmptyRecords();
-  }
-}
-
-function saveSolitaireRecords(records) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(GAME_RECORD_STORAGE_KEYS.SOLITAIRE_RECORDS, JSON.stringify(records));
-  } catch {
-    // Storage can be unavailable in privacy mode; gameplay still continues.
-  }
-}
+export { readSolitaireRecords } from "./solitaireRecords.js";
 
 function formatRecordTime(seconds) {
   return seconds == null ? "--:--" : formatActiveGameTime(seconds * 1000);
 }
 
-function getTableauCardOffset(column, index) {
-  const previousCards = column.slice(0, index);
-  return {
-    "--face-down-before": previousCards.filter((card) => !card.faceUp).length,
-    "--face-up-before": previousCards.filter((card) => card.faceUp).length,
-  };
-}
-
-function getSourceFromElement(element) {
-  const source = element?.closest?.("[data-source-type]");
-  if (!source) return null;
-  const type = source.dataset.sourceType;
-  if (type === "waste") return { type };
-  if (type === "foundation") return { type, suit: source.dataset.sourceSuit };
-  if (type === "tableau") {
-    return {
-      type,
-      column: Number(source.dataset.sourceColumn),
-      index: Number(source.dataset.sourceIndex),
-    };
-  }
-  return null;
-}
-
-function getDestinationFromElement(element) {
-  const destination = element?.closest?.("[data-drop-type]");
-  if (!destination) return null;
-  const type = destination.dataset.dropType;
-  if (type === "foundation") return { type, suit: destination.dataset.dropSuit };
-  if (type === "tableau") return { type, column: Number(destination.dataset.dropColumn) };
-  return null;
-}
-
-function PlayingCard({ card, className = "", onClick, onDoubleClick, source, style }) {
-  const sourceProps = source ? {
-    "data-source-type": source.type,
-    "data-source-column": source.column,
-    "data-source-index": source.index,
-    "data-source-suit": source.suit,
-  } : {};
-
-  if (!card.faceUp) {
-    return <span aria-label="뒤집힌 카드" className={cx(`solitaire-card is-back ${className}`)} style={style}><span /></span>;
-  }
-
-  return (
-    <button
-      aria-label={`${getSolitaireRankLabel(card.rank)} ${card.symbol}`}
-      className={cx(`solitaire-card is-front is-${card.color} ${className}`)}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-      style={style}
-      type="button"
-      {...sourceProps}
-    >
-      <span className={cx("solitaire-card__corner")}>
-        <strong>{getSolitaireRankLabel(card.rank)}</strong>
-        <span>{card.symbol}</span>
-      </span>
-      <span className={cx("solitaire-card__suit")} aria-hidden="true">{card.symbol}</span>
-      <span className={cx("solitaire-card__corner is-bottom")} aria-hidden="true">
-        <strong>{getSolitaireRankLabel(card.rank)}</strong>
-        <span>{card.symbol}</span>
-      </span>
-    </button>
-  );
-}
 
 export function SolitaireGame({ game }) {
   const navigate = useNavigate();
@@ -335,7 +232,7 @@ export function SolitaireGame({ game }) {
 
   function handlePointerDown(event) {
     if (phase !== "playing") return;
-    const source = getSourceFromElement(event.target);
+    const source = getSolitaireSource(event.target);
     if (!source) return;
     dragRef.current = { source, startX: event.clientX, startY: event.clientY, moved: false };
   }
@@ -355,7 +252,7 @@ export function SolitaireGame({ game }) {
     const target = typeof document.elementFromPoint === "function"
       ? document.elementFromPoint(event.clientX, event.clientY)
       : event.target;
-    const destination = getDestinationFromElement(target);
+    const destination = getSolitaireDestination(target);
     if (destination) applyMove(drag.source, destination);
     suppressClickRef.current = true;
   }
@@ -441,7 +338,7 @@ export function SolitaireGame({ game }) {
               {board.waste.slice(-3).map((card, index, shownCards) => {
                 const isTop = index === shownCards.length - 1;
                 return isTop ? (
-                  <PlayingCard
+                  <SolitaireCard
                     card={card}
                     className={cx(`is-waste is-offset-${index}${isHintSource({ type: "waste" }) ? " is-hint-target" : ""}`)}
                     key={card.id}
@@ -471,7 +368,7 @@ export function SolitaireGame({ game }) {
                   key={suit.id}
                 >
                   {topCard ? (
-                    <PlayingCard
+                    <SolitaireCard
                       card={topCard}
                       className={cx(selection?.type === "foundation" && selection.suit === suit.id ? "is-selected" : "")}
                       onClick={() => chooseSource(source)}
@@ -517,7 +414,7 @@ export function SolitaireGame({ game }) {
                   && selection.column === columnIndex
                   && cardIndex >= selection.index;
                 return (
-                  <PlayingCard
+                  <SolitaireCard
                     card={card}
                     className={cx(`is-tableau${selected ? " is-selected" : ""}${isHintSource(source) ? " is-hint-target" : ""}`)}
                     key={card.id}
