@@ -33,7 +33,7 @@ async function startGame() {
 }
 
 function getSequenceIds() {
-  return Array.from(document.querySelectorAll(".memory-sequence__item"), (item) => item.dataset.symbolId);
+  return Array.from(document.querySelectorAll("[data-symbol-id]"), (item) => item.dataset.symbolId);
 }
 
 function areCardsDisabled() {
@@ -43,7 +43,7 @@ function areCardsDisabled() {
 function clickSequence(sequenceIds) {
   sequenceIds.forEach((symbolId) => {
     const symbol = MEMORY_SYMBOLS.find((item) => item.id === symbolId);
-    const button = document.querySelector(`.memory-card[aria-label="${symbol.name} 선택"]`);
+    const button = document.querySelector(`button[aria-label="${symbol.name} 선택"]`);
     act(() => button.click());
   });
 }
@@ -152,8 +152,8 @@ describe("MemoryOrderGame transitions and exit flow", () => {
     expect(document.body.textContent).toContain("ROUND 1 CLEAR!");
 
     act(() => vi.advanceTimersByTime(MEMORY_TIMING.ROUND_CLEAR_DURATION_MS));
-    expect(document.querySelector('.memory-game__play-shell')?.dataset.phase).toBe("preview");
-    expect(document.querySelector('.memory-game__start-flow[data-state="countdown"]')).toBeNull();
+    expect(document.querySelector('[data-phase="preview"]')).not.toBeNull();
+    expect(document.querySelector('[data-state="countdown"]')).toBeNull();
 
     view.unmount();
   });

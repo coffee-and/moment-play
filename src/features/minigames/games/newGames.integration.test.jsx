@@ -105,7 +105,7 @@ describe("new playable games", () => {
 
   it("starts SET and selects a card", () => {
     const view = renderGame(SetGame, "set");
-    const firstCard = view.host.querySelector(".set-card");
+    const firstCard = view.host.querySelector('[role="grid"] > button');
     act(() => firstCard.click());
     expect(firstCard.getAttribute("aria-pressed")).toBe("true");
     view.unmount();
@@ -120,24 +120,24 @@ describe("new playable games", () => {
       .find((button) => button.textContent === "힌트 사용하기").click());
 
     expect(view.host.textContent).toContain("강조된 두 카드와 함께 SET을 이루는 마지막 카드 한 장을 찾아보세요.");
-    let targets = [...view.host.querySelectorAll(".set-card.is-set-hint-target")];
+    let targets = [...view.host.querySelectorAll("[data-hint-order]")];
     expect(targets).toHaveLength(2);
     expect(targets.map((card) => card.dataset.hintOrder)).toEqual(["1", "2"]);
     expect(targets[0].getAttribute("aria-label")).toContain("힌트 카드 1");
 
     act(() => targets[0].click());
-    expect(targets[0].classList.contains("is-selected")).toBe(true);
-    expect(targets[0].classList.contains("is-set-hint-target")).toBe(true);
+    expect(targets[0].getAttribute("aria-pressed")).toBe("true");
+    expect(targets[0].dataset.hintOrder).toBe("1");
 
     act(() => [...view.host.querySelectorAll("button")]
       .find((button) => button.textContent === "다음 힌트").click());
     expect(view.host.textContent).toContain("색·모양·개수·채움을 하나씩 비교해보세요.");
-    expect(view.host.querySelectorAll(".set-card.is-set-hint-target")).toHaveLength(2);
+    expect(view.host.querySelectorAll("[data-hint-order]")).toHaveLength(2);
 
     act(() => [...view.host.querySelectorAll("button")]
       .find((button) => button.textContent === "다음 힌트").click());
     expect(view.host.textContent).toContain("각 속성은 세 카드가 모두 같거나 모두 달라야 해요.");
-    targets = [...view.host.querySelectorAll(".set-card.is-set-hint-target")];
+    targets = [...view.host.querySelectorAll("[data-hint-order]")];
     expect(targets.map((card) => card.dataset.hintOrder)).toEqual(["1", "2", "3"]);
 
     const scrollIntoView = vi.fn();
@@ -152,7 +152,7 @@ describe("new playable games", () => {
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center", inline: "nearest" });
     expect(document.activeElement).toBe(targets[0]);
-    expect(view.host.querySelectorAll(".set-card.is-set-hint-target")).toHaveLength(3);
+    expect(view.host.querySelectorAll("[data-hint-order]")).toHaveLength(3);
     requestAnimationFrame.mockRestore();
     view.unmount();
   });
@@ -229,11 +229,11 @@ describe("new playable games", () => {
 
   it("shows where a selected Block Blast piece can go and places it there", () => {
     const view = renderGame(BlockBlastGame, "block-blast");
-    const firstPiece = view.host.querySelector(".block-piece:not(:disabled)");
+    const firstPiece = view.host.querySelector('[aria-label="사용할 블록"] > button:not(:disabled)');
     act(() => firstPiece.click());
 
     expect(view.host.querySelector('[role="status"]').textContent).toContain("점 표시가 있는 칸");
-    const validCell = [...view.host.querySelectorAll(".block-blast-cell")]
+    const validCell = [...view.host.querySelectorAll('[role="grid"] > button')]
       .find((cell) => cell.getAttribute("aria-label").includes("놓을 수 있음"));
     expect(validCell).toBeTruthy();
 

@@ -39,7 +39,10 @@ import {
   solveSudoku,
 } from "./sudoku.logic.js";
 import { DEFAULT_SUDOKU_PUZZLE, SUDOKU_PUZZLES } from "./sudoku.puzzles.js";
-import "./sudoku.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./sudoku.module.css";
+
+const cx = bindCssModule(styles);
 
 const EMPTY_LEVEL_RECORD = { completedCount: 0, bestTimeSeconds: null, lastCompletedAt: null };
 
@@ -152,16 +155,16 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   const isStageCovered = phase === SUDOKU_PHASE.IDLE || phase === SUDOKU_PHASE.COMPLETED || phase === SUDOKU_PHASE.RESET_CONFIRM || isExitConfirmOpen || isSurrenderOpen;
   const statusText = isAnswerRevealed ? "정답을 표시한 연습 판이에요." : SUDOKU_COPY.status[phase] ?? SUDOKU_COPY.status.idle;
   const bestTimeText = levelRecords.bestTimeSeconds === null ? SUDOKU_COPY.meta.emptyBestTime : formatTime(levelRecords.bestTimeSeconds);
-  const gameActions = <div className="game-stage__inline-actions">{phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>}<Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button></div>;
+  const gameActions = <div className={cx("game-stage__inline-actions")}>{phase === SUDOKU_PHASE.IDLE ? null : <Button type="button" variant="secondary" onClick={requestNewGame}>{SUDOKU_COPY.actions.newGame}</Button>}<Button type="button" variant="secondary" onClick={requestExit}>게임 나가기</Button></div>;
   const sidebar = (
     <>
-      <div className="stat-row">
-        <div className="stat"><div className="l">Level</div><div className="v"><small>{activeLevelLabel}</small></div></div>
-        <div className="stat"><div className="l">Time</div><div className="v">{formatTime(elapsedSeconds)}</div></div>
-        <div className="stat"><div className="l">Clear</div><div className="v">{levelRecords.completedCount}</div></div>
-        <div className="stat"><div className="l">Best</div><div className="v">{bestTimeText}</div></div>
+      <div className={cx("stat-row")}>
+        <div className={cx("stat")}><div className={cx("l")}>Level</div><div className={cx("v")}><small>{activeLevelLabel}</small></div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Time</div><div className={cx("v")}>{formatTime(elapsedSeconds)}</div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Clear</div><div className={cx("v")}>{levelRecords.completedCount}</div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Best</div><div className={cx("v")}>{bestTimeText}</div></div>
       </div>
-      <p className="game-stage__side-note">{activeLevelLabel} · {statusText}</p>
+      <p className={cx("game-stage__side-note")}>{activeLevelLabel} · {statusText}</p>
     </>
   );
 
@@ -268,39 +271,39 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function getCellClassName(index, value) { const selected = selectedIndex === index; const given = isGivenCell(activePuzzle.puzzle, index); const sameNumber = Boolean(selectedValue && value === selectedValue && !selected); const related = !selected && (selectedHighlights.row.has(index) || selectedHighlights.column.has(index) || selectedHighlights.box.has(index)); return joinClassNames(["sudoku-game__cell", selected ? "is-selected" : "", related ? "is-related" : "", sameNumber ? "is-same-number" : "", conflictIndexes.has(index) ? "is-conflict" : "", given ? "is-given" : "", !given && value ? "is-user" : "", value ? "" : "is-empty", hint.currentStep?.targetIndexes?.includes(index) ? "is-hint-target" : ""]); }
 
   return (
-    <GameStage className="sudoku-game" eyebrow={game.eyebrow} title={game.title} actions={gameActions} sidebar={sidebar} ariaLabel={game.title}>
-      <div className="sudoku-game__stage">
+    <GameStage className={cx("sudoku-game")} eyebrow={game.eyebrow} title={game.title} actions={gameActions} sidebar={sidebar} ariaLabel={game.title}>
+      <div className={cx("sudoku-game__stage")}>
         {phase !== SUDOKU_PHASE.IDLE ? (
-          <div className="sudoku-game__play">
-            <section className="sudoku-game__meta" aria-label={`${activeLevelLabel} 스도쿠 기록`}>
+          <div className={cx("sudoku-game__play")}>
+            <section className={cx("sudoku-game__meta")} aria-label={`${activeLevelLabel} 스도쿠 기록`}>
               <div><span>{SUDOKU_COPY.meta.completed}</span><strong>{levelRecords.completedCount}</strong></div>
               <div><span>{SUDOKU_COPY.meta.bestTime}</span><strong>{bestTimeText}</strong></div>
               <div><span>{SUDOKU_COPY.meta.currentTime}</span><strong>{formatTime(elapsedSeconds)}</strong></div>
             </section>
-            <p className="sudoku-game__status" aria-live="polite">{activeLevelLabel} · {statusText}</p>
-            <div className="sudoku-game__board" role="grid" tabIndex={-1} aria-label={`${activeLevelLabel} 스도쿠 보드`} aria-rowcount={SUDOKU_BOARD_SIZE} aria-colcount={SUDOKU_BOARD_SIZE} onKeyDown={handleGameKeyDown}>
+            <p className={cx("sudoku-game__status")} aria-live="polite">{activeLevelLabel} · {statusText}</p>
+            <div className={cx("sudoku-game__board")} role="grid" tabIndex={-1} aria-label={`${activeLevelLabel} 스도쿠 보드`} aria-rowcount={SUDOKU_BOARD_SIZE} aria-colcount={SUDOKU_BOARD_SIZE} onKeyDown={handleGameKeyDown}>
               {board.map((value, index) => {
                 const selected = selectedIndex === index;
                 return (
-                  <button ref={(element) => { cellRefs.current[index] = element; }} type="button" className={getCellClassName(index, value)} key={`${activePuzzle.id}-${index}`} role="gridcell" aria-label={getCellAriaLabel({ conflictIndexes, index, puzzle: activePuzzle.puzzle, selected, value })} aria-selected={selected} aria-readonly={isGivenCell(activePuzzle.puzzle, index) ? "true" : undefined} aria-rowindex={getRowIndex(index) + 1} aria-colindex={getColumnIndex(index) + 1} onClick={() => selectCell(index)}>
+                  <button ref={(element) => { cellRefs.current[index] = element; }} type="button" className={cx(getCellClassName(index, value))} key={`${activePuzzle.id}-${index}`} role="gridcell" aria-label={getCellAriaLabel({ conflictIndexes, index, puzzle: activePuzzle.puzzle, selected, value })} aria-selected={selected} aria-readonly={isGivenCell(activePuzzle.puzzle, index) ? "true" : undefined} aria-rowindex={getRowIndex(index) + 1} aria-colindex={getColumnIndex(index) + 1} onClick={() => selectCell(index)}>
                     {value ? <span>{value}</span> : null}
                   </button>
                 );
               })}
             </div>
-            <div className="sudoku-game__controls" role="group" aria-label={SUDOKU_COPY.numberPadLabel}>
+            <div className={cx("sudoku-game__controls")} role="group" aria-label={SUDOKU_COPY.numberPadLabel}>
               {SUDOKU_NUMBERS.map((number) => (
-                <button type="button" className="sudoku-game__number-button" key={number} onClick={() => updateSelectedValue(number)} disabled={!canEditSelected} aria-label={`${number} 입력`}>{number}</button>
+                <button type="button" className={cx("sudoku-game__number-button")} key={number} onClick={() => updateSelectedValue(number)} disabled={!canEditSelected} aria-label={`${number} 입력`}>{number}</button>
               ))}
-              <button type="button" className="sudoku-game__erase-button" onClick={eraseSelectedValue} disabled={!canEditSelected} aria-label={SUDOKU_COPY.eraseLabel}>Del</button>
+              <button type="button" className={cx("sudoku-game__erase-button")} onClick={eraseSelectedValue} disabled={!canEditSelected} aria-label={SUDOKU_COPY.eraseLabel}>Del</button>
             </div>
             {!isAnswerRevealed ? (
-              <div className="sudoku-game__assist">
+              <div className={cx("sudoku-game__assist")}>
                 <PuzzleHintButton hint={hint} />
                 <Button size="small" type="button" variant="secondary" onClick={requestSurrender}>포기</Button>
               </div>
             ) : (
-              <section className="logic-puzzle-stage__answer-summary" aria-labelledby="sudoku-answer-title">
+              <section className={cx("logic-puzzle-stage__answer-summary")} aria-labelledby="sudoku-answer-title">
                 <strong id="sudoku-answer-title">정답을 확인했어요</strong>
                 <p>표시된 풀이를 천천히 살펴보세요.</p>
                 <span>연속 성공 기록은 초기화됐어요.</span>
@@ -312,16 +315,16 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
         ) : null}
       </div>
       {isStageCovered ? (
-        <GameStageOverlay className="sudoku-game__overlay-layer" state={isExitConfirmOpen ? "exit-confirm" : phase === SUDOKU_PHASE.IDLE ? "start" : phase}>
+        <GameStageOverlay className={cx("sudoku-game__overlay-layer")} state={isExitConfirmOpen ? "exit-confirm" : phase === SUDOKU_PHASE.IDLE ? "start" : phase}>
           {phase === SUDOKU_PHASE.IDLE && !isExitConfirmOpen ? (
-            <GameStageModal className="sudoku-game__modal sudoku-game__start" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-start-title">
+            <GameStageModal className={cx("sudoku-game__modal sudoku-game__start")} role="dialog" aria-modal="true" aria-labelledby="sudoku-game-start-title">
               <GameStageDoodle variant="start" />
-              <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.start.eyebrow}</p>
+              <p className={cx("sudoku-game__modal-eyebrow")}>{SUDOKU_COPY.start.eyebrow}</p>
               <h3 id="sudoku-game-start-title">{SUDOKU_COPY.start.title}</h3>
               <p>{SUDOKU_COPY.start.description}</p>
-              <div className="sudoku-game__level-list" role="group" aria-label="스도쿠 난이도 선택">
+              <div className={cx("sudoku-game__level-list")} role="group" aria-label="스도쿠 난이도 선택">
                 {SUDOKU_LEVEL_OPTIONS.map((option) => (
-                  <button type="button" className="sudoku-game__level-button" key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
+                  <button type="button" className={cx("sudoku-game__level-button")} key={option.id} onClick={() => startLevel(option.id)} disabled={rankingSubmission.isStarting} aria-label={`${option.label} 난이도 시작`}>
                     <strong>{option.label}</strong>
                     <span>{option.description}</span>
                   </button>
@@ -330,52 +333,52 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
             </GameStageModal>
           ) : null}
           {isExitConfirmOpen ? (
-            <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-exit-title">
+            <GameStageModal className={cx("sudoku-game__modal")} role="dialog" aria-modal="true" aria-labelledby="sudoku-game-exit-title">
               <h3 id="sudoku-game-exit-title">게임을 나갈까요?</h3>
               <p>현재 퍼즐 진행은 저장되지 않아요.</p>
-              <div className="game-stage-modal__actions"><Button type="button" onClick={cancelExit}>계속하기</Button><Button type="button" variant="secondary" onClick={confirmExit}>게임 나가기</Button></div>
+              <div className={cx("game-stage-modal__actions")}><Button type="button" onClick={cancelExit}>계속하기</Button><Button type="button" variant="secondary" onClick={confirmExit}>게임 나가기</Button></div>
             </GameStageModal>
           ) : null}
           {phase === SUDOKU_PHASE.COMPLETED && !isExitConfirmOpen ? (
             <GameStageModal
               celebrationStreak={gameStreak.completionStreak}
-              className="sudoku-game__modal sudoku-game__modal--complete"
+              className={cx("sudoku-game__modal sudoku-game__modal--complete")}
               showCompletionStars
               role="dialog"
               aria-modal="true"
               aria-labelledby="sudoku-game-complete-title"
             >
               <GameRecordCelebration isNewRecord={didBreakRecordThisAttempt} />
-              <p className="sudoku-game__modal-eyebrow">{SUDOKU_COPY.completed.eyebrow}</p>
+              <p className={cx("sudoku-game__modal-eyebrow")}>{SUDOKU_COPY.completed.eyebrow}</p>
               <h3 id="sudoku-game-complete-title">{streakCopy.title}</h3>
               <p>{streakCopy.subtitle}</p>
               <p>{completedCopy.title} {completedCopy.description}</p>
               <strong>{formatTime(elapsedSeconds)}</strong>
               <p>{SUDOKU_COPY.completed.bestTime}</p>
               {hint.hasUsedHint
-                ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록 · 랭킹 미제출</p>
+                ? <p className={cx("puzzle-hint-result-label")}>힌트 사용 · 연습 기록 · 랭킹 미제출</p>
                 : <ResultSubmissionStatus submission={rankingSubmission} />}
-              <div className="game-stage-modal__actions">
+              <div className={cx("game-stage-modal__actions")}>
                 <Button type="button" onClick={continueAfterComplete}>{NEXT_ROUND_LABEL}</Button>
                 <Button type="button" variant="secondary" onClick={returnToLevelSelect}>{SUDOKU_COPY.actions.chooseLevel}</Button>
               </div>
             </GameStageModal>
           ) : null}
           {phase === SUDOKU_PHASE.RESET_CONFIRM && !isExitConfirmOpen ? (
-            <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-reset-title">
+            <GameStageModal className={cx("sudoku-game__modal")} role="dialog" aria-modal="true" aria-labelledby="sudoku-game-reset-title">
               <h3 id="sudoku-game-reset-title">{SUDOKU_COPY.reset.title}</h3>
               <p>{SUDOKU_COPY.reset.description}</p>
-              <div className="game-stage-modal__actions">
+              <div className={cx("game-stage-modal__actions")}>
                 <Button type="button" variant="secondary" onClick={closeResetConfirm}>{SUDOKU_COPY.actions.keepPlaying}</Button>
                 <Button type="button" onClick={confirmNewGame}>{SUDOKU_COPY.reset.confirm}</Button>
               </div>
             </GameStageModal>
           ) : null}
           {isSurrenderOpen ? (
-            <GameStageModal className="sudoku-game__modal" role="dialog" aria-modal="true" aria-labelledby="sudoku-game-surrender-title">
+            <GameStageModal className={cx("sudoku-game__modal")} role="dialog" aria-modal="true" aria-labelledby="sudoku-game-surrender-title">
               <h3 id="sudoku-game-surrender-title">정말 포기할까요?</h3>
               <p>정답을 확인하면 이번 판은 완료 기록과 랭킹에 포함되지 않아요.</p>
-              <div className="game-stage-modal__actions">
+              <div className={cx("game-stage-modal__actions")}>
                 <Button type="button" onClick={revealSolution}>정답 보기</Button>
                 <Button type="button" variant="secondary" onClick={cancelSurrender}>계속 풀기</Button>
               </div>

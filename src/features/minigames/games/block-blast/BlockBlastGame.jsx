@@ -30,7 +30,10 @@ import {
   placeBlockPiece,
 } from "./blockBlast.logic.js";
 import feedbackStyles from "./block-blast-feedback.module.css";
-import "./block-blast.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./block-blast.module.css";
+
+const cx = bindCssModule(styles);
 
 function readBestScore() {
   try {
@@ -222,10 +225,10 @@ export function BlockBlastGame({ game }) {
   }
 
   const sidebar = (
-    <div className="stat-row">
-      <div className="stat"><div className="l">Score</div><div className="v">{score}</div></div>
-      <div className="stat"><div className="l">Best</div><div className="v">{bestScore}</div></div>
-      <div className="stat"><div className="l">Combo</div><div className="v">×{combo}</div></div>
+    <div className={cx("stat-row")}>
+      <div className={cx("stat")}><div className={cx("l")}>Score</div><div className={cx("v")}>{score}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Best</div><div className={cx("v")}>{bestScore}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Combo</div><div className={cx("v")}>×{combo}</div></div>
     </div>
   );
 
@@ -249,7 +252,7 @@ export function BlockBlastGame({ game }) {
         </>
       )}
       ariaLabel="블록 블라스트 게임"
-      className="block-blast-game"
+      className={cx("block-blast-game")}
       eyebrow="BLOCK / SCORE"
       phase={phase}
       sidebar={sidebar}
@@ -261,10 +264,10 @@ export function BlockBlastGame({ game }) {
         </span>
       )}
     >
-      <div className="block-blast-layout">
-        <div className={`block-blast-board-wrap ${feedbackStyles.host}`}>
+      <div className={cx("block-blast-layout")}>
+        <div className={cx(`block-blast-board-wrap ${feedbackStyles.host}`)}>
           <div
-            className="block-blast-board"
+            className={cx("block-blast-board")}
             role="grid"
             tabIndex={-1}
             aria-label="8×8 블록 보드"
@@ -281,11 +284,11 @@ export function BlockBlastGame({ game }) {
                   aria-label={`${row + 1}행 ${col + 1}열${value ? ", 채워짐" : ", 비어 있음"}${
                     selectedPiece ? isValidOrigin ? ", 선택한 블록을 놓을 수 있음" : ", 선택한 블록을 놓을 수 없음" : ""
                   }`}
-                  className={`block-blast-cell${value ? ` is-filled color-${value}` : ""}${
+                  className={cx(`block-blast-cell${value ? ` is-filled color-${value}` : ""}${
                     isValidOrigin ? " is-valid-origin" : ""
                   }${isPreview ? previewIsValid ? ` is-preview color-${selectedPiece.color}` : " is-invalid-preview" : ""}${
                     hint.currentStep?.targetIndexes?.includes(index) ? " is-hint-target" : ""
-                  }`}
+                  }`)}
                   key={index}
                   onClick={() => placeSelected(row, col)}
                   onFocus={() => setPreviewOrigin({ row, col })}
@@ -305,12 +308,12 @@ export function BlockBlastGame({ game }) {
           <GameActionFeedback className={feedbackStyles.feedback} feedback={actionFeedback} />
         </div>
 
-        <div className="block-blast-tray" aria-label="사용할 블록">
+        <div className={cx("block-blast-tray")} aria-label="사용할 블록">
           {pieces.map((piece, pieceIndex) => (
             <button
               aria-label={piece ? `${piece.cells.length}칸 블록 선택` : "사용한 블록"}
               aria-pressed={selectedPieceIndex === pieceIndex}
-              className={`block-piece${selectedPieceIndex === pieceIndex ? " is-selected" : ""}${hint.currentStep?.targetPieceIndex === pieceIndex ? " is-hint-target" : ""}`}
+              className={cx(`block-piece${selectedPieceIndex === pieceIndex ? " is-selected" : ""}${hint.currentStep?.targetPieceIndex === pieceIndex ? " is-hint-target" : ""}`)}
               disabled={!piece || phase !== "playing"}
               draggable={Boolean(piece)}
               key={piece?.instanceId ?? `used-${pieceIndex}`}
@@ -327,10 +330,10 @@ export function BlockBlastGame({ game }) {
               type="button"
             >
               {piece ? (
-                <span className="block-piece-grid">
+                <span className={cx("block-piece-grid")}>
                   {piece.cells.map(([row, col]) => (
                     <span
-                      className={`block-piece-cell color-${piece.color}`}
+                      className={cx(`block-piece-cell color-${piece.color}`)}
                       key={`${row}-${col}`}
                       style={{ gridColumn: col + 1, gridRow: row + 1 }}
                     />
@@ -338,16 +341,16 @@ export function BlockBlastGame({ game }) {
                 </span>
               ) : null}
               {piece ? (
-                <span className="block-piece__hint">
+                <span className={cx("block-piece__hint")}>
                   {selectedPieceIndex === pieceIndex ? "선택됨" : "선택"}
                 </span>
               ) : null}
             </button>
           ))}
         </div>
-        <p className="logic-board-status" role="status">{status}</p>
+        <p className={cx("logic-board-status")} role="status">{status}</p>
         {phase !== "idle" ? (
-          <div className="block-blast-session-controls">
+          <div className={cx("block-blast-session-controls")}>
             {phase === "playing" ? <PuzzleHintButton hint={hint} /> : null}
             <Button size="small" variant="secondary" onClick={startGame}>
               <RestartIcon />
@@ -361,7 +364,7 @@ export function BlockBlastGame({ game }) {
       {phase === "idle" ? (
         <GameStageOverlay state="start">
           <GameStageModal
-            className="game-stage-start-modal"
+            className={cx("game-stage-start-modal")}
             role="dialog"
             aria-modal="true"
             aria-labelledby="block-blast-start-title"
@@ -369,7 +372,7 @@ export function BlockBlastGame({ game }) {
             <GameStageDoodle variant="start" />
             <h2 id="block-blast-start-title">Block Blast</h2>
             <GameGuideContent compact guide={game.guide ?? { description: game.howTo }} />
-            <div className="game-stage-modal__actions"><Button data-modal-initial-focus="" onClick={startGame}>게임 시작</Button></div>
+            <div className={cx("game-stage-modal__actions")}><Button data-modal-initial-focus="" onClick={startGame}>게임 시작</Button></div>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}
@@ -380,8 +383,8 @@ export function BlockBlastGame({ game }) {
             <GameStageDoodle variant="failure" />
             <h2 id="block-blast-over-title">더 놓을 곳이 없어요</h2>
             <p>이번 점수는 {score}점이에요.</p>
-            {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
-            <div className="game-stage-modal__actions">
+            {hint.hasUsedHint ? <p className={cx("puzzle-hint-result-label")}>힌트 사용 · 연습 기록</p> : null}
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={startGame}>다시 도전</Button>
               <Button variant="secondary" onClick={() => navigateFromGame("/")}>게임 목록으로</Button>
             </div>
@@ -394,7 +397,7 @@ export function BlockBlastGame({ game }) {
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-paused-title">
             <h2 id="block-blast-paused-title">일시정지</h2>
             <p>보드와 점수가 그대로 멈춰 있어요.</p>
-            <div className="game-stage-modal__actions">
+            <div className={cx("game-stage-modal__actions")}>
               <Button data-modal-initial-focus="" onClick={resumeGame}>
                 <PlayIcon />
                 계속하기
@@ -409,7 +412,7 @@ export function BlockBlastGame({ game }) {
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="block-blast-exit-title">
             <h2 id="block-blast-exit-title">게임을 나갈까요?</h2>
             <p>현재 점수와 보드는 저장되지 않아요.</p>
-            <div className="game-stage-modal__actions">
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={() => navigateFromGame("/")}>나가기</Button>
               <Button variant="secondary" onClick={continueGame}>계속하기</Button>
             </div>

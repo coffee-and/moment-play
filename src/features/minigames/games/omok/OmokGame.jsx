@@ -44,7 +44,7 @@ import {
   OMOK_DIALOG,
   OMOK_SCREEN,
 } from "./omok.presentation.js";
-import "./omok.css";
+import { omokClassName as cx } from "./omokStyles.js";
 
 function getPlayerByRole(room, role) {
   return room?.players?.find((player) => player.role === role) ?? null;
@@ -443,18 +443,18 @@ export function OmokGame({ game = DEFAULT_OMOK_GAME_META, roomId = null }) {
           게임 나가기
         </Button>
       )}
-      className={"omok-game" + (isGameScreenVisible ? " is-game-screen" : "")}
+      className={cx(`omok-game${isGameScreenVisible ? " is-game-screen" : ""}`)}
       eyebrow={game.eyebrow}
       title={game.title}
       sidebar={sidebar}
       ariaLabel={game.title}
     >
-      <div className="omok-game__content">
+      <div className={cx("omok-game__content")}>
         {online.status === ONLINE_ROOM_LOAD_STATUS.CHECKING_PROFILE ? (
-          <div className="omok-game__lobby" role="status">
-            <div className="kicker">Online room</div>
-            <h3 className="omok-game__section-title">온라인 방을 준비하는 중입니다</h3>
-            <p className="omok-game__hint">익명 세션과 닉네임 정보를 확인하고 있어요.</p>
+          <div className={cx("omok-game__lobby")} role="status">
+            <div className={cx("kicker")}>Online room</div>
+            <h3 className={cx("omok-game__section-title")}>온라인 방을 준비하는 중입니다</h3>
+            <p className={cx("omok-game__hint")}>익명 세션과 닉네임 정보를 확인하고 있어요.</p>
           </div>
         ) : null}
         {isOnlineWaiting ? (

@@ -28,7 +28,7 @@ import {
   isMemoryTimerUrgent,
 } from "./memoryGameConfig.js";
 import { MemoryGameOverlays } from "./MemoryGameOverlays.jsx";
-import "./memory-game.css";
+import { memoryClassName as cx } from "./memoryStyles.js";
 
 const PHASE = MEMORY_PHASE;
 const FAILURE_REASON = MEMORY_FAILURE_REASON;
@@ -505,7 +505,7 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   const gameActions = (
     <>
       {canPause ? (
-        <Button className="memory-game__pause" variant="secondary" type="button" onClick={pauseGame}>
+        <Button className={cx("memory-game__pause")} variant="secondary" type="button" onClick={pauseGame}>
           일시정지
         </Button>
       ) : null}
@@ -516,31 +516,31 @@ export function MemoryOrderGame({ game = DEFAULT_GAME_META }) {
   );
   const sidebar = (
     <>
-      <div className="stat-row">
-        <div className="stat">
-          <div className="l">Score</div>
-          <div className="v">{score}</div>
+      <div className={cx("stat-row")}>
+        <div className={cx("stat")}>
+          <div className={cx("l")}>Score</div>
+          <div className={cx("v")}>{score}</div>
         </div>
-        <div className="stat">
-          <div className="l">Combo</div>
-          <div className="v">×{combo}</div>
+        <div className={cx("stat")}>
+          <div className={cx("l")}>Combo</div>
+          <div className={cx("v")}>×{combo}</div>
         </div>
-        <div className="stat">
-          <div className="l">Round</div>
-          <div className="v">{Math.min(round, MEMORY_ORDER_ROUNDS)}<small> / {MEMORY_ORDER_ROUNDS}</small></div>
+        <div className={cx("stat")}>
+          <div className={cx("l")}>Round</div>
+          <div className={cx("v")}>{Math.min(round, MEMORY_ORDER_ROUNDS)}<small> / {MEMORY_ORDER_ROUNDS}</small></div>
         </div>
-        <div className="stat">
-          <div className="l">Lives</div>
-          <div className="v">{lives}</div>
+        <div className={cx("stat")}>
+          <div className={cx("l")}>Lives</div>
+          <div className={cx("v")}>{lives}</div>
         </div>
       </div>
-      <p className="game-stage__side-note">다시 보기 {replayGauge}% {replayGauge >= 100 ? "· READY" : ""}</p>
+      <p className={cx("game-stage__side-note")}>다시 보기 {replayGauge}% {replayGauge >= 100 ? "· READY" : ""}</p>
     </>
   );
 
   return (
     <GameStage
-      className="memory-game"
+      className={cx("memory-game")}
       eyebrow={game.eyebrow}
       title={game.title}
       actions={gameActions}

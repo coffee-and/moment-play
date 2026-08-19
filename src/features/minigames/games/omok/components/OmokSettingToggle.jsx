@@ -1,8 +1,10 @@
+import { omokClassName as cx } from "../omokStyles.js";
+
 export function OmokSettingToggle({ checked, disabled = false, label, onChange }) {
   return (
     <button
       aria-pressed={checked}
-      className={`omok-game__setting-toggle${checked ? " is-on" : ""}`}
+      className={cx(`omok-game__setting-toggle${checked ? " is-on" : ""}`)}
       disabled={disabled}
       onClick={() => onChange(!checked)}
       type="button"

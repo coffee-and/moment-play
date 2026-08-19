@@ -1,23 +1,24 @@
 import { GameItemPanel } from "../../shared/components/GameItemPanel.jsx";
 import { MEMORY_PHASE, MEMORY_SYMBOLS } from "./memoryGameConfig.js";
+import { memoryClassName as cx } from "./memoryStyles.js";
 
 function MemorySymbol({ value }) {
-  return <span className="memory-symbol" aria-hidden="true">{value}</span>;
+  return <span className={cx("memory-symbol")} aria-hidden="true">{value}</span>;
 }
 
 function MemoryPedestal() {
   return (
-    <span className="memory-sequence__platform memory-pedestal" aria-hidden="true">
-      <span className="memory-pedestal__shadow" />
-      <span className="memory-pedestal__body" />
-      <span className="memory-pedestal__top" />
+    <span className={cx("memory-sequence__platform memory-pedestal")} aria-hidden="true">
+      <span className={cx("memory-pedestal__shadow")} />
+      <span className={cx("memory-pedestal__body")} />
+      <span className={cx("memory-pedestal__top")} />
     </span>
   );
 }
 
 function StopwatchIcon() {
   return (
-    <svg aria-hidden="true" className="memory-game__clock-icon" fill="none" viewBox="0 0 24 24">
+    <svg aria-hidden="true" className={cx("memory-game__clock-icon")} fill="none" viewBox="0 0 24 24">
       <path d="M12 8v5l3 2M9 3h6M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
     </svg>
   );
@@ -25,12 +26,12 @@ function StopwatchIcon() {
 
 function CorrectBurst() {
   return (
-    <span className="memory-card__success" aria-hidden="true">
-      <span className="memory-card__success-ring" />
+    <span className={cx("memory-card__success")} aria-hidden="true">
+      <span className={cx("memory-card__success-ring")} />
       {Array.from({ length: 8 }, (_, index) => (
-        <span className="memory-card__success-particle" key={index} style={{ "--memory-particle-index": index }} />
+        <span className={cx("memory-card__success-particle")} key={index} style={{ "--memory-particle-index": index }} />
       ))}
-      <span className="memory-card__success-label">GOOD!</span>
+      <span className={cx("memory-card__success-label")}>GOOD!</span>
     </span>
   );
 }
@@ -52,16 +53,16 @@ export function MemoryGameBoard({
   const shouldShowTimer = phase === MEMORY_PHASE.PREVIEW || phase === MEMORY_PHASE.PLAYING;
 
   return (
-    <div className="memory-game__stage-content">
+    <div className={cx("memory-game__stage-content")}>
       {phase !== MEMORY_PHASE.IDLE ? (
-        <div className="memory-game__play-shell" data-memory-count={data.count} data-phase={phase}>
-          <div className="memory-game__timer-row">
+        <div className={cx("memory-game__play-shell")} data-memory-count={data.count} data-phase={phase}>
+          <div className={cx("memory-game__timer-row")}>
             {shouldShowTimer ? (
               <div
-                className={`memory-game__clock${isTimerUrgent ? " is-urgent" : ""}`}
+                className={cx(`memory-game__clock${isTimerUrgent ? " is-urgent" : ""}`)}
                 aria-label={`남은 시간 ${timerText}초`}
               >
-                <span className="memory-game__clock-body">
+                <span className={cx("memory-game__clock-body")}>
                   <StopwatchIcon />
                   <span>{timerText}</span>
                 </span>
@@ -71,11 +72,11 @@ export function MemoryGameBoard({
           <GameItemPanel
             title={`${round} ROUND`}
             variant="problem"
-            className="memory-game__problem-panel"
+            className={cx("memory-game__problem-panel")}
             ariaLabel={`${round}라운드 기억할 순서`}
           >
             <div
-              className="memory-sequence"
+              className={cx("memory-sequence")}
               data-count={data.count}
               data-density={sequenceDensity}
               aria-label="기억해야 할 이모지 순서"
@@ -84,13 +85,13 @@ export function MemoryGameBoard({
                 const revealed = shouldReveal(index);
                 return (
                   <div
-                    className={`memory-sequence__item${revealed ? " is-revealed" : " is-empty"}`}
+                    className={cx(`memory-sequence__item${revealed ? " is-revealed" : " is-empty"}`)}
                     data-revealed={revealed ? "true" : "false"}
                     data-symbol-id={item.id}
                     key={`${round}-${item.id}-${index}`}
                     aria-label={revealed ? `${item.name}, 순서 ${index + 1}` : `${index + 1}번째 순서, 아직 맞히지 않음`}
                   >
-                    <span className="memory-sequence__display">
+                    <span className={cx("memory-sequence__display")}>
                       {revealed ? <MemorySymbol value={item.symbol} /> : null}
                     </span>
                     <MemoryPedestal />
@@ -102,22 +103,22 @@ export function MemoryGameBoard({
           <GameItemPanel
             title="순서대로 선택하세요"
             variant="selection"
-            className="memory-game__selection-panel"
+            className={cx("memory-game__selection-panel")}
             ariaLabel="선택할 이모지"
           >
-            <div className="memory-card-grid">
+            <div className={cx("memory-card-grid")}>
               {MEMORY_SYMBOLS.map((symbol) => {
                 const showFeedback = correctFeedback?.symbolId === symbol.id;
                 return (
                   <button
                     type="button"
-                    className="memory-card"
+                    className={cx("memory-card")}
                     key={symbol.id}
                     onClick={(event) => onChoose(symbol, event)}
                     disabled={phase !== MEMORY_PHASE.PLAYING}
                     aria-label={`${symbol.name} 선택`}
                   >
-                    <span className="memory-card__content">
+                    <span className={cx("memory-card__content")}>
                       <MemorySymbol value={symbol.symbol} />
                     </span>
                     {showFeedback ? <CorrectBurst key={correctFeedback.sequence} /> : null}
@@ -125,7 +126,7 @@ export function MemoryGameBoard({
                 );
               })}
             </div>
-            <span className="visually-hidden" aria-live="polite">{correctAnnouncement}</span>
+            <span className={cx("visually-hidden")} aria-live="polite">{correctAnnouncement}</span>
           </GameItemPanel>
         </div>
       ) : null}

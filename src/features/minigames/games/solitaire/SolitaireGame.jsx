@@ -26,7 +26,10 @@ import {
   SOLITAIRE_DRAW_COUNT,
   SOLITAIRE_SUITS,
 } from "./solitaire.logic.js";
-import "./solitaire.css";
+import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
+import styles from "./solitaire.module.css";
+
+const cx = bindCssModule(styles);
 
 const EMPTY_DIFFICULTY_RECORD = { bestTimeSeconds: null, completedCount: 0 };
 const DIFFICULTY_COPY = {
@@ -126,25 +129,25 @@ function PlayingCard({ card, className = "", onClick, onDoubleClick, source, sty
   } : {};
 
   if (!card.faceUp) {
-    return <span aria-label="뒤집힌 카드" className={`solitaire-card is-back ${className}`} style={style}><span /></span>;
+    return <span aria-label="뒤집힌 카드" className={cx(`solitaire-card is-back ${className}`)} style={style}><span /></span>;
   }
 
   return (
     <button
       aria-label={`${getSolitaireRankLabel(card.rank)} ${card.symbol}`}
-      className={`solitaire-card is-front is-${card.color} ${className}`}
+      className={cx(`solitaire-card is-front is-${card.color} ${className}`)}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       style={style}
       type="button"
       {...sourceProps}
     >
-      <span className="solitaire-card__corner">
+      <span className={cx("solitaire-card__corner")}>
         <strong>{getSolitaireRankLabel(card.rank)}</strong>
         <span>{card.symbol}</span>
       </span>
-      <span className="solitaire-card__suit" aria-hidden="true">{card.symbol}</span>
-      <span className="solitaire-card__corner is-bottom" aria-hidden="true">
+      <span className={cx("solitaire-card__suit")} aria-hidden="true">{card.symbol}</span>
+      <span className={cx("solitaire-card__corner is-bottom")} aria-hidden="true">
         <strong>{getSolitaireRankLabel(card.rank)}</strong>
         <span>{card.symbol}</span>
       </span>
@@ -387,20 +390,20 @@ export function SolitaireGame({ game }) {
   }
 
   const actions = (
-    <div className="game-stage__inline-actions">
+    <div className={cx("game-stage__inline-actions")}>
       {phase === "playing" ? <Button variant="secondary" onClick={() => setIsNewGameOpen(true)}>새 게임</Button> : null}
       <Button variant="secondary" onClick={requestExit}>게임 나가기</Button>
     </div>
   );
   const sidebar = (
     <>
-      <div className="stat-row">
-        <div className="stat"><div className="l">Mode</div><div className="v"><small>{DIFFICULTY_COPY[difficulty].label}</small></div></div>
-        <div className="stat"><div className="l">Time</div><div className="v">{time}</div></div>
-        <div className="stat"><div className="l">Moves</div><div className="v">{moves}</div></div>
-        <div className="stat"><div className="l">Best</div><div className="v">{formatRecordTime(difficultyRecord.bestTimeSeconds)}</div></div>
+      <div className={cx("stat-row")}>
+        <div className={cx("stat")}><div className={cx("l")}>Mode</div><div className={cx("v")}><small>{DIFFICULTY_COPY[difficulty].label}</small></div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Time</div><div className={cx("v")}>{time}</div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Moves</div><div className={cx("v")}>{moves}</div></div>
+        <div className={cx("stat")}><div className={cx("l")}>Best</div><div className={cx("v")}>{formatRecordTime(difficultyRecord.bestTimeSeconds)}</div></div>
       </div>
-      <p className="game-stage__side-note">
+      <p className={cx("game-stage__side-note")}>
         {SOLITAIRE_DRAW_COUNT[difficulty]}장씩 공개 · 완료 {difficultyRecord.completedCount}회
       </p>
     </>
@@ -410,59 +413,59 @@ export function SolitaireGame({ game }) {
     <GameStage
       actions={actions}
       ariaLabel="솔리테어 게임"
-      className="solitaire-game"
+      className={cx("solitaire-game")}
       eyebrow="CARD / KLONDIKE"
       sidebar={sidebar}
       title={game.title}
     >
       <div
-        className={`solitaire-game__board${selection ? " has-selection" : ""}`}
+        className={cx(`solitaire-game__board${selection ? " has-selection" : ""}`)}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         role="application"
         aria-label="클론다이크 솔리테어 카드판"
       >
-        <div className="solitaire-game__top">
-          <div className="solitaire-game__draw-piles">
+        <div className={cx("solitaire-game__top")}>
+          <div className={cx("solitaire-game__draw-piles")}>
             <button
               aria-label={board.stock.length ? `스톡 ${board.stock.length}장, 카드 공개` : "버린 카드 다시 섞기"}
-              className={`solitaire-pile solitaire-stock${board.stock.length ? " has-cards" : ""}${hint.currentStep?.showStock ? " is-hint-target" : ""}`}
+              className={cx(`solitaire-pile solitaire-stock${board.stock.length ? " has-cards" : ""}${hint.currentStep?.showStock ? " is-hint-target" : ""}`)}
               disabled={phase !== "playing" || (!board.stock.length && !board.waste.length)}
               onClick={drawStock}
               type="button"
             >
-              {board.stock.length ? <span className="solitaire-card is-back"><span /></span> : <span className="solitaire-stock__reset">↻</span>}
+              {board.stock.length ? <span className={cx("solitaire-card is-back")}><span /></span> : <span className={cx("solitaire-stock__reset")}>↻</span>}
             </button>
-            <div className="solitaire-pile solitaire-waste" aria-label="버린 카드">
+            <div className={cx("solitaire-pile solitaire-waste")} aria-label="버린 카드">
               {board.waste.slice(-3).map((card, index, shownCards) => {
                 const isTop = index === shownCards.length - 1;
                 return isTop ? (
                   <PlayingCard
                     card={card}
-                    className={`is-waste is-offset-${index}${isHintSource({ type: "waste" }) ? " is-hint-target" : ""}`}
+                    className={cx(`is-waste is-offset-${index}${isHintSource({ type: "waste" }) ? " is-hint-target" : ""}`)}
                     key={card.id}
                     onClick={() => chooseSource({ type: "waste" })}
                     onDoubleClick={() => moveToFoundation({ type: "waste" })}
                     source={{ type: "waste" }}
                   />
                 ) : (
-                  <span className={`solitaire-card is-front is-${card.color} is-waste is-offset-${index}`} key={card.id}>
-                    <span className="solitaire-card__corner"><strong>{getSolitaireRankLabel(card.rank)}</strong><span>{card.symbol}</span></span>
+                  <span className={cx(`solitaire-card is-front is-${card.color} is-waste is-offset-${index}`)} key={card.id}>
+                    <span className={cx("solitaire-card__corner")}><strong>{getSolitaireRankLabel(card.rank)}</strong><span>{card.symbol}</span></span>
                   </span>
                 );
               })}
             </div>
           </div>
 
-          <div className="solitaire-game__foundations" aria-label="완성 카드 칸">
+          <div className={cx("solitaire-game__foundations")} aria-label="완성 카드 칸">
             {SOLITAIRE_SUITS.map((suit) => {
               const foundation = board.foundations[suit.id];
               const topCard = foundation.at(-1);
               const source = { type: "foundation", suit: suit.id };
               return (
                 <div
-                  className={`solitaire-pile solitaire-foundation${isHintDestination({ type: "foundation", suit: suit.id }) ? " is-hint-target" : ""}`}
+                  className={cx(`solitaire-pile solitaire-foundation${isHintDestination({ type: "foundation", suit: suit.id }) ? " is-hint-target" : ""}`)}
                   data-drop-type="foundation"
                   data-drop-suit={suit.id}
                   key={suit.id}
@@ -470,14 +473,14 @@ export function SolitaireGame({ game }) {
                   {topCard ? (
                     <PlayingCard
                       card={topCard}
-                      className={selection?.type === "foundation" && selection.suit === suit.id ? "is-selected" : ""}
+                      className={cx(selection?.type === "foundation" && selection.suit === suit.id ? "is-selected" : "")}
                       onClick={() => chooseSource(source)}
                       source={source}
                     />
                   ) : (
                     <button
                       aria-label={`${suit.label} 완성 카드 칸`}
-                      className={`solitaire-foundation__empty is-${suit.color}`}
+                      className={cx(`solitaire-foundation__empty is-${suit.color}`)}
                       onClick={() => chooseDestination({ type: "foundation", suit: suit.id })}
                       type="button"
                     >
@@ -490,10 +493,10 @@ export function SolitaireGame({ game }) {
           </div>
         </div>
 
-        <div className="solitaire-game__tableau" aria-label="카드 열">
+        <div className={cx("solitaire-game__tableau")} aria-label="카드 열">
           {board.tableau.map((column, columnIndex) => (
             <div
-              className={`solitaire-tableau-column${isHintDestination({ type: "tableau", column: columnIndex }) ? " is-hint-target" : ""}`}
+              className={cx(`solitaire-tableau-column${isHintDestination({ type: "tableau", column: columnIndex }) ? " is-hint-target" : ""}`)}
               data-drop-type="tableau"
               data-drop-column={columnIndex}
               key={columnIndex}
@@ -501,7 +504,7 @@ export function SolitaireGame({ game }) {
               {column.length === 0 ? (
                 <button
                   aria-label={`${columnIndex + 1}번째 빈 카드 열`}
-                  className="solitaire-tableau-empty"
+                  className={cx("solitaire-tableau-empty")}
                   onClick={() => chooseDestination({ type: "tableau", column: columnIndex })}
                   type="button"
                 >
@@ -516,7 +519,7 @@ export function SolitaireGame({ game }) {
                 return (
                   <PlayingCard
                     card={card}
-                    className={`is-tableau${selected ? " is-selected" : ""}${isHintSource(source) ? " is-hint-target" : ""}`}
+                    className={cx(`is-tableau${selected ? " is-selected" : ""}${isHintSource(source) ? " is-hint-target" : ""}`)}
                     key={card.id}
                     onClick={card.faceUp ? () => chooseSource(source) : undefined}
                     onDoubleClick={card.faceUp && cardIndex === column.length - 1 ? () => moveToFoundation(source) : undefined}
@@ -529,13 +532,13 @@ export function SolitaireGame({ game }) {
           ))}
         </div>
 
-        <p className="solitaire-game__hint">
+        <p className={cx("solitaire-game__hint")}>
           카드를 탭하거나 끌어서 옮기세요. 완성 칸으로 보낼 카드는 두 번 탭할 수 있어요.
         </p>
       </div>
 
       {phase === "playing" ? (
-        <div className="solitaire-game__assist">
+        <div className={cx("solitaire-game__assist")}>
           <PuzzleHintButton hint={hint} />
           <PuzzleHintPanel gameId={game.id} hint={hint} />
         </div>
@@ -543,14 +546,14 @@ export function SolitaireGame({ game }) {
 
       {phase === "idle" ? (
         <GameStageOverlay state="start">
-          <GameStageModal className="solitaire-game__modal" role="dialog" aria-modal="true" aria-labelledby="solitaire-start-title">
+          <GameStageModal className={cx("solitaire-game__modal")} role="dialog" aria-modal="true" aria-labelledby="solitaire-start-title">
             <GameStageDoodle variant="start" />
-            <div className="game-stage-modal__eyebrow">CARD / KLONDIKE</div>
+            <div className={cx("game-stage-modal__eyebrow")}>CARD / KLONDIKE</div>
             <h3 id="solitaire-start-title">오늘의 카드를 정리해볼까요?</h3>
             <p>색을 번갈아 내림차순으로 쌓고, 네 문양을 A부터 K까지 완성하세요.</p>
-            <div className="solitaire-game__difficulty-list" role="group" aria-label="솔리테어 난이도 선택">
+            <div className={cx("solitaire-game__difficulty-list")} role="group" aria-label="솔리테어 난이도 선택">
               {Object.entries(DIFFICULTY_COPY).map(([id, copy]) => (
-                <button className="solitaire-game__difficulty" key={id} onClick={() => startGame(id)} type="button">
+                <button className={cx("solitaire-game__difficulty")} key={id} onClick={() => startGame(id)} type="button">
                   <span>{copy.eyebrow}</span>
                   <strong>{copy.label}</strong>
                   <small>{copy.description}</small>
@@ -566,19 +569,19 @@ export function SolitaireGame({ game }) {
         <GameStageOverlay state="completed">
           <GameStageModal
             celebrationStreak={gameStreak.completionStreak}
-            className="solitaire-game__modal"
+            className={cx("solitaire-game__modal")}
             showCompletionStars
             role="dialog"
             aria-modal="true"
             aria-labelledby="solitaire-complete-title"
           >
             <GameRecordCelebration isNewRecord={isNewRecord} />
-            <div className="game-stage-modal__eyebrow">{isNewRecord ? "NEW RECORD" : "SOLITAIRE CLEAR"}</div>
+            <div className={cx("game-stage-modal__eyebrow")}>{isNewRecord ? "NEW RECORD" : "SOLITAIRE CLEAR"}</div>
             <h3 id="solitaire-complete-title">{streakCopy.title}</h3>
             <p>{streakCopy.subtitle}</p>
             <p>{DIFFICULTY_COPY[difficulty].label} 모드 · {time} · {moves}번 이동</p>
-            {hint.hasUsedHint ? <p className="puzzle-hint-result-label">힌트 사용 · 연습 기록</p> : null}
-            <div className="game-stage-modal__actions">
+            {hint.hasUsedHint ? <p className={cx("puzzle-hint-result-label")}>힌트 사용 · 연습 기록</p> : null}
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={startNextRound}>{NEXT_ROUND_LABEL}</Button>
               <Button variant="secondary" onClick={chooseDifficulty}>난이도 선택</Button>
             </div>
@@ -589,10 +592,10 @@ export function SolitaireGame({ game }) {
       {isNewGameOpen ? (
         <GameStageOverlay state="confirm">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="solitaire-new-title">
-            <div className="game-stage-modal__eyebrow">NEW GAME</div>
+            <div className={cx("game-stage-modal__eyebrow")}>NEW GAME</div>
             <h3 id="solitaire-new-title">새 카드를 받을까요?</h3>
             <p>현재 진행은 저장되지 않고 새 게임이 시작돼요.</p>
-            <div className="game-stage-modal__actions">
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={() => setIsNewGameOpen(false)}>계속하기</Button>
               <Button variant="secondary" onClick={() => startGame(difficulty)}>새 게임</Button>
             </div>
@@ -603,10 +606,10 @@ export function SolitaireGame({ game }) {
       {isExitOpen ? (
         <GameStageOverlay state="confirm">
           <GameStageModal role="dialog" aria-modal="true" aria-labelledby="solitaire-exit-title">
-            <div className="game-stage-modal__eyebrow">LEAVE GAME</div>
+            <div className={cx("game-stage-modal__eyebrow")}>LEAVE GAME</div>
             <h3 id="solitaire-exit-title">게임을 나갈까요?</h3>
             <p>현재 카드 진행은 저장되지 않아요.</p>
-            <div className="game-stage-modal__actions">
+            <div className={cx("game-stage-modal__actions")}>
               <Button onClick={() => setIsExitOpen(false)}>계속하기</Button>
               <Button variant="secondary" onClick={() => {
                 gameStreak.disqualifyRound();

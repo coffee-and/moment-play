@@ -218,18 +218,18 @@
   }
 
   section[data-game-stage].flappy-game [data-stage-slot="game-actions"],
-  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] .game-stage__inline-actions {
+  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] :global(.game-stage__inline-actions) {
     width: 100%;
     min-width: 0;
   }
 
-  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] .game-stage__inline-actions {
+  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] :global(.game-stage__inline-actions) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
     gap: 8px;
   }
 
-  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] .button {
+  section[data-game-stage].flappy-game [data-stage-slot="game-actions"] :global(.button) {
     width: 100%;
     min-width: 0;
     min-height: 40px;
