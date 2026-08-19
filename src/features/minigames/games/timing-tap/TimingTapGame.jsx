@@ -329,7 +329,7 @@ export function TimingTapGame({ game }) {
               width: `${roundConfig.targetWidth}%`,
             }}
           />
-          <span className={cx("timing-tap__needle")} style={{ left: `${needlePosition}%` }} />
+          <span className={cx("timing-tap__needle")} data-timing-needle="" style={{ left: `${needlePosition}%` }} />
           <span className={cx("timing-tap__track-line")} />
           <GameActionFeedback
             announce={false}

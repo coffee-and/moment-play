@@ -2,6 +2,22 @@ import { expect, test } from "@playwright/test";
 import { useAuthenticatedSession } from "./support/supabaseAuth.js";
 
 const THEME_STORAGE_KEY = "momentPlay.theme";
+const AVAILABLE_GAME_IDS = [
+  "2048",
+  "memory",
+  "sudoku",
+  "omok",
+  "flappy",
+  "timing-tap",
+  "glow-sequence",
+  "solitaire",
+  "lits",
+  "shikaku",
+  "minesweeper",
+  "set",
+  "mosaic",
+  "block-blast",
+];
 
 async function openTimingTap(page, { fromCatalog = false } = {}) {
   await useAuthenticatedSession(page);
@@ -30,7 +46,7 @@ async function openMinesweeper(page) {
   await page.getByRole("dialog", { name: "Minesweeper" })
     .getByRole("button", { name: "게임 시작", exact: true })
     .click();
-  await expect(page.locator(".minesweeper-board")).toBeVisible();
+  await expect(page.getByRole("grid", { name: /지뢰찾기 보드/ })).toBeVisible();
 }
 
 async function longPressWithNativeTouch(page, target, durationMs) {
@@ -100,7 +116,7 @@ test("game controls activate from the keyboard and the exit modal pauses play", 
   await page.keyboard.press("Enter");
 
   await expect(page.getByRole("button", { name: /TAP/ })).toBeVisible();
-  const needle = page.locator(".timing-tap__needle");
+  const needle = page.locator("[data-timing-needle]");
   await expect.poll(() => needle.getAttribute("style")).not.toContain("left: 0%");
 
   await page.getByRole("button", { name: "게임 나가기" }).click();
@@ -126,6 +142,22 @@ test("game controls activate from the keyboard and the exit modal pauses play", 
   await expect(page).toHaveURL(/#\/$/);
   expect(await page.goForward()).toBeNull();
   await expect(page.getByRole("button", { name: "게임 시작하기" })).toHaveCount(0);
+});
+
+test.describe("available game routes", () => {
+  for (const gameId of AVAILABLE_GAME_IDS) {
+    test(`${gameId} loads its playable stage without a runtime failure`, async ({ page }) => {
+      const pageErrors = [];
+      page.on("pageerror", (error) => pageErrors.push(error.message));
+      await useAuthenticatedSession(page);
+      await page.goto(`./?browser-test=game-smoke-${gameId}#/minigames/${gameId}`);
+      await page.getByRole("button", { name: "게임 시작하기" }).click();
+
+      await expect(page.locator("section[data-game-stage]")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "게임을 계속할 수 없어요." })).toHaveCount(0);
+      expect(pageErrors).toEqual([]);
+    });
+  }
 });
 
 test("minesweeper touch gestures cancel pending work across movement, pause, and exit", async ({ page }) => {
