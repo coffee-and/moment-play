@@ -126,10 +126,19 @@ export function useGameResultSubmission() {
     void save(pendingResultRef.current);
   }, [save]);
 
+  const invalidateAttempt = useCallback((message) => {
+    attemptRef.current = null;
+    pendingResultRef.current = null;
+    setStatus(RESULT_SUBMISSION_STATUS.ERROR);
+    setErrorMessage(message || "공식 랭킹 조건을 벗어나 로컬 기록으로 계속합니다.");
+  }, []);
+
   return {
     canRetry: Boolean(pendingResultRef.current && attemptRef.current),
     errorMessage,
     isStarting: status === RESULT_SUBMISSION_STATUS.STARTING,
+    isSaving: status === RESULT_SUBMISSION_STATUS.SAVING,
+    invalidateAttempt,
     retry,
     startAttempt,
     status,

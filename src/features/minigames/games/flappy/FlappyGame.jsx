@@ -4,6 +4,7 @@ import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
 import { createRandomSeed } from "../../../../shared/random/deterministicRandom.js";
+import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -32,6 +33,7 @@ import {
 import feedbackStyles from "./flappy-feedback.module.css";
 import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import styles from "./flappy-game.module.css";
+import { useFlappyRankingRun } from "./useFlappyRankingRun.js";
 
 const cx = bindCssModule(styles);
 
@@ -68,6 +70,14 @@ function vibrate(pattern) {
 export function FlappyGame({ game }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
+  const {
+    disqualify: disqualifyRankingRun,
+    finishCourse: finishRankedCourse,
+    finishEndless: finishRankedEndless,
+    recordStep: recordRankedStep,
+    startRun: startRankingRun,
+    submission: rankingSubmission,
+  } = useFlappyRankingRun();
   const [phase, setPhase] = useState("idle");
   const [simulation, setSimulation] = useState(() => createFlappySimulation({
     mode: FLAPPY_SESSION_MODE.COURSE,
@@ -101,6 +111,7 @@ export function FlappyGame({ game }) {
   const resumeAfterDialogRef = useRef(false);
   const feedbackSequenceRef = useRef(0);
   const feedbackTimerRef = useRef(null);
+  const isStartingRef = useRef(false);
 
   phaseRef.current = phase;
   simulationRef.current = simulation;
@@ -132,6 +143,8 @@ export function FlappyGame({ game }) {
       return;
     }
 
+    void finishRankedEndless(finalSimulation);
+
     const metrics = createFlappyEndlessMetrics(finalWorld, finalSession);
     const didBreakRecord = isNewGameRecord({
       previous: endlessBestDurationRef.current,
@@ -147,7 +160,7 @@ export function FlappyGame({ game }) {
         metrics.survivalMs,
       );
     }
-  }, [playSound]);
+  }, [finishRankedEndless, playSound]);
 
   const completeCourse = useCallback((finalSimulation) => {
     const { world: finalWorld } = finalSimulation;
@@ -174,7 +187,8 @@ export function FlappyGame({ game }) {
         metrics.courseScore,
       );
     }
-  }, [playSound]);
+    void finishRankedCourse(finalSimulation);
+  }, [finishRankedCourse, playSound]);
 
   useEffect(() => {
     if (phase !== "playing") return undefined;
@@ -188,12 +202,16 @@ export function FlappyGame({ game }) {
 
       let didAdvance = false;
       while (frameAccumulatorRef.current >= FLAPPY_SIMULATION_TICK_MS) {
+        const flapTick = pendingFlapRef.current
+          ? simulationRef.current.tick
+          : null;
         const result = advanceFlappySimulation(simulationRef.current, {
           flap: pendingFlapRef.current,
         });
         pendingFlapRef.current = false;
         frameAccumulatorRef.current -= FLAPPY_SIMULATION_TICK_MS;
         simulationRef.current = result.simulation;
+        recordRankedStep({ flapTick, simulation: result.simulation });
         didAdvance = true;
 
         if (result.scored > 0) {
@@ -268,32 +286,37 @@ export function FlappyGame({ game }) {
 
     frameRef.current = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frameRef.current);
-  }, [completeCourse, finishFlight, phase, playSound, showFlightFeedback]);
+  }, [completeCourse, finishFlight, phase, playSound, recordRankedStep, showFlightFeedback]);
 
   useEffect(() => () => {
     window.cancelAnimationFrame(frameRef.current);
     window.clearTimeout(feedbackTimerRef.current);
   }, []);
 
-  function startFlight(mode) {
-    const initialSimulation = createFlappySimulation({
-      mode,
-      seed: createRandomSeed(),
-    });
-    simulationRef.current = initialSimulation;
-    frameAccumulatorRef.current = 0;
-    pendingFlapRef.current = false;
-    phaseRef.current = "playing";
-    setSimulation(initialSimulation);
-    if (mode === FLAPPY_SESSION_MODE.COURSE) setCourseMetrics(null);
-    setEndlessMetrics(null);
-    setDidBreakRecordThisAttempt(false);
-    setIsExitOpen(false);
-    setActionFeedback(null);
-    window.clearTimeout(feedbackTimerRef.current);
-    setPhase("playing");
-    playSound("countdownFinal");
-    vibrate(8);
+  async function startFlight(mode) {
+    if (isStartingRef.current) return;
+    isStartingRef.current = true;
+    try {
+      const run = await startRankingRun(mode);
+      if (!run) return;
+      const initialSimulation = createFlappySimulation({ mode, seed: run.seed });
+      simulationRef.current = initialSimulation;
+      frameAccumulatorRef.current = 0;
+      pendingFlapRef.current = false;
+      phaseRef.current = "playing";
+      setSimulation(initialSimulation);
+      if (mode === FLAPPY_SESSION_MODE.COURSE) setCourseMetrics(null);
+      setEndlessMetrics(null);
+      setDidBreakRecordThisAttempt(false);
+      setIsExitOpen(false);
+      setActionFeedback(null);
+      window.clearTimeout(feedbackTimerRef.current);
+      setPhase("playing");
+      playSound("countdownFinal");
+      vibrate(8);
+    } finally {
+      isStartingRef.current = false;
+    }
   }
 
   function startCourse() {
@@ -312,6 +335,7 @@ export function FlappyGame({ game }) {
   }
 
   function pauseGame() {
+    disqualifyRankingRun("일시정지한 비행은 로컬 기록으로만 계속됩니다.");
     phaseRef.current = "paused";
     setPhase("paused");
   }
@@ -339,6 +363,18 @@ export function FlappyGame({ game }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   });
 
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (!document.hidden || phaseRef.current !== "playing") return;
+      disqualifyRankingRun("백그라운드로 전환된 비행은 로컬 기록으로만 계속됩니다.");
+      phaseRef.current = "paused";
+      setPhase("paused");
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [disqualifyRankingRun]);
+
   function requestExit() {
     if (phase === "idle" || phase === "courseComplete" || phase === "over") {
       navigateFromGame("/");
@@ -359,6 +395,7 @@ export function FlappyGame({ game }) {
   const displayedTime = isEndless
     ? formatFlappyClock(session.totalElapsedMs)
     : formatFlappyClock(getFlappyTimeRemainingMs(session));
+  const isRankingBusy = rankingSubmission.isStarting || rankingSubmission.isSaving;
 
   const sidebar = (
     <div className={cx("stat-row")}>
@@ -462,7 +499,9 @@ export function FlappyGame({ game }) {
             <div className={cx("game-stage-modal__eyebrow")}>ARCADE / FLIGHT</div>
             <h3 id="flappy-start-title">별빛 사이를 날아보세요</h3>
             <p>90초씩 5라운드를 통과하면 무한 비행이 열려요.</p>
-            <Button onClick={startCourse}>비행 시작</Button>
+            <Button onClick={startCourse} disabled={isRankingBusy}>
+              {rankingSubmission.isStarting ? "랭킹 비행 준비 중…" : "비행 시작"}
+            </Button>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}
@@ -485,9 +524,10 @@ export function FlappyGame({ game }) {
               {" · "}실수 {courseMetrics?.courseMistakes ?? world.mistakes}회
             </p>
             <p>코스 최고 기록 {Math.max(courseBest, courseMetrics?.courseScore ?? 0)}점</p>
+            <ResultSubmissionStatus submission={rankingSubmission} />
             <div className={cx("game-stage-modal__actions")} data-action-count="2">
-              <Button onClick={startEndless}>무한 비행</Button>
-              <Button variant="secondary" onClick={startCourse}>코스 다시</Button>
+              <Button onClick={startEndless} disabled={isRankingBusy}>무한 비행</Button>
+              <Button variant="secondary" onClick={startCourse} disabled={isRankingBusy}>코스 다시</Button>
             </div>
           </GameStageModal>
         </GameStageOverlay>
@@ -526,7 +566,8 @@ export function FlappyGame({ game }) {
                 ? `최장 생존 ${formatFlappyClock(Math.max(endlessBestDuration, endlessMetrics?.survivalMs ?? 0))}`
                 : `${session.round}라운드에서 비행 종료`}
             </p>
-            <Button onClick={startCourse}>코스 다시</Button>
+            <ResultSubmissionStatus submission={rankingSubmission} />
+            <Button onClick={startCourse} disabled={isRankingBusy}>코스 다시</Button>
           </GameStageModal>
         </GameStageOverlay>
       ) : null}

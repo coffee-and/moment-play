@@ -20,7 +20,7 @@
 | Memory Sequence | 최고 완료 라운드 | 운영 중 | 점수 높은 순 |
 | Sudoku | 전체·난이도별 완료 횟수와 최단 시간 | 운영 중 | 난이도별 완료 시간 짧은 순 |
 | Omok | 없음 | 미도입 | 서버 확정 대국 결과를 이용한 레이팅 체계가 선행되어야 함 |
-| Star Flight | 코스 최고 점수, 무한 비행 최장 생존 시간 | 구현 진행 중 | 코스: 점수·콤보·실수, 무한: 생존 시간·점수·게이트 |
+| Star Flight | 코스 최고 점수, 무한 비행 최장 생존 시간 | 운영 중 | 코스: 점수·콤보·실수, 무한: 생존 시간·점수·게이트 |
 | Timing Tap | 최고 점수 | 로컬 전용 | 향후 점수 높은 순 |
 | Glow Sequence | 최고 완료 라운드 | 로컬 전용 | 향후 완료 라운드·실수 기준 |
 | Solitaire | 난이도별 완료 횟수와 최단 시간 | 로컬 전용 | 향후 난이도별 완료 시간 짧은 순 |
@@ -33,7 +33,7 @@
 
 ## 현재 운영 중인 공식 랭킹
 
-모든 현재 보드는 `all-time`, 규칙 버전 `1`을 사용한다. 클라이언트 등록 정보는 `src/features/ranking/rankingRegistry.js`, 서버 보드와 검증 계약은 `supabase/migrations/20260820063057_generalize_ranked_game_results.sql`에 있다.
+모든 현재 보드는 `all-time`, 규칙 버전 `1`을 사용한다. 클라이언트 등록 정보는 `src/features/ranking/rankingRegistry.js`, 공용 서버 계약은 `supabase/migrations/20260820063057_generalize_ranked_game_results.sql`, Star Flight 검증 계약은 `supabase/migrations/20260820084728_add_ranked_star_flight_verification.sql`에 있다.
 
 ### 2048
 
@@ -65,7 +65,7 @@
 
 ## Star Flight 랭킹 계약
 
-Star Flight는 결정론적 20ms 고정 틱 시뮬레이션과 시드 기반 재생 기반을 갖췄지만 아직 공식 랭킹 레지스트리와 DB 보드가 공개되지 않았다. 아래 내용은 현재 구현 중인 계약이며 완료 전까지 기존 로컬 기록만 유효하다.
+Star Flight는 결정론적 20ms 고정 틱 시뮬레이션과 서버 시드 기반 재생을 사용한다. 공식 랭킹은 `flappy / course`, `flappy / endless` 두 보드로 분리되며 로컬 최고 기록과 별도로 저장된다.
 
 ### 코스 랭킹
 
@@ -90,6 +90,8 @@ Star Flight는 결정론적 20ms 고정 틱 시뮬레이션과 시드 기반 재
 - 틱 목록은 정렬·중복·범위·종료 뒤 입력·최대 크기를 검증한다.
 - 일시정지나 백그라운드 전환이 발생한 플레이는 공식 기록 자격을 잃는다. 서버 경과 시간과 재생 시간이 허용 범위를 벗어나도 거부한다.
 - 무한 비행은 최종 한 번에 무제한 입력을 제출하지 않고 검증 가능한 구간 단위 체크포인트로 나눈다.
+- 클라이언트는 20초 단위로 체크포인트를 직렬 전송하며 서버는 구간당 최대 30초만 허용한다. 마지막 충돌 구간까지 서버가 `over`로 재생한 뒤에만 최종 결과를 확정한다.
+- 새 랭킹 시도를 시작하면 같은 보드의 이전 열린 시도는 `abandoned`로 종료되고 새 시도 ID를 발급한다. 이전 요청이 늦게 도착해도 새 비행에 합쳐지지 않는다.
 
 ## 아직 공식 랭킹이 없는 게임
 
@@ -131,7 +133,7 @@ Easy는 한 장, Hard는 세 장씩 뽑으며 난이도별 완료 횟수와 최�
 - 로컬 기록 키: `src/shared/storage/localStorageRegistry.js`
 - 공식 랭킹 보드와 표시 형식: `src/features/ranking/rankingRegistry.js`
 - 공용 제출 흐름: `src/features/ranking/useGameResultSubmission.js`
-- 서버 보드·시도·검증·조회 계약: `supabase/migrations/20260820063057_generalize_ranked_game_results.sql`
+- 서버 보드·시도·검증·조회 계약: `supabase/migrations/20260820063057_generalize_ranked_game_results.sql`, `supabase/migrations/20260820084728_add_ranked_star_flight_verification.sql`
 - DB 계약 검사: `supabase/tests/phase3_game_results_test.sql`
 
 게임을 공식 랭킹에 추가할 때는 레지스트리만 늘리지 않는다. 서버 보드 등록, 시도 발급, 결정론적 검증기, 지표 산출, 클라이언트 제출, 랭킹 표시, 악성 증거 DB 계약 검사를 한 기능 단위로 함께 추가한다.

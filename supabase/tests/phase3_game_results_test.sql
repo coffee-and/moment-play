@@ -244,6 +244,50 @@ select throws_ok(
   'callers cannot choose an unregistered rules version'
 );
 
+select set_config(
+  'phase3.replaced_attempt_id',
+  public.begin_ranked_game('2048', 'classic', '1', '{}'::jsonb) ->> 'attemptId',
+  true
+);
+
+select set_config(
+  'phase3.replacement_attempt_id',
+  public.begin_ranked_game('2048', 'classic', '1', '{}'::jsonb) ->> 'attemptId',
+  true
+);
+
+select isnt(
+  current_setting('phase3.replaced_attempt_id'),
+  current_setting('phase3.replacement_attempt_id'),
+  'restarting a ranking board receives a fresh attempt identity'
+);
+
+reset role;
+
+select ok(
+  exists (
+    select 1
+    from private.ranked_game_attempts as attempt
+    where attempt.id = current_setting('phase3.replaced_attempt_id')::uuid
+      and attempt.status = 'abandoned'
+      and attempt.completed_at is not null
+      and attempt.client_submission_id is null
+  ),
+  'a replaced attempt is closed without masquerading as a result'
+);
+
+set local role authenticated;
+
+select throws_ok(
+  $$select public.complete_ranked_game(
+      current_setting('phase3.replaced_attempt_id')::uuid,
+      '30000000-0000-4000-8000-000000000014',
+      '{"moves":[]}'::jsonb
+    )$$,
+  'P0001', 'Ranked game attempt is no longer active',
+  'late evidence cannot complete a replaced attempt'
+);
+
 select lives_ok(
   $$select set_config(
       'phase3.sudoku_begin_response',
@@ -448,12 +492,11 @@ reset role;
 
 update private.ranked_game_attempts
 set seed = 12345,
-    started_at = clock_timestamp() - interval '3.02 seconds'
+    started_at = clock_timestamp() - interval '30 seconds'
 where id = current_setting('phase3.flappy_endless_attempt_id')::uuid;
 
 update private.ranked_flappy_checkpoints
-set state = private.create_ranked_flappy_state(12345, 'endless'),
-    updated_at = clock_timestamp() - interval '30 seconds'
+set state = private.create_ranked_flappy_state(12345, 'endless')
 where attempt_id = current_setting('phase3.flappy_endless_attempt_id')::uuid;
 
 select set_config(
@@ -494,9 +537,9 @@ select throws_ok(
 );
 
 reset role;
-update private.ranked_flappy_checkpoints
-set updated_at = clock_timestamp() - interval '3.02 seconds'
-where attempt_id = current_setting('phase3.flappy_endless_attempt_id')::uuid;
+update private.ranked_game_attempts
+set started_at = clock_timestamp() - interval '3.02 seconds'
+where id = current_setting('phase3.flappy_endless_attempt_id')::uuid;
 set local role authenticated;
 
 select lives_ok(

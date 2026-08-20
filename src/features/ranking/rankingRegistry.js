@@ -3,6 +3,7 @@ export const RANKING_PATH = "/ranking";
 export const RANKING_GAME = Object.freeze({
   GAME_2048: "2048",
   MEMORY: "memory",
+  STAR_FLIGHT: "flappy",
   SUDOKU: "sudoku",
 });
 
@@ -52,6 +53,22 @@ export const RANKING_BOARD = Object.freeze({
     "score",
     formatScore,
   ),
+  STAR_FLIGHT_COURSE: createBoard(
+    RANKING_GAME.STAR_FLIGHT,
+    "course",
+    "Course",
+    "점수",
+    "courseScore",
+    formatScore,
+  ),
+  STAR_FLIGHT_ENDLESS: createBoard(
+    RANKING_GAME.STAR_FLIGHT,
+    "endless",
+    "Endless",
+    "생존 시간",
+    "survivalMs",
+    formatDuration,
+  ),
   SUDOKU_EASY: createBoard(
     RANKING_GAME.SUDOKU,
     "easy",
@@ -88,6 +105,14 @@ export const RANKING_GAMES = Object.freeze([
     gameKey: RANKING_GAME.MEMORY,
     label: "Memory Order",
     boards: Object.freeze([RANKING_BOARD.MEMORY_STANDARD]),
+  }),
+  Object.freeze({
+    gameKey: RANKING_GAME.STAR_FLIGHT,
+    label: "Star Flight",
+    boards: Object.freeze([
+      RANKING_BOARD.STAR_FLIGHT_COURSE,
+      RANKING_BOARD.STAR_FLIGHT_ENDLESS,
+    ]),
   }),
   Object.freeze({
     gameKey: RANKING_GAME.SUDOKU,

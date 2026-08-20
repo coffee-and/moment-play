@@ -13,6 +13,24 @@ values
   ('flappy', 'course', '1', 'all-time'),
   ('flappy', 'endless', '1', 'all-time');
 
+alter table private.ranked_game_attempts
+drop constraint ranked_game_attempts_status_check;
+
+alter table private.ranked_game_attempts
+add constraint ranked_game_attempts_status_check
+check (status in ('open', 'completed', 'abandoned'));
+
+alter table private.ranked_game_attempts
+drop constraint ranked_game_attempts_lifecycle_check;
+
+alter table private.ranked_game_attempts
+add constraint ranked_game_attempts_lifecycle_check
+check (
+  (status = 'open' and completed_at is null and client_submission_id is null)
+  or (status = 'completed' and completed_at is not null and client_submission_id is not null)
+  or (status = 'abandoned' and completed_at is not null and client_submission_id is null)
+);
+
 create table private.ranked_flappy_checkpoints (
   attempt_id uuid primary key
     references private.ranked_game_attempts(id) on delete cascade,
@@ -548,6 +566,14 @@ begin
     raise exception 'Unsupported ranking board';
   end if;
 
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      current_user_id::text || ':' || p_game_key || ':' || p_board_key,
+      0
+    )
+  );
+  attempt_started_at := clock_timestamp();
+
   attempt_challenge_key := case selected_board.challenge_policy
     when 'all-time' then 'all-time'
     when 'daily' then to_char(attempt_started_at at time zone 'UTC', 'YYYY-MM-DD')
@@ -604,6 +630,14 @@ begin
     raise exception 'Ranking board verifier is not implemented';
   end if;
 
+  update private.ranked_game_attempts as previous_attempt
+  set status = 'abandoned',
+      completed_at = attempt_started_at
+  where previous_attempt.user_id = current_user_id
+    and previous_attempt.game_key = p_game_key
+    and previous_attempt.board_key = p_board_key
+    and previous_attempt.status = 'open';
+
   insert into private.ranked_game_attempts (
     user_id,
     game_key,
@@ -626,16 +660,6 @@ begin
     attempt_started_at,
     attempt_started_at + interval '24 hours'
   )
-  on conflict (user_id, game_key, board_key) where status = 'open'
-  do update
-  set challenge_key = excluded.challenge_key,
-      rules_version = excluded.rules_version,
-      seed = excluded.seed,
-      context = excluded.context,
-      started_at = excluded.started_at,
-      expires_at = excluded.expires_at,
-      completed_at = null,
-      client_submission_id = null
   returning id into attempt_id;
 
   if p_game_key = 'flappy' and p_board_key = 'endless' then
@@ -697,8 +721,8 @@ declare
   checkpoint private.ranked_flappy_checkpoints%rowtype;
   next_state jsonb;
   next_status text;
-  simulated_delta_ms bigint;
-  server_delta_ms bigint;
+  simulated_elapsed_ms bigint;
+  server_elapsed_ms bigint;
 begin
   if current_user_id is null
     or coalesce((auth.jwt() ->> 'is_anonymous')::boolean, true) then
@@ -767,14 +791,14 @@ begin
     raise exception 'Star Flight checkpoint range is invalid';
   end if;
 
-  simulated_delta_ms := (p_to_tick - checkpoint.tick) * 20;
-  server_delta_ms := floor(
-    extract(epoch from (clock_timestamp() - checkpoint.updated_at)) * 1000
+  simulated_elapsed_ms := p_to_tick * 20;
+  server_elapsed_ms := floor(
+    extract(epoch from (clock_timestamp() - attempt.started_at)) * 1000
   )::bigint;
-  if server_delta_ms + 2000 < simulated_delta_ms then
+  if server_elapsed_ms + 2000 < simulated_elapsed_ms then
     raise exception 'Star Flight checkpoint advances faster than server time';
   end if;
-  if server_delta_ms > simulated_delta_ms + 15000 then
+  if server_elapsed_ms > simulated_elapsed_ms + 15000 then
     raise exception 'Star Flight endless run was not continuously active';
   end if;
 
