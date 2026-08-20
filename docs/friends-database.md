@@ -1,8 +1,8 @@
-# Phase 4 Friendship Database
+# Friendship Database Contract
 
 ## Scope
 
-This phase adds the database and client gateway foundation for friend features. It does not add the `/friends` screen yet.
+This document describes the database and client gateway contract used by the `/friends` screen.
 
 Included:
 
@@ -49,7 +49,7 @@ Run the application tests:
 npm test
 ```
 
-Start the isolated local database and run the Phase 4 database contract:
+Start the isolated local database and run the friendship database contract:
 
 ```sh
 npx supabase db start
@@ -67,14 +67,3 @@ The SQL file opens a transaction, creates isolated users and relationships, runs
 Friend-code fixtures are assigned before the test switches to restricted database roles. This matters because SQL function arguments are evaluated with the caller's permissions: an authenticated user must not query another user's `profiles` row merely to discover the code passed to a SECURITY DEFINER RPC.
 
 The test command returns a non-zero result when an assertion fails or an uncaught SQL exception interrupts the suite. Never add `--linked`; the fixtures must remain isolated from hosted data. See [Database contract tests](./database-contract-tests.md) for the full suite and CI contract.
-
-## Next phase
-
-Phase 4-2 will add the friend page and UI states using `friendsGateway.js`:
-
-- My friend code
-- Friend-code search
-- Incoming requests
-- Outgoing requests
-- Friend list
-- Accept, reject, cancel, and remove actions

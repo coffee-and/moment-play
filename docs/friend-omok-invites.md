@@ -2,7 +2,7 @@
 
 ## Scope
 
-This phase adds the database and client-gateway foundation for inviting an accepted friend to an existing online Omok room. It does not add the invite buttons, inbox UI, or navigation badge yet.
+This document describes the database and client-gateway contract used to invite an accepted friend to an online Omok room. The friend screen and invitation UI consume this contract.
 
 ## Lifecycle
 
@@ -78,13 +78,3 @@ npm run test:db:invites
 
 The pgTAP SQL creates isolated test users, friendships, invites, and rooms inside a transaction and rolls everything back.
 It runs only against the local database; never add `--linked`. See [Database contract tests](./database-contract-tests.md) for the full suite and CI contract.
-
-## Next phase
-
-The follow-up UI phase will:
-
-- Add an Omok invite action to accepted friends
-- Reuse the existing Omok rule and guide settings
-- Show incoming and outgoing invitations
-- Navigate the receiver to `/minigames/omok/room/:roomId` after acceptance
-- Add friendly loading, error, expiry, and duplicate-invite states
