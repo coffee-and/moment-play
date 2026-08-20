@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
+import { createRandomSeed } from "../../../../shared/random/deterministicRandom.js";
 import { GameActionFeedback } from "../../shared/components/GameActionFeedback.jsx";
 import { GameStage } from "../../shared/components/GameStage.jsx";
 import { GameStageDoodle } from "../../shared/components/GameStageDoodle.jsx";
@@ -14,23 +15,20 @@ import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGu
 import { FlappyFish } from "./FlappyFish.jsx";
 import {
   FLAPPY_CONFIG,
-  advanceFlappyState,
-  createInitialFlappyState,
-  flapFlappyState,
-  recoverFlappyState,
 } from "./flappy.logic.js";
 import {
   FLAPPY_SESSION_CONFIG,
   FLAPPY_SESSION_MODE,
-  advanceFlappySession,
   createFlappyCourseMetrics,
-  createFlappyCourseSession,
   createFlappyEndlessMetrics,
-  createFlappyEndlessSession,
   formatFlappyClock,
-  getFlappySessionDifficulty,
   getFlappyTimeRemainingMs,
 } from "./flappySession.js";
+import {
+  FLAPPY_SIMULATION_TICK_MS,
+  advanceFlappySimulation,
+  createFlappySimulation,
+} from "./flappySimulation.js";
 import feedbackStyles from "./flappy-feedback.module.css";
 import { bindCssModule } from "../../../../shared/styles/bindCssModule.js";
 import styles from "./flappy-game.module.css";
@@ -71,8 +69,11 @@ export function FlappyGame({ game }) {
   const navigate = useNavigate();
   const { playSound } = useGameAudio();
   const [phase, setPhase] = useState("idle");
-  const [world, setWorld] = useState(createInitialFlappyState);
-  const [session, setSession] = useState(createFlappyCourseSession);
+  const [simulation, setSimulation] = useState(() => createFlappySimulation({
+    mode: FLAPPY_SESSION_MODE.COURSE,
+    seed: createRandomSeed(),
+  }));
+  const { session, world } = simulation;
   const [courseBest, setCourseBest] = useState(() => (
     readRecord(GAME_RECORD_STORAGE_KEYS.FLAPPY_COURSE_BEST_SCORE)
   ));
@@ -90,19 +91,19 @@ export function FlappyGame({ game }) {
   });
   const [actionFeedback, setActionFeedback] = useState(null);
   const phaseRef = useRef(phase);
-  const worldRef = useRef(world);
-  const sessionRef = useRef(session);
+  const simulationRef = useRef(simulation);
   const courseBestRef = useRef(courseBest);
   const endlessBestDurationRef = useRef(endlessBestDuration);
   const frameRef = useRef(null);
   const lastFrameRef = useRef(0);
+  const frameAccumulatorRef = useRef(0);
+  const pendingFlapRef = useRef(false);
   const resumeAfterDialogRef = useRef(false);
   const feedbackSequenceRef = useRef(0);
   const feedbackTimerRef = useRef(null);
 
   phaseRef.current = phase;
-  worldRef.current = world;
-  sessionRef.current = session;
+  simulationRef.current = simulation;
   courseBestRef.current = courseBest;
   endlessBestDurationRef.current = endlessBestDuration;
 
@@ -117,9 +118,11 @@ export function FlappyGame({ game }) {
     }, durationMs + 30);
   }, []);
 
-  const finishFlight = useCallback((finalWorld, finalSession) => {
+  const finishFlight = useCallback((finalSimulation) => {
+    const { session: finalSession, world: finalWorld } = finalSimulation;
     phaseRef.current = "over";
-    setWorld(finalWorld);
+    simulationRef.current = finalSimulation;
+    setSimulation(finalSimulation);
     setPhase("over");
     playSound("gameOver");
     vibrate([28, 34, 42]);
@@ -146,7 +149,8 @@ export function FlappyGame({ game }) {
     }
   }, [playSound]);
 
-  const completeCourse = useCallback((finalWorld, finalSession) => {
+  const completeCourse = useCallback((finalSimulation) => {
+    const { world: finalWorld } = finalSimulation;
     const metrics = createFlappyCourseMetrics(finalWorld);
     const didBreakRecord = isNewGameRecord({
       previous: courseBestRef.current,
@@ -154,8 +158,8 @@ export function FlappyGame({ game }) {
     });
 
     phaseRef.current = "courseComplete";
-    setWorld(finalWorld);
-    setSession(finalSession);
+    simulationRef.current = finalSimulation;
+    setSimulation(finalSimulation);
     setCourseMetrics(metrics);
     setDidBreakRecordThisAttempt(didBreakRecord);
     setPhase("courseComplete");
@@ -176,85 +180,88 @@ export function FlappyGame({ game }) {
     if (phase !== "playing") return undefined;
 
     lastFrameRef.current = performance.now();
+    frameAccumulatorRef.current = 0;
     function animate(now) {
-      const deltaSeconds = Math.min(Math.max((now - lastFrameRef.current) / 1000, 0), 0.05);
+      const deltaMs = Math.min(Math.max(now - lastFrameRef.current, 0), 100);
       lastFrameRef.current = now;
-      const result = advanceFlappyState(worldRef.current, deltaSeconds, {
-        difficulty: getFlappySessionDifficulty(sessionRef.current),
-      });
-      worldRef.current = result.state;
-      setWorld(result.state);
+      frameAccumulatorRef.current += deltaMs;
 
-      const sessionResult = advanceFlappySession(sessionRef.current, deltaSeconds * 1000);
-      sessionRef.current = sessionResult.session;
-      setSession(sessionResult.session);
-
-      if (result.scored > 0) {
-        playSound("correct");
-        vibrate(12);
-        const nextCombo = result.state.combo;
-        if (nextCombo === 5) {
-          showFlightFeedback({
-            comboLabel: "COMBO ×5",
-            durationMs: 1180,
-            label: "GREAT FLIGHT!",
-            variant: "major",
-          });
-        } else if (nextCombo === 10 || (nextCombo > 10 && nextCombo % 5 === 0)) {
-          showFlightFeedback({
-            durationMs: 1220,
-            label: `COMBO ×${nextCombo}`,
-            showStars: true,
-            variant: "major",
-          });
-        } else if (nextCombo === 3) {
-          showFlightFeedback({
-            durationMs: 1020,
-            label: "COMBO ×3",
-            showStars: true,
-            variant: "combo",
-          });
-        } else {
-          showFlightFeedback({
-            durationMs: 780,
-            label: `+${result.scoreGain}`,
-            showStars: false,
-            variant: "compact",
-          });
-        }
-      }
-
-      if (sessionResult.event === "round-complete") {
-        showFlightFeedback({
-          durationMs: 1200,
-          label: `ROUND ${sessionResult.session.round}`,
-          showStars: true,
-          variant: "major",
+      let didAdvance = false;
+      while (frameAccumulatorRef.current >= FLAPPY_SIMULATION_TICK_MS) {
+        const result = advanceFlappySimulation(simulationRef.current, {
+          flap: pendingFlapRef.current,
         });
-        playSound("success");
-      } else if (sessionResult.event === "course-complete") {
-        completeCourse(result.state, sessionResult.session);
-        return;
-      }
+        pendingFlapRef.current = false;
+        frameAccumulatorRef.current -= FLAPPY_SIMULATION_TICK_MS;
+        simulationRef.current = result.simulation;
+        didAdvance = true;
 
-      if (result.status === "collision") {
-        const recovery = recoverFlappyState(result.state);
-        worldRef.current = recovery.state;
-        setWorld(recovery.state);
-        if (recovery.status === "over") {
-          finishFlight(recovery.state, sessionResult.session);
+        if (result.scored > 0) {
+          playSound("correct");
+          vibrate(12);
+          const nextCombo = result.simulation.world.combo;
+          if (nextCombo === 5) {
+            showFlightFeedback({
+              comboLabel: "COMBO ×5",
+              durationMs: 1180,
+              label: "GREAT FLIGHT!",
+              variant: "major",
+            });
+          } else if (nextCombo === 10 || (nextCombo > 10 && nextCombo % 5 === 0)) {
+            showFlightFeedback({
+              durationMs: 1220,
+              label: `COMBO ×${nextCombo}`,
+              showStars: true,
+              variant: "major",
+            });
+          } else if (nextCombo === 3) {
+            showFlightFeedback({
+              durationMs: 1020,
+              label: "COMBO ×3",
+              showStars: true,
+              variant: "combo",
+            });
+          } else {
+            showFlightFeedback({
+              durationMs: 780,
+              label: `+${result.scoreGain}`,
+              showStars: false,
+              variant: "compact",
+            });
+          }
+        }
+
+        if (result.sessionEvent === "round-complete") {
+          showFlightFeedback({
+            durationMs: 1200,
+            label: `ROUND ${result.simulation.session.round}`,
+            showStars: true,
+            variant: "major",
+          });
+          playSound("success");
+        } else if (result.sessionEvent === "course-complete") {
+          completeCourse(result.simulation);
           return;
         }
-        showFlightFeedback({
-          durationMs: 880,
-          label: recovery.status === "shield" ? "SHIELD SAVE!" : "LIFE -1",
-          showStars: recovery.status === "shield",
-          tone: recovery.status === "shield" ? "neutral" : "negative",
-          variant: "standard",
-        });
-        playSound(recovery.status === "shield" ? "success" : "wrong");
-        vibrate(recovery.status === "shield" ? [10, 20, 10] : [24, 30, 24]);
+
+        if (result.collisionRecovery) {
+          if (result.collisionRecovery === "over") {
+            finishFlight(result.simulation);
+            return;
+          }
+          showFlightFeedback({
+            durationMs: 880,
+            label: result.collisionRecovery === "shield" ? "SHIELD SAVE!" : "LIFE -1",
+            showStars: result.collisionRecovery === "shield",
+            tone: result.collisionRecovery === "shield" ? "neutral" : "negative",
+            variant: "standard",
+          });
+          playSound(result.collisionRecovery === "shield" ? "success" : "wrong");
+          vibrate(result.collisionRecovery === "shield" ? [10, 20, 10] : [24, 30, 24]);
+        }
       }
+
+      if (didAdvance) setSimulation(simulationRef.current);
 
       frameRef.current = window.requestAnimationFrame(animate);
     }
@@ -268,15 +275,17 @@ export function FlappyGame({ game }) {
     window.clearTimeout(feedbackTimerRef.current);
   }, []);
 
-  function startCourse() {
-    const initialWorld = flapFlappyState(createInitialFlappyState());
-    const initialSession = createFlappyCourseSession();
-    worldRef.current = initialWorld;
-    sessionRef.current = initialSession;
+  function startFlight(mode) {
+    const initialSimulation = createFlappySimulation({
+      mode,
+      seed: createRandomSeed(),
+    });
+    simulationRef.current = initialSimulation;
+    frameAccumulatorRef.current = 0;
+    pendingFlapRef.current = false;
     phaseRef.current = "playing";
-    setWorld(initialWorld);
-    setSession(initialSession);
-    setCourseMetrics(null);
+    setSimulation(initialSimulation);
+    if (mode === FLAPPY_SESSION_MODE.COURSE) setCourseMetrics(null);
     setEndlessMetrics(null);
     setDidBreakRecordThisAttempt(false);
     setIsExitOpen(false);
@@ -285,31 +294,19 @@ export function FlappyGame({ game }) {
     setPhase("playing");
     playSound("countdownFinal");
     vibrate(8);
+  }
+
+  function startCourse() {
+    startFlight(FLAPPY_SESSION_MODE.COURSE);
   }
 
   function startEndless() {
-    const initialWorld = flapFlappyState(createInitialFlappyState());
-    const initialSession = createFlappyEndlessSession();
-    worldRef.current = initialWorld;
-    sessionRef.current = initialSession;
-    phaseRef.current = "playing";
-    setWorld(initialWorld);
-    setSession(initialSession);
-    setEndlessMetrics(null);
-    setDidBreakRecordThisAttempt(false);
-    setIsExitOpen(false);
-    setActionFeedback(null);
-    window.clearTimeout(feedbackTimerRef.current);
-    setPhase("playing");
-    playSound("countdownFinal");
-    vibrate(8);
+    startFlight(FLAPPY_SESSION_MODE.ENDLESS);
   }
 
   function flap() {
-    if (phaseRef.current !== "playing") return;
-    const nextWorld = flapFlappyState(worldRef.current);
-    worldRef.current = nextWorld;
-    setWorld(nextWorld);
+    if (phaseRef.current !== "playing" || pendingFlapRef.current) return;
+    pendingFlapRef.current = true;
     playSound("tap");
     vibrate(7);
   }

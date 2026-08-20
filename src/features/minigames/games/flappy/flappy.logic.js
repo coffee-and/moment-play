@@ -1,4 +1,8 @@
 import { getComboAward } from "../../shared/gameProgression.js";
+import {
+  deterministicRandomFraction,
+  normalizeDeterministicSeed,
+} from "../../../../shared/random/deterministicRandom.js";
 
 export const FLAPPY_CONFIG = {
   birdX: 22,
@@ -19,12 +23,16 @@ export const FLAPPY_CONFIG = {
   shieldChargePerGate: 4,
 };
 
-function createPipe(id, x, random) {
+function createPipe(id, x, randomState) {
+  const random = deterministicRandomFraction(randomState);
   return {
-    id,
-    x,
-    gapY: 31 + random() * 38,
-    passed: false,
+    pipe: {
+      id,
+      x,
+      gapY: 31 + random.value * 38,
+      passed: false,
+    },
+    randomState: random.nextSeed,
   };
 }
 
@@ -45,7 +53,13 @@ export function getFlappyPipeSpeed({
   );
 }
 
-export function createInitialFlappyState(random = Math.random) {
+export function createInitialFlappyState(seed = 1) {
+  const firstPipe = createPipe(0, FLAPPY_CONFIG.firstPipeX, normalizeDeterministicSeed(seed));
+  const secondPipe = createPipe(
+    1,
+    FLAPPY_CONFIG.firstPipeX + FLAPPY_CONFIG.pipeSpacing,
+    firstPipe.randomState,
+  );
   return {
     birdY: 50,
     velocity: 0,
@@ -60,10 +74,8 @@ export function createInitialFlappyState(random = Math.random) {
     recoverySeconds: 0,
     recoveryKind: null,
     nextPipeId: 2,
-    pipes: [
-      createPipe(0, FLAPPY_CONFIG.firstPipeX, random),
-      createPipe(1, FLAPPY_CONFIG.firstPipeX + FLAPPY_CONFIG.pipeSpacing, random),
-    ],
+    pipes: [firstPipe.pipe, secondPipe.pipe],
+    randomState: secondPipe.randomState,
   };
 }
 
@@ -93,7 +105,7 @@ export function hasFlappyCollision(state) {
 export function advanceFlappyState(
   state,
   deltaSeconds,
-  { difficulty, random = Math.random } = {},
+  { difficulty } = {},
 ) {
   const delta = Math.min(Math.max(deltaSeconds, 0), 0.05);
   const velocity = state.velocity + FLAPPY_CONFIG.gravity * delta;
@@ -115,12 +127,19 @@ export function advanceFlappyState(
     .filter((pipe) => pipe.x + FLAPPY_CONFIG.pipeWidth > -4);
 
   let nextPipeId = state.nextPipeId;
+  let randomState = state.randomState;
   const lastPipeX = pipes.at(-1)?.x ?? FLAPPY_CONFIG.firstPipeX;
   if (lastPipeX < FLAPPY_CONFIG.firstPipeX) {
+    const nextPipe = createPipe(
+      nextPipeId,
+      lastPipeX + FLAPPY_CONFIG.pipeSpacing,
+      randomState,
+    );
     pipes = [
       ...pipes,
-      createPipe(nextPipeId, lastPipeX + FLAPPY_CONFIG.pipeSpacing, random),
+      nextPipe.pipe,
     ];
+    randomState = nextPipe.randomState;
     nextPipeId += 1;
   }
 
@@ -149,6 +168,7 @@ export function advanceFlappyState(
     recoveryKind: state.recoverySeconds - delta > 0 ? state.recoveryKind : null,
     nextPipeId,
     pipes,
+    randomState,
   };
 
   return {
