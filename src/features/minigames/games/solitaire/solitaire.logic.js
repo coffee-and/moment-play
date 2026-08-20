@@ -42,36 +42,6 @@ export function createSolitaireDeck() {
   ));
 }
 
-export function shuffleSolitaireDeck(deck, random = Math.random) {
-  const shuffled = deck.map((card) => ({ ...card }));
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(random() * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-  }
-  return shuffled;
-}
-
-export function dealSolitaire(random = Math.random) {
-  const deck = shuffleSolitaireDeck(createSolitaireDeck(), random);
-  const tableau = Array.from({ length: 7 }, () => []);
-  let deckIndex = 0;
-
-  for (let column = 0; column < tableau.length; column += 1) {
-    for (let row = 0; row <= column; row += 1) {
-      const card = { ...deck[deckIndex], faceUp: row === column };
-      tableau[column].push(card);
-      deckIndex += 1;
-    }
-  }
-
-  return {
-    stock: deck.slice(deckIndex).map((card) => ({ ...card, faceUp: false })),
-    waste: [],
-    foundations: Object.fromEntries(SOLITAIRE_SUITS.map((suit) => [suit.id, []])),
-    tableau,
-  };
-}
-
 export function canPlaceOnTableau(card, targetCard = null) {
   if (!card) return false;
   if (!targetCard) return card.rank === 13;
@@ -210,39 +180,5 @@ export function getSolitaireSelectionCard(state, selection) {
   if (selection.type === "waste") return state.waste.at(-1) ?? null;
   if (selection.type === "foundation") return state.foundations[selection.suit]?.at(-1) ?? null;
   if (selection.type === "tableau") return state.tableau[selection.column]?.[selection.index] ?? null;
-  return null;
-}
-
-export function findSolitaireHint(state) {
-  const sources = [];
-  if (state.waste.length > 0) sources.push({ type: "waste" });
-  state.tableau.forEach((column, columnIndex) => {
-    column.forEach((card, cardIndex) => {
-      if (card.faceUp && isValidTableauRun(column, cardIndex)) {
-        sources.push({ type: "tableau", column: columnIndex, index: cardIndex });
-      }
-    });
-  });
-
-  for (const source of sources) {
-    const card = getSolitaireSelectionCard(state, source);
-    if (!card) continue;
-    const destination = { type: "foundation", suit: card.suit };
-    if (moveSolitaireSelection(state, source, destination).moved) {
-      return { type: "move", source, destination, card };
-    }
-  }
-
-  for (const source of sources) {
-    const card = getSolitaireSelectionCard(state, source);
-    for (let column = 0; column < state.tableau.length; column += 1) {
-      const destination = { type: "tableau", column };
-      if (moveSolitaireSelection(state, source, destination).moved) {
-        return { type: "move", source, destination, card };
-      }
-    }
-  }
-
-  if (state.stock.length > 0 || state.waste.length > 0) return { type: "draw" };
   return null;
 }

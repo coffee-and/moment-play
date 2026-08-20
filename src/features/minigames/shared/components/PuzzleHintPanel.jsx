@@ -10,7 +10,7 @@ export function PuzzleHintButton({ hint }) {
   );
 }
 
-export function PuzzleHintPanel({ gameId, hint }) {
+export function PuzzleHintPanel({ gameId, hint, onAcceptHint }) {
   if (!hint?.isOpen) return null;
 
   if (!hint.hasUsedHint) {
@@ -21,7 +21,16 @@ export function PuzzleHintPanel({ gameId, hint }) {
           <p>힌트를 사용한 이번 판은 연습 기록으로 남고 공식 랭킹에는 제출되지 않아요.</p>
         </div>
         <div className="puzzle-hint-panel__actions">
-          <Button size="small" type="button" onClick={hint.acceptHint}>힌트 사용하기</Button>
+          <Button
+            size="small"
+            type="button"
+            onClick={() => {
+              onAcceptHint?.();
+              hint.acceptHint();
+            }}
+          >
+            힌트 사용하기
+          </Button>
           <Button size="small" type="button" variant="secondary" onClick={hint.closeHint}>닫기</Button>
         </div>
       </section>

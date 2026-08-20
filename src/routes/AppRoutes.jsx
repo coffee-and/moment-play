@@ -6,7 +6,7 @@ import { SETTINGS_PATH } from "../features/settings/settingsConstants.js";
 import { AUTH_CALLBACK_PATH, LOGIN_PATH, SIGNUP_PATH } from "../shared/auth/authConstants.js";
 import { HomePage } from "../features/minigames/pages/HomePage.jsx";
 import { MINIGAMES_PATH } from "../features/minigames/data/minigameCatalog.js";
-import { RANKING_PATH } from "../features/ranking/rankingConstants.js";
+import { RANKING_PATH } from "../features/ranking/rankingRegistry.js";
 import { LoadingIndicator } from "../shared/components/LoadingIndicator.jsx";
 import { StatusPanel } from "../shared/components/StatusPanel.jsx";
 import { lazyNamedComponent } from "../shared/components/lazyNamedComponent.js";

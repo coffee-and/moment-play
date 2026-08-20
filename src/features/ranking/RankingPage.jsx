@@ -9,29 +9,28 @@ import { StatusPanel } from "../../shared/components/StatusPanel.jsx";
 import {
   formatRankingDate,
   formatRankingValue,
-  getRankingModeLabel,
-  RANKING_GAME,
-  RANKING_GAME_OPTIONS,
-  SUDOKU_RANKING_MODES,
-} from "./rankingConstants.js";
+  getRankingGame,
+  RANKING_GAMES,
+} from "./rankingRegistry.js";
 import styles from "./RankingPage.module.css";
 
 const LOAD_STATUS = { LOADING: "loading", READY: "ready", ERROR: "error" };
 
 export function RankingPage() {
   const { isConfigured, status: authStatus } = useAuth();
-  const [gameKey, setGameKey] = useState(RANKING_GAME.GAME_2048);
-  const [sudokuMode, setSudokuMode] = useState(SUDOKU_RANKING_MODES[0].id);
+  const [gameKey, setGameKey] = useState(RANKING_GAMES[0].gameKey);
+  const [boardKey, setBoardKey] = useState(RANKING_GAMES[0].boards[0].boardKey);
   const [entries, setEntries] = useState([]);
   const [loadStatus, setLoadStatus] = useState(LOAD_STATUS.LOADING);
   const [reloadKey, setReloadKey] = useState(0);
-  const activeGame = RANKING_GAME_OPTIONS.find((game) => game.id === gameKey);
-  const mode = gameKey === RANKING_GAME.SUDOKU ? sudokuMode : null;
+  const activeGame = getRankingGame(gameKey);
+  const activeBoard = activeGame.boards.find((board) => board.boardKey === boardKey)
+    ?? activeGame.boards[0];
 
   const retry = useCallback(() => setReloadKey((value) => value + 1), []);
 
   useEffect(() => {
-    if (gameKey === RANKING_GAME.OMOK || !isConfigured) {
+    if (!isConfigured) {
       setEntries([]);
       setLoadStatus(LOAD_STATUS.READY);
       return undefined;
@@ -39,7 +38,12 @@ export function RankingPage() {
 
     let active = true;
     setLoadStatus(LOAD_STATUS.LOADING);
-    fetchLeaderboard({ gameKey, mode })
+    fetchLeaderboard({
+      boardKey: activeBoard.boardKey,
+      challengeKey: activeBoard.challengeKey,
+      gameKey,
+      rulesVersion: activeBoard.rulesVersion,
+    })
       .then((nextEntries) => {
         if (!active) return;
         setEntries(nextEntries);
@@ -50,7 +54,13 @@ export function RankingPage() {
         setLoadStatus(LOAD_STATUS.ERROR);
       });
     return () => { active = false; };
-  }, [gameKey, isConfigured, mode, reloadKey]);
+  }, [activeBoard, gameKey, isConfigured, reloadKey]);
+
+  function selectGame(nextGameKey) {
+    const nextGame = getRankingGame(nextGameKey);
+    setGameKey(nextGameKey);
+    setBoardKey(nextGame.boards[0].boardKey);
+  }
 
   return (
     <section className={`wrap ${styles.page}`} aria-labelledby="ranking-title">
@@ -68,53 +78,46 @@ export function RankingPage() {
       ) : null}
 
       <div className={styles.filters} role="tablist" aria-label="게임 선택">
-        {RANKING_GAME_OPTIONS.map((game) => (
+        {RANKING_GAMES.map((game) => (
           <button
-            className={`chipf${game.id === gameKey ? " on" : ""}`}
+            className={`chipf${game.gameKey === gameKey ? " on" : ""}`}
             type="button"
             role="tab"
-            aria-selected={game.id === gameKey}
-            key={game.id}
-            onClick={() => setGameKey(game.id)}
+            aria-selected={game.gameKey === gameKey}
+            key={game.gameKey}
+            onClick={() => selectGame(game.gameKey)}
           >
             {game.label}
           </button>
         ))}
       </div>
 
-      {gameKey === RANKING_GAME.SUDOKU ? (
-        <div className={`${styles.filters} ${styles.modeFilters}`} role="group" aria-label="Sudoku 난이도">
-          {SUDOKU_RANKING_MODES.map((modeOption) => (
+      {activeGame.boards.length > 1 ? (
+        <div className={`${styles.filters} ${styles.modeFilters}`} role="group" aria-label={`${activeGame.label} 랭킹 구분`}>
+          {activeGame.boards.map((board) => (
             <button
-              className={`chipf${modeOption.id === sudokuMode ? " on" : ""}`}
+              className={`chipf${board.boardKey === activeBoard.boardKey ? " on" : ""}`}
               type="button"
-              key={modeOption.id}
-              onClick={() => setSudokuMode(modeOption.id)}
+              key={board.boardKey}
+              onClick={() => setBoardKey(board.boardKey)}
             >
-              {modeOption.label}
+              {board.label}
             </button>
           ))}
         </div>
       ) : null}
 
-      {gameKey === RANKING_GAME.OMOK ? (
-        <StatusPanel
-          title="Omok 랭킹은 준비 중입니다"
-          description="완료된 온라인 대국을 서버에서 확정하는 결과 모델이 아직 없어, 조작 가능한 클라이언트 승리를 랭킹으로 저장하지 않습니다."
-        />
-      ) : null}
-
-      {gameKey !== RANKING_GAME.OMOK && !isConfigured ? (
+      {!isConfigured ? (
         <StatusPanel title="랭킹 서버가 연결되지 않았습니다" description="Supabase 환경 설정을 확인해 주세요." />
       ) : null}
 
-      {gameKey !== RANKING_GAME.OMOK && isConfigured && loadStatus === LOAD_STATUS.LOADING ? (
+      {isConfigured && loadStatus === LOAD_STATUS.LOADING ? (
         <div className={`card ${styles.loading}`}>
           <LoadingIndicator label="랭킹을 불러오는 중…" />
         </div>
       ) : null}
 
-      {gameKey !== RANKING_GAME.OMOK && isConfigured && loadStatus === LOAD_STATUS.ERROR ? (
+      {isConfigured && loadStatus === LOAD_STATUS.ERROR ? (
         <StatusPanel
           type="error"
           title="랭킹을 불러오지 못했습니다"
@@ -123,21 +126,21 @@ export function RankingPage() {
         />
       ) : null}
 
-      {gameKey !== RANKING_GAME.OMOK && isConfigured && loadStatus === LOAD_STATUS.READY && entries.length === 0 ? (
+      {isConfigured && loadStatus === LOAD_STATUS.READY && entries.length === 0 ? (
         <StatusPanel title="아직 등록된 기록이 없습니다" description={`${activeGame.label}의 첫 번째 랭킹 기록을 만들어 보세요.`} />
       ) : null}
 
-      {gameKey !== RANKING_GAME.OMOK && loadStatus === LOAD_STATUS.READY && entries.length > 0 ? (
+      {loadStatus === LOAD_STATUS.READY && entries.length > 0 ? (
         <div className={`card ${styles.tableWrap}`}>
           <table className={styles.table}>
-            <thead><tr><th>순위</th><th>닉네임</th><th>모드</th><th>{activeGame.valueLabel}</th><th>완료일</th></tr></thead>
+            <thead><tr><th>순위</th><th>닉네임</th><th>구분</th><th>{activeBoard.valueLabel}</th><th>완료일</th></tr></thead>
             <tbody>
               {entries.map((entry) => (
                 <tr className={entry.isCurrentUser ? styles.currentUser : undefined} key={`${entry.rank}-${entry.nickname}-${entry.createdAt}`}>
                   <td data-label="순위"><strong>#{entry.rank}</strong></td>
                   <td data-label="닉네임">{entry.nickname}{entry.isCurrentUser ? <span className={styles.you}>나</span> : null}</td>
-                  <td data-label="모드">{getRankingModeLabel(entry.mode)}</td>
-                  <td data-label={activeGame.valueLabel}>{formatRankingValue(entry)}</td>
+                  <td data-label="구분">{activeBoard.label}</td>
+                  <td data-label={activeBoard.valueLabel}>{formatRankingValue(entry, activeBoard)}</td>
                   <td data-label="완료일"><time dateTime={entry.createdAt}>{formatRankingDate(entry.createdAt)}</time></td>
                 </tr>
               ))}

@@ -1,4 +1,9 @@
 import { GAME_GUIDES } from "./gameGuides.js";
+import {
+  GLOW_SEQUENCE_MASTER_END_ROUND,
+  GLOW_SEQUENCE_MASTER_LENGTH,
+  GLOW_SEQUENCE_STANDARD_END_ROUND,
+} from "../games/glow-sequence/glowSequence.config.js";
 
 export const MINIGAME_STATUS = {
   AVAILABLE: "available",
@@ -79,10 +84,10 @@ export const MINIGAME_CATALOG = [
   {
     id: "glow-sequence",
     title: "Glow Sequence",
-    description: "빛나는 칸의 위치와 순서를 기억해 마지막 16칸까지 도전해요.",
+    description: `빛나는 칸의 순서를 기억해 ${GLOW_SEQUENCE_STANDARD_END_ROUND}라운드를 완주하고 MASTER에 도전해요.`,
     cardDescription: "빛나는 칸의 순서를 기억해요.",
     homeCardDescription: "빛의 순서를 기억해 끝까지 이어보세요.",
-    howTo: "빛나는 칸을 순서대로 기억한 뒤 같은 위치를 차례대로 선택하세요. 60라운드의 16칸 순서를 완성하면 MASTER를 달성해요.",
+    howTo: `빛나는 칸을 순서대로 기억한 뒤 같은 위치를 차례대로 선택하세요. ${GLOW_SEQUENCE_STANDARD_END_ROUND}라운드 기본 코스를 마치면 종료하거나, ${GLOW_SEQUENCE_MASTER_END_ROUND}라운드의 ${GLOW_SEQUENCE_MASTER_LENGTH}칸 MASTER 도전을 이어갈 수 있어요.`,
     guide: GAME_GUIDES["glow-sequence"],
     status: MINIGAME_STATUS.AVAILABLE,
     route: "/minigames/glow-sequence",

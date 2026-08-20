@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { Button } from "../../../../shared/components/Button.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
-import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
+import { getSudokuRankingBoard } from "../../../ranking/rankingRegistry.js";
 import { ResultSubmissionStatus } from "../../../ranking/ResultSubmissionStatus.jsx";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { GameStage } from "../../shared/components/GameStage.jsx";
@@ -196,14 +196,21 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
     isStartingRef.current = true;
     try {
       const level = getPuzzleLevel(puzzle);
-      const attempt = await rankingSubmission.startAttempt({
-        gameKey: RANKING_GAME.SUDOKU,
-        mode: level,
-      });
+      const attempt = await rankingSubmission.startAttempt(getSudokuRankingBoard(level));
       if (!attempt) return;
 
+      const rankedPuzzle = attempt.payload;
+      if (
+        attempt.ranked
+        && (
+          typeof rankedPuzzle.puzzleId !== "string"
+          || Number(rankedPuzzle.proofVersion) !== 2
+          || typeof rankedPuzzle.puzzle !== "string"
+          || !/^[0-9]{81}$/.test(rankedPuzzle.puzzle)
+        )
+      ) throw new Error("서버가 유효한 스도쿠 퍼즐을 발급하지 않았습니다.");
       const issuedPuzzle = attempt.ranked
-        ? { id: attempt.puzzleId, level, puzzle: attempt.puzzle }
+        ? { id: rankedPuzzle.puzzleId, level, puzzle: [...rankedPuzzle.puzzle].map(Number) }
         : puzzle;
 
       playSound("countdownFinal");
@@ -241,7 +248,7 @@ export function SudokuLevelGame({ game = DEFAULT_SUDOKU_GAME_META }) {
   function revealSolution() { const solution = activeSolutionRef.current; if (!solution) return; gameStreak.disqualifyRound({ answerRevealed: true }); setUserValues([...solution]); setIsSurrenderOpen(false); setIsAnswerRevealed(true); }
   function continueAfterAnswer() { if (nextRoundPendingRef.current) return; nextRoundPendingRef.current = true; void startPuzzle(getNextPuzzleForLevel(activePuzzleRef.current)); }
   function continueAfterComplete() { if (nextRoundPendingRef.current) return; nextRoundPendingRef.current = true; startLevel(completedCopy.nextLevel, { preserveStreak: true }); }
-  function completeGame(rankedEvents) { if (phaseRef.current !== SUDOKU_PHASE.PLAYING || isAnswerRevealed) return; phaseRef.current = SUDOKU_PHASE.COMPLETED; gameStreak.recordSuccess(); playSound("clear"); const finalElapsedMs = getCurrentElapsedMilliseconds(); const finalTimeSeconds = Math.floor(finalElapsedMs / 1000); elapsedMillisecondsRef.current = finalElapsedMs; const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); if (!hint.hasUsedHint && isRankedAttemptRef.current) void rankingSubmission.submitResult({ gameKey: RANKING_GAME.SUDOKU, proof: { puzzleId: activePuzzleRef.current.id, events: rankedEvents } }); }
+  function completeGame(rankedEvents) { if (phaseRef.current !== SUDOKU_PHASE.PLAYING || isAnswerRevealed) return; phaseRef.current = SUDOKU_PHASE.COMPLETED; gameStreak.recordSuccess(); playSound("clear"); const finalElapsedMs = getCurrentElapsedMilliseconds(); const finalTimeSeconds = Math.floor(finalElapsedMs / 1000); elapsedMillisecondsRef.current = finalElapsedMs; const currentRecords = recordsRef.current; const level = getPuzzleLevel(activePuzzleRef.current); const currentLevelRecord = currentRecords.byLevel?.[level] ?? EMPTY_LEVEL_RECORD; const didBreakRecord = isNewGameRecord({ previous: currentLevelRecord.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }); const nextLevelRecord = { completedCount: currentLevelRecord.completedCount + 1, bestTimeSeconds: didBreakRecord ? finalTimeSeconds : currentLevelRecord.bestTimeSeconds, lastCompletedAt: new Date().toISOString() }; const nextRecords = { completedCount: currentRecords.completedCount + 1, bestTimeSeconds: isNewGameRecord({ previous: currentRecords.bestTimeSeconds, next: finalTimeSeconds, direction: RECORD_DIRECTION.LOWER }) ? finalTimeSeconds : currentRecords.bestTimeSeconds, lastCompletedAt: nextLevelRecord.lastCompletedAt, byLevel: { ...createEmptyLevelRecords(), ...currentRecords.byLevel, [level]: nextLevelRecord } }; startedAtRef.current = null; setElapsedSeconds(finalTimeSeconds); setDidBreakRecordThisAttempt(didBreakRecord); setRecords(nextRecords); saveRecords(nextRecords); setPhase(SUDOKU_PHASE.COMPLETED); if (!hint.hasUsedHint && isRankedAttemptRef.current) void rankingSubmission.submitResult({ proof: { puzzleId: activePuzzleRef.current.id, events: rankedEvents } }); }
   function updateSelectedValue(value) {
     if (!canEditSelected) return;
     const index = selectedIndexRef.current;

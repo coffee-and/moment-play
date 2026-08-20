@@ -41,7 +41,7 @@ export function useGameResultSubmission() {
     };
   }, []);
 
-  const startAttempt = useCallback(({ gameKey, mode = null, context = {} }) => {
+  const startAttempt = useCallback(({ gameKey, boardKey, rulesVersion, context = {} }) => {
     if (startPromiseRef.current) return startPromiseRef.current;
 
     const startPromise = (async () => {
@@ -61,7 +61,8 @@ export function useGameResultSubmission() {
           authStatus,
           user,
           gameKey,
-          mode,
+          boardKey,
+          rulesVersion,
           context,
         });
         if (!mountedRef.current) return null;

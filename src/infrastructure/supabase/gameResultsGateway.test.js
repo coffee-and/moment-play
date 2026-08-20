@@ -43,9 +43,15 @@ describe("gameResultsGateway", () => {
   it("begins a server-owned attempt without accepting a caller-supplied owner", async () => {
     const attempt = {
       attemptId: result.attemptId,
-      proofVersion: 2,
-      puzzleId: "ocean-01-shift",
-      puzzle: "000000010002195300198000567009761423026053701700020856000000084280019030300286070",
+      boardKey: "easy",
+      challengeKey: "all-time",
+      gameKey: "sudoku",
+      payload: {
+        proofVersion: 2,
+        puzzleId: "ocean-01-shift",
+        puzzle: "000000010002195300198000567009761423026053701700020856000000084280019030300286070",
+      },
+      rulesVersion: "1",
       startedAt: "2026-08-16T00:00:00Z",
     };
     const client = createClient({ beginData: attempt });
@@ -54,27 +60,28 @@ describe("gameResultsGateway", () => {
       authStatus: "authenticated",
       user: authenticatedUser,
       gameKey: "sudoku",
-      mode: "easy",
+      boardKey: "easy",
+      rulesVersion: "1",
       userId: "other-user",
     }, client)).resolves.toEqual({
       ...attempt,
-      puzzle: [...attempt.puzzle].map(Number),
       seed: null,
     });
 
     expect(client.rpc).toHaveBeenCalledWith("begin_ranked_game", {
-      p_game_key: "sudoku",
-      p_mode: "easy",
+      p_board_key: "easy",
       p_context: {},
+      p_game_key: "sudoku",
+      p_rules_version: "1",
     });
   });
 
   it("submits only the attempt identifiers and replay proof to the completion RPC", async () => {
-    const client = createClient({ completeData: { duplicate: false, scoreValue: 4096 } });
+    const client = createClient({ completeData: { duplicate: false, metrics: { score: 4096 } } });
     await submitGameResult({
       authStatus: "authenticated",
       user: authenticatedUser,
-      result: { ...result, scoreValue: 999999, userId: "other-user" },
+      result: { ...result, metrics: { score: 999999 }, userId: "other-user" },
     }, client);
 
     expect(client.rpc).toHaveBeenCalledWith("complete_ranked_game", {
@@ -85,12 +92,12 @@ describe("gameResultsGateway", () => {
   });
 
   it("preserves the server's idempotent duplicate response", async () => {
-    const client = createClient({ completeData: { duplicate: true, scoreValue: 4096 } });
+    const client = createClient({ completeData: { duplicate: true, metrics: { score: 4096 } } });
     await expect(submitGameResult({
       authStatus: "authenticated",
       user: authenticatedUser,
       result,
-    }, client)).resolves.toEqual({ duplicate: true, scoreValue: 4096 });
+    }, client)).resolves.toEqual({ duplicate: true, metrics: { score: 4096 } });
   });
 
   it("maps only public leaderboard fields and drops private response properties", async () => {
@@ -99,19 +106,25 @@ describe("gameResultsGateway", () => {
         rank: 1,
         nickname: "Sky",
         game_key: "2048",
-        mode: null,
-        score_value: 8192,
-        duration_ms: null,
-        match_result: null,
+        board_key: "classic",
+        challenge_key: "all-time",
+        rules_version: "1",
+        metrics: { score: 8192 },
         created_at: "2026-07-14T00:00:00Z",
         is_current_user: true,
         email: "private@example.com",
         user_id: "private-user-id",
       }],
     });
-    const [entry] = await fetchLeaderboard({ gameKey: "2048" }, client);
+    const [entry] = await fetchLeaderboard({
+      boardKey: "classic",
+      challengeKey: "all-time",
+      gameKey: "2048",
+      rulesVersion: "1",
+    }, client);
     expect(entry).not.toHaveProperty("email");
     expect(entry).not.toHaveProperty("userId");
     expect(entry.nickname).toBe("Sky");
+    expect(entry.metrics).toEqual({ score: 8192 });
   });
 });

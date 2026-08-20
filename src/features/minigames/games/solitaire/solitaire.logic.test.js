@@ -3,12 +3,11 @@ import {
   canPlaceOnFoundation,
   canPlaceOnTableau,
   createSolitaireDeck,
-  dealSolitaire,
   drawSolitaireStock,
-  findSolitaireHint,
   isValidTableauRun,
   moveSolitaireSelection,
 } from "./solitaire.logic.js";
+import { findSolitaireHint } from "./solitaire.analysis.js";
 
 function card({ color = "black", faceUp = true, rank, suit = "spades" }) {
   return { id: `${suit}-${rank}`, color, faceUp, rank, suit, symbol: suit === "hearts" ? "♥" : "♠" };
@@ -25,12 +24,8 @@ function stateWith(overrides = {}) {
 }
 
 describe("solitaire rules", () => {
-  it("creates and deals a standard 52-card deck", () => {
+  it("creates a standard 52-card deck", () => {
     expect(createSolitaireDeck()).toHaveLength(52);
-    const state = dealSolitaire(() => 0.5);
-    expect(state.tableau.map((column) => column.length)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(state.stock).toHaveLength(24);
-    expect(state.tableau.every((column) => column.at(-1).faceUp)).toBe(true);
   });
 
   it("uses descending alternating colors in tableau and ascending suits in foundations", () => {

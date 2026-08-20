@@ -52,13 +52,28 @@ describe("RankingPage", () => {
     await act(async () => {});
     clickButton(view.host, "Memory Order");
     await act(async () => {});
-    expect(fetchLeaderboard).toHaveBeenLastCalledWith({ gameKey: "memory", mode: null });
+    expect(fetchLeaderboard).toHaveBeenLastCalledWith({
+      boardKey: "standard",
+      challengeKey: "all-time",
+      gameKey: "memory",
+      rulesVersion: "1",
+    });
     clickButton(view.host, "Sudoku");
     await act(async () => {});
-    expect(fetchLeaderboard).toHaveBeenLastCalledWith({ gameKey: "sudoku", mode: "easy" });
+    expect(fetchLeaderboard).toHaveBeenLastCalledWith({
+      boardKey: "easy",
+      challengeKey: "all-time",
+      gameKey: "sudoku",
+      rulesVersion: "1",
+    });
     clickButton(view.host, "Advanced");
     await act(async () => {});
-    expect(fetchLeaderboard).toHaveBeenLastCalledWith({ gameKey: "sudoku", mode: "advanced" });
+    expect(fetchLeaderboard).toHaveBeenLastCalledWith({
+      boardKey: "advanced",
+      challengeKey: "all-time",
+      gameKey: "sudoku",
+      rulesVersion: "1",
+    });
     view.unmount();
   });
 });

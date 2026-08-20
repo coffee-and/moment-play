@@ -73,10 +73,16 @@ beforeEach(() => {
   startAttempt.mockReset();
   startAttempt.mockResolvedValue({
     attemptId: "22222222-2222-4222-8222-222222222222",
-    proofVersion: 2,
-    puzzleId: DEFAULT_SUDOKU_PUZZLE.id,
-    puzzle: DEFAULT_SUDOKU_PUZZLE.puzzle,
+    boardKey: "easy",
+    challengeKey: "all-time",
+    gameKey: "sudoku",
+    payload: {
+      proofVersion: 2,
+      puzzleId: DEFAULT_SUDOKU_PUZZLE.id,
+      puzzle: DEFAULT_SUDOKU_PUZZLE.puzzle.join(""),
+    },
     ranked: true,
+    rulesVersion: "1",
   });
   submitResult.mockClear();
 });

@@ -143,7 +143,13 @@ export function LogicPuzzleStage({
         </div>
       ) : null}
 
-      {session.phase === "playing" ? <PuzzleHintPanel gameId={game.id} hint={hint} /> : null}
+      {session.phase === "playing" ? (
+        <PuzzleHintPanel
+          gameId={game.id}
+          hint={hint}
+          onAcceptHint={session.disqualifyRecord}
+        />
+      ) : null}
 
       {session.phase === "surrendered" ? (
         <section className="logic-puzzle-stage__answer-summary" aria-labelledby={`${game.id}-answer-title`}>

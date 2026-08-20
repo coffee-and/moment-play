@@ -70,7 +70,7 @@ select is(
     where namespace.nspname = 'public'
       and proc.proowner = 'postgres'::regrole
       and has_function_privilege('anon', proc.oid, 'EXECUTE')
-      and proc.oid <> 'public.get_game_leaderboard(text,text,integer)'::regprocedure
+      and proc.oid <> 'public.get_game_leaderboard(text,text,text,text,integer)'::regprocedure
   ),
   0::bigint,
   'anon can execute only the public leaderboard RPC'
@@ -79,7 +79,7 @@ select is(
 select ok(
   has_function_privilege(
     'anon',
-    'public.get_game_leaderboard(text,text,integer)',
+    'public.get_game_leaderboard(text,text,text,text,integer)',
     'EXECUTE'
   ),
   'anon retains leaderboard access'
@@ -91,9 +91,9 @@ create temporary table expected_authenticated_functions (
 
 insert into expected_authenticated_functions (signature)
 values
-  ('public.begin_ranked_game(text,text,jsonb)'),
+  ('public.begin_ranked_game(text,text,text,jsonb)'),
   ('public.complete_ranked_game(uuid,uuid,jsonb)'),
-  ('public.get_game_leaderboard(text,text,integer)'),
+  ('public.get_game_leaderboard(text,text,text,text,integer)'),
   ('public.update_my_profile_nickname(text)'),
   ('public.get_my_friend_profile()'),
   ('public.find_friend_by_code(text)'),

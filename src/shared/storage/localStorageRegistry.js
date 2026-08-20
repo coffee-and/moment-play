@@ -1,6 +1,7 @@
 export const GAME_RECORD_STORAGE_KEYS = Object.freeze({
   BLOCK_BLAST_BEST_SCORE: "eunContents.blockBlast.bestScore",
-  FLAPPY_BEST_SCORE: "eunContents.flappy.best",
+  FLAPPY_COURSE_BEST_SCORE: "moment-play:star-flight:course-score:v1",
+  FLAPPY_ENDLESS_BEST_DURATION: "moment-play:star-flight:endless-duration:v1",
   GAME_2048_BEST_SCORE: "eunContents.game2048.bestScore",
   GLOW_SEQUENCE_BEST_ROUND: "eunContents.glowSequence.bestRound",
   LITS_BEST_TIME: "eunContents.lits.bestTime",

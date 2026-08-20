@@ -1,26 +1,68 @@
-export const GLOW_SEQUENCE_MAX_ROUND = 60;
-export const GLOW_SEQUENCE_MASTER_COUNT = 16;
+import {
+  GLOW_SEQUENCE_GRID_SIZE,
+  GLOW_SEQUENCE_MASTER_END_ROUND,
+  GLOW_SEQUENCE_MASTER_LENGTH,
+  GLOW_SEQUENCE_MILESTONE_INTERVAL,
+  GLOW_SEQUENCE_ROUND_OUTCOME,
+  GLOW_SEQUENCE_STANDARD_END_ROUND,
+  GLOW_SEQUENCE_TIMING,
+} from "./glowSequence.config.js";
 
-export function getGlowSequenceLength(round) {
-  const safeRound = Math.min(
-    GLOW_SEQUENCE_MAX_ROUND,
+function normalizeRound(round) {
+  return Math.min(
+    GLOW_SEQUENCE_MASTER_END_ROUND,
     Math.max(1, Math.floor(Number(round) || 1)),
   );
+}
+
+export function getGlowRoundOutcome(round) {
+  const safeRound = normalizeRound(round);
+  if (safeRound === GLOW_SEQUENCE_MASTER_END_ROUND) {
+    return GLOW_SEQUENCE_ROUND_OUTCOME.MASTER_COMPLETE;
+  }
+  if (safeRound === GLOW_SEQUENCE_STANDARD_END_ROUND) {
+    return GLOW_SEQUENCE_ROUND_OUTCOME.STANDARD_COMPLETE;
+  }
+  return GLOW_SEQUENCE_ROUND_OUTCOME.CONTINUE;
+}
+
+export function getGlowRoundLimit(round) {
+  return normalizeRound(round) > GLOW_SEQUENCE_STANDARD_END_ROUND
+    ? GLOW_SEQUENCE_MASTER_END_ROUND
+    : GLOW_SEQUENCE_STANDARD_END_ROUND;
+}
+
+export function isGlowMilestoneRound(round) {
+  return normalizeRound(round) % GLOW_SEQUENCE_MILESTONE_INTERVAL === 0;
+}
+
+export function getGlowSequenceLength(round) {
+  const safeRound = normalizeRound(round);
 
   if (safeRound <= 2) return 3;
   if (safeRound <= 5) return 4;
   if (safeRound <= 9) return 5;
-  if (safeRound === GLOW_SEQUENCE_MAX_ROUND) return GLOW_SEQUENCE_MASTER_COUNT;
+  if (safeRound === GLOW_SEQUENCE_MASTER_END_ROUND) return GLOW_SEQUENCE_MASTER_LENGTH;
 
   return Math.min(15, 6 + Math.floor((safeRound - 10) / 5));
 }
 
 export function getGlowGridSize() {
-  return 4;
+  return GLOW_SEQUENCE_GRID_SIZE;
 }
 
 export function getGlowPlaybackTiming() {
-  return { leadMs: 520, onMs: 430, gapMs: 150 };
+  return {
+    gapMs: GLOW_SEQUENCE_TIMING.PLAYBACK_GAP_MS,
+    leadMs: GLOW_SEQUENCE_TIMING.PLAYBACK_LEAD_MS,
+    onMs: GLOW_SEQUENCE_TIMING.PLAYBACK_ON_MS,
+  };
+}
+
+export function getGlowPlaybackDuration(sequenceLength) {
+  const safeLength = Math.max(0, Math.floor(Number(sequenceLength) || 0));
+  const timing = getGlowPlaybackTiming();
+  return timing.leadMs + safeLength * (timing.onMs + timing.gapMs);
 }
 
 function normalizeRandom(value) {
