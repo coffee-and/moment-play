@@ -57,7 +57,6 @@
 }
 
 .glow-sequence__grid[data-size="4"] { --glow-grid-size: 4; }
-.glow-sequence__grid[data-size="5"] { --glow-grid-size: 5; }
 
 .glow-sequence__cell {
   aspect-ratio: 1;
