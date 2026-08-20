@@ -395,7 +395,7 @@ export function FlappyGame({ game }) {
   const displayedTime = isEndless
     ? formatFlappyClock(session.totalElapsedMs)
     : formatFlappyClock(getFlappyTimeRemainingMs(session));
-  const isRankingBusy = rankingSubmission.isStarting || rankingSubmission.isSaving;
+  const isRankingBusy = rankingSubmission.isBusy;
 
   const sidebar = (
     <div className={cx("stat-row")}>
@@ -412,7 +412,13 @@ export function FlappyGame({ game }) {
     <div className={cx("game-stage__inline-actions")}>
       {phase === "playing" ? <Button variant="secondary" onClick={pauseGame}>일시정지</Button> : null}
       {phase === "paused" ? <Button variant="secondary" onClick={resumeGame}>계속하기</Button> : null}
-      <Button variant="secondary" onClick={requestExit}>게임 나가기</Button>
+      <Button
+        variant="secondary"
+        onClick={requestExit}
+        disabled={rankingSubmission.isFinalizing || rankingSubmission.isSaving}
+      >
+        게임 나가기
+      </Button>
     </div>
   );
 

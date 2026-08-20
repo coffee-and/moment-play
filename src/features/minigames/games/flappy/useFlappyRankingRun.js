@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { checkpointRankedFlappy } from "../../../../infrastructure/supabase/gameResultsGateway.js";
 import { useAuth } from "../../../../shared/auth/AuthContext.jsx";
 import { createRandomSeed } from "../../../../shared/random/deterministicRandom.js";
@@ -31,6 +31,7 @@ export function useFlappyRankingRun() {
   const { status: authStatus, user } = useAuth();
   const submission = useGameResultSubmission();
   const { invalidateAttempt, startAttempt, submitResult } = submission;
+  const [isFinalizing, setIsFinalizing] = useState(false);
   const activeRunRef = useRef(null);
   const runGenerationRef = useRef(0);
 
@@ -43,6 +44,7 @@ export function useFlappyRankingRun() {
     runGenerationRef.current += 1;
     const generation = runGenerationRef.current;
     activeRunRef.current = null;
+    setIsFinalizing(false);
     const board = BOARD_BY_MODE[mode];
     if (!board) throw new Error("지원하지 않는 별빛 비행 랭킹 모드입니다.");
 
@@ -76,19 +78,39 @@ export function useFlappyRankingRun() {
 
   const finishCourse = useCallback(async (finalSimulation) => {
     const run = activeRunRef.current;
-    const proof = await run?.finishCourse(finalSimulation);
-    if (proof && activeRunRef.current === run) await submitResult({ proof });
+    if (!run) return;
+    const generation = runGenerationRef.current;
+    setIsFinalizing(true);
+    try {
+      const proof = await run.finishCourse(finalSimulation);
+      if (proof && activeRunRef.current === run) await submitResult({ proof });
+    } finally {
+      if (runGenerationRef.current === generation) setIsFinalizing(false);
+    }
   }, [submitResult]);
 
   const finishEndless = useCallback(async (finalSimulation) => {
     const run = activeRunRef.current;
-    const proof = await run?.finishEndless(finalSimulation);
-    if (proof && activeRunRef.current === run) await submitResult({ proof });
+    if (!run) return;
+    const generation = runGenerationRef.current;
+    setIsFinalizing(true);
+    try {
+      const proof = await run.finishEndless(finalSimulation);
+      if (proof && activeRunRef.current === run) await submitResult({ proof });
+    } finally {
+      if (runGenerationRef.current === generation) setIsFinalizing(false);
+    }
   }, [submitResult]);
 
   const disqualify = useCallback((message) => {
     activeRunRef.current?.disqualify(message);
   }, []);
+
+  const rankingSubmission = {
+    ...submission,
+    isBusy: isFinalizing || submission.isSaving || submission.isStarting,
+    isFinalizing,
+  };
 
   return {
     disqualify,
@@ -96,6 +118,6 @@ export function useFlappyRankingRun() {
     finishEndless,
     recordStep,
     startRun,
-    submission,
+    submission: rankingSubmission,
   };
 }
