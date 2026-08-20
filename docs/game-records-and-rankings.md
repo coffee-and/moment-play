@@ -11,6 +11,7 @@
 - 사용자마다 가장 좋은 결과 하나만 순위 계산에 사용한다. `rank_primary`, `rank_secondary`, `rank_tertiary`를 차례로 내림차순 비교하고 같은 지표 조합에는 같은 순위가 부여된다.
 - 게임 규칙이나 점수 계산이 달라지면 기존 기록의 의미를 바꾸지 않고 `rulesVersion`을 올려 별도 계약으로 운영한다.
 - 랭킹 테이블은 클라이언트가 직접 읽거나 쓰지 않는다. 기록 제출은 인증 사용자 전용 RPC, 조회는 제한된 리더보드 RPC를 사용한다.
+- 최종 결과 요청은 사용자와 시도 ID에 묶인 복구 outbox에 먼저 기록한다. 화면을 이동해도 같은 제출을 계속하고, 일시적인 통신 실패나 응답 유실에는 동일 요청만 재전송하며 성공·영구 오류·보존 기한 만료 시 제거한다.
 
 ## 전체 현황
 
@@ -91,7 +92,7 @@ Star Flight는 결정론적 20ms 고정 틱 시뮬레이션과 서버 시드 기
 - 일시정지나 백그라운드 전환이 발생한 플레이는 공식 기록 자격을 잃는다. 서버 경과 시간과 재생 시간이 허용 범위를 벗어나도 거부한다.
 - 무한 비행은 최종 한 번에 무제한 입력을 제출하지 않고 검증 가능한 구간 단위 체크포인트로 나눈다.
 - 클라이언트는 20초 단위로 체크포인트를 직렬 전송하며 서버는 구간당 최대 30초만 허용한다. 마지막 충돌 구간까지 서버가 `over`로 재생한 뒤에만 최종 결과를 확정한다.
-- 새 랭킹 시도를 시작하면 같은 보드의 이전 열린 시도는 `abandoned`로 종료되고 새 시도 ID를 발급한다. 이전 요청이 늦게 도착해도 새 비행에 합쳐지지 않는다.
+- 새 랭킹 시도를 시작하면 결과가 없는 같은 보드의 이전 열린 시도와 체크포인트를 트랜잭션 안에서 제거하고 새 시도 ID를 발급한다. 이전 요청이 늦게 도착해도 존재하지 않는 시도 ID이므로 새 비행에 합쳐지지 않는다.
 
 ## 아직 공식 랭킹이 없는 게임
 
@@ -132,8 +133,9 @@ Easy는 한 장, Hard는 세 장씩 뽑으며 난이도별 완료 횟수와 최�
 - 게임 목록과 경로: `src/features/minigames/data/minigameCatalog.js`
 - 로컬 기록 키: `src/shared/storage/localStorageRegistry.js`
 - 공식 랭킹 보드와 표시 형식: `src/features/ranking/rankingRegistry.js`
-- 공용 제출 흐름: `src/features/ranking/useGameResultSubmission.js`
+- 공용 제출 흐름과 복구 outbox: `src/features/ranking/useGameResultSubmission.js`, `src/features/ranking/rankedResultFinalizer.js`
 - 서버 보드·시도·검증·조회 계약: `supabase/migrations/20260820063057_generalize_ranked_game_results.sql`, `supabase/migrations/20260820084728_add_ranked_star_flight_verification.sql`
+- 만료된 미완료 시도 정리: `supabase/migrations/20260820164100_cleanup_expired_ranked_attempts.sql`
 - DB 계약 검사: `supabase/tests/phase3_game_results_test.sql`
 
 게임을 공식 랭킹에 추가할 때는 레지스트리만 늘리지 않는다. 서버 보드 등록, 시도 발급, 결정론적 검증기, 지표 산출, 클라이언트 제출, 랭킹 표시, 악성 증거 DB 계약 검사를 한 기능 단위로 함께 추가한다.

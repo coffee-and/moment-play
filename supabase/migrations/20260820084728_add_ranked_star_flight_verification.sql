@@ -13,24 +13,6 @@ values
   ('flappy', 'course', '1', 'all-time'),
   ('flappy', 'endless', '1', 'all-time');
 
-alter table private.ranked_game_attempts
-drop constraint ranked_game_attempts_status_check;
-
-alter table private.ranked_game_attempts
-add constraint ranked_game_attempts_status_check
-check (status in ('open', 'completed', 'abandoned'));
-
-alter table private.ranked_game_attempts
-drop constraint ranked_game_attempts_lifecycle_check;
-
-alter table private.ranked_game_attempts
-add constraint ranked_game_attempts_lifecycle_check
-check (
-  (status = 'open' and completed_at is null and client_submission_id is null)
-  or (status = 'completed' and completed_at is not null and client_submission_id is not null)
-  or (status = 'abandoned' and completed_at is not null and client_submission_id is null)
-);
-
 create table private.ranked_flappy_checkpoints (
   attempt_id uuid primary key
     references private.ranked_game_attempts(id) on delete cascade,
@@ -39,7 +21,6 @@ create table private.ranked_flappy_checkpoints (
   status text not null default 'flying',
   state jsonb not null,
   last_flap_ticks jsonb null,
-  updated_at timestamptz not null,
   constraint ranked_flappy_checkpoints_sequence_check
     check (sequence >= 0),
   constraint ranked_flappy_checkpoints_tick_check
@@ -630,9 +611,7 @@ begin
     raise exception 'Ranking board verifier is not implemented';
   end if;
 
-  update private.ranked_game_attempts as previous_attempt
-  set status = 'abandoned',
-      completed_at = attempt_started_at
+  delete from private.ranked_game_attempts as previous_attempt
   where previous_attempt.user_id = current_user_id
     and previous_attempt.game_key = p_game_key
     and previous_attempt.board_key = p_board_key
@@ -669,8 +648,7 @@ begin
       tick,
       status,
       state,
-      last_flap_ticks,
-      updated_at
+      last_flap_ticks
     )
     values (
       attempt_id,
@@ -678,16 +656,8 @@ begin
       0,
       'flying',
       private.create_ranked_flappy_state(attempt_seed, 'endless'),
-      null,
-      attempt_started_at
-    )
-    on conflict (attempt_id) do update
-    set sequence = 0,
-        tick = 0,
-        status = 'flying',
-        state = excluded.state,
-        last_flap_ticks = null,
-        updated_at = excluded.updated_at;
+      null
+    );
   end if;
 
   return jsonb_strip_nulls(jsonb_build_object(
@@ -823,8 +793,7 @@ begin
       tick = p_to_tick,
       status = next_status,
       state = next_state,
-      last_flap_ticks = p_flap_ticks,
-      updated_at = clock_timestamp()
+      last_flap_ticks = p_flap_ticks
   where stored_checkpoint.attempt_id = attempt.id;
 
   return jsonb_build_object(

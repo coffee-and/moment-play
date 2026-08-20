@@ -21,6 +21,10 @@ select col_type_is('public', 'game_results', 'metrics', 'jsonb', 'game metrics a
 select has_pk('private', 'ranking_boards', 'ranking boards have a composite primary key');
 select has_pk('private', 'ranked_game_attempts', 'ranked attempts have a primary key');
 select has_pk('public', 'game_results', 'game results have a primary key');
+select has_index(
+  'private', 'ranked_game_attempts', 'ranked_game_attempts_expired_open_idx',
+  'expired open attempts can be cleaned without scanning completed history'
+);
 
 select ok(
   (select relrowsecurity from pg_catalog.pg_class where oid = 'private.ranking_boards'::regclass)
@@ -265,15 +269,12 @@ select isnt(
 reset role;
 
 select ok(
-  exists (
+  not exists (
     select 1
     from private.ranked_game_attempts as attempt
     where attempt.id = current_setting('phase3.replaced_attempt_id')::uuid
-      and attempt.status = 'abandoned'
-      and attempt.completed_at is not null
-      and attempt.client_submission_id is null
   ),
-  'a replaced attempt is closed without masquerading as a result'
+  'a replaced open attempt is removed instead of accumulating dead state'
 );
 
 set local role authenticated;
@@ -284,9 +285,37 @@ select throws_ok(
       '30000000-0000-4000-8000-000000000014',
       '{"moves":[]}'::jsonb
     )$$,
-  'P0001', 'Ranked game attempt is no longer active',
+  '42501', 'Ranked game attempt was not found',
   'late evidence cannot complete a replaced attempt'
 );
+
+select set_config(
+  'phase3.expired_attempt_id',
+  public.begin_ranked_game('memory', 'standard', '1', '{}'::jsonb) ->> 'attemptId',
+  true
+);
+
+reset role;
+
+update private.ranked_game_attempts
+set expires_at = clock_timestamp() - interval '1 second'
+where id = current_setting('phase3.expired_attempt_id')::uuid;
+
+select lives_ok(
+  $$select public.moment_play_cleanup_expired_data()$$,
+  'the daily cleanup accepts expired ranked attempts'
+);
+
+select ok(
+  not exists (
+    select 1
+    from private.ranked_game_attempts
+    where id = current_setting('phase3.expired_attempt_id')::uuid
+  ),
+  'expired open attempts are removed from ranking storage'
+);
+
+set local role authenticated;
 
 select lives_ok(
   $$select set_config(
