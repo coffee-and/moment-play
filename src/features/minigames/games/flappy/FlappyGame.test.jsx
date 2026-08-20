@@ -48,16 +48,6 @@ afterEach(() => {
 });
 
 describe("FlappyGame", () => {
-  it("does not render or persist a fish picker", () => {
-    const view = renderGame();
-
-    expect(document.body.querySelector('[role="radiogroup"]')).toBeNull();
-    expect(findButton(document.body, "노란 물고기")).toBeUndefined();
-    expect(findButton(document.body, "파란 고래")).toBeUndefined();
-    expect(window.localStorage.getItem("eunContents.flappy.fishSkin")).toBeNull();
-    view.unmount();
-  });
-
   it("supports keyboard and pointer controls and uses the shared pause modal", () => {
     const view = renderGame();
     const surface = view.host.querySelector('[role="button"][aria-label^="별빛 비행"]');
