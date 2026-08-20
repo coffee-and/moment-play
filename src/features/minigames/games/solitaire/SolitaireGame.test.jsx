@@ -54,4 +54,19 @@ describe("SolitaireGame", () => {
     expect(view.host.querySelector('button[aria-label="스톡 23장, 카드 공개"]')).not.toBeNull();
     view.unmount();
   });
+
+  it("restores the complete previous state when the player undoes a draw", () => {
+    const view = renderGame();
+    const easyButton = [...document.querySelectorAll("button")].find((button) => button.textContent.includes("쉬움"));
+    act(() => easyButton.click());
+    act(() => view.host.querySelector('button[aria-label="스톡 24장, 카드 공개"]').click());
+
+    const undoButton = [...view.host.querySelectorAll("button")].find((button) => button.textContent === "되돌리기");
+    expect(undoButton.disabled).toBe(false);
+    act(() => undoButton.click());
+
+    expect(view.host.querySelector('button[aria-label="스톡 24장, 카드 공개"]')).not.toBeNull();
+    expect(view.host.textContent).toContain("Moves0");
+    view.unmount();
+  });
 });
