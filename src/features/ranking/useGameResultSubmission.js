@@ -2,8 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../shared/auth/AuthContext.jsx";
 import {
   beginRankedGameAttempt,
-  submitGameResult,
 } from "../../infrastructure/supabase/gameResultsGateway.js";
+import {
+  finalizeRankedResult,
+  resumeRankedResultOutbox,
+} from "./rankedResultFinalizer.js";
+import { isTransientRankedRequestError } from "./rankedRequestRetry.js";
 
 export const RESULT_SUBMISSION_STATUS = {
   IDLE: "idle",
@@ -57,6 +61,16 @@ export function useGameResultSubmission() {
 
       setStatus(RESULT_SUBMISSION_STATUS.STARTING);
       try {
+        const recoveredResults = await resumeRankedResultOutbox({
+          authStatus,
+          boardKey,
+          gameKey,
+          user,
+        });
+        const pendingFailure = recoveredResults.find((result) => (
+          result?.error && isTransientRankedRequestError(result.error)
+        ));
+        if (pendingFailure) throw pendingFailure.error;
         const attempt = await beginRankedGameAttempt({
           authStatus,
           user,
@@ -102,14 +116,12 @@ export function useGameResultSubmission() {
     setStatus(RESULT_SUBMISSION_STATUS.SAVING);
     setErrorMessage("");
     try {
-      await submitGameResult({
+      await finalizeRankedResult({
+        attempt: attemptRef.current,
         authStatus,
+        clientSubmissionId,
+        proof: result.proof,
         user,
-        result: {
-          ...result,
-          attemptId: attemptRef.current.attemptId,
-          clientSubmissionId,
-        },
       });
       if (!mountedRef.current) return;
       setStatus(RESULT_SUBMISSION_STATUS.SAVED);

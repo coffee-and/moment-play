@@ -54,7 +54,7 @@ afterEach(() => {
 });
 
 describe("useFlappyRankingRun", () => {
-  it("keeps the result locked until the terminal checkpoint and result save both finish", async () => {
+  it("continues finalization after the game screen unmounts", async () => {
     let resolveCheckpoint;
     let resolveSubmission;
     startAttempt.mockResolvedValue({
@@ -69,9 +69,11 @@ describe("useFlappyRankingRun", () => {
       ranked: true,
       seed: 12_345,
     });
-    checkpointRankedFlappy.mockImplementation(() => new Promise((resolve) => {
-      resolveCheckpoint = resolve;
-    }));
+    checkpointRankedFlappy
+      .mockRejectedValueOnce(new TypeError("network down"))
+      .mockImplementation(() => new Promise((resolve) => {
+        resolveCheckpoint = resolve;
+      }));
     submitResult.mockImplementation(() => new Promise((resolve) => {
       resolveSubmission = resolve;
     }));
@@ -87,20 +89,15 @@ describe("useFlappyRankingRun", () => {
     });
     expect(latest.submission.isFinalizing).toBe(true);
 
-    await act(async () => {
-      resolveCheckpoint({ checkpointSequence: 1, status: "over", tick: 151 });
-      await Promise.resolve();
-    });
+    await vi.waitFor(() => expect(resolveCheckpoint).toBeTypeOf("function"));
+    unmount();
+    resolveCheckpoint({ checkpointSequence: 1, status: "over", tick: 151 });
+    await vi.waitFor(() => expect(submitResult).toHaveBeenCalled());
+    expect(checkpointRankedFlappy).toHaveBeenCalledTimes(2);
     expect(submitResult).toHaveBeenCalledWith({
       proof: { checkpointSequence: 1, proofVersion: 1 },
     });
-    expect(latest.submission.isFinalizing).toBe(true);
-
-    await act(async () => {
-      resolveSubmission();
-      await finishPromise;
-    });
-    expect(latest.submission.isFinalizing).toBe(false);
-    unmount();
+    resolveSubmission();
+    await finishPromise;
   });
 });

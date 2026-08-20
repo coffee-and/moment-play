@@ -17,6 +17,7 @@ export const GAME_RECORD_STORAGE_KEYS = Object.freeze({
 
 export const LOCAL_STORAGE_KEYS = Object.freeze({
   PROFILE_NICKNAME: "eunContents.profile.nickname",
+  RANKED_RESULT_OUTBOX: "moment-play:ranked-result-outbox:v1",
   STORAGE_PROBE: "eunContents.storageProbe",
   THEME: "momentPlay.theme",
 });

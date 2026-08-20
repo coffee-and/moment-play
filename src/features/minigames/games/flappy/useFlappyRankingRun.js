@@ -4,6 +4,7 @@ import { useAuth } from "../../../../shared/auth/AuthContext.jsx";
 import { createRandomSeed } from "../../../../shared/random/deterministicRandom.js";
 import { RANKING_BOARD } from "../../../ranking/rankingRegistry.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
+import { retryRankedRequest } from "../../../ranking/rankedRequestRetry.js";
 import { FLAPPY_SIMULATION_TICK_MS } from "./flappySimulation.js";
 import { FLAPPY_SESSION_MODE } from "./flappySession.js";
 import {
@@ -33,10 +34,11 @@ export function useFlappyRankingRun() {
   const { invalidateAttempt, startAttempt, submitResult } = submission;
   const [isFinalizing, setIsFinalizing] = useState(false);
   const activeRunRef = useRef(null);
+  const mountedRef = useRef(true);
   const runGenerationRef = useRef(0);
 
   useEffect(() => () => {
-    runGenerationRef.current += 1;
+    mountedRef.current = false;
     activeRunRef.current = null;
   }, []);
 
@@ -63,11 +65,13 @@ export function useFlappyRankingRun() {
           invalidateAttempt(message);
         }
       },
-      submitCheckpoint: (checkpoint) => checkpointRankedFlappy({
-        ...checkpoint,
-        authStatus,
-        user,
-      }),
+      submitCheckpoint: (checkpoint) => retryRankedRequest(
+        () => checkpointRankedFlappy({
+          ...checkpoint,
+          authStatus,
+          user,
+        }),
+      ),
     });
     return { ranked: true, seed: attempt.seed };
   }, [authStatus, invalidateAttempt, startAttempt, user]);
@@ -83,9 +87,9 @@ export function useFlappyRankingRun() {
     setIsFinalizing(true);
     try {
       const proof = await run.finishCourse(finalSimulation);
-      if (proof && activeRunRef.current === run) await submitResult({ proof });
+      if (proof && runGenerationRef.current === generation) await submitResult({ proof });
     } finally {
-      if (runGenerationRef.current === generation) setIsFinalizing(false);
+      if (mountedRef.current && runGenerationRef.current === generation) setIsFinalizing(false);
     }
   }, [submitResult]);
 
@@ -96,9 +100,9 @@ export function useFlappyRankingRun() {
     setIsFinalizing(true);
     try {
       const proof = await run.finishEndless(finalSimulation);
-      if (proof && activeRunRef.current === run) await submitResult({ proof });
+      if (proof && runGenerationRef.current === generation) await submitResult({ proof });
     } finally {
-      if (runGenerationRef.current === generation) setIsFinalizing(false);
+      if (mountedRef.current && runGenerationRef.current === generation) setIsFinalizing(false);
     }
   }, [submitResult]);
 
