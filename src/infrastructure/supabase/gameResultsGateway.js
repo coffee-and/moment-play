@@ -9,20 +9,28 @@ function mapLeaderboardEntry(row) {
     rank: Number(row.rank),
     nickname: row.nickname,
     gameKey: row.game_key,
-    mode: row.mode,
-    scoreValue: row.score_value === null ? null : Number(row.score_value),
-    durationMs: row.duration_ms === null ? null : Number(row.duration_ms),
-    matchResult: row.match_result,
+    boardKey: row.board_key,
+    challengeKey: row.challenge_key,
+    rulesVersion: row.rules_version,
+    metrics: row.metrics && typeof row.metrics === "object" ? row.metrics : {},
     createdAt: row.created_at,
     isCurrentUser: Boolean(row.is_current_user),
   };
 }
 
-export async function fetchLeaderboard({ gameKey, mode = null, limit = DEFAULT_LEADERBOARD_LIMIT }, client = getSupabaseClient()) {
+export async function fetchLeaderboard({
+  gameKey,
+  boardKey,
+  challengeKey,
+  rulesVersion,
+  limit = DEFAULT_LEADERBOARD_LIMIT,
+}, client = getSupabaseClient()) {
   const { data, error } = await client.rpc("get_game_leaderboard", {
+    p_board_key: boardKey,
+    p_challenge_key: challengeKey,
     p_game_key: gameKey,
-    p_mode: mode,
     p_limit: limit,
+    p_rules_version: rulesVersion,
   });
   if (error) throw error;
   return (data ?? []).map(mapLeaderboardEntry);
@@ -38,38 +46,36 @@ export async function beginRankedGameAttempt({
   authStatus,
   user,
   gameKey,
-  mode = null,
+  boardKey,
+  rulesVersion,
   context = {},
 }, client = getSupabaseClient()) {
   assertPermanentAccount(authStatus, user);
 
   const { data, error } = await client.rpc("begin_ranked_game", {
-    p_game_key: gameKey,
-    p_mode: mode,
+    p_board_key: boardKey,
     p_context: context,
+    p_game_key: gameKey,
+    p_rules_version: rulesVersion,
   });
   if (error) throw error;
-  if (!data?.attemptId) throw new Error("랭킹 게임 시도를 시작하지 못했습니다.");
-
-  const attempt = {
-    attemptId: data.attemptId,
-    seed: data.seed ?? null,
-    startedAt: data.startedAt ?? null,
-  };
-  if (gameKey !== "sudoku") return attempt;
   if (
-    typeof data.puzzleId !== "string"
-    || Number(data.proofVersion) !== 2
-    || !/^[0-9]{81}$/.test(data.puzzle)
-  ) {
-    throw new Error("서버가 유효한 스도쿠 퍼즐을 발급하지 않았습니다.");
-  }
+    !data?.attemptId
+    || data.gameKey !== gameKey
+    || data.boardKey !== boardKey
+    || data.rulesVersion !== rulesVersion
+    || typeof data.challengeKey !== "string"
+  ) throw new Error("서버가 유효한 랭킹 게임 시도를 발급하지 않았습니다.");
 
   return {
-    ...attempt,
-    proofVersion: Number(data.proofVersion),
-    puzzleId: data.puzzleId,
-    puzzle: [...data.puzzle].map(Number),
+    attemptId: data.attemptId,
+    boardKey: data.boardKey,
+    challengeKey: data.challengeKey,
+    gameKey: data.gameKey,
+    payload: data.payload && typeof data.payload === "object" ? data.payload : {},
+    rulesVersion: data.rulesVersion,
+    seed: data.seed ?? null,
+    startedAt: data.startedAt ?? null,
   };
 }
 

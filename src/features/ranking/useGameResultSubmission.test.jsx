@@ -43,7 +43,7 @@ describe("useGameResultSubmission", () => {
   it("keeps the result screen intact and blocks guest submissions", async () => {
     auth = { status: "guest", user: null };
     const view = renderHook();
-    await act(async () => latest.submitResult({ gameKey: "memory", scoreValue: 3 }));
+    await act(async () => latest.submitResult({ proof: { rounds: [] } }));
     expect(latest.status).toBe("unauthenticated");
     expect(submitGameResult).not.toHaveBeenCalled();
     expect(view.host.textContent).toContain("RESULT SCREEN");
@@ -54,12 +54,20 @@ describe("useGameResultSubmission", () => {
     auth = { status: "authenticated", user: { id: "user-1" } };
     beginRankedGameAttempt.mockResolvedValue({
       attemptId: "22222222-2222-4222-8222-222222222222",
+      boardKey: "classic",
+      challengeKey: "all-time",
+      gameKey: "2048",
+      rulesVersion: "1",
       seed: 1234,
     });
     submitGameResult.mockResolvedValue({ duplicate: false });
     const view = renderHook();
-    await act(async () => latest.startAttempt({ gameKey: "2048" }));
-    const terminalResult = { gameKey: "2048", proof: { moves: ["left"] } };
+    await act(async () => latest.startAttempt({
+      boardKey: "classic",
+      gameKey: "2048",
+      rulesVersion: "1",
+    }));
+    const terminalResult = { proof: { moves: ["left"] } };
     await act(async () => {
       await Promise.all([latest.submitResult(terminalResult), latest.submitResult(terminalResult)]);
     });
@@ -72,15 +80,19 @@ describe("useGameResultSubmission", () => {
     auth = { status: "authenticated", user: { id: "user-1" } };
     beginRankedGameAttempt.mockResolvedValue({
       attemptId: "22222222-2222-4222-8222-222222222222",
+      boardKey: "easy",
+      challengeKey: "all-time",
+      gameKey: "sudoku",
+      rulesVersion: "1",
     });
     submitGameResult.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({ duplicate: false });
     const view = renderHook();
     await act(async () => latest.startAttempt({
       gameKey: "sudoku",
-      mode: "easy",
+      boardKey: "easy",
+      rulesVersion: "1",
     }));
     await act(async () => latest.submitResult({
-      gameKey: "sudoku",
       proof: { puzzleId: "ocean-01", events: [] },
     }));
     expect(latest.status).toBe("error");

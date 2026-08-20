@@ -8,14 +8,15 @@ export const FLAPPY_CONFIG = {
   pipeWidth: 10,
   gapHeight: 29,
   pipeSpeed: 20,
-  speedIncreaseEveryGates: 8,
-  speedIncreaseStep: 0.4,
+  courseSpeedIncreasePerRound: 0.6,
+  endlessSpeedIncreaseEveryMs: 45_000,
+  endlessSpeedIncreaseStep: 0.2,
   maxPipeSpeed: 23.2,
   firstPipeX: 82,
   pipeSpacing: 48,
   initialLives: 2,
   recoverySeconds: 1.2,
-  shieldChargePerGate: 25,
+  shieldChargePerGate: 4,
 };
 
 function createPipe(id, x, random) {
@@ -27,13 +28,20 @@ function createPipe(id, x, random) {
   };
 }
 
-export function getFlappyPipeSpeed(gatesPassed = 0) {
-  const completedSteps = Math.floor(
-    Math.max(0, gatesPassed) / FLAPPY_CONFIG.speedIncreaseEveryGates,
-  );
+export function getFlappyPipeSpeed({
+  endlessElapsedMs = 0,
+  mode = "course",
+  round = 1,
+} = {}) {
+  const courseSpeed = FLAPPY_CONFIG.pipeSpeed
+    + (Math.max(1, Math.min(5, round)) - 1) * FLAPPY_CONFIG.courseSpeedIncreasePerRound;
+  const endlessSpeed = mode === "endless"
+    ? Math.floor(Math.max(0, endlessElapsedMs) / FLAPPY_CONFIG.endlessSpeedIncreaseEveryMs)
+      * FLAPPY_CONFIG.endlessSpeedIncreaseStep
+    : 0;
   return Math.min(
     FLAPPY_CONFIG.maxPipeSpeed,
-    FLAPPY_CONFIG.pipeSpeed + completedSteps * FLAPPY_CONFIG.speedIncreaseStep,
+    courseSpeed + endlessSpeed,
   );
 }
 
@@ -44,6 +52,7 @@ export function createInitialFlappyState(random = Math.random) {
     score: 0,
     combo: 0,
     maxCombo: 0,
+    mistakes: 0,
     gatesPassed: 0,
     lives: FLAPPY_CONFIG.initialLives,
     shieldGauge: 0,
@@ -81,11 +90,15 @@ export function hasFlappyCollision(state) {
   });
 }
 
-export function advanceFlappyState(state, deltaSeconds, random = Math.random) {
+export function advanceFlappyState(
+  state,
+  deltaSeconds,
+  { difficulty, random = Math.random } = {},
+) {
   const delta = Math.min(Math.max(deltaSeconds, 0), 0.05);
   const velocity = state.velocity + FLAPPY_CONFIG.gravity * delta;
   const birdY = state.birdY + velocity * delta;
-  const pipeSpeed = getFlappyPipeSpeed(state.gatesPassed);
+  const pipeSpeed = getFlappyPipeSpeed(difficulty);
   let scored = 0;
 
   let pipes = state.pipes
@@ -152,6 +165,7 @@ export function recoverFlappyState(state) {
     birdY: 50,
     velocity: 0,
     combo: 0,
+    mistakes: state.mistakes + 1,
     recoverySeconds: FLAPPY_CONFIG.recoverySeconds,
   };
 
@@ -171,6 +185,8 @@ export function recoverFlappyState(state) {
     return {
       state: {
         ...sharedRecovery,
+        shieldGauge: 0,
+        shieldReady: false,
         lives: state.lives - 1,
         recoveryKind: "life",
       },
@@ -183,6 +199,9 @@ export function recoverFlappyState(state) {
       ...state,
       lives: 0,
       combo: 0,
+      mistakes: state.mistakes + 1,
+      shieldGauge: 0,
+      shieldReady: false,
     },
     status: "over",
   };

@@ -1,6 +1,6 @@
 import { FriendsIcon, GamesIcon, HomeIcon, RankingIcon, SettingsIcon } from "./navIcons.jsx";
 import { FRIENDS_PATH } from "../../../features/friends/friendsConstants.js";
-import { RANKING_PATH } from "../../../features/ranking/rankingConstants.js";
+import { RANKING_PATH } from "../../../features/ranking/rankingRegistry.js";
 import { SETTINGS_PATH } from "../../../features/settings/settingsConstants.js";
 import { MINIGAMES_PATH } from "../../../features/minigames/data/minigameCatalog.js";
 

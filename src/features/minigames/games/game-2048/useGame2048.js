@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
 import { GAME_RECORD_STORAGE_KEYS } from "../../../../shared/storage/localStorageRegistry.js";
-import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
+import { RANKING_BOARD } from "../../../ranking/rankingRegistry.js";
 import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { isNewGameRecord } from "../../shared/gameRecord.js";
@@ -143,7 +143,7 @@ export function useGame2048() {
     if (isStartingRef.current) return;
     isStartingRef.current = true;
     try {
-      const attempt = await rankingSubmission.startAttempt({ gameKey: RANKING_GAME.GAME_2048 });
+      const attempt = await rankingSubmission.startAttempt(RANKING_BOARD.GAME_2048_CLASSIC);
       if (!attempt) return;
       rankedRandomRef.current = attempt?.seed ? createRankedRandom(attempt.seed) : Math.random;
       rankedMovesRef.current = [];
@@ -176,7 +176,6 @@ export function useGame2048() {
 
   function submitRankedResult() {
     void rankingSubmission.submitResult({
-      gameKey: RANKING_GAME.GAME_2048,
       proof: { moves: [...rankedMovesRef.current] },
     });
   }

@@ -35,10 +35,12 @@ export function usePuzzleSession(storageKey) {
   const [phase, setPhase] = useState("idle");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [bestTime, setBestTime] = useState(() => readBestTime(storageKey));
+  const [isRecordEligible, setIsRecordEligible] = useState(true);
   const [isExitOpen, setIsExitOpen] = useState(false);
   const elapsedClockRef = useRef(null);
   if (!elapsedClockRef.current) elapsedClockRef.current = createPuzzleElapsedClock();
   const phaseRef = useRef(phase);
+  const recordEligibleRef = useRef(true);
   phaseRef.current = phase;
 
   const updateElapsed = useCallback(() => {
@@ -65,12 +67,20 @@ export function usePuzzleSession(storageKey) {
     phaseRef.current = "playing";
     setElapsedSeconds(0);
     setIsExitOpen(false);
+    recordEligibleRef.current = true;
+    setIsRecordEligible(true);
     setPhase("playing");
     beginRound({ preserveStreak });
   }, [beginRound]);
 
   const start = useCallback(() => begin(false), [begin]);
   const startNextRound = useCallback(() => begin(true), [begin]);
+
+  const disqualifyRecord = useCallback(() => {
+    recordEligibleRef.current = false;
+    setIsRecordEligible(false);
+    disqualifyRound();
+  }, [disqualifyRound]);
 
   const complete = useCallback(() => {
     if (phaseRef.current !== "playing") return null;
@@ -79,11 +89,13 @@ export function usePuzzleSession(storageKey) {
     const finalSeconds = Math.max(1, Math.floor(finalElapsedMs / 1000));
     setPhase("completed");
     recordSuccess();
-    setBestTime((current) => {
-      if (current != null && current <= finalSeconds) return current;
-      saveBestTime(storageKey, finalSeconds);
-      return finalSeconds;
-    });
+    if (recordEligibleRef.current) {
+      setBestTime((current) => {
+        if (current != null && current <= finalSeconds) return current;
+        saveBestTime(storageKey, finalSeconds);
+        return finalSeconds;
+      });
+    }
     return finalSeconds;
   }, [pauseElapsed, recordSuccess, storageKey]);
 
@@ -137,10 +149,14 @@ export function usePuzzleSession(storageKey) {
     if (phaseRef.current !== "paused" && phaseRef.current !== "playing") return;
     phaseRef.current = "surrendered";
     setPhase("surrendered");
+    recordEligibleRef.current = false;
+    setIsRecordEligible(false);
     disqualifyRound({ answerRevealed: true });
   }, [disqualifyRound]);
 
   const revealAnswer = useCallback(() => {
+    recordEligibleRef.current = false;
+    setIsRecordEligible(false);
     disqualifyRound({ answerRevealed: true });
   }, [disqualifyRound]);
 
@@ -153,10 +169,12 @@ export function usePuzzleSession(storageKey) {
     bestTime,
     complete,
     continueGame,
+    disqualifyRecord,
     elapsedSeconds,
     fail,
     hasRevealedAnswer,
     isExitOpen,
+    isRecordEligible,
     leaveGame,
     pause,
     phase,

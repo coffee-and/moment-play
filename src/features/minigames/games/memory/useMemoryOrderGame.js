@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameAudio } from "../../../../shared/audio/GameAudioContext.jsx";
-import { RANKING_GAME } from "../../../ranking/rankingConstants.js";
+import { RANKING_BOARD } from "../../../ranking/rankingRegistry.js";
 import { createRankedRandom } from "../../../ranking/rankedGameProof.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
@@ -281,7 +281,7 @@ export function useMemoryOrderGame() {
     if (isStartingRef.current) return;
     isStartingRef.current = true;
     try {
-      const attempt = await rankingSubmission.startAttempt({ gameKey: RANKING_GAME.MEMORY });
+      const attempt = await rankingSubmission.startAttempt(RANKING_BOARD.MEMORY_STANDARD);
       if (!attempt) return;
       rankedRandomRef.current = attempt?.seed ? createRankedRandom(attempt.seed) : Math.random;
       rankedRoundsRef.current = [];
@@ -348,7 +348,6 @@ export function useMemoryOrderGame() {
     phaseRef.current = PHASE.FAILED;
     if (resolution.status === "over") {
       void rankingSubmission.submitResult({
-        gameKey: RANKING_GAME.MEMORY,
         proof: { rounds: [...rankedRoundsRef.current] },
       });
     }
@@ -379,7 +378,6 @@ export function useMemoryOrderGame() {
       setPhase(PHASE.COMPLETED);
       phaseRef.current = PHASE.COMPLETED;
       void rankingSubmission.submitResult({
-        gameKey: RANKING_GAME.MEMORY,
         proof: { rounds: [...rankedRoundsRef.current] },
       });
       return;
