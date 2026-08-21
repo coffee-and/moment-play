@@ -3,15 +3,16 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const ALLOWED_AUTHENTICATED_RPC_IDENTITIES = new Set([
-  "public_begin_ranked_game_p_game_key text, p_mode text, p_context jsonb",
+  "public_begin_ranked_game_p_game_key text, p_board_key text, p_rules_version text, p_context jsonb",
   "public_cancel_friend_omok_invite_p_invite_id uuid",
   "public_cancel_friend_request_p_friendship_id uuid",
+  "public_checkpoint_ranked_flappy_p_attempt_id uuid, p_sequence integer, p_to_tick bigint, p_flap_ticks jsonb",
   "public_complete_ranked_game_p_attempt_id uuid, p_client_submission_id uuid, p_proof jsonb",
   "public_create_friend_omok_invite_p_friendship_id uuid, p_game_mode text, p_show_forbidden_positions boolean, p_explain_forbidden_reasons boolean, p_allow_forbidden_positions boolean, p_allow_forbidden_reasons boolean",
   "public_find_friend_by_code_p_friend_code text",
   "public_get_friend_omok_invites_",
   "public_get_friend_overview_",
-  "public_get_game_leaderboard_p_game_key text, p_mode text, p_limit integer",
+  "public_get_game_leaderboard_p_game_key text, p_board_key text, p_challenge_key text, p_rules_version text, p_limit integer",
   "public_get_my_friend_profile_",
   "public_omok_accept_rematch_p_room_id uuid",
   "public_omok_cancel_rematch_p_room_id uuid",
@@ -31,7 +32,19 @@ const ALLOWED_AUTHENTICATED_RPC_IDENTITIES = new Set([
   "public_update_my_profile_nickname_p_nickname text",
 ]);
 
-const ANON_LEADERBOARD_IDENTITY = "public_get_game_leaderboard_p_game_key text, p_mode text, p_limit integer";
+const ALLOWED_ANON_RPC_IDENTITIES = new Set([
+  "public_get_game_leaderboard_p_game_key text, p_board_key text, p_challenge_key text, p_rules_version text, p_limit integer",
+]);
+
+const ALLOWED_RPC_IDENTITIES_BY_ADVISORY = new Map([
+  ["anon_security_definer_function_executable", ALLOWED_ANON_RPC_IDENTITIES],
+  ["authenticated_security_definer_function_executable", ALLOWED_AUTHENTICATED_RPC_IDENTITIES],
+]);
+
+const ALLOWED_NON_RPC_ADVISORIES = new Set([
+  // This paid-plan control remains explicitly deferred.
+  "auth_leaked_password_protection",
+]);
 
 function runAdvisors() {
   const cliEntry = resolve("node_modules", "supabase", "dist", "supabase.js");
@@ -54,19 +67,19 @@ function runAdvisors() {
   });
 }
 
-function isAllowedAdvisory(advisory) {
-  const rpcIdentity = advisory.cache_key?.slice(advisory.name.length + 1);
+function getRpcIdentity(advisory) {
+  const cacheKeyPrefix = `${advisory.name}_`;
+  return advisory.cache_key?.startsWith(cacheKeyPrefix)
+    ? advisory.cache_key.slice(cacheKeyPrefix.length)
+    : null;
+}
 
-  if (advisory.name === "anon_security_definer_function_executable") {
-    return rpcIdentity === ANON_LEADERBOARD_IDENTITY;
+export function isAllowedAdvisory(advisory) {
+  const allowedRpcIdentities = ALLOWED_RPC_IDENTITIES_BY_ADVISORY.get(advisory.name);
+  if (allowedRpcIdentities) {
+    return allowedRpcIdentities.has(getRpcIdentity(advisory));
   }
-
-  if (advisory.name === "authenticated_security_definer_function_executable") {
-    return ALLOWED_AUTHENTICATED_RPC_IDENTITIES.has(rpcIdentity);
-  }
-
-  // This paid-plan control remains explicitly deferred; all other warnings fail the gate.
-  return advisory.name === "auth_leaked_password_protection";
+  return ALLOWED_NON_RPC_ADVISORIES.has(advisory.name);
 }
 
 export function parseAdvisoriesOutput(rawOutput) {

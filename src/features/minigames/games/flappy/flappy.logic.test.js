@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { FLAPPY_CONFIG } from "./flappyConfig.js";
 import {
-  FLAPPY_CONFIG,
   advanceFlappyState,
   createInitialFlappyState,
   flapFlappyState,
@@ -9,7 +9,6 @@ import {
   recoverFlappyState,
 } from "./flappy.logic.js";
 import {
-  FLAPPY_SESSION_CONFIG,
   advanceFlappySession,
   createFlappyCourseMetrics,
   createFlappyCourseSession,
@@ -24,16 +23,16 @@ import {
 describe("flappy game logic", () => {
   it("derives course and endless speed from the session instead of score", () => {
     expect(getFlappyPipeSpeed({ round: 1 })).toBe(20);
-    expect(getFlappyPipeSpeed({ round: 5 })).toBeCloseTo(22.4);
+    expect(getFlappyPipeSpeed({ round: FLAPPY_CONFIG.courseRoundCount })).toBeCloseTo(22.4);
     expect(getFlappyPipeSpeed({
-      endlessElapsedMs: FLAPPY_CONFIG.endlessSpeedIncreaseEveryMs,
+      endlessElapsedMs: FLAPPY_CONFIG.endlessDifficultyStepMs,
       mode: "endless",
-      round: 5,
+      round: FLAPPY_CONFIG.courseRoundCount,
     })).toBeCloseTo(22.6);
     expect(getFlappyPipeSpeed({
-      endlessElapsedMs: 10 * FLAPPY_CONFIG.endlessSpeedIncreaseEveryMs,
+      endlessElapsedMs: 10 * FLAPPY_CONFIG.endlessDifficultyStepMs,
       mode: "endless",
-      round: 5,
+      round: FLAPPY_CONFIG.courseRoundCount,
     })).toBe(FLAPPY_CONFIG.maxPipeSpeed);
   });
 
@@ -135,20 +134,20 @@ describe("flappy game logic", () => {
   it("runs five 90-second rounds and then opens a separate endless session", () => {
     let session = createFlappyCourseSession();
 
-    for (let round = 2; round <= FLAPPY_SESSION_CONFIG.courseRoundCount; round += 1) {
-      const result = advanceFlappySession(session, FLAPPY_SESSION_CONFIG.roundDurationMs);
+    for (let round = 2; round <= FLAPPY_CONFIG.courseRoundCount; round += 1) {
+      const result = advanceFlappySession(session, FLAPPY_CONFIG.roundDurationMs);
       expect(result.event).toBe("round-complete");
       expect(result.session.round).toBe(round);
       session = result.session;
     }
 
-    const completion = advanceFlappySession(session, FLAPPY_SESSION_CONFIG.roundDurationMs);
+    const completion = advanceFlappySession(session, FLAPPY_CONFIG.roundDurationMs);
     expect(completion.event).toBe("course-complete");
     expect(completion.session.totalElapsedMs).toBe(450_000);
 
     const endless = advanceFlappySession(createFlappyEndlessSession(), 12_345);
     expect(endless.event).toBeNull();
-    expect(endless.session.round).toBe(5);
+    expect(endless.session.round).toBe(FLAPPY_CONFIG.courseRoundCount);
     expect(endless.session.totalElapsedMs).toBe(12_345);
   });
 

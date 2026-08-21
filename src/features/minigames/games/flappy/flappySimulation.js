@@ -4,6 +4,7 @@ import {
   flapFlappyState,
   recoverFlappyState,
 } from "./flappy.logic.js";
+import { FLAPPY_CONFIG } from "./flappyConfig.js";
 import {
   FLAPPY_SESSION_MODE,
   advanceFlappySession,
@@ -11,8 +12,6 @@ import {
   createFlappyEndlessSession,
   getFlappySessionDifficulty,
 } from "./flappySession.js";
-
-export const FLAPPY_SIMULATION_TICK_MS = 20;
 
 function createSession(mode) {
   if (mode === FLAPPY_SESSION_MODE.COURSE) return createFlappyCourseSession();
@@ -44,12 +43,12 @@ export function advanceFlappySimulation(simulation, { flap = false } = {}) {
   const inputWorld = flap ? flapFlappyState(simulation.world) : simulation.world;
   const worldResult = advanceFlappyState(
     inputWorld,
-    FLAPPY_SIMULATION_TICK_MS / 1000,
+    FLAPPY_CONFIG.simulationTickMs / 1000,
     { difficulty: getFlappySessionDifficulty(simulation.session) },
   );
   const sessionResult = advanceFlappySession(
     simulation.session,
-    FLAPPY_SIMULATION_TICK_MS,
+    FLAPPY_CONFIG.simulationTickMs,
   );
 
   if (sessionResult.event === "course-complete") {
