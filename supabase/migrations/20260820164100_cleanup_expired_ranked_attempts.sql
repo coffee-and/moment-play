@@ -2,6 +2,8 @@
 -- retention. Replaced open attempts are removed transactionally by
 -- begin_ranked_game; this daily cleanup covers attempts whose clients never
 -- returned. Completed attempts remain because game_results references them.
+-- Account deletion remains outside this retention job and belongs to the
+-- account-management lifecycle.
 
 create index ranked_game_attempts_expired_open_idx
 on private.ranked_game_attempts(expires_at)
@@ -24,20 +26,6 @@ begin
   delete from private.ranked_game_attempts as attempt
   where attempt.status = 'open'
     and attempt.expires_at < now();
-
-  delete from auth.users as anon_user
-  where anon_user.is_anonymous = true
-    and not exists (
-      select 1 from public.omok_rooms as room where room.host_user_id = anon_user.id
-    )
-    and not exists (
-      select 1 from public.omok_room_players as player where player.user_id = anon_user.id
-    )
-    and coalesce(
-      (select profile.last_active_at from public.profiles as profile where profile.user_id = anon_user.id),
-      anon_user.last_sign_in_at,
-      anon_user.created_at
-    ) < now() - interval '30 days';
 end;
 $$;
 
