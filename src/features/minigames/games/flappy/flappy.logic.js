@@ -3,25 +3,7 @@ import {
   deterministicRandomFraction,
   normalizeDeterministicSeed,
 } from "../../../../shared/random/deterministicRandom.js";
-
-export const FLAPPY_CONFIG = {
-  birdX: 22,
-  birdRadius: 2.7,
-  gravity: 48,
-  flapVelocity: -18,
-  pipeWidth: 10,
-  gapHeight: 29,
-  pipeSpeed: 20,
-  courseSpeedIncreasePerRound: 0.6,
-  endlessSpeedIncreaseEveryMs: 45_000,
-  endlessSpeedIncreaseStep: 0.2,
-  maxPipeSpeed: 23.2,
-  firstPipeX: 82,
-  pipeSpacing: 48,
-  initialLives: 2,
-  recoverySeconds: 1.2,
-  shieldChargePerGate: 4,
-};
+import { FLAPPY_CONFIG } from "./flappyConfig.js";
 
 function createPipe(id, x, randomState) {
   const random = deterministicRandomFraction(randomState);
@@ -42,9 +24,10 @@ export function getFlappyPipeSpeed({
   round = 1,
 } = {}) {
   const courseSpeed = FLAPPY_CONFIG.pipeSpeed
-    + (Math.max(1, Math.min(5, round)) - 1) * FLAPPY_CONFIG.courseSpeedIncreasePerRound;
+    + (Math.max(1, Math.min(FLAPPY_CONFIG.courseRoundCount, round)) - 1)
+      * FLAPPY_CONFIG.courseSpeedIncreasePerRound;
   const endlessSpeed = mode === "endless"
-    ? Math.floor(Math.max(0, endlessElapsedMs) / FLAPPY_CONFIG.endlessSpeedIncreaseEveryMs)
+    ? Math.floor(Math.max(0, endlessElapsedMs) / FLAPPY_CONFIG.endlessDifficultyStepMs)
       * FLAPPY_CONFIG.endlessSpeedIncreaseStep
     : 0;
   return Math.min(

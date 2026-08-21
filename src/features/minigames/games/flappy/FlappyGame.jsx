@@ -14,11 +14,8 @@ import { isNewGameRecord } from "../../shared/gameRecord.js";
 import { formatStarRating, getStarRating } from "../../shared/gameProgression.js";
 import { useGameBrowserBackGuard } from "../../shared/hooks/useGameBrowserBackGuard.js";
 import { FlappyFish } from "./FlappyFish.jsx";
+import { FLAPPY_CONFIG } from "./flappyConfig.js";
 import {
-  FLAPPY_CONFIG,
-} from "./flappy.logic.js";
-import {
-  FLAPPY_SESSION_CONFIG,
   FLAPPY_SESSION_MODE,
   createFlappyCourseMetrics,
   createFlappyEndlessMetrics,
@@ -26,7 +23,6 @@ import {
   getFlappyTimeRemainingMs,
 } from "./flappySession.js";
 import {
-  FLAPPY_SIMULATION_TICK_MS,
   advanceFlappySimulation,
   createFlappySimulation,
 } from "./flappySimulation.js";
@@ -201,7 +197,7 @@ export function FlappyGame({ game }) {
       frameAccumulatorRef.current += deltaMs;
 
       let didAdvance = false;
-      while (frameAccumulatorRef.current >= FLAPPY_SIMULATION_TICK_MS) {
+      while (frameAccumulatorRef.current >= FLAPPY_CONFIG.simulationTickMs) {
         const flapTick = pendingFlapRef.current
           ? simulationRef.current.tick
           : null;
@@ -209,7 +205,7 @@ export function FlappyGame({ game }) {
           flap: pendingFlapRef.current,
         });
         pendingFlapRef.current = false;
-        frameAccumulatorRef.current -= FLAPPY_SIMULATION_TICK_MS;
+        frameAccumulatorRef.current -= FLAPPY_CONFIG.simulationTickMs;
         simulationRef.current = result.simulation;
         recordRankedStep({ flapTick, simulation: result.simulation });
         didAdvance = true;
@@ -400,7 +396,7 @@ export function FlappyGame({ game }) {
   const sidebar = (
     <div className={cx("stat-row")}>
       <div className={cx("stat")}><div className={cx("l")}>Score</div><div className={cx("v")}>{world.score}</div></div>
-      <div className={cx("stat")}><div className={cx("l")}>Flight</div><div className={cx("v")}>{isEndless ? "∞" : `${session.round}/${FLAPPY_SESSION_CONFIG.courseRoundCount}`}</div></div>
+      <div className={cx("stat")}><div className={cx("l")}>Flight</div><div className={cx("v")}>{isEndless ? "∞" : `${session.round}/${FLAPPY_CONFIG.courseRoundCount}`}</div></div>
       <div className={cx("stat")}><div className={cx("l")}>{isEndless ? "Survival" : "Time"}</div><div className={cx("v")}>{displayedTime}</div></div>
       <div className={cx("stat")}><div className={cx("l")}>Combo</div><div className={cx("v")}>×{world.combo}</div></div>
       <div className={cx("stat")}><div className={cx("l")}>Lives</div><div className={cx("v")}>{world.lives}</div></div>

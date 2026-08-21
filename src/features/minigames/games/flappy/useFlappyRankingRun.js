@@ -5,7 +5,7 @@ import { createRandomSeed } from "../../../../shared/random/deterministicRandom.
 import { RANKING_BOARD } from "../../../ranking/rankingRegistry.js";
 import { useGameResultSubmission } from "../../../ranking/useGameResultSubmission.js";
 import { retryRankedRequest } from "../../../ranking/rankedRequestRetry.js";
-import { FLAPPY_SIMULATION_TICK_MS } from "./flappySimulation.js";
+import { FLAPPY_CONFIG } from "./flappyConfig.js";
 import { FLAPPY_SESSION_MODE } from "./flappySession.js";
 import {
   FLAPPY_RANKING_PROOF_VERSION,
@@ -22,7 +22,7 @@ function hasValidAttemptContract(attempt, mode) {
   const hasSharedContract = Number.isSafeInteger(attempt.seed)
     && attempt.payload?.mode === mode
     && attempt.payload?.proofVersion === FLAPPY_RANKING_PROOF_VERSION
-    && attempt.payload?.tickMs === FLAPPY_SIMULATION_TICK_MS;
+    && attempt.payload?.tickMs === FLAPPY_CONFIG.simulationTickMs;
   if (!hasSharedContract) return false;
   return mode !== FLAPPY_SESSION_MODE.ENDLESS
     || attempt.payload?.checkpointTickLimit === FLAPPY_RANKING_CHECKPOINT_LIMIT_TICKS;
