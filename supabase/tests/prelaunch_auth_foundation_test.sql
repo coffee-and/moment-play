@@ -93,6 +93,7 @@ insert into expected_authenticated_functions (signature)
 values
   ('public.begin_ranked_game(text,text,text,jsonb)'),
   ('public.complete_ranked_game(uuid,uuid,jsonb)'),
+  ('public.checkpoint_ranked_flappy(uuid,integer,bigint,jsonb)'),
   ('public.get_game_leaderboard(text,text,text,text,integer)'),
   ('public.update_my_profile_nickname(text)'),
   ('public.get_my_friend_profile()'),

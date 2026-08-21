@@ -5,6 +5,9 @@ import { RESULT_SUBMISSION_STATUS } from "./useGameResultSubmission.js";
 import styles from "./ResultSubmissionStatus.module.css";
 
 export function ResultSubmissionStatus({ submission }) {
+  if (submission?.isFinalizing) {
+    return <p className={styles.root} role="status">랭킹 기록 검증 중…</p>;
+  }
   if (!submission || submission.status === RESULT_SUBMISSION_STATUS.IDLE) return null;
 
   if (submission.status === RESULT_SUBMISSION_STATUS.STARTING) {

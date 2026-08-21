@@ -90,3 +90,29 @@ export async function submitGameResult({ authStatus, user, result }, client = ge
   if (error) throw error;
   return data;
 }
+
+export async function checkpointRankedFlappy({
+  authStatus,
+  user,
+  attemptId,
+  sequence,
+  toTick,
+  flapTicks,
+}, client = getSupabaseClient()) {
+  assertPermanentAccount(authStatus, user);
+
+  const { data, error } = await client.rpc("checkpoint_ranked_flappy", {
+    p_attempt_id: attemptId,
+    p_flap_ticks: flapTicks,
+    p_sequence: sequence,
+    p_to_tick: toTick,
+  });
+  if (error) throw error;
+  if (
+    !data
+    || data.checkpointSequence !== sequence
+    || data.tick !== toTick
+    || !["flying", "over"].includes(data.status)
+  ) throw new Error("서버가 유효한 별빛 비행 체크포인트를 반환하지 않았습니다.");
+  return data;
+}

@@ -3,6 +3,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { AuthProvider } from "../../../../shared/auth/AuthContext.jsx";
 import { FlappyGame } from "./FlappyGame.jsx";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -23,7 +24,9 @@ function renderGame() {
 
   act(() => root.render(
     <MemoryRouter>
-      <FlappyGame game={game} />
+      <AuthProvider>
+        <FlappyGame game={game} />
+      </AuthProvider>
     </MemoryRouter>,
   ));
 
@@ -48,18 +51,20 @@ afterEach(() => {
 });
 
 describe("FlappyGame", () => {
-  it("supports keyboard and pointer controls and uses the shared pause modal", () => {
+  it("supports keyboard and pointer controls and uses the shared pause modal", async () => {
     const view = renderGame();
     const surface = view.host.querySelector('[role="button"][aria-label^="별빛 비행"]');
 
     expect(surface.tabIndex).toBe(0);
 
     act(() => surface.focus());
-    act(() => window.dispatchEvent(new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      key: " ",
-    })));
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: " ",
+      }));
+    });
     expect(findButton(view.host, "일시정지")).toBeDefined();
 
     act(() => surface.dispatchEvent(new MouseEvent("pointerdown", {

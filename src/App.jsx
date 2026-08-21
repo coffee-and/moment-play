@@ -7,6 +7,7 @@ import { Button } from "./shared/components/Button.jsx";
 import { ErrorBoundary } from "./shared/errors/ErrorBoundary.jsx";
 import { ErrorFallback } from "./shared/errors/ErrorFallback.jsx";
 import { reloadDocument } from "./shared/errors/errorRecovery.js";
+import { RankedSubmissionRecovery } from "./features/ranking/RankedSubmissionRecovery.jsx";
 
 function AppErrorFallback() {
   return (
@@ -29,6 +30,7 @@ function App() {
       <ThemeProvider>
         <GameAudioProvider>
           <AuthProvider>
+            <RankedSubmissionRecovery />
             <InviteNotificationProvider>
               <AppRoutes />
             </InviteNotificationProvider>

@@ -2,6 +2,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { LOCAL_STORAGE_KEYS } from "../../shared/storage/localStorageRegistry.js";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -33,6 +34,7 @@ function renderHook() {
 
 afterEach(() => {
   document.body.innerHTML = "";
+  window.localStorage.clear();
   auth = { status: "guest", user: null };
   beginRankedGameAttempt.mockReset();
   submitGameResult.mockReset();
@@ -50,7 +52,8 @@ describe("useGameResultSubmission", () => {
     view.unmount();
   });
 
-  it("submits an authenticated terminal result only once per attempt", async () => {
+  it("submits once and finishes after the result screen unmounts", async () => {
+    let resolveSubmission;
     auth = { status: "authenticated", user: { id: "user-1" } };
     beginRankedGameAttempt.mockResolvedValue({
       attemptId: "22222222-2222-4222-8222-222222222222",
@@ -60,7 +63,9 @@ describe("useGameResultSubmission", () => {
       rulesVersion: "1",
       seed: 1234,
     });
-    submitGameResult.mockResolvedValue({ duplicate: false });
+    submitGameResult.mockImplementation(() => new Promise((resolve) => {
+      resolveSubmission = resolve;
+    }));
     const view = renderHook();
     await act(async () => latest.startAttempt({
       boardKey: "classic",
@@ -68,12 +73,17 @@ describe("useGameResultSubmission", () => {
       rulesVersion: "1",
     }));
     const terminalResult = { proof: { moves: ["left"] } };
+    let submissions;
     await act(async () => {
-      await Promise.all([latest.submitResult(terminalResult), latest.submitResult(terminalResult)]);
+      submissions = [latest.submitResult(terminalResult), latest.submitResult(terminalResult)];
+      await Promise.resolve();
     });
     expect(submitGameResult).toHaveBeenCalledTimes(1);
-    expect(latest.status).toBe("saved");
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.RANKED_RESULT_OUTBOX)).not.toBeNull();
     view.unmount();
+    resolveSubmission({ duplicate: false });
+    await Promise.all(submissions);
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.RANKED_RESULT_OUTBOX)).toBeNull();
   });
 
   it("surfaces a failed save without removing the result screen and allows retry", async () => {
@@ -85,7 +95,11 @@ describe("useGameResultSubmission", () => {
       gameKey: "sudoku",
       rulesVersion: "1",
     });
-    submitGameResult.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({ duplicate: false });
+    submitGameResult
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockResolvedValueOnce({ duplicate: false });
     const view = renderHook();
     await act(async () => latest.startAttempt({
       gameKey: "sudoku",
@@ -98,9 +112,12 @@ describe("useGameResultSubmission", () => {
     expect(latest.status).toBe("error");
     expect(latest.errorMessage).toBe("network down");
     expect(view.host.textContent).toContain("RESULT SCREEN");
+    expect(submitGameResult).toHaveBeenCalledTimes(3);
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.RANKED_RESULT_OUTBOX)).not.toBeNull();
     await act(async () => latest.retry());
-    expect(submitGameResult).toHaveBeenCalledTimes(2);
+    expect(submitGameResult).toHaveBeenCalledTimes(4);
     expect(latest.status).toBe("saved");
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.RANKED_RESULT_OUTBOX)).toBeNull();
     view.unmount();
   });
 });

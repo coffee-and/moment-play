@@ -1,16 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   beginRankedGameAttempt,
+  checkpointRankedFlappy,
   fetchLeaderboard,
   ResultSubmissionNotAllowedError,
   submitGameResult,
 } from "./gameResultsGateway.js";
 
-function createClient({ beginData, completeData, leaderboardData = [], rpcError = null } = {}) {
+function createClient({ beginData, checkpointData, completeData, leaderboardData = [], rpcError = null } = {}) {
   return {
     rpc: vi.fn(async (functionName) => ({
       data: functionName === "begin_ranked_game"
         ? beginData
+        : functionName === "checkpoint_ranked_flappy"
+          ? checkpointData
         : functionName === "complete_ranked_game"
           ? completeData
           : leaderboardData,
@@ -98,6 +101,32 @@ describe("gameResultsGateway", () => {
       user: authenticatedUser,
       result,
     }, client)).resolves.toEqual({ duplicate: true, metrics: { score: 4096 } });
+  });
+
+  it("submits a bounded Star Flight checkpoint without client-owned metrics", async () => {
+    const checkpoint = {
+      checkpointSequence: 3,
+      metrics: { endlessGates: 9, endlessScore: 220, survivalMs: 60_000 },
+      status: "flying",
+      tick: 3_000,
+    };
+    const client = createClient({ checkpointData: checkpoint });
+
+    await expect(checkpointRankedFlappy({
+      authStatus: "authenticated",
+      user: authenticatedUser,
+      attemptId: result.attemptId,
+      flapTicks: [2_850, 2_920],
+      sequence: 3,
+      toTick: 3_000,
+    }, client)).resolves.toEqual(checkpoint);
+
+    expect(client.rpc).toHaveBeenCalledWith("checkpoint_ranked_flappy", {
+      p_attempt_id: result.attemptId,
+      p_flap_ticks: [2_850, 2_920],
+      p_sequence: 3,
+      p_to_tick: 3_000,
+    });
   });
 
   it("maps only public leaderboard fields and drops private response properties", async () => {
