@@ -37,9 +37,12 @@ export function useFlappyRankingRun() {
   const mountedRef = useRef(true);
   const runGenerationRef = useRef(0);
 
-  useEffect(() => () => {
-    mountedRef.current = false;
-    activeRunRef.current = null;
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      activeRunRef.current = null;
+    };
   }, []);
 
   const startRun = useCallback(async (mode) => {

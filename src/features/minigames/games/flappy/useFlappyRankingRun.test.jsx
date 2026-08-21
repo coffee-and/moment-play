@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act } from "react";
+import { StrictMode, act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -37,11 +37,11 @@ function Harness() {
   return null;
 }
 
-function renderHook() {
+function renderHook({ strict = false } = {}) {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
-  act(() => root.render(<Harness />));
+  act(() => root.render(strict ? <StrictMode><Harness /></StrictMode> : <Harness />));
   return () => act(() => root.unmount());
 }
 
@@ -54,6 +54,31 @@ afterEach(() => {
 });
 
 describe("useFlappyRankingRun", () => {
+  it("clears finalization state after a ranked course completes in StrictMode", async () => {
+    startAttempt.mockResolvedValue({
+      attemptId: "11111111-1111-4111-8111-111111111111",
+      boardKey: "course",
+      payload: {
+        mode: "course",
+        proofVersion: 1,
+        tickMs: 20,
+      },
+      ranked: true,
+      seed: 12_345,
+    });
+    submitResult.mockResolvedValue({});
+    const unmount = renderHook({ strict: true });
+
+    await act(async () => latest.startRun("course"));
+    await act(async () => latest.finishCourse({ status: "course-complete", tick: 22_500 }));
+
+    expect(submitResult).toHaveBeenCalledWith({
+      proof: { flapTicks: [], maxTicks: 22_500, proofVersion: 1 },
+    });
+    expect(latest.submission.isFinalizing).toBe(false);
+    unmount();
+  });
+
   it("continues finalization after the game screen unmounts", async () => {
     let resolveCheckpoint;
     let resolveSubmission;
